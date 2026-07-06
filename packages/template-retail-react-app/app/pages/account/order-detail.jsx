@@ -63,6 +63,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
+import {useFeedbackState} from '@salesforce/retail-react-app/app/pages/account/hooks/use-feedback-state'
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
@@ -180,25 +181,30 @@ const AccountOrderDetail = () => {
         onOpen: openReturnModal,
         onClose: closeReturnModal
     } = useDisclosure()
-    const [cancelFeedback, setCancelFeedback] = useState(null)
+    // Cancel and return each own an independent feedback banner (nullable
+    // {status, title, description, link?}) plus its SR-announce delay timer,
+    // extracted into useFeedbackState. They stay separate so the "Cancelled"
+    // badge — which keys off the cancel feedback — never fires on a return success.
+    const {
+        feedback: cancelFeedback,
+        setFeedback: setCancelFeedback,
+        announce: announceCancel
+    } = useFeedbackState()
+    const {
+        feedback: returnFeedback,
+        setFeedback: setReturnFeedback,
+        announce: announceReturn
+    } = useFeedbackState()
     // Terminal errors (404/409) mean retrying won't help — disable the button
     const [cancelTerminal, setCancelTerminal] = useState(false)
     const cancelMutation = useShopperOrdersMutation(ShopperOrdersMutations.CancelOmsOrder)
     const returnMutation = useShopperOrdersMutation(ShopperOrdersMutations.ReturnOmsOrder)
-    // Return feedback is kept separate from cancelFeedback so the "Cancelled"
-    // badge (which keys off cancelFeedback) never fires on a return success.
-    const [returnFeedback, setReturnFeedback] = useState(null)
     const [returnSubmitError, setReturnSubmitError] = useState(null)
     // Monotonic token: a submit's async result is only applied if it's still the
     // latest submit AND the modal hasn't been closed/reopened since it started.
     // Guards against a stale success closing a freshly-reopened modal or a stale
     // failure setting an error after close.
     const returnSubmitTokenRef = useRef(0)
-    // setTimeout ids for the SR-announce-delayed feedback alerts, cleared on
-    // unmount and before scheduling a new one so a late timer can't fire after
-    // the component is gone or after feedback was intentionally cleared.
-    const returnFeedbackTimerRef = useRef(null)
-    const cancelFeedbackTimerRef = useRef(null)
     // Selection state lives on the parent so the Modal/Drawer wrapper swap on
     // viewport resize doesn't lose the shopper's progress, and so the
     // review step can read the same payload without prop-drilling.
@@ -377,8 +383,7 @@ const AccountOrderDetail = () => {
                 if (token !== returnSubmitTokenRef.current) return
                 handleCloseReturnModal()
                 // Delay lets screen readers finish announcing modal close before the alert
-                if (returnFeedbackTimerRef.current) clearTimeout(returnFeedbackTimerRef.current)
-                returnFeedbackTimerRef.current = setTimeout(showReturnSuccess, 300)
+                announceReturn(showReturnSuccess)
             } catch (e) {
                 // Classifying reads the response body (async, once) for the 400
                 // errorCode discriminator, so re-check the token AFTER the await:
@@ -402,7 +407,14 @@ const AccountOrderDetail = () => {
                 setReturnSubmitError(classified)
             }
         },
-        [returnMutation, order?.orderNo, handleCloseReturnModal, showReturnSuccess, refetchOrder]
+        [
+            returnMutation,
+            order?.orderNo,
+            handleCloseReturnModal,
+            showReturnSuccess,
+            announceReturn,
+            refetchOrder
+        ]
     )
 
     const canCancel = useMemo(() => {
@@ -504,25 +516,17 @@ const AccountOrderDetail = () => {
                 })
                 closeCancelModal()
                 // Delay allows screen readers to finish announcing modal close before the alert
-                if (cancelFeedbackTimerRef.current) clearTimeout(cancelFeedbackTimerRef.current)
-                cancelFeedbackTimerRef.current = setTimeout(showCancelSuccess, 300)
+                announceCancel(showCancelSuccess)
             } catch (e) {
                 closeCancelModal()
-                if (cancelFeedbackTimerRef.current) clearTimeout(cancelFeedbackTimerRef.current)
-                cancelFeedbackTimerRef.current = setTimeout(() => showCancelError(e), 300)
+                announceCancel(() => showCancelError(e))
             }
         },
-        [closeCancelModal, cancelMutation, showCancelSuccess, showCancelError]
+        [closeCancelModal, cancelMutation, showCancelSuccess, showCancelError, announceCancel]
     )
 
-    // Clear any pending feedback timers on unmount so they can't fire after the
-    // component is gone (e.g. shopper navigates away during the 300ms delay).
-    useEffect(() => {
-        return () => {
-            if (returnFeedbackTimerRef.current) clearTimeout(returnFeedbackTimerRef.current)
-            if (cancelFeedbackTimerRef.current) clearTimeout(cancelFeedbackTimerRef.current)
-        }
-    }, [])
+    // Pending feedback timers are cleared on unmount by each useFeedbackState
+    // instance, so no combined cleanup effect is needed here.
 
     const {pickupShipments, deliveryShipments} = useMemo(() => {
         return storeLocatorEnabled
