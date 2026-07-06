@@ -165,6 +165,33 @@ const exception = (req) => {
 }
 
 /**
+ * Express handler that makes a loopback request back to this target's own
+ * CloudFront distribution. The outgoing-request-hook detects loopback and
+ * injects X-Mobify-Access-Key, which bypasses WAF origin protection rules.
+ * Returns the status code of the loopback response.
+ */
+const loopbackTest = async (req, res) => {
+    const appHostname = process.env.EXTERNAL_DOMAIN_NAME
+    if (!appHostname) {
+        return res.status(500).json({error: 'EXTERNAL_DOMAIN_NAME not set'})
+    }
+    const targetPath = req.query.path || '/'
+    const url = `https://${appHostname}${targetPath}`
+    try {
+        const response = await fetch(url)
+        const body = await response.text()
+        res.json({
+            url,
+            status: response.status,
+            ok: response.ok,
+            body: body.substring(0, 1000)
+        })
+    } catch (err) {
+        res.status(502).json({url, error: err.message})
+    }
+}
+
+/**
  * Express handler that makes 2 requests to badssl TLS testing domains
  * to verify that our applications can only make requests to domains with
  * updated TLS versions.
@@ -446,6 +473,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.use(envBasePathMiddleware)
     // Configure routes
     app.all('/exception', exception)
+    app.get('/loopback', loopbackTest)
     app.get('/tls', tlsVersionTest)
     app.get('/cache', cacheTest)
     app.get('/cache/:duration(\\d+)', cacheTest)
