@@ -525,6 +525,24 @@ describe('OpenTelemetry Server Tracing', () => {
             expect(mockSpan.end).toHaveBeenCalled()
         })
 
+        test('logs span whose parentSpanContext resolves to the parent span id', async () => {
+            const {logSpanData} = jest.requireMock('../../utils/opentelemetry')
+            logSpanData.mockClear()
+
+            const mockFn = jest.fn().mockResolvedValue('test-result')
+            const mockRes = {setHeader: jest.fn()}
+            const mockReq = {query: {__server_timing: ''}}
+
+            await tracePerformance('perf-test', mockFn, mockRes, mockReq)
+
+            // Guards the OTel v2 fix end-to-end: the span handed to logSpanData
+            // must expose parentSpanContext (v2), not the removed parentSpanId,
+            // so the resolved parentId is the real parent span id, not undefined.
+            expect(logSpanData).toHaveBeenCalled()
+            const loggedSpan = logSpanData.mock.calls[0][0]
+            expect(loggedSpan.parentSpanContext?.spanId).toBe('test-parent-span-id')
+        })
+
         test('should handle function errors', async () => {
             const mockFn = jest.fn().mockRejectedValue(new Error('Function failed'))
             const mockRes = {

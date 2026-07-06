@@ -311,6 +311,21 @@ describe('OpenTelemetry Utilities', () => {
         })
     })
 
+    describe('logSpanData parentId resolution', () => {
+        test('resolves parentId from span.parentSpanContext.spanId', () => {
+            const consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
+
+            opentelemetryUtils.logSpanData(mockSpan, 'end')
+
+            const logged = JSON.parse(consoleInfoSpy.mock.calls[0][0])
+            // Guards the OTel v2 fix: a regression to span.parentSpanId would
+            // yield undefined here rather than the resolved parent span id.
+            expect(logged.parentId).toBe('test-parent-span-id')
+
+            consoleInfoSpy.mockRestore()
+        })
+    })
+
     // Test to cover the defensive check in logSpanData (lines 57-73)
     describe('logSpanData with invalid timing data', () => {
         test('should not warn about invalid startTime data in test environment', () => {
