@@ -211,6 +211,7 @@ const performRender = async (req, res, next) => {
         // low-cardinality. Fuzzy-matched routes embed the full site/locale enumeration
         // (e.g. '/:site(us|RefArch)/:locale(en-US|en-CA|...)/category/:categoryId'), which
         // is noisy in http.route; reduce it to '/:site/:locale/category/:categoryId'.
+        // Assumes flat constraint groups like (us|RefArch); nested parens aren't handled.
         const routeTemplate = route.path.replace(/\([^)]*\)/g, '')
         setActiveSpanAttribute('http.route', routeTemplate)
     }
