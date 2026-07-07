@@ -491,9 +491,9 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/streaming-large', streamingLarge)
     app.get('/data-store/:key', dataStoreTest)
     app.get('/error-no-cache', (req, res) => {
-      res.removeHeader('Cache-Control')
-      res.status(503).send('Service Unavailable')
-  })
+        res.removeHeader('Cache-Control')
+        res.status(503).send('Service Unavailable')
+    })
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
