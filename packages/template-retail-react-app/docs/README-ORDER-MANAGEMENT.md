@@ -144,40 +144,38 @@ cancelled in full. Once any unit has shipped, the order is no longer cancelable.
 Return feedback is kept separate from cancel feedback so the **Cancelled** badge
 (which keys off the cancel result) never fires on a return success.
 
-## Refunds (downstream — out of PWA Kit scope)
+## Refunds (Out of PWA Kit Scope)
 
 **Payment refunds are not owned by the storefront.** The PWA Kit UI only *initiates*
 a return (see [Order Returns](#order-returns)) or a cancellation (see
-[Order Cancellation](#order-cancellation)); the refund itself is a fully automated
-downstream process inside OMS/SOM, with nothing running in B2C Commerce (ECOM). This
+[Order Cancellation](#order-cancellation)). The refund itself is a fully automated
+downstream process inside OMS/SOM, with nothing running in B2C Commerce. This
 section documents that flow so developers understand where a shopper's refund actually
-comes from. Confirmed by SOM/Transact (Philip Egan & Mathias Stödtler,
-`#scapi-unified-b2ce-som`, 2026-06-24).
+comes from.
 
-For a **return**, the refund happens only *after* the item is physically returned—not
+For a return, the refund happens only after the item is physically returned—not
 when the shopper initiates the return:
 
-1. Shopper requests a return in self-service → a return order is triggered via the
+1. Shopper requests a return in self-service. A return order is triggered via the
    create-return-order API.
-2. The return order is created in OMS → the item moves to **Return Initiated** status.
-3. The item is physically returned → the return order is closed (manually in the OMS
+2. The return order is created in OMS. The item moves to **Return Initiated** status.
+3. The item is physically returned. The return order is closed (manually in the OMS
    UI, or via an API integration such as a WMS).
-4. A close event fires → it triggers the **EnsureRefunds** API (a SOM process, nothing
-   in ECOM).
-5. **EnsureRefunds** makes a callout to the PSP to process the refund → a credit memo
-   is generated.
+4. A close event fires. It triggers the `EnsureRefunds` API (a SOM process).
+5. `EnsureRefunds` makes a callout to the payment service provider (PSP) to process the
+   refund. A credit memo is generated.
 
-For a **cancellation**, the same automated downstream refund fires on the order's
+For a cancellation, the same automated downstream refund fires on the order's
 status change (there is no "return the item" step to wait on).
 
 Notes:
 
-- **Return-label generation** is a gray area OMS does not handle out of the box—the
-  merchant arranges it with their carrier / label aggregator. (The storefront's return
+- Return-label generation is a gray area OMS does not handle out of the box—the
+  merchant arranges it with their carrier or label aggregator. (The storefront's return
   success alert says "We'll email a return label shortly," which assumes such an
   integration exists.)
-- There is **nothing to implement in PWA Kit** for refunds; the storefront's
-  responsibility ends at initiating the return/cancellation.
+- There is **nothing to implement in PWA Kit** for refunds. The storefront's
+  responsibility ends at initiating the return or cancellation.
 
 ## Order Tracking
 
