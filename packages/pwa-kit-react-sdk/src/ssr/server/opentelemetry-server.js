@@ -6,9 +6,8 @@
  */
 
 import {NodeTracerProvider} from '@opentelemetry/sdk-trace-node'
-import {SimpleSpanProcessor} from '@opentelemetry/sdk-trace-base'
 import {B3Propagator} from '@opentelemetry/propagator-b3'
-import {Resource} from '@opentelemetry/resources'
+import {resourceFromAttributes} from '@opentelemetry/resources'
 import {propagation} from '@opentelemetry/api'
 import logger from '../../utils/logger-instance'
 import {getServiceName, getOTELConfig} from '../../utils/opentelemetry-config'
@@ -49,8 +48,7 @@ export const initializeServerTracing = (options = {}) => {
 
         // Initialize the tracer provider
         provider = new NodeTracerProvider({
-            resource: new Resource(resourceAttributes),
-            spanProcessor: new SimpleSpanProcessor()
+            resource: resourceFromAttributes(resourceAttributes)
         })
 
         // Add B3 propagator

@@ -344,6 +344,12 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         locale,
         currency,
         headers?.['correlation-id'],
+        // Rebuild the SCAPI clients whenever the server-affinity cookie (dwsid) changes so the
+        // sfdc_dwsid header baked into each client's config (default path) — and captured by the
+        // per-client transformer Proxy (apiClients path) — never goes stale. Depending on the
+        // primitive `dwsid` rather than the per-render `serverAffinityHeader` object avoids
+        // rebuilding on every render due to unstable object identity. See W-23089490.
+        dwsid,
         apiClients,
         enablePWAKitPrivateClient,
         privateClientProxyEndpoint,

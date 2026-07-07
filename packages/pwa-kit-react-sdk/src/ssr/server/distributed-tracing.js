@@ -23,7 +23,7 @@
  */
 import {NodeTracerProvider} from '@opentelemetry/sdk-trace-node'
 import {SimpleSpanProcessor} from '@opentelemetry/sdk-trace-base'
-import {Resource} from '@opentelemetry/resources'
+import {resourceFromAttributes} from '@opentelemetry/resources'
 import {context, trace, SpanStatusCode} from '@opentelemetry/api'
 import {W3CTraceContextPropagator} from '@opentelemetry/core'
 import {AsyncHooksContextManager} from '@opentelemetry/context-async-hooks'
@@ -52,7 +52,7 @@ const getTracer = () => {
 
     // Resource attributes sourced from the MRT-provided runtime env. BUNDLE_ID
     // is a deploy identifier (numeric), not a semver — MRT exposes no semver var.
-    const resource = new Resource({
+    const resource = resourceFromAttributes({
         'service.name': SERVICE_NAME,
         'service.namespace': process.env.MOBIFY_PROPERTY_ID || '',
         'service.version': process.env.BUNDLE_ID || '',
@@ -60,8 +60,10 @@ const getTracer = () => {
         'deployment.environment': process.env.DEPLOY_TARGET || ''
     })
 
-    const provider = new NodeTracerProvider({resource})
-    provider.addSpanProcessor(new SimpleSpanProcessor(new MrtConsoleSpanExporter()))
+    const provider = new NodeTracerProvider({
+        resource,
+        spanProcessors: [new SimpleSpanProcessor(new MrtConsoleSpanExporter())]
+    })
     tracer = provider.getTracer(SERVICE_NAME)
     return tracer
 }
