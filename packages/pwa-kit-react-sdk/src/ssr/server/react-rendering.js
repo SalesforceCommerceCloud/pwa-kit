@@ -212,7 +212,11 @@ const performRender = async (req, res, next) => {
         // (e.g. '/:site(us|RefArch)/:locale(en-US|en-CA|...)/category/:categoryId'), which
         // is noisy in http.route; reduce it to '/:site/:locale/category/:categoryId'.
         // Assumes flat constraint groups like (us|RefArch); nested parens aren't handled.
-        const routeTemplate = route.path.replace(/\([^)]*\)/g, '')
+        // matchPath also accepts array/RegExp paths, which have no .replace — pass those through.
+        const routeTemplate =
+            typeof route.path === 'string'
+                ? route.path.replace(/\([^)]*\)/g, '')
+                : route.path
         setActiveSpanAttribute('http.route', routeTemplate)
     }
 
