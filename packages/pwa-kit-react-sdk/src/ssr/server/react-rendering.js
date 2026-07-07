@@ -214,9 +214,7 @@ const performRender = async (req, res, next) => {
         // Assumes flat constraint groups like (us|RefArch); nested parens aren't handled.
         // matchPath also accepts array/RegExp paths, which have no .replace — pass those through.
         const routeTemplate =
-            typeof route.path === 'string'
-                ? route.path.replace(/\([^)]*\)/g, '')
-                : route.path
+            typeof route.path === 'string' ? route.path.replace(/\([^)]*\)/g, '') : route.path
         setActiveSpanAttribute('http.route', routeTemplate)
     }
 
