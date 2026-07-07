@@ -210,7 +210,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const {organizationId, siteId: configSiteId} = useConfig()
 
     // Fetch my_domain from Shopper Configurations API
-    const {data: configurationsData} = useConfigurations({})
+    const {data: configurationsData, isLoading: isConfigurationsLoading} = useConfigurations({})
     const myDomain = configurationsData?.configurations?.find(
         (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
     )?.value
@@ -741,8 +741,8 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     // Build the current domain URL
     const domainUrl = `${appOrigin}${buildUrl('')}`
 
-    // Only render when the agent is enabled (client-side) and the basket has loaded.
-    if (!isShopperAgentEnabled || !basketDoneLoading) {
+    // Only render when the agent is enabled (client-side), the basket has loaded, and configurations API has completed.
+    if (!isShopperAgentEnabled || !basketDoneLoading || isConfigurationsLoading) {
         return null
     }
 
