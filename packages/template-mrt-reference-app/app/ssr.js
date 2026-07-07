@@ -175,8 +175,12 @@ const loopbackTest = async (req, res) => {
     if (!appHostname) {
         return res.status(500).json({error: 'EXTERNAL_DOMAIN_NAME not set'})
     }
-    const targetPath = req.query.path || '/'
-    const url = `https://${appHostname}${targetPath}`
+    const base = `https://${appHostname}`
+    const resolved = new URL(req.query.path || '/', base)
+    if (resolved.origin !== new URL(base).origin) {
+        return res.status(400).json({error: 'path must be relative to this origin'})
+    }
+    const url = resolved.href
     try {
         const response = await fetch(url)
         const body = await response.text()
@@ -461,11 +465,11 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
 
     // Add middleware to explicitly suppress caching on all responses (done
     // before we invoke the handlers)
-    app.use((req, res, next) => {
-        res.set('Cache-Control', 'no-cache')
-        res.set('Server', 'mrt ref app')
-        return next()
-    })
+    // app.use((req, res, next) => {
+    //     res.set('Cache-Control', 'no-cache')
+    //     res.set('Server', 'mrt ref app')
+    //     return next()
+    // })
 
     // Add middleware to log request and response headers
     app.use(loggingMiddleware)
@@ -486,6 +490,10 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/ssr-shared', ssrShared)
     app.get('/streaming-large', streamingLarge)
     app.get('/data-store/:key', dataStoreTest)
+    app.get('/error-no-cache', (req, res) => {
+      res.removeHeader('Cache-Control')
+      res.status(503).send('Service Unavailable')
+  })
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)

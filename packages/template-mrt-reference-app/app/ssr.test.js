@@ -297,6 +297,36 @@ describe('server', () => {
                 error: 'ECONNREFUSED'
             })
         })
+
+        test('safely resolves @-prefixed path as relative', async () => {
+            crossFetch.mockResolvedValue({
+                status: 200,
+                ok: true,
+                text: () => Promise.resolve('ok')
+            })
+            const response = await request(app).get('/loopback?path=@evil.com/x')
+            expect(response.status).toBe(200)
+            expect(response.body.url).toBe('https://test.com/@evil.com/x')
+            expect(crossFetch).toHaveBeenCalledWith('https://test.com/@evil.com/x')
+        })
+
+        test('rejects absolute URL to a different host', async () => {
+            const response = await request(app).get(
+                '/loopback?path=' + encodeURIComponent('https://evil.com/x')
+            )
+            expect(response.status).toBe(400)
+            expect(response.body).toEqual({error: 'path must be relative to this origin'})
+            expect(crossFetch).not.toHaveBeenCalled()
+        })
+
+        test('rejects protocol-relative URL', async () => {
+            const response = await request(app).get(
+                '/loopback?path=' + encodeURIComponent('//evil.com/x')
+            )
+            expect(response.status).toBe(400)
+            expect(response.body).toEqual({error: 'path must be relative to this origin'})
+            expect(crossFetch).not.toHaveBeenCalled()
+        })
     })
 
     describe('dataStoreTest', () => {
