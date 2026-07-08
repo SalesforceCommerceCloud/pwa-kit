@@ -20,7 +20,7 @@ import {getOTELConfig} from '../../utils/opentelemetry-config'
 
 const makeSpan = () => ({
     spanContext: () => ({traceId: 'trace-abc', spanId: 'span-123'}),
-    parentSpanId: 'parent-999',
+    parentSpanContext: {spanId: 'parent-999'},
     name: 'ssr.render',
     kind: 0,
     startTime: [1718000000, 0],
