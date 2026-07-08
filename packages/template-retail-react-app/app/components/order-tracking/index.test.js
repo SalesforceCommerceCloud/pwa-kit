@@ -154,4 +154,31 @@ describe('OrderTracking component', () => {
         // The rest of the block still renders.
         expect(screen.getByText('FedEx Ground')).toBeInTheDocument()
     })
+
+    test('omits the date line for a truthy epoch-era sentinel string (no "1 Jan 1970")', () => {
+        // A truthy string like "1970-01-01T00:00:00Z" parses to a *valid* Date (unlike
+        // null/"" which the falsy check already handles), so without the epoch-year guard
+        // it would render "1 Jan 1970" to the shopper. SOM does not currently send such a
+        // sentinel, but the guard is cheap insurance if it ever does.
+        renderWithProviders(
+            <OrderTracking
+                {...baseProps}
+                expectedDeliveryDate="1970-01-01T00:00:00Z"
+                actualDeliveryDate="1970-01-01T00:00:00Z"
+            />
+        )
+        expect(screen.queryByText(/Expected delivery/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/Delivered/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/1970/)).not.toBeInTheDocument()
+        // The rest of the block still renders.
+        expect(screen.getByText('FedEx Ground')).toBeInTheDocument()
+    })
+
+    test('still renders a legitimate recent date (the epoch guard does not over-suppress)', () => {
+        const {container} = renderWithProviders(
+            <OrderTracking {...baseProps} expectedDeliveryDate="2026-06-12T00:00:00.000Z" />
+        )
+        expect(screen.getByText(/Expected delivery/i)).toBeInTheDocument()
+        expect(container.textContent).toMatch(/Expected delivery:\s*\d{1,2} Jun 2026/)
+    })
 })

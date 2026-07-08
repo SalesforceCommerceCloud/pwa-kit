@@ -53,6 +53,12 @@ const OrderTracking = ({
         if (!value) return null
         const date = new Date(value)
         if (isNaN(date.getTime())) return null
+        // Defensive guard against an epoch-era SOM sentinel: a truthy date string like
+        // "1970-01-01T00:00:00Z" parses to a valid Date and would render "1 Jan 1970".
+        // (The `!value` guard above already covers null/0/""; JS parses "0" as year 2000,
+        // not the epoch, so this specifically catches truthy 1970-era strings.) SOM does
+        // not currently send such a sentinel — this is cheap insurance if it ever does.
+        if (date.getUTCFullYear() <= 1970) return null
         return formatDate(date, {year: 'numeric', month: 'short', day: 'numeric'})
     }
 
