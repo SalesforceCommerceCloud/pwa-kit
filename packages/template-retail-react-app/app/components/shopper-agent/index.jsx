@@ -4,20 +4,39 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useMemo} from 'react'
+
+import React, {useEffect, useRef, useMemo} from 'react'
+import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useAccessToken,
+    useConfig,
+    useConfigurations,
+    useCustomerType,
+    useUsid
+} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
 import {DEFAULT_COMMERCE_CLIENT_ELEMENT_ID} from '@salesforce/retail-react-app/app/constants'
-import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
-import {validateCommerceClientAgentSettings} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {
+    resetEmbeddedMessagingForCommerceSessionChange,
+    validateCommerceClientAgentSettings
+} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
 
 const onClient = typeof window !== 'undefined'
+
+const HTTP_OK = 200
+
+const SESSION_INIT_ERROR_MESSAGE = defineMessage({
+    id: 'shopper_agent.error.session_init_failed',
+    defaultMessage: 'Something went wrong. Try again.'
+})
 
 /**
  * Validates that a URL is from a trusted Salesforce domain.
@@ -125,9 +144,11 @@ const isEnabled = (enabled) => {
  * Key responsibilities:
  * - Loads the embedded messaging script using useScript hook
  * - Initializes the MIAW service using useMiaw hook
- * - Sets up prechat fields with current locale, currency, and user context
+ * - Sets up prechat fields with current locale, currency, and user context on embedded messaging ready
+ * - Calls Core's Token Bridge proxy when a conversation starts (`onEmbeddedMessagingConversationStarted`)
  * - Manages event listeners for messaging lifecycle events
  * - Handles z-index management for maximized chat windows
+ * - On guest ↔ registered Commerce session transitions, resets MIAW (FAB) so shoppers start a fresh agent session
  * - Cleans up resources on unmount
  *
  * @param {Object} props - Component props
@@ -151,18 +172,19 @@ const isEnabled = (enabled) => {
  * @see {@link useScript} - For script loading functionality
  * @see {@link useMiaw} - For MIAW initialization
  * @see {@link useMultiSite} - For locale and currency information
- * @see {@link useRefreshToken} - For authentication token
  * @see {@link useUsid} - For user session identifier
  */
 const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     // Theme hook for z-index management
     const theme = useTheme()
 
+    const {formatMessage} = useIntl()
+    const toast = useToast()
+    const toastRef = useRef(toast)
+    toastRef.current = toast
+
     // Multi-site hook for locale and currency information
     const {locale} = useMultiSite()
-
-    // Authentication hook for refresh token
-    const refreshToken = useRefreshToken()
 
     // Normalize locale to Salesforce language format
     const sfLanguage = normalizeLocaleToSalesforce(locale.id)
@@ -183,6 +205,60 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
     // User session identifier hook
     const {usid} = useUsid()
+    const {customerType} = useCustomerType()
+    const {organizationId, siteId: configSiteId} = useConfig()
+
+    // Fetch my_domain from Shopper Configurations API
+    const {data: configurationsData} = useConfigurations({})
+    const myDomain = configurationsData?.configurations?.find(
+        (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
+    )?.value
+
+    // SLAS access token — needed to call Core's Token Bridge directly.
+    const {getTokenWhenReady} = useAccessToken()
+    const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    getTokenWhenReadyRef.current = getTokenWhenReady
+
+    const prevCommerceCustomerTypeRef = useRef(undefined)
+
+    /**
+     * Reset embedded messaging whenever customerType changes (login, logout, registration).
+     * This ensures the chat context is cleared when user authentication state changes.
+     */
+    useEffect(() => {
+        const prev = prevCommerceCustomerTypeRef.current
+        prevCommerceCustomerTypeRef.current = customerType
+
+        // Skip initial mount
+        if (prev === undefined) {
+            return
+        }
+
+        // Reset on any customerType change (login, logout, register)
+        if (prev !== customerType) {
+            resetEmbeddedMessagingForCommerceSessionChange()
+        }
+    }, [customerType])
+
+    const formatMessageRef = useRef(formatMessage)
+    formatMessageRef.current = formatMessage
+
+    /** Latest values for embedded messaging handlers (stable window listeners). */
+    const embeddedLifecycleRef = useRef({})
+    embeddedLifecycleRef.current = {
+        siteId,
+        localeId: locale.id,
+        preferredCurrency: locale.preferredCurrency,
+        commerceOrgId,
+        usid,
+        sfLanguage,
+        domainUrl,
+        organizationId,
+        configSiteId,
+        myDomain
+    }
+
+    const lastConversationSessionInitRef = useRef(null)
 
     /**
      * Retrieves conversation context data based on configuration.
@@ -284,30 +360,116 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         }
     }, [])
 
+    /**
+     * Register embedded messaging window listeners once. Handlers read latest values from refs so we do not
+     * remove/re-add listeners when auth or config updates (which would fight the widget and loop loading).
+     */
     useEffect(() => {
-        /**
-         * Sets up hidden prechat fields when the embedded messaging service is ready.
-         * These fields provide context to the chat agent about the current user session,
-         * site configuration, and locale settings.
-         */
-        const handleEmbeddedMessagingReady = () => {
-            window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-                SiteId: siteId,
-                Locale: locale.id,
-                OrganizationId: commerceOrgId,
-                UsId: usid,
+        const applyHiddenPrechatFields = () => {
+            const bootstrap = window.embeddedservice_bootstrap
+            if (!bootstrap?.prechatAPI?.setHiddenPrechatFields) {
+                return
+            }
+            const s = embeddedLifecycleRef.current
+            bootstrap.prechatAPI.setHiddenPrechatFields({
+                SiteId: s.siteId,
+                Locale: s.localeId,
+                OrganizationId: s.commerceOrgId,
+                UsId: s.usid,
                 IsCartMgmtSupported: 'true',
-                RefreshToken: refreshToken,
-                Currency: locale.preferredCurrency,
-                Language: sfLanguage,
-                DomainUrl: domainUrl
+                Currency: s.preferredCurrency,
+                Language: s.sfLanguage,
+                DomainUrl: s.domainUrl
             })
         }
 
-        /**
-         * Manages z-index for maximized chat windows to ensure proper layering
-         * above other page elements while maintaining accessibility.
-         */
+        const handleEmbeddedMessagingReady = () => {
+            applyHiddenPrechatFields()
+        }
+
+        // Reset the embedded messaging session and surface a localized error
+        // toast. Called from every failure branch of the conversation-started
+        // flow so the shopper sees consistent feedback and the next attempt
+        // starts from a clean state.
+        const failSessionInit = () => {
+            resetEmbeddedMessagingForCommerceSessionChange()
+            toastRef.current({
+                title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+                status: 'error'
+            })
+        }
+
+        const handleEmbeddedMessagingConversationStarted = (event) => {
+            const {
+                organizationId: orgId,
+                configSiteId: sid,
+                myDomain: domain
+            } = embeddedLifecycleRef.current
+
+            if (!orgId || !sid) return
+
+            if (!domain) return
+
+            // Prevents refiring of the event if already call has been done
+            const conversationId = event?.detail?.conversationId
+            if (!conversationId || typeof conversationId !== 'string' || !conversationId.trim()) {
+                return
+            }
+            const normalizedConversationId = conversationId.trim()
+            if (lastConversationSessionInitRef.current === normalizedConversationId) return
+            lastConversationSessionInitRef.current = normalizedConversationId
+
+            const getAuthLinkKey =
+                window.embeddedservice_bootstrap?.userVerificationAPI?.getAuthLinkKey
+            if (typeof getAuthLinkKey !== 'function') {
+                console.error('Shopper Agent: getAuthLinkKey is not available')
+                return
+            }
+
+            getAuthLinkKey()
+                .then(async (authLinkKey) => {
+                    // Direct callout to Core's Token Bridge via the same-origin
+                    // PWA Kit proxy. Replaces the prior postSessionInit SCAPI call.
+                    try {
+                        // Check if HttpOnly mode is enabled by reading the flag directly
+                        // (same source as CommerceApiProvider's enableHttpOnlySessionCookies)
+                        const isHttpOnly =
+                            typeof window !== 'undefined'
+                                ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
+                                : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+
+                        // In non-HttpOnly mode, fetch the access token from localStorage
+                        const slasAccessToken = isHttpOnly
+                            ? undefined
+                            : await getTokenWhenReadyRef.current()
+
+                        const result = await callTokenBridge({
+                            authLinkKey,
+                            // Only send access token in non-HttpOnly mode (from localStorage)
+                            // In HttpOnly mode, server reads from cc-at_{siteId} cookie
+                            slasAccessToken,
+                            siteId: sid
+                        })
+
+                        if (result.status !== HTTP_OK) {
+                            const errorCode = result.body?.error || `HTTP_${result.status}`
+                            console.error('Token Bridge failed', {
+                                status: result.status,
+                                error: errorCode
+                            })
+                            failSessionInit()
+                        }
+                    } catch (error) {
+                        console.error('Token Bridge threw', error)
+                        failSessionInit()
+                    }
+                })
+                .catch((error) => {
+                    console.error('Shopper Agent: getAuthLinkKey failed', error)
+                    failSessionInit()
+                })
+        }
+
         const handleEmbeddedMessagingWindowMaximized = () => {
             const zIndex = theme.zIndices.sticky + 1
             const embeddedMessagingFrame = document.body.querySelector(
@@ -318,31 +480,31 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             }
         }
 
-        // Set up event listeners for messaging lifecycle events
         window.addEventListener('onEmbeddedMessagingReady', handleEmbeddedMessagingReady)
+        window.addEventListener(
+            'onEmbeddedMessagingConversationStarted',
+            handleEmbeddedMessagingConversationStarted
+        )
         window.addEventListener(
             'onEmbeddedMessagingWindowMaximized',
             handleEmbeddedMessagingWindowMaximized
         )
 
-        // Cleanup function to remove event listeners on unmount
         return () => {
             window.removeEventListener('onEmbeddedMessagingReady', handleEmbeddedMessagingReady)
+            window.removeEventListener(
+                'onEmbeddedMessagingConversationStarted',
+                handleEmbeddedMessagingConversationStarted
+            )
             window.removeEventListener(
                 'onEmbeddedMessagingWindowMaximized',
                 handleEmbeddedMessagingWindowMaximized
             )
         }
-    }, [
-        siteId,
-        locale.id,
-        locale.preferredCurrency,
-        commerceOrgId,
-        usid,
-        theme.zIndices.sticky,
-        refreshToken,
-        domainUrl
-    ])
+        // All dynamic config/auth values are read from embeddedLifecycleRef inside
+        // the handlers, so we only re-register listeners when the z-index token
+        // (used directly in the maximize handler's DOM mutation) changes.
+    }, [theme.zIndices.sticky])
 
     // Load the embedded messaging script asynchronously
     const scriptLoadStatus = useScript(scriptSourceUrl)
@@ -355,7 +517,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         embeddedServiceEndpoint,
         scrt2Url,
         locale.id,
-        refreshToken,
         enableAgentFromFloatingButton
     )
 
@@ -579,8 +740,11 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     // Build the current domain URL
     const domainUrl = `${appOrigin}${buildUrl('')}`
 
-    // Only render when the agent is enabled (client-side) and the basket has loaded.
-    if (!isShopperAgentEnabled || !basketDoneLoading) {
+    // Fetch configurations to ensure myDomain is resolved before rendering
+    const {isLoading: isConfigurationsLoading} = useConfigurations({})
+
+    // Only render when the agent is enabled (client-side), the basket has loaded, and configurations API has completed.
+    if (!isShopperAgentEnabled || !basketDoneLoading || isConfigurationsLoading) {
         return null
     }
 

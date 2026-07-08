@@ -58,6 +58,43 @@ export function openShopperAgent() {
 }
 
 /**
+ * Resets Embedded Messaging (MIAW) when the Commerce shopper session **type** changes between
+ * guest and registered (login, registration, or logout). Calls Salesforce
+ * `userVerificationAPI.clearSession`, which ends the active messaging session and returns the
+ * client to the floating action button (FAB) baseline.
+ *
+ * **Short-term (current):** Full session clear is the supported API for auth transitions; the
+ * public `utilAPI` does not expose a “minimize only” method.
+ *
+ * **Long-term (product):** Optionally explore keeping the channel open and re-issuing identity
+ * tokens (`setIdentityToken`) versus requiring a new conversation after verification—see
+ * Messaging for Web User Verification and `onEmbeddedMessagingIdentityTokenExpired`.
+ *
+ * @see https://developer.salesforce.com/docs/service/messaging-web/references/m4w-reference/userVerificationAPI.html
+ * @returns {void}
+ */
+export function resetEmbeddedMessagingForCommerceSessionChange() {
+    if (typeof window === 'undefined') {
+        return
+    }
+
+    try {
+        const clearSession = window.embeddedservice_bootstrap?.userVerificationAPI?.clearSession
+        if (typeof clearSession !== 'function') {
+            return
+        }
+        void Promise.resolve(clearSession(true)).catch((err) => {
+            console.error('Shopper Agent: clearSession after Commerce auth transition failed', err)
+        })
+    } catch (error) {
+        console.error(
+            'Shopper Agent: reset embedded messaging after Commerce auth transition failed',
+            error
+        )
+    }
+}
+
+/**
  * Show or hide the Commerce Client messaging widget.
  *
  * Uses the SDK exposed on `window.CimulateMessaging.eventHandlers`. Passing no

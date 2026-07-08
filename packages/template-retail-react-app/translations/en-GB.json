@@ -2147,6 +2147,9 @@
   "shipping_options.title.shipping_method": {
     "defaultMessage": "Shipping Options"
   },
+  "shopper_agent.error.session_init_failed": {
+    "defaultMessage": "Something went wrong. Try again."
+  },
   "signout_confirmation_dialog.button.cancel": {
     "defaultMessage": "Cancel"
   },

@@ -10851,6 +10851,20 @@
       "value": "]"
     }
   ],
+  "shopper_agent.error.session_init_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şǿǿḿḗḗŧħīƞɠ ẇḗḗƞŧ ẇřǿǿƞɠ. Ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "signout_confirmation_dialog.button.cancel": [
     {
       "type": 0,
