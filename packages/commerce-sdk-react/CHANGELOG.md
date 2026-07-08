@@ -1,4 +1,4 @@
-## v5.3.0-dev
+## v5.3.0-preview.0
 - [Bugfix] Fix stale `sfdc_dwsid` server-affinity header in `CommerceApiProvider`. The `updatedClients` `useMemo` baked the `dwsid`-derived header into each SCAPI client's config but omitted `dwsid` from its dependency array, so when only the `dwsid` cookie changed (guest-to-login, session bridge, re-auth) the memoized clients kept sending the stale header, risking wrong/expired app-server routing on hybrid storefronts. The `dwsid` primitive is now a dependency so clients rebuild on change without churning on unrelated renders.
 - [Feature] Add OMS order-action hooks for Shopper Orders: the `cancelOmsOrder` and `returnOmsOrder` mutations and the `getOmsMetaData` query hook (return/cancel reason codes), with cache invalidation on the mutating actions. [#3864](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3864) [#3869](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3869)
 - Bump `commerce-sdk-isomorphic` to `5.4.0`, the first stable release carrying the OMS Shopper Orders endpoints (`oms-return-order`, `oms-cancel-order`, `oms-meta-data`).
