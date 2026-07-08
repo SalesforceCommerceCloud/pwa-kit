@@ -83,7 +83,15 @@ jest.mock('../universal/routes', () => {
             return React.createElement('div', null, 'test')
         }
     }
-    return [{path: '/', component: TestPage, exact: true}]
+    return [
+        {path: '/', component: TestPage, exact: true},
+        // Fuzzy-matched route with inline site/locale regex constraints, mirroring
+        // what configureRoutes({fuzzyPathMatching: true}) produces in the retail app.
+        {
+            path: '/:site(us|RefArch)/:locale(en-US|en-CA)/category/:categoryId',
+            component: TestPage
+        }
+    ]
 })
 /* eslint-enable @typescript-eslint/no-var-requires, @typescript-eslint/no-empty-function, react/prop-types */
 
@@ -303,6 +311,46 @@ describe('react-rendering distributed-tracing wiring', () => {
 
         // The matched route path ('/' from the mocked routes) is reported as http.route.
         expect(mockSetActiveSpanAttribute).toHaveBeenCalledWith('http.route', '/')
+    })
+
+    test('http.route strips inline regex constraints from fuzzy-matched routes', async () => {
+        mockIsDistributedTracingEnabled.mockReturnValue(true)
+
+        let serverSpanFn
+        mockWithServerSpan.mockImplementation((req, res, ctx, fn) => {
+            serverSpanFn = fn
+            return Promise.resolve()
+        })
+
+        const url = '/us/en-US/category/womens-jewelry-necklaces'
+        const req = {
+            headers: {traceparent: '00-abc-def-01'},
+            method: 'GET',
+            originalUrl: url,
+            url,
+            query: {},
+            path: url
+        }
+        const res = {
+            locals: {requestId: 'test-id'},
+            setHeader: jest.fn(),
+            set: jest.fn(),
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn(),
+            on: jest.fn(),
+            statusCode: 200
+        }
+        const next = jest.fn()
+
+        await render(req, res, next)
+        await serverSpanFn()
+
+        // The '(us|RefArch)' / '(en-US|en-CA)' constraint groups are removed so the
+        // template stays low-cardinality and readable.
+        expect(mockSetActiveSpanAttribute).toHaveBeenCalledWith(
+            'http.route',
+            '/:site/:locale/category/:categoryId'
+        )
     })
 
     test('child spans: withChildSpan called with route-match, getProps and render-to-string inside withServerSpan', async () => {

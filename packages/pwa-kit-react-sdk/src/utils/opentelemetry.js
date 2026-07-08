@@ -46,7 +46,7 @@ export const logSpanData = (span, event = 'start') => {
     // Create the span data object that matches the expected format
     const spanData = {
         traceId: spanContext.traceId,
-        parentId: span.parentSpanId,
+        parentId: span.parentSpanContext?.spanId,
         name: span.name,
         id: spanContext.spanId,
         kind: span.kind,
