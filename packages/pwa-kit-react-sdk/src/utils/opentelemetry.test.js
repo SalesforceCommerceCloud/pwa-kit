@@ -70,7 +70,7 @@ describe('OpenTelemetry Utilities', () => {
                 traceId: 'test-trace-id',
                 spanId: 'test-span-id'
             })),
-            parentSpanId: 'test-parent-span-id',
+            parentSpanContext: {spanId: 'test-parent-span-id'},
             name: 'test-span',
             kind: 1,
             startTime: [1234567890, 0],
@@ -308,6 +308,21 @@ describe('OpenTelemetry Utilities', () => {
                     error: 'Span end failed'
                 }
             })
+        })
+    })
+
+    describe('logSpanData parentId resolution', () => {
+        test('resolves parentId from span.parentSpanContext.spanId', () => {
+            const consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
+
+            opentelemetryUtils.logSpanData(mockSpan, 'end')
+
+            const logged = JSON.parse(consoleInfoSpy.mock.calls[0][0])
+            // Guards the OTel v2 fix: a regression to span.parentSpanId would
+            // yield undefined here rather than the resolved parent span id.
+            expect(logged.parentId).toBe('test-parent-span-id')
+
+            consoleInfoSpy.mockRestore()
         })
     })
 

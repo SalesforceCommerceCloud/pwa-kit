@@ -17,6 +17,10 @@ const {
 const {mockClient} = require('aws-sdk-client-mock')
 const {ServiceException} = require('@smithy/smithy-client')
 
+jest.mock('cross-fetch', () =>
+    jest.fn(() => Promise.resolve({ok: true, status: 200, text: () => Promise.resolve('')}))
+)
+
 const {
     DataStore,
     DataStoreNotFoundError,
@@ -228,6 +232,101 @@ describe('server', () => {
         const response = await request(app).get('/streaming-large')
         expect(response.status).toBe(200)
         expect(response.body).toEqual({streaming: false})
+    })
+
+    describe('loopbackTest', () => {
+        const crossFetch = require('cross-fetch')
+
+        afterEach(() => {
+            crossFetch.mockReset()
+        })
+
+        test('returns 500 when EXTERNAL_DOMAIN_NAME is not set', async () => {
+            delete process.env.EXTERNAL_DOMAIN_NAME
+            const response = await request(app).get('/loopback')
+            expect(response.status).toBe(500)
+            expect(response.body).toEqual({error: 'EXTERNAL_DOMAIN_NAME not set'})
+        })
+
+        test('returns loopback response on success', async () => {
+            crossFetch.mockResolvedValue({
+                status: 200,
+                ok: true,
+                text: () => Promise.resolve('<html>hello</html>')
+            })
+            const response = await request(app).get('/loopback')
+            expect(response.status).toBe(200)
+            expect(response.body).toEqual({
+                url: 'https://test.com/',
+                status: 200,
+                ok: true,
+                body: '<html>hello</html>'
+            })
+            expect(crossFetch).toHaveBeenCalledWith('https://test.com/')
+        })
+
+        test('uses custom path from query parameter', async () => {
+            crossFetch.mockResolvedValue({
+                status: 200,
+                ok: true,
+                text: () => Promise.resolve('ok')
+            })
+            const response = await request(app).get('/loopback?path=/healthcheck')
+            expect(response.status).toBe(200)
+            expect(response.body.url).toBe('https://test.com/healthcheck')
+            expect(crossFetch).toHaveBeenCalledWith('https://test.com/healthcheck')
+        })
+
+        test('truncates response body to 1000 characters', async () => {
+            const longBody = 'x'.repeat(2000)
+            crossFetch.mockResolvedValue({
+                status: 200,
+                ok: true,
+                text: () => Promise.resolve(longBody)
+            })
+            const response = await request(app).get('/loopback')
+            expect(response.body.body).toHaveLength(1000)
+        })
+
+        test('returns 502 when fetch throws', async () => {
+            crossFetch.mockRejectedValue(new Error('ECONNREFUSED'))
+            const response = await request(app).get('/loopback')
+            expect(response.status).toBe(502)
+            expect(response.body).toEqual({
+                url: 'https://test.com/',
+                error: 'ECONNREFUSED'
+            })
+        })
+
+        test('safely resolves @-prefixed path as relative', async () => {
+            crossFetch.mockResolvedValue({
+                status: 200,
+                ok: true,
+                text: () => Promise.resolve('ok')
+            })
+            const response = await request(app).get('/loopback?path=@evil.com/x')
+            expect(response.status).toBe(200)
+            expect(response.body.url).toBe('https://test.com/@evil.com/x')
+            expect(crossFetch).toHaveBeenCalledWith('https://test.com/@evil.com/x')
+        })
+
+        test('rejects absolute URL to a different host', async () => {
+            const response = await request(app).get(
+                '/loopback?path=' + encodeURIComponent('https://evil.com/x')
+            )
+            expect(response.status).toBe(400)
+            expect(response.body).toEqual({error: 'path must be relative to this origin'})
+            expect(crossFetch).not.toHaveBeenCalled()
+        })
+
+        test('rejects protocol-relative URL', async () => {
+            const response = await request(app).get(
+                '/loopback?path=' + encodeURIComponent('//evil.com/x')
+            )
+            expect(response.status).toBe(400)
+            expect(response.body).toEqual({error: 'path must be relative to this origin'})
+            expect(crossFetch).not.toHaveBeenCalled()
+        })
     })
 
     describe('dataStoreTest', () => {

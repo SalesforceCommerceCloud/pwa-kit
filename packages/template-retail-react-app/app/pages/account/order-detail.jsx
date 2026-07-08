@@ -66,6 +66,10 @@ import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
+// Delay before surfacing a cancel/return feedback alert, so screen readers finish
+// announcing the modal close before the alert steals the live-region announcement.
+const ANNOUNCE_DELAY_MS = 300
+
 // Static id linking the Return Items button to its VisuallyHidden disabled-reason
 // hint (only one such button exists per page, so a constant is safe).
 const RETURN_DISABLED_HINT_ID = 'return-items-disabled-hint'
@@ -378,7 +382,7 @@ const AccountOrderDetail = () => {
                 handleCloseReturnModal()
                 // Delay lets screen readers finish announcing modal close before the alert
                 if (returnFeedbackTimerRef.current) clearTimeout(returnFeedbackTimerRef.current)
-                returnFeedbackTimerRef.current = setTimeout(showReturnSuccess, 300)
+                returnFeedbackTimerRef.current = setTimeout(showReturnSuccess, ANNOUNCE_DELAY_MS)
             } catch (e) {
                 // Classifying reads the response body (async, once) for the 400
                 // errorCode discriminator, so re-check the token AFTER the await:
@@ -505,18 +509,21 @@ const AccountOrderDetail = () => {
                 closeCancelModal()
                 // Delay allows screen readers to finish announcing modal close before the alert
                 if (cancelFeedbackTimerRef.current) clearTimeout(cancelFeedbackTimerRef.current)
-                cancelFeedbackTimerRef.current = setTimeout(showCancelSuccess, 300)
+                cancelFeedbackTimerRef.current = setTimeout(showCancelSuccess, ANNOUNCE_DELAY_MS)
             } catch (e) {
                 closeCancelModal()
                 if (cancelFeedbackTimerRef.current) clearTimeout(cancelFeedbackTimerRef.current)
-                cancelFeedbackTimerRef.current = setTimeout(() => showCancelError(e), 300)
+                cancelFeedbackTimerRef.current = setTimeout(
+                    () => showCancelError(e),
+                    ANNOUNCE_DELAY_MS
+                )
             }
         },
         [closeCancelModal, cancelMutation, showCancelSuccess, showCancelError]
     )
 
     // Clear any pending feedback timers on unmount so they can't fire after the
-    // component is gone (e.g. shopper navigates away during the 300ms delay).
+    // component is gone (e.g. shopper navigates away during the announce delay).
     useEffect(() => {
         return () => {
             if (returnFeedbackTimerRef.current) clearTimeout(returnFeedbackTimerRef.current)
