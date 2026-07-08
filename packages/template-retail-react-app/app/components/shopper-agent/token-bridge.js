@@ -80,7 +80,7 @@ export function resolveAncMyDomain(myDomain) {
 /**
  * Extract myDomain from ANC_MYDOMAIN environment variable.
  * Returns the domain directly from the environment variable.
- * Example: https://orgfarm-8fcc267362.test1.my.pc-rnd.site.com
+ * Example: https://orgfarm-8fcc267362.test1.my.pc-rnd.salesforce.com
  *
  * @returns {string|null} - The myDomain or null if not found
  */
