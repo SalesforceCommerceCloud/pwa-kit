@@ -8,6 +8,7 @@
 import {
     launchChat,
     openShopperAgent,
+    resetEmbeddedMessagingForCommerceSessionChange,
     openCommerceClientWidget,
     openShopperAgentWidget,
     validateCommerceClientDomain,
@@ -232,6 +233,64 @@ describe('shopper-agent-utils', () => {
 
             // Should not throw, launchChat handles missing bootstrap gracefully
             expect(() => openShopperAgent()).not.toThrow()
+        })
+    })
+
+    describe('resetEmbeddedMessagingForCommerceSessionChange', () => {
+        test('should call userVerificationAPI.clearSession(true) when available', async () => {
+            const clearSession = jest.fn().mockResolvedValue(undefined)
+            global.window = {
+                embeddedservice_bootstrap: {
+                    userVerificationAPI: {clearSession}
+                }
+            }
+
+            resetEmbeddedMessagingForCommerceSessionChange()
+
+            await Promise.resolve()
+            expect(clearSession).toHaveBeenCalledWith(true)
+        })
+
+        test('should handle clearSession rejection and log error', async () => {
+            const clearSession = jest.fn().mockRejectedValue(new Error('Clear session failed'))
+            global.window = {
+                embeddedservice_bootstrap: {
+                    userVerificationAPI: {clearSession}
+                }
+            }
+
+            resetEmbeddedMessagingForCommerceSessionChange()
+
+            await Promise.resolve()
+            await Promise.resolve() // Wait for rejection to be caught
+
+            expect(clearSession).toHaveBeenCalledWith(true)
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Shopper Agent: clearSession after Commerce auth transition failed',
+                expect.any(Error)
+            )
+        })
+
+        test('should no-op when clearSession is missing', () => {
+            global.window = {
+                embeddedservice_bootstrap: {}
+            }
+
+            expect(() => resetEmbeddedMessagingForCommerceSessionChange()).not.toThrow()
+        })
+
+        test('should no-op when userVerificationAPI is missing', () => {
+            global.window = {
+                embeddedservice_bootstrap: {}
+            }
+
+            expect(() => resetEmbeddedMessagingForCommerceSessionChange()).not.toThrow()
+        })
+
+        test('should return early when not on client', () => {
+            delete global.window
+
+            expect(() => resetEmbeddedMessagingForCommerceSessionChange()).not.toThrow()
         })
     })
 

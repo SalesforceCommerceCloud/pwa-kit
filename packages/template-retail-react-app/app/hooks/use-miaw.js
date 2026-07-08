@@ -121,7 +121,6 @@ const initEmbeddedMessaging = (
  * @param {string} embeddedServiceDeploymentUrl - URL of the embedded service deployment
  * @param {string} scrt2Url - SCRT2 URL for the embedded messaging service
  * @param {string} locale - BCP-47 locale for the embedded messaging service
- * @param {string} refreshToken - Refresh token for the embedded messaging service
  * @param {string} [enableAgentFromFloatingButton='true'] - When 'false', hides the floating chat button on load
  */
 const useMiaw = (
@@ -131,7 +130,6 @@ const useMiaw = (
     embeddedServiceDeploymentUrl,
     scrt2Url,
     locale,
-    refreshToken,
     enableAgentFromFloatingButton = 'true'
 ) => {
     useEffect(() => {
@@ -152,7 +150,6 @@ const useMiaw = (
         embeddedServiceDeploymentUrl,
         scrt2Url,
         locale,
-        refreshToken,
         enableAgentFromFloatingButton
     ])
 }

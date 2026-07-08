@@ -26,6 +26,8 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 
 const config = getConfig()
 
@@ -514,6 +516,17 @@ const {handler} = runtime.createHandler(options, (app) => {
             })
         }
     })
+
+    // Shopper Agent — Token Bridge proxy.
+    // Browser POSTs an auth_link_key and siteId (as x-site-id header).
+    // In HttpOnly mode, tokens are read from cookies server-side.
+    // In non-HttpOnly mode, SLAS access token is sent in request body.
+    // Server extracts my_domain from ANC_MYDOMAIN environment variable,
+    // validates it's a trusted Salesforce host (SSRF prevention), then
+    // forwards the tokens to Core's `/agent/identity/bridge` endpoint with
+    // the access token in an `Authorization: SLAS` header and the refresh
+    // token in the body.
+    registerTokenBridgeRoute(app)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))

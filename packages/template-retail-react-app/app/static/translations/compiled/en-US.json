@@ -5163,6 +5163,12 @@
       "value": "Shipping Options"
     }
   ],
+  "shopper_agent.error.session_init_failed": [
+    {
+      "type": 0,
+      "value": "Something went wrong. Try again."
+    }
+  ],
   "signout_confirmation_dialog.button.cancel": [
     {
       "type": 0,
