@@ -1,4 +1,4 @@
-## v10.1.0-dev
+## v10.1.0-preview.0
 - [Feature] Enable customer context for Shopper Agent: on conversation start, call Core's Token Bridge via a same-origin PWA Kit proxy that forwards the shopper's SLAS session (access token in the body for non-HttpOnly mode; both tokens read server-side from `cc-at_*` / `cc-nx_*` cookies in HttpOnly mode) and reset the embedded messaging session on guest ↔ registered transitions so the agent never picks up a stale shopper identity.
 - [Bugfix] Add explicit `rel="noopener noreferrer"` to external carrier tracking links so the order page URL doesn't leak as the `Referer` (Chakra `isExternal` alone only emits `noopener`).
 - Bump `vendor.js` bundle-size budget from 397 kB to 398 kB to accommodate the `commerce-sdk-isomorphic` 5.4.0 upgrade.
