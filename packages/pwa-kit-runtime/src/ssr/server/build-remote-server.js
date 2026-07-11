@@ -18,7 +18,8 @@ import {
     SLAS_TOKEN_RESPONSE_ENDPOINTS,
     SLAS_LOGOUT_ENDPOINT,
     X_SITE_ID,
-    X_GRANT_TYPE
+    X_GRANT_TYPE,
+    X_PREVIEW_PARENT
 } from './constants'
 import {SESSION_COOKIE_CONFIG, getCookieName, getSiteId} from './httponly-cookie-config'
 import {tryWriteStorefrontPreviewMarker} from './preview-context'
@@ -216,6 +217,9 @@ const handleHttpOnlyCookiesOnProxyReq = (proxyRequest, incomingRequest) => {
 
     stripSessionCookies(proxyRequest, incomingRequest)
     proxyRequest.removeHeader(X_SITE_ID)
+    // Internal preview-context signal consumed by the response interceptor
+    // (process-token-response); never forwarded to SLAS/SCAPI.
+    proxyRequest.removeHeader(X_PREVIEW_PARENT)
 }
 
 /**

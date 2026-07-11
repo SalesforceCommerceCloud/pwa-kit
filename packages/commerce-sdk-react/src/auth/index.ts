@@ -21,6 +21,7 @@ import {
     isOriginTrusted,
     onClient,
     getDefaultCookieAttributes,
+    getTrustedPreviewParentOrigin,
     stringToBase64,
     extractCustomParameters,
     parseResponseBodyClone
@@ -32,7 +33,8 @@ import {
     DNT_COOKIE_NAME,
     DWSID_COOKIE_NAME,
     SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG,
-    X_GRANT_TYPE
+    X_GRANT_TYPE,
+    X_PREVIEW_PARENT
 } from '../constant'
 
 import {Logger} from '../types'
@@ -367,6 +369,22 @@ class Auth {
                 ...config.fetchOptions
             }
         })
+
+        // When HttpOnly session cookies are enabled and the storefront is
+        // running inside a trusted Storefront Preview iframe, signal the parent
+        // origin to the BFF so it sets session cookies with SameSite=None;
+        // Partitioned (required for the cross-site iframe). This rides on the
+        // SLAS token POST — which is never CDN-cached — so it always reaches
+        // the origin, unlike the server-set `__Host-pwakit_preview_ctx` marker
+        // cookie that depends on the (cacheable) iframe document load hitting
+        // the origin. The BFF re-validates the value against its allow-list.
+        if (config.enableHttpOnlySessionCookies) {
+            const previewParentOrigin = getTrustedPreviewParentOrigin()
+            if (previewParentOrigin) {
+                this.client.clientConfig.headers[X_PREVIEW_PARENT] = previewParentOrigin
+            }
+        }
+
         this.shopperCustomersClient = new ShopperCustomers({
             proxy: config.proxy,
             headers: config.headers || {},
