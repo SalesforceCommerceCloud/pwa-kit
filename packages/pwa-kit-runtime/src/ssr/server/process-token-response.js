@@ -44,11 +44,22 @@ const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
 
 /**
  * Returns a function that appends a Set-Cookie header to `res`. When
- * `cookieDomain` is configured, every write also emits a second expiring
- * Set-Cookie for the same name without a Domain attribute, expiring any
- * pre-existing host-scoped cookie. This mirrors
- * `CookieStorage.removeHostAndDomainCookie` in commerce-sdk-react and prevents
- * stale duplicates when a merchant first enables the cookieDomain config.
+ * `cookieDomain` is configured, every write first emits an expiring
+ * Set-Cookie for the same name WITHOUT a Domain attribute (clearing any
+ * pre-existing host-scoped cookie), THEN emits the real Domain-scoped cookie.
+ * This mirrors `CookieStorage.removeHostAndDomainCookie` in commerce-sdk-react
+ * and prevents stale duplicates when a merchant first enables the cookieDomain
+ * config.
+ *
+ * Order matters for SSR: on a cookieless SSR load, commerce-sdk-isomorphic
+ * reconstructs the guest-login TokenResponse from this response's Set-Cookie
+ * headers, parsing the array with last-write-wins per cookie name. Emitting the
+ * host-scoped deletion (empty value) BEFORE the real cookie ensures the real
+ * token value wins instead of being clobbered by the empty deletion —
+ * otherwise the SSR shopper token would be empty and data-bearing routes
+ * (e.g. a PLP) would 401 (regression of W-23388089). In the browser the two
+ * writes target different cookie scopes (host vs Domain), so their relative
+ * order has no effect.
  *
  * `siteAttrs` (sameSite/partitioned) is decided per-request by
  * `getSiteAttrsForRequest` and applied uniformly to every cookie this
@@ -59,17 +70,9 @@ const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
  */
 function makeAppendCookie(res, cookieDomain, siteAttrs) {
     return ({name, value, expires, attributes}) => {
-        res.append(
-            SET_COOKIE,
-            cookieAsString({
-                name,
-                value,
-                expires,
-                ...attributes,
-                ...siteAttrs,
-                ...(cookieDomain && {domain: cookieDomain})
-            })
-        )
+        // Clear any pre-existing host-scoped cookie first. This must precede the
+        // real write so the SSR last-write-wins Set-Cookie parser recovers the
+        // real token value, not the empty deletion (see JSDoc above).
         if (cookieDomain) {
             res.append(
                 SET_COOKIE,
@@ -82,6 +85,17 @@ function makeAppendCookie(res, cookieDomain, siteAttrs) {
                 })
             )
         }
+        res.append(
+            SET_COOKIE,
+            cookieAsString({
+                name,
+                value,
+                expires,
+                ...attributes,
+                ...siteAttrs,
+                ...(cookieDomain && {domain: cookieDomain})
+            })
+        )
     }
 }
 
