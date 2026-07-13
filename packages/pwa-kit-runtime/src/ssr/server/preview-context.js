@@ -8,7 +8,8 @@ import {cookieAsString} from '../../utils/ssr-proxying'
 import {
     SET_COOKIE,
     STOREFRONT_PREVIEW_CTX_COOKIE,
-    STOREFRONT_PREVIEW_PARENT_ALLOW_LIST
+    STOREFRONT_PREVIEW_PARENT_ALLOW_LIST,
+    X_PREVIEW_PARENT
 } from './constants'
 
 const SEC_FETCH_DEST = 'sec-fetch-dest'
@@ -168,6 +169,43 @@ export function readStorefrontPreviewMarker(req) {
     const value = getCookieValue(req.headers?.cookie, STOREFRONT_PREVIEW_CTX_COOKIE)
     if (!value || !isAllowedParentOrigin(value)) return undefined
     return value
+}
+
+/**
+ * Returns the validated parent origin from the `x-pwakit-preview-parent`
+ * request header, or undefined when the header is absent or carries a value
+ * that is not on the trusted allow-list.
+ *
+ * The client (commerce-sdk-react) sends this header on SLAS token requests
+ * when it detects — via `window.location.ancestorOrigins` — that the
+ * storefront is running inside a trusted Storefront Preview iframe. Because
+ * the token request is a POST that is never served from the CDN cache, this
+ * header reliably reaches the origin even when the iframe *document* load
+ * (which sets the `__Host-pwakit_preview_ctx` marker cookie) is served from
+ * cache and never runs the marker-writer middleware.
+ *
+ * The value is re-validated here against the same allow-list as the marker
+ * cookie. A spoofed header is harmless: the worst case is that a caller
+ * receives its own session cookies with SameSite=None; Partitioned (which are
+ * partitioned by the caller's top-level site and grant no cross-site access),
+ * and only when the asserted origin is itself on the trusted allow-list.
+ */
+export function readTrustedPreviewParentHeader(req) {
+    const value = req.headers?.[X_PREVIEW_PARENT]
+    if (!value || !isAllowedParentOrigin(value)) return undefined
+    return value
+}
+
+/**
+ * Returns true when the request originates from a trusted Storefront Preview
+ * iframe — either via the server-set marker cookie (iframe document load that
+ * reached the origin) or via the client-sent `x-pwakit-preview-parent` header
+ * (CDN-cache-proof). Either signal is sufficient; both are re-validated
+ * against the trusted allow-list. Used to decide SameSite=None; Partitioned
+ * vs. SameSite=Lax for session cookies.
+ */
+export function isTrustedPreviewRequest(req) {
+    return Boolean(readStorefrontPreviewMarker(req) || readTrustedPreviewParentHeader(req))
 }
 
 /**

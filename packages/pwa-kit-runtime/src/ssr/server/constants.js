@@ -41,6 +41,12 @@ export const SLAS_LOGOUT_ENDPOINT = /\/oauth2\/logout/
 export const DWSID_COOKIE_NAME = 'dwsid'
 export const X_SITE_ID = 'x-site-id'
 export const X_GRANT_TYPE = 'x-grant-type'
+// Client-sent header carrying the trusted Storefront Preview parent origin on
+// SLAS token requests. Read (and re-validated against
+// STOREFRONT_PREVIEW_PARENT_ALLOW_LIST) when choosing SameSite=None; Partitioned
+// for session cookies, as a CDN-cache-proof alternative to the
+// __Host-pwakit_preview_ctx marker cookie. Stripped before forwarding to SLAS/SCAPI.
+export const X_PREVIEW_PARENT = 'x-pwakit-preview-parent'
 
 // Server-only marker cookie set when the storefront is loaded inside a
 // trusted Storefront Preview iframe (parent origin attested by Sec-Fetch-*
