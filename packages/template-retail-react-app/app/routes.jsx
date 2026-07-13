@@ -19,6 +19,8 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
+import '@adyen/adyen-salesforce-pwa/dist/app/adyen.css'
+import '@salesforce/retail-react-app/app/styles/adyen-overrides.css'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -52,6 +54,9 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
 })
 const PaymentProcessing = loadable(() => import('./pages/checkout/payment-processing'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
+const Express = loadable(() => import('./pages/express'), {
+    fallback: fallback
+})
 
 export const routes = [
     {
@@ -125,6 +130,11 @@ export const routes = [
     {
         path: '/store-locator',
         component: StoreLocator
+    },
+    {
+        path: '/express',
+        component: Express,
+        exact: true
     }
 ]
 

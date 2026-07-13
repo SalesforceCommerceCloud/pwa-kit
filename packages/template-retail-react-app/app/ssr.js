@@ -28,6 +28,8 @@ import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
+import {registerAdyenEndpoints} from '@adyen/adyen-salesforce-pwa/dist/ssr/index.js'
+import standalonePaymentMethodsHandler from './api/adyen/paymentMethods/standalone.js'
 
 const config = getConfig()
 
@@ -59,7 +61,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
     // To extend the SLAS private-client proxy allow-list, supply
     // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
@@ -362,6 +364,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'img-src': [
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
+                        '*.cc.salesforce.com',
                         '*.demandware.net',
                         '*.adyen.com',
                         'pay.google.com', // Google Pay payment handler icon
@@ -385,7 +388,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'www.gstatic.com',
                         '*.demandware.net', // Used to load a valid payment scripts in test environment
                         'maps.googleapis.com',
-                        'places.googleapis.com'
+                        'places.googleapis.com',
+                        "*.test1.my.pc-rnd.site.com"
+
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -394,10 +399,13 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.cimulate.ai',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com',
+                        'https://api.lab.amplitude.com/sdk/vardata',
                         'maps.googleapis.com',
                         'places.googleapis.com',
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
+                        '*.test1.my.pc-rnd.salesforce-scrt.com',
+                        '*.test1.my.pc-rnd.site.com',
                         // Payment gateways
                         // Note: Google Pay requires different CSP entries depending on the integration and environment.
                         // - 'pay.google.com' and 'payments.google.com' are generally needed for the SDK to load and create payment tokens.
@@ -412,9 +420,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'google.com/pay',
                         'google.com/pay/',
                         'www.google.com/pay',
-                        'www.google.com/pay/',
-                        // Connect to SFCC/ODS instances
-                        '*.demandware.net'
+                        'www.google.com/pay/'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
@@ -424,11 +430,23 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.paypal.com',
                         '*.adyen.com',
                         'payments.google.com',
-                        'pay.google.com'
+                        'pay.google.com',
+                        '*.pc-rnd.site.com',
+                        '*.test1.my.pc-rnd.salesforce-scrt.com',
+                        '*.test1.vf.pc-rnd.force.com',
+                        '*.git.soma.salesforce.com',
+                        '*.test1.my.pc-rnd.site.com'
+
                     ],
                     'frame-ancestors': [
-                        // Allow Page Designer to embed the storefront in an iframe
-                        '*.demandware.net'
+                        "'self'",
+                        // MIAW
+                        "https://orgfarm-43fa0c1e62.test1.my.pc-rnd.site.com",
+                        "https://orgfarm-43fa0c1e62.test1.lightning.pc-rnd.force.com",
+                        // PWA
+                        "https://agentforce-checkout-production.mrt-storefront-staging.com",
+                        '*',
+                        "https://pwaancvoltrontest-264.sfdc-ckzqgc-ecom1.exp-delivery-soak.com"
                     ]
                 }
             }
@@ -569,6 +587,46 @@ const {handler} = runtime.createHandler(options, (app) => {
             res.status(500).json({
                 error: 'Failed to fetch metadata',
                 details: error.message
+            })
+        }
+    })
+
+    /* -----------------Adyen Begin ------------------------ */
+    /**
+     * Adyen API Endpoints
+     * - Environment
+     * - Payment Methods
+     * - Payments
+     * - Payments Details
+     * - Webhooks
+     *
+     * @param app - express app used to register the routes
+     * @param runtime - express runtime used to render pages after sanitizing the query params
+     * @param overrides (optional) - an object that provides the option for using different endpoint handlers
+     *
+     * @example
+     * const overrides = {
+     *   payments: [PrePaymentsController, PaymentsController, PostPaymentsController],
+     *   webhook: [
+     *      authenticate,
+     *      validateHmac,
+     *      parseNotification,
+     *      authorizationWebhookHandler,
+     *      donationWebhookHandler
+     *  ]
+     * }
+     */
+    registerAdyenEndpoints(app, runtime)
+
+    // Register standalone payment methods endpoint for Apple Pay "Buy Now" flows
+    app.get('/api/adyen/paymentMethods/standalone', async (req, res) => {
+        try {
+            await standalonePaymentMethodsHandler(req, res)
+        } catch (error) {
+            console.error('Error in standalone payment methods endpoint:', error)
+            res.status(500).json({
+                error: 'Internal server error',
+                message: error.message
             })
         }
     })
