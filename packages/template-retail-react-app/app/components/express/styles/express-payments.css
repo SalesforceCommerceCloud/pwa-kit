@@ -1,0 +1,29 @@
+/* Express Payment Styles */
+
+.express-payment-container {
+    /* Container for all express payment methods */
+}
+
+.express-payment-method {
+    /* Base styles for individual payment method containers */
+}
+
+.express-payment-method--single {
+    /* Styles when only one payment method is available */
+    height: auto;
+}
+
+.express-payment-method--multiple {
+    /* Styles when multiple payment methods are available */
+    height: 40px;
+}
+
+.express-payment-method--with-margin {
+    /* Add margin when multiple payment methods exist */
+    margin-bottom: 8px;
+}
+
+.express-payment-method--no-margin {
+    /* No margin when single payment method */
+    margin-bottom: 0;
+}

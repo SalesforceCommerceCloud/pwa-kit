@@ -98,6 +98,7 @@ const initEmbeddedMessaging = (
             // Hide floating chat button when enableAgentFromFloatingButton is 'false'
             window.embeddedservice_bootstrap.settings.hideChatButtonOnLoad =
                 enableAgentFromFloatingButton !== 'true'
+            window.embeddedservice_bootstrap.settings.iframeAllow = 'payment *'
             window.embeddedservice_bootstrap.init(
                 salesforceOrgId,
                 embeddedServiceDeploymentName,

@@ -12,6 +12,7 @@ import {
     useAccessToken,
     useConfig,
     useConfigurations,
+    useCustomerId,
     useCustomerType,
     useUsid
 } from '@salesforce/commerce-sdk-react'
@@ -208,6 +209,9 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const {customerType} = useCustomerType()
     const {organizationId, siteId: configSiteId} = useConfig()
 
+    // Customer details for express payments
+    const customerId = useCustomerId()
+
     // Fetch my_domain from Shopper Configurations API
     const {data: configurationsData} = useConfigurations({})
     const myDomain = configurationsData?.configurations?.find(
@@ -321,6 +325,18 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         }
     }
 
+    // Send express message to the embedded messaging iframe
+    const sendExpressMessage = (type, payload = {}) => {
+        const embeddedMessagingFrame = document.querySelector('div.embedded-messaging iframe')
+        const iframeSrc = embeddedMessagingFrame.src
+        const eventData = {
+            type,
+            payload
+        }
+        const targetOrigin = new URL(iframeSrc).origin
+        embeddedMessagingFrame.contentWindow.postMessage(eventData, targetOrigin)
+    }
+
     /**
      * Handles incoming MIAW events requesting customer data.
      * Processes conversation context requests and sends appropriate responses.
@@ -342,6 +358,21 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
                     // Handle domain URL request
                     sendConversationContext('conversational.domainUrl', {
                         domainUrl
+                    })
+                } else if (event.data.type === 'lwc.getPwaContext') {
+                    const pwaDomainUrl = window.location.origin
+                    const pwaSiteId = siteId
+                    const pwaLocale = locale.id
+                    sendExpressMessage('lwc.pwaContext', {
+                        pwaDomainUrl,
+                        pwaSiteId,
+                        pwaLocale
+                    })
+                } else if (event.data.type === 'lwc.getCustomerData') {
+                    const authToken = await getTokenWhenReadyRef.current()
+                    sendExpressMessage('express.actualCustomerData', {
+                        customerId,
+                        authToken
                     })
                 }
             } catch (error) {
