@@ -1,3 +1,4 @@
+## v3.19.0-nightly-20260713090132 (Jul 13, 2026)
 ## v3.19.0-dev
 - Add TextEncoder polyfill alongside existing TextDecoder in Jest test environment setup (setup-jest.js). Required for complete AWS SDK 3.x's @smithy/core CBOR support (both encode and decode paths) used by mrt-utilities 0.2.2+. [#3917](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3917)
 - **Security**: Add TextDecoder polyfill to Jest test environment setup (setup-jest.js). Required for AWS SDK 3.x's @smithy/core CBOR encoding used by mrt-utilities 0.2.2+. Ensures template tests run successfully with the upgraded AWS SDK dependency. [#3911](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3911)
