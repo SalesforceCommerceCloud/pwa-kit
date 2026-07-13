@@ -43,6 +43,9 @@ module.exports = {
             // Embedded Service developer name for the Commerce Client widget. Falls back
             // to embeddedServiceName when not set.
             esDeveloperName: '',
+            // Embedded Messaging capabilities version forwarded to the widget as
+            // messagingConfig.capabilitiesVersion. Defaults to '65'.
+            capabilitiesVersion: '65',
             // Header text shown at the top of the Commerce Client widget.
             headerText: '',
             // Markdown disclaimer shown in the Commerce Client widget. Supports links and

@@ -27,6 +27,7 @@ export const getCommerceAgentConfig = () => {
         provider: 'miaw',
         commerceClientScriptSourceUrl: '',
         esDeveloperName: '',
+        capabilitiesVersion: '65',
         headerText: '',
         disclaimerMarkdown: '',
         commerceClientDisplayMode: 'panel',
