@@ -10,7 +10,7 @@ import {
     expireHttpOnlySessionCookies
 } from './process-token-response'
 import {_resetWarnedDomainsForTesting} from './cookie-domain'
-import {X_SITE_ID} from './constants'
+import {X_SITE_ID, X_PREVIEW_PARENT} from './constants'
 import {parse as parseSetCookie} from 'set-cookie-parser'
 
 jest.mock('../../utils/logger-instance', () => ({
@@ -812,6 +812,12 @@ describe('trusted Storefront Preview iframe', () => {
         return {headers: {[X_SITE_ID]: siteId, cookie: `${MARKER}=${value}`}}
     }
 
+    // The client-sent header path — used when the iframe document load is
+    // served from the CDN cache and never sets the marker cookie.
+    function makeReqWithHeader(value, siteId = 'testsite') {
+        return {headers: {[X_SITE_ID]: siteId, [X_PREVIEW_PARENT]: value}}
+    }
+
     function makeFullSlasResponse() {
         const accessToken = makeJWT({
             iat: 1000,
@@ -885,6 +891,36 @@ describe('trusted Storefront Preview iframe', () => {
         const res = makeRes()
         const {buf} = makeFullSlasResponse()
         setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
+
+        for (const cookieStr of res.cookies) {
+            expect(cookieStr).toMatch(/SameSite=lax/i)
+            expect(cookieStr).not.toMatch(/Partitioned/i)
+        }
+    })
+
+    test('every session cookie carries SameSite=none; Partitioned when only the client header is present (CDN-cached document load, no marker cookie)', () => {
+        const res = makeRes()
+        const {buf} = makeFullSlasResponse()
+        setHttpOnlySessionCookies(buf, {}, makeReqWithHeader(TRUSTED_PARENT), res, {})
+
+        expect(res.cookies.length).toBeGreaterThan(0)
+        for (const cookieStr of res.cookies) {
+            expect(cookieStr).toMatch(/SameSite=none/i)
+            expect(cookieStr).toMatch(/Partitioned/i)
+            expect(cookieStr).not.toMatch(/SameSite=lax/i)
+        }
+    })
+
+    test('falls back to SameSite=Lax when the client header value is not on the allow-list', () => {
+        const res = makeRes()
+        const {buf} = makeFullSlasResponse()
+        setHttpOnlySessionCookies(
+            buf,
+            {},
+            makeReqWithHeader('https://attacker.example.com'),
+            res,
+            {}
+        )
 
         for (const cookieStr of res.cookies) {
             expect(cookieStr).toMatch(/SameSite=lax/i)

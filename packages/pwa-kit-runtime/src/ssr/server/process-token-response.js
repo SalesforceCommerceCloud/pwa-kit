@@ -8,7 +8,7 @@ import {jwtDecode} from 'jwt-decode'
 import {cookieAsString} from '../../utils/ssr-proxying'
 import {SET_COOKIE} from './constants'
 import {getValidatedCookieDomain} from './cookie-domain'
-import {clearStorefrontPreviewMarker, readStorefrontPreviewMarker} from './preview-context'
+import {clearStorefrontPreviewMarker, isTrustedPreviewRequest} from './preview-context'
 import {
     SESSION_COOKIE_CONFIG,
     getAllCookieConfigs,
@@ -27,15 +27,17 @@ const PREVIEW_IFRAME_SITE_ATTRS = Object.freeze({sameSite: 'none', partitioned: 
 
 /**
  * Resolves the SameSite/Partitioned attributes to apply to all session
- * cookies on this response. When the request carries a validated
- * Storefront-Preview marker (set under server-attested conditions on the
- * iframe document load), returns `{sameSite: 'none', partitioned: true}`
- * so cookies attach inside the cross-site iframe. Otherwise returns
+ * cookies on this response. When the request originates from a trusted
+ * Storefront Preview iframe — signalled either by the server-set marker
+ * cookie (iframe document load that reached the origin) or by the
+ * client-sent `x-pwakit-preview-parent` header (CDN-cache-proof, rides on
+ * the non-cacheable token POST) — returns `{sameSite: 'none', partitioned:
+ * true}` so cookies attach inside the cross-site iframe. Otherwise returns
  * `{sameSite: 'lax'}` (the existing top-level behavior).
  * @private
  */
 function getSiteAttrsForRequest(req) {
-    return readStorefrontPreviewMarker(req) ? PREVIEW_IFRAME_SITE_ATTRS : DEFAULT_SITE_ATTRS
+    return isTrustedPreviewRequest(req) ? PREVIEW_IFRAME_SITE_ATTRS : DEFAULT_SITE_ATTRS
 }
 
 // Refresh token cookie TTL defaults (seconds). Must stay in sync with commerce-sdk-react auth constants.
