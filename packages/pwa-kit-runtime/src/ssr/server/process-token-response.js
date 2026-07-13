@@ -59,9 +59,14 @@ const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
  * host-scoped deletion (empty value) BEFORE the real cookie ensures the real
  * token value wins instead of being clobbered by the empty deletion —
  * otherwise the SSR shopper token would be empty and data-bearing routes
- * (e.g. a PLP) would 401 (regression of W-23388089). In the browser the two
- * writes target different cookie scopes (host vs Domain), so their relative
- * order has no effect.
+ * (e.g. a PLP) would 401 (regression of W-23388089). This rests on a cross-repo
+ * invariant: the parser is commerce-sdk-isomorphic's server-side TokenResponse
+ * reconstruction (helpers/slasHelper), which walks the Set-Cookie array keyed
+ * only by cookie NAME (Domain ignored) and assigns each token field with
+ * last-write-wins — notably both cc-nx and cc-nx-g map to refresh_token. If a
+ * future SDK version stops being last-write-wins (or skips empty values), this
+ * ordering must be revisited. In the browser the two writes target different
+ * cookie scopes (host vs Domain), so their relative order has no effect.
  *
  * `siteAttrs` (sameSite/partitioned) is decided per-request by
  * `getSiteAttrsForRequest` and applied uniformly to every cookie this
