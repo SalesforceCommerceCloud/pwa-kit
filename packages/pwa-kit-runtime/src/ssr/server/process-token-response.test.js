@@ -60,6 +60,24 @@ function findCookies(cookies, name) {
     return cookies.filter((c) => c.startsWith(`${name}=`)).map(parseCookie)
 }
 
+// Mirrors commerce-sdk-isomorphic's SSR TokenResponse reconstruction: it walks
+// the response's Set-Cookie array in emission order and assigns per token field
+// with last-write-wins, keyed only by cookie NAME (the Domain attribute is
+// ignored). Notably BOTH cc-nx and cc-nx-g map to refresh_token. This is what a
+// cookieless SSR guest login uses to recover its tokens, so the raw emission
+// order of these Set-Cookie headers is load-bearing — see the ordering notes in
+// makeAppendCookie and the refresh-token block of process-token-response.js.
+function reconstructSsrTokens(cookies, site = 'testsite') {
+    const out = {}
+    for (const raw of cookies) {
+        const {name, value} = parseCookie(raw)
+        if (name === `cc-at_${site}`) out.access_token = value
+        else if (name === `cc-nx_${site}` || name === `cc-nx-g_${site}`)
+            out.refresh_token = value
+    }
+    return out
+}
+
 describe('getRefreshTokenCookieTTL', () => {
     const GUEST_DEFAULT = 30 * 24 * 60 * 60
     const REGISTERED_DEFAULT = 90 * 24 * 60 * 60
@@ -631,6 +649,78 @@ describe('cookieDomain support', () => {
         expect(atActive).toBeDefined()
         expect(atActive.domain).toBe('.example.com')
         expect(atActive.httpOnly).toBe(true)
+    })
+
+    test('emits the host-scoped deletion BEFORE the real Domain-scoped write (raw emission order)', () => {
+        // The existing cleanup test above sorts the two writes by Domain, so it
+        // would still pass if the two res.append calls in makeAppendCookie were
+        // flipped back — reintroducing the SSR-reconstruction 401. Assert the
+        // raw emission order directly so that regression is caught.
+        const res = makeRes()
+        const accessToken = makeJWT({iat: 1000, exp: 2800, isb: 'uido:ecom::upn:Guest'})
+        const buf = makeResponseBuffer({access_token: accessToken, refresh_token: 'refresh-value'})
+        setHttpOnlySessionCookies(
+            buf,
+            {},
+            makeReq(),
+            res,
+            makeOptionsWithCookieDomain('.example.com')
+        )
+
+        // For a given cookie name, the empty host-scoped deletion must be emitted
+        // before the real Domain-scoped value so last-write-wins recovers the value.
+        const assertDeletionFirst = (name, realValue) => {
+            const idxOf = (predicate) =>
+                res.cookies.findIndex(
+                    (c) => c.startsWith(`${name}=`) && predicate(parseCookie(c))
+                )
+            const deletionIdx = idxOf((c) => c.value === '' && c.domain === undefined)
+            const realIdx = idxOf((c) => c.value === realValue && c.domain === '.example.com')
+            expect(deletionIdx).toBeGreaterThanOrEqual(0)
+            expect(realIdx).toBeGreaterThanOrEqual(0)
+            expect(deletionIdx).toBeLessThan(realIdx)
+        }
+
+        assertDeletionFirst('cc-at_testsite', accessToken)
+        assertDeletionFirst('cc-nx-g_testsite', 'refresh-value')
+    })
+
+    test('SSR last-write-wins reconstruction recovers the real access AND refresh tokens', () => {
+        // Guards the end-to-end invariant, including the cross-name refresh case
+        // that the per-name ordering test above cannot catch: the empty
+        // opposite-refresh deletion (cc-nx) is emitted as a separate appendCookie
+        // AFTER the real cc-nx-g in the pre-fix code, and both names map to
+        // refresh_token — so the deletion would clobber the reconstructed token.
+        const accessToken = makeJWT({iat: 1000, exp: 2800, isb: 'uido:ecom::upn:Guest'})
+
+        // With cookieDomain configured (the reported 401 scenario).
+        const withDomain = makeRes()
+        setHttpOnlySessionCookies(
+            makeResponseBuffer({access_token: accessToken, refresh_token: 'refresh-value'}),
+            {},
+            makeReq(),
+            withDomain,
+            makeOptionsWithCookieDomain('.example.com')
+        )
+        expect(reconstructSsrTokens(withDomain.cookies)).toEqual({
+            access_token: accessToken,
+            refresh_token: 'refresh-value'
+        })
+
+        // And without cookieDomain: the opposite-refresh deletion is still emitted
+        // last in the pre-fix code, so refresh_token must survive here too.
+        const noDomain = makeRes()
+        setHttpOnlySessionCookies(
+            makeResponseBuffer({access_token: accessToken, refresh_token: 'refresh-value'}),
+            {},
+            makeReq(),
+            noDomain,
+            {}
+        )
+        expect(reconstructSsrTokens(noDomain.cookies)).toEqual({
+            access_token: accessToken,
+            refresh_token: 'refresh-value'
+        })
     })
 
     test('setHttpOnlySessionCookies warns and ignores invalid cookieDomain', () => {

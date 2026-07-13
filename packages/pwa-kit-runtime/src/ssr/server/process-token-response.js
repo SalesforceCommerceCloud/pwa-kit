@@ -289,22 +289,33 @@ export function setHttpOnlySessionCookies(responseBuffer, proxyRes, req, res, op
         const refreshExpires = new Date(Date.now() + refreshTTL * 1000)
         const refreshConfig = isGuest ? refreshTokenGuest : refreshTokenRegistered
 
-        appendCookie({
-            name: getCookieName(refreshConfig, site),
-            value: parsed.refresh_token,
-            expires: refreshExpires,
-            attributes: refreshConfig.attributes
-        })
-
         // Delete the opposite refresh token cookie to mirror client-side behavior:
         // Login (guest → registered): delete guest cookie cc-nx-g
         // Logout (registered → guest): delete registered cookie cc-nx
+        //
+        // This deletion MUST be emitted BEFORE the real refresh-token write
+        // below. Both cc-nx and cc-nx-g map to `refresh_token` in
+        // commerce-sdk-isomorphic's SSR TokenResponse reconstruction, which
+        // parses the Set-Cookie array with last-write-wins per token field
+        // (ignoring the Domain attribute). If the empty opposite-cookie deletion
+        // were emitted last it would clobber the reconstructed refresh_token to
+        // empty — the same failure mode fixed for the access token in
+        // makeAppendCookie. The browser is unaffected either way (cc-nx and
+        // cc-nx-g are distinct cookie names, so their relative order is
+        // irrelevant there).
         const staleRefreshConfig = isGuest ? refreshTokenRegistered : refreshTokenGuest
         appendCookie({
             name: getCookieName(staleRefreshConfig, site),
             value: '',
             expires: new Date(0),
             attributes: staleRefreshConfig.attributes
+        })
+
+        appendCookie({
+            name: getCookieName(refreshConfig, site),
+            value: parsed.refresh_token,
+            expires: refreshExpires,
+            attributes: refreshConfig.attributes
         })
 
         // Hybrid SFRA + PWA: mirror session-scoped SLAS metadata as
