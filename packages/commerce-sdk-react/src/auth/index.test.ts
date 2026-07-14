@@ -271,6 +271,49 @@ describe('Auth', () => {
 
         expect(auth.get('access_token_sfra')).toBeFalsy()
     })
+    describe('graceful handling of stale/invalid session tokens', () => {
+        // Regression coverage for W-23444948: a stale or malformed session cookie
+        // (e.g. a truncated cc-at chunk or a value from an older format) must not
+        // surface jwt-decode's "Invalid token specified: missing part #2" to the
+        // storefront. Instead the token is discarded and the flow re-bootstraps.
+        test('isAccessTokenExpired clears an undecodable access token and treats it as expired', () => {
+            const auth = new Auth(config)
+            // @ts-expect-error private method
+            auth.set('access_token', 'not-a-valid-jwt')
+            // @ts-expect-error private method
+            expect(auth.isAccessTokenExpired()).toBe(true)
+            expect(auth.get('access_token')).toBeFalsy()
+        })
+        test('getAccessToken clears an undecodable SFRA handoff token and falls back to local store', () => {
+            const auth = new Auth(config)
+            // @ts-expect-error private method
+            auth.set('access_token', 'local-token')
+            // @ts-expect-error private method
+            auth.set('access_token_sfra', 'not-a-valid-jwt')
+            // @ts-expect-error private method
+            expect(auth.getAccessToken()).toBe('local-token')
+            expect(auth.get('access_token_sfra')).toBeFalsy()
+        })
+        test('getDntFromAccessToken returns undefined for an undecodable access token', () => {
+            const auth = new Auth(config)
+            // @ts-expect-error private method
+            auth.set('access_token', 'not-a-valid-jwt')
+            // @ts-expect-error private method
+            expect(auth.getDntFromAccessToken()).toBeUndefined()
+        })
+        test('handleTokenResponse does not throw when the access token is not a valid JWT', () => {
+            const auth = new Auth(config)
+            expect(() =>
+                // @ts-expect-error private method
+                auth.handleTokenResponse({...TOKEN_RESPONSE, access_token: 'not-a-valid-jwt'}, true)
+            ).not.toThrow()
+        })
+        test('ready - malformed fetchedToken does not throw and falls through to login', async () => {
+            const auth = new Auth({...config, fetchedToken: 'not-a-valid-jwt'})
+            await expect(auth.ready()).resolves.toBeDefined()
+            expect(helpers.loginGuestUser).toHaveBeenCalled()
+        })
+    })
     test('site switch clears auth storage', () => {
         const auth = new Auth(config)
         // @ts-expect-error private method
