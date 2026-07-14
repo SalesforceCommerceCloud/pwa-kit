@@ -75,6 +75,25 @@ export const getCookieSameSiteAttribute = () => {
 }
 
 /**
+ * Returns the parent origin when the storefront is running inside a trusted
+ * Storefront Preview iframe (i.e. the same condition under which
+ * `getCookieSameSiteAttribute` returns `"none"`), otherwise `undefined`.
+ *
+ * Used to signal the trusted parent origin to the BFF (via the
+ * `x-pwakit-preview-parent` header) on SLAS token requests when HttpOnly
+ * session cookies are enabled, so the server can set session cookies with
+ * SameSite=None; Partitioned. Returns `undefined` on the server and on
+ * localhost (the server-side allow-list does not include the local dev
+ * origin, and local dev is not fronted by the CDN that motivates this header).
+ */
+export const getTrustedPreviewParentOrigin = (): string | undefined => {
+    if (!onClient()) return undefined
+    const isLocalHost = window.location.hostname === 'localhost'
+    const parentOrigin = getParentOrigin()
+    return !isLocalHost && isOriginTrusted(parentOrigin) ? parentOrigin : undefined
+}
+
+/**
  * Gets the default cookie attributes. Sets the secure flag unless running on localhost in Safari.
  * Sets the sameSite attribute to `"none"` when running in a trusted iframe.
  */

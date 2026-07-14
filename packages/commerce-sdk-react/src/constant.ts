@@ -49,6 +49,17 @@ export const SERVER_AFFINITY_HEADER_KEY = 'sfdc_dwsid'
 // Custom header sent by the SDK to signal a refresh token request to the proxy.
 export const X_GRANT_TYPE = 'x-grant-type'
 
+// Custom header sent by the SDK on SLAS token requests when the storefront is
+// running inside a trusted Storefront Preview iframe. Carries the (trusted)
+// parent origin so the BFF can set session cookies with SameSite=None;
+// Partitioned instead of SameSite=Lax. Sent only when HttpOnly session cookies
+// are enabled. Unlike the server-set `__Host-pwakit_preview_ctx` marker cookie
+// (which relies on the iframe document load reaching the origin, and so is
+// bypassed when that response is served from the CDN cache), this header rides
+// on the non-cacheable token POST and always reaches the origin. The BFF
+// re-validates the value against its own allow-list before honoring it.
+export const X_PREVIEW_PARENT = 'x-pwakit-preview-parent'
+
 export const CLIENT_KEYS = {
     SHOPPER_BASKETS: 'shopperBaskets',
     SHOPPER_BASKETS_V2: 'shopperBasketsV2',

@@ -1,4 +1,5 @@
-## v3.19.0-dev
+## v3.20.0-dev (Jul 13, 2026)
+## v3.19.0 (Jul 13, 2026)
 - Fix OpenTelemetry v2 breaking change: `ReadableSpan.parentSpanId` renamed to `parentSpanContext`. Updated `src/utils/opentelemetry.js` and `src/ssr/server/mrt-console-span-exporter.js` to use `span.parentSpanContext?.spanId` instead of `span.parentSpanId` to restore parent span links in exported spans. Add `TextEncoder` polyfill alongside existing `TextDecoder` for complete AWS SDK 3.x CBOR support. [#3917](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3917)
 - Report the matched route template (e.g. `/:site/:locale/category/:categoryId`) as the `http.route` attribute on the DT server span, stripping inline regex constraint groups to keep the attribute low-cardinality. [#3917](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3917)
 - **Security**: Upgrade all `@opentelemetry/*` packages from `^1.15.1` to `^2.8.0` to resolve GHSA-8988-4f7v-96qf (Moderate - unbounded memory allocation vulnerability). Updated production code for OpenTelemetry v2 API changes: replaced `new Resource()` with `resourceFromAttributes()` and changed from `provider.addSpanProcessor()` to `spanProcessors: []` array in NodeTracerProvider constructor. [#3911](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3911)
