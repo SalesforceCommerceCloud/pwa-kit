@@ -4,9 +4,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import type {DOMWindow} from 'jsdom'
 import * as utils from './utils'
 import {DEFAULT_TEST_CONFIG} from './test-utils'
 import {SDKClientTransformConfig} from './hooks/types'
+
+// `jsdom` is declared as a global by src/components/StorefrontPreview/utils.test.ts
+// (a `declare global` augmentation is visible program-wide); redeclaring it here
+// would be a TS2451 "cannot redeclare block-scoped variable" error under tsc.
+
+/** Empty `window.top` that throws if anything touches it — proves we don't. */
+const mockTop = new Proxy({} as DOMWindow, {
+    get: (_, prop) => {
+        throw new Error(`window.top['${String(prop)}'] is not mocked.`)
+    }
+})
 
 describe('Utils', () => {
     test.each([
@@ -250,5 +262,59 @@ describe('parseResponseBodyClone', () => {
 
         await expect(utils.parseResponseBodyClone(response)).resolves.toBeUndefined()
         expect(json).not.toHaveBeenCalled()
+    })
+})
+
+describe('getTrustedPreviewParentOrigin', () => {
+    const TRUSTED_PARENT = 'https://runtime.commercecloud.com'
+    const UNTRUSTED_PARENT = 'https://website.about.bagels'
+    const STOREFRONT_URL = 'https://storefront.mobify-storefront.com'
+
+    let originalLocation: string
+
+    // Bypasses two TS constraints on `location.ancestorOrigins`: it's read-only
+    // and typed as DOMStringList. Numeric indexing on a plain array is enough
+    // for getParentOrigin, which only reads `ancestorOrigins[0]`.
+    const setAncestorOrigins = (...ancestorOrigins: string[]) => {
+        Object.assign(location, {ancestorOrigins})
+    }
+
+    beforeAll(() => {
+        originalLocation = window.location.href
+    })
+    beforeEach(() => {
+        // Sever `window.top === window.self` so detectInIframe() reports true,
+        // and set a non-localhost storefront URL.
+        jsdom.reconfigure({windowTop: mockTop, url: STOREFRONT_URL})
+    })
+    afterEach(() => {
+        // @ts-expect-error DOM lib types ancestorOrigins as required; JSDOM omits it
+        delete window.location.ancestorOrigins
+    })
+    afterAll(() => {
+        jsdom.reconfigure({windowTop: window as unknown as DOMWindow, url: originalLocation})
+    })
+
+    test('returns the parent origin when in a trusted iframe on a non-localhost host', () => {
+        setAncestorOrigins(TRUSTED_PARENT)
+        expect(utils.getTrustedPreviewParentOrigin()).toBe(TRUSTED_PARENT)
+    })
+
+    test('returns undefined when the parent origin is not trusted', () => {
+        setAncestorOrigins(UNTRUSTED_PARENT)
+        expect(utils.getTrustedPreviewParentOrigin()).toBeUndefined()
+    })
+
+    test('returns undefined when not in an iframe', () => {
+        jsdom.reconfigure({windowTop: window as unknown as DOMWindow, url: STOREFRONT_URL})
+        setAncestorOrigins(TRUSTED_PARENT)
+        expect(utils.getTrustedPreviewParentOrigin()).toBeUndefined()
+    })
+
+    test('returns undefined on localhost even when the parent origin is the dev origin', () => {
+        // Mirrors getCookieSameSiteAttribute: localhost never opts into SameSite=None.
+        jsdom.reconfigure({windowTop: mockTop, url: 'http://localhost:3000'})
+        setAncestorOrigins('http://localhost:4000')
+        expect(utils.getTrustedPreviewParentOrigin()).toBeUndefined()
     })
 })

@@ -6,8 +6,17 @@
  */
 import * as fs from 'fs'
 import * as path from 'path'
-import {tryWriteStorefrontPreviewMarker, readStorefrontPreviewMarker} from './preview-context'
-import {STOREFRONT_PREVIEW_CTX_COOKIE, STOREFRONT_PREVIEW_PARENT_ALLOW_LIST} from './constants'
+import {
+    tryWriteStorefrontPreviewMarker,
+    readStorefrontPreviewMarker,
+    readTrustedPreviewParentHeader,
+    isTrustedPreviewRequest
+} from './preview-context'
+import {
+    STOREFRONT_PREVIEW_CTX_COOKIE,
+    STOREFRONT_PREVIEW_PARENT_ALLOW_LIST,
+    X_PREVIEW_PARENT
+} from './constants'
 
 const TRUSTED_PARENT = 'https://runtime-admin-preview.mobify-storefront.com'
 
@@ -165,6 +174,71 @@ describe('readStorefrontPreviewMarker', () => {
     test('returns undefined when the marker cookie is absent but other cookies present', () => {
         const req = {headers: {cookie: 'foo=bar; baz=qux'}}
         expect(readStorefrontPreviewMarker(req)).toBeUndefined()
+    })
+})
+
+describe('readTrustedPreviewParentHeader', () => {
+    test('returns undefined when the header is absent', () => {
+        expect(readTrustedPreviewParentHeader({headers: {}})).toBeUndefined()
+    })
+
+    test('returns the validated origin when the header value is on the allow-list', () => {
+        const req = {headers: {[X_PREVIEW_PARENT]: TRUSTED_PARENT}}
+        expect(readTrustedPreviewParentHeader(req)).toBe(TRUSTED_PARENT)
+    })
+
+    test.each(STOREFRONT_PREVIEW_PARENT_ALLOW_LIST)(
+        'returns the origin for trusted parent %s',
+        (origin) => {
+            const req = {headers: {[X_PREVIEW_PARENT]: origin}}
+            expect(readTrustedPreviewParentHeader(req)).toBe(origin)
+        }
+    )
+
+    test('returns undefined when the header value is not on the allow-list', () => {
+        const req = {headers: {[X_PREVIEW_PARENT]: 'https://evil.example.com'}}
+        expect(readTrustedPreviewParentHeader(req)).toBeUndefined()
+    })
+
+    test('returns undefined when the header value is empty', () => {
+        const req = {headers: {[X_PREVIEW_PARENT]: ''}}
+        expect(readTrustedPreviewParentHeader(req)).toBeUndefined()
+    })
+})
+
+describe('isTrustedPreviewRequest', () => {
+    test('true when only the marker cookie is present', () => {
+        const req = {headers: {cookie: `${STOREFRONT_PREVIEW_CTX_COOKIE}=${TRUSTED_PARENT}`}}
+        expect(isTrustedPreviewRequest(req)).toBe(true)
+    })
+
+    test('true when only the client header is present (CDN cache bypasses the marker)', () => {
+        const req = {headers: {[X_PREVIEW_PARENT]: TRUSTED_PARENT}}
+        expect(isTrustedPreviewRequest(req)).toBe(true)
+    })
+
+    test('true when both signals are present', () => {
+        const req = {
+            headers: {
+                cookie: `${STOREFRONT_PREVIEW_CTX_COOKIE}=${TRUSTED_PARENT}`,
+                [X_PREVIEW_PARENT]: TRUSTED_PARENT
+            }
+        }
+        expect(isTrustedPreviewRequest(req)).toBe(true)
+    })
+
+    test('false when neither signal is present', () => {
+        expect(isTrustedPreviewRequest({headers: {}})).toBe(false)
+    })
+
+    test('false when both signals carry untrusted values', () => {
+        const req = {
+            headers: {
+                cookie: `${STOREFRONT_PREVIEW_CTX_COOKIE}=https://evil.example.com`,
+                [X_PREVIEW_PARENT]: 'https://evil.example.com'
+            }
+        }
+        expect(isTrustedPreviewRequest(req)).toBe(false)
     })
 })
 

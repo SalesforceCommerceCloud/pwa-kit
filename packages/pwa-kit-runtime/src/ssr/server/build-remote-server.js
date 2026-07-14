@@ -18,7 +18,8 @@ import {
     SLAS_TOKEN_RESPONSE_ENDPOINTS,
     SLAS_LOGOUT_ENDPOINT,
     X_SITE_ID,
-    X_GRANT_TYPE
+    X_GRANT_TYPE,
+    X_PREVIEW_PARENT
 } from './constants'
 import {SESSION_COOKIE_CONFIG, getCookieName, getSiteId} from './httponly-cookie-config'
 import {tryWriteStorefrontPreviewMarker} from './preview-context'
@@ -1387,6 +1388,11 @@ export const RemoteServerFactory = {
                             targetProtocol: 'https'
                         })
 
+                        // Internal preview-context signal consumed by the response
+                        // interceptor (process-token-response); never forwarded to
+                        // SLAS, regardless of the HttpOnly session-cookie flag.
+                        proxyRequest.removeHeader(X_PREVIEW_PARENT)
+
                         // Credential mode is taken from the allow-list entry
                         // attached by the pre-proxy guard.
                         const {injectAuth = SlasProxyAuthType.NONE} =
@@ -1594,6 +1600,11 @@ export const RemoteServerFactory = {
                             targetHost: options.slasHostName,
                             targetProtocol: 'https'
                         })
+
+                        // Internal preview-context signal consumed by the response
+                        // interceptor (process-token-response); never forwarded to
+                        // SLAS, regardless of the HttpOnly session-cookie flag.
+                        proxyRequest.removeHeader(X_PREVIEW_PARENT)
 
                         if (httpOnlyCookiesEnabled) {
                             handleHttpOnlyCookiesOnProxyReq(proxyRequest, incomingRequest)
