@@ -14,10 +14,11 @@ import {X_SITE_ID, DWSID_COOKIE_NAME} from './constants'
  *
  * `attributes` covers the *static* per-cookie attributes only (`httpOnly`,
  * `secure`, `path`). `SameSite` and `Partitioned` are resolved per-request
- * by `setHttpOnlySessionCookies` based on the Storefront Preview marker
- * cookie — see `preview-context.js`. Top-level traffic gets `SameSite=Lax`;
- * traffic with a validated trusted-iframe marker gets
- * `SameSite=None; Partitioned`.
+ * by `setHttpOnlySessionCookies` based on the Storefront Preview signal —
+ * either the server-set marker cookie or the client-sent
+ * `x-pwakit-preview-parent` header (see `isTrustedPreviewRequest` in
+ * `preview-context.js`). Top-level traffic gets `SameSite=Lax`; traffic from a
+ * validated trusted iframe gets `SameSite=None; Partitioned`.
  */
 export const SESSION_COOKIE_CONFIG = {
     accessToken: {

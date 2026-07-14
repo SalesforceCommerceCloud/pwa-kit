@@ -14,7 +14,7 @@ import {
     ShopperLogin
 } from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
-import {SLAS_SECRET_PLACEHOLDER, X_GRANT_TYPE} from '../constant'
+import {SLAS_SECRET_PLACEHOLDER, X_GRANT_TYPE, X_PREVIEW_PARENT} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
@@ -86,6 +86,7 @@ jest.mock('../utils', () => ({
     getParentOrigin: jest.fn().mockResolvedValue(''),
     isOriginTrusted: () => false,
     getDefaultCookieAttributes: () => {},
+    getTrustedPreviewParentOrigin: jest.fn().mockReturnValue(undefined),
     isAbsoluteUrl: () => true
 }))
 
@@ -1860,5 +1861,37 @@ describe('HttpOnly Session Cookies', () => {
         expect(headerDuringCall).toBeUndefined()
         // @ts-expect-error private property
         expect(auth.client.clientConfig.headers[X_GRANT_TYPE]).toBeUndefined()
+    })
+
+    test('sets x-pwakit-preview-parent header when httpOnly is enabled inside a trusted preview iframe', () => {
+        const TRUSTED_PARENT = 'https://runtime.commercecloud.com'
+        ;(utils.getTrustedPreviewParentOrigin as jest.Mock).mockReturnValueOnce(TRUSTED_PARENT)
+
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_PREVIEW_PARENT]).toBe(TRUSTED_PARENT)
+    })
+
+    test('does not set x-pwakit-preview-parent header when not in a trusted preview iframe', () => {
+        // Default mock returns undefined (getTrustedPreviewParentOrigin gates on
+        // iframe detection + allow-list), so the header must not be attached.
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_PREVIEW_PARENT]).toBeUndefined()
+    })
+
+    test('does not set x-pwakit-preview-parent header when httpOnly cookies are disabled', () => {
+        // Even if the storefront is in a trusted iframe, the header is only
+        // meaningful for the HttpOnly-cookie BFF flow, so it must be skipped.
+        const trustedMock = utils.getTrustedPreviewParentOrigin as jest.Mock
+        trustedMock.mockReturnValueOnce('https://runtime.commercecloud.com')
+
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: false})
+
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_PREVIEW_PARENT]).toBeUndefined()
+        expect(trustedMock).not.toHaveBeenCalled()
     })
 })
