@@ -510,7 +510,7 @@ class Auth {
         }
         const accessToken = this.getAccessToken()
         if (accessToken) {
-            return this.safeParseSlasJWT(accessToken)?.dnt
+            return this.parseSlasJWT(accessToken)?.dnt
         }
         return undefined
     }
@@ -744,7 +744,7 @@ class Auth {
                 this.clearSFRAAuthToken()
                 return ''
             }
-            const parsed = this.safeParseSlasJWT(sfraAuthToken)
+            const parsed = this.parseSlasJWT(sfraAuthToken)
             if (!parsed) {
                 // The SFRA cc-at handoff cookie is stale/truncated and can't be
                 // decoded. Clear it so it can't keep re-triggering the failure and
@@ -916,7 +916,7 @@ class Auth {
         this.set('access_token', res.access_token)
         this.set('idp_access_token', res.idp_access_token)
         if (res.access_token) {
-            const parsed = this.safeParseSlasJWT(res.access_token)
+            const parsed = this.parseSlasJWT(res.access_token)
             if (parsed) {
                 this.set('uido', parsed.uido)
             }
@@ -1018,15 +1018,15 @@ class Auth {
         // refresh flow for TAOB
         const accessToken = this.getAccessToken()
         if (this.isAccessTokenExpired()) {
-            try {
-                const {isGuest, usid, loginId, isAgent} = this.parseSlasJWT(accessToken)
-                if (isAgent) {
-                    const token = await this.refreshTrustedAgent(loginId, usid)
-                    this.handleTokenResponse(token, isGuest)
+            const parsed = this.parseSlasJWT(accessToken)
+            if (parsed?.isAgent) {
+                try {
+                    const token = await this.refreshTrustedAgent(parsed.loginId, parsed.usid)
+                    this.handleTokenResponse(token, parsed.isGuest)
                     return this.data
+                } catch (e) {
+                    /* fall through to guest login if the TAOB refresh fails */
                 }
-            } catch (e) {
-                /* catch invalid jwt */
             }
         }
 
@@ -1111,7 +1111,7 @@ class Auth {
         }
 
         if (this.fetchedToken && this.fetchedToken !== '') {
-            const parsed = this.safeParseSlasJWT(this.fetchedToken)
+            const parsed = this.parseSlasJWT(this.fetchedToken)
             // A malformed fetchedToken (stale/truncated JWT captured during SSR)
             // can't be used to hydrate session state. Discard it and fall through
             // to the refresh / guest-login path below instead of throwing.
@@ -1742,56 +1742,50 @@ class Auth {
     }
 
     /**
-     * Decode SLAS JWT and extract information such as customer id, usid, etc.
+     * Decode a SLAS JWT and extract information such as customer id, usid, etc.
      *
+     * Returns null (instead of throwing) when the token is missing, truncated, or
+     * otherwise not a valid JWT — e.g. a stale session cookie or a lost `cc-at`
+     * chunk. Callers treat null as "no usable token" and fall through to a refresh
+     * / guest login rather than surfacing jwt-decode's "Invalid token specified:
+     * missing part #2" error to the storefront.
      */
     parseSlasJWT(jwt: string) {
-        const payload: SlasJwtPayload = jwtDecode(jwt)
-        const {sub, isb, dnt} = payload
-
-        if (!sub || !isb) {
-            throw new Error('Unable to parse access token payload: missing sub and isb.')
-        }
-
-        // ISB format
-        // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
-        const isbParts = isb.split('::')
-        const uido = isbParts[0].split('uido:')[1]
-        const isGuest = isbParts[1] === 'upn:Guest'
-        const customerId = isGuest
-            ? isbParts[3].replace('gcid:', '')
-            : isbParts[4].replace('rcid:', '')
-
-        const loginId = isGuest ? 'guest' : isbParts[1].replace('upn:', '')
-
-        const isAgent = !!isbParts?.[isGuest ? 5 : 6]?.startsWith('agent:')
-        const agentId = isAgent ? isbParts?.[isGuest ? 5 : 6]?.replace('agent:', '') : null
-
-        // SUB format
-        // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
-        const usid = sub.split('::')[3].replace('usid:', '')
-        return {
-            isGuest,
-            customerId,
-            usid,
-            dnt,
-            loginId,
-            isAgent,
-            agentId,
-            uido
-        }
-    }
-
-    /**
-     * Safely decode a SLAS JWT. Returns null (instead of throwing) when the token
-     * is missing, truncated, or otherwise not a valid JWT — e.g. a stale session
-     * cookie or a lost `cc-at` chunk. Callers treat null as "no usable token" and
-     * fall through to a refresh / guest login rather than surfacing jwt-decode's
-     * "Invalid token specified: missing part #2" error to the storefront.
-     */
-    private safeParseSlasJWT(jwt: string) {
         try {
-            return this.parseSlasJWT(jwt)
+            const payload: SlasJwtPayload = jwtDecode(jwt)
+            const {sub, isb, dnt} = payload
+
+            if (!sub || !isb) {
+                throw new Error('Unable to parse access token payload: missing sub and isb.')
+            }
+
+            // ISB format
+            // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
+            const isbParts = isb.split('::')
+            const uido = isbParts[0].split('uido:')[1]
+            const isGuest = isbParts[1] === 'upn:Guest'
+            const customerId = isGuest
+                ? isbParts[3].replace('gcid:', '')
+                : isbParts[4].replace('rcid:', '')
+
+            const loginId = isGuest ? 'guest' : isbParts[1].replace('upn:', '')
+
+            const isAgent = !!isbParts?.[isGuest ? 5 : 6]?.startsWith('agent:')
+            const agentId = isAgent ? isbParts?.[isGuest ? 5 : 6]?.replace('agent:', '') : null
+
+            // SUB format
+            // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
+            const usid = sub.split('::')[3].replace('usid:', '')
+            return {
+                isGuest,
+                customerId,
+                usid,
+                dnt,
+                loginId,
+                isAgent,
+                agentId,
+                uido
+            }
         } catch (e) {
             this.logWarning(`Ignoring invalid access token: ${(e as Error).message}`)
             return null

@@ -276,6 +276,10 @@ describe('Auth', () => {
         // (e.g. a truncated cc-at chunk or a value from an older format) must not
         // surface jwt-decode's "Invalid token specified: missing part #2" to the
         // storefront. Instead the token is discarded and the flow re-bootstraps.
+        test('parseSlasJWT returns null for an undecodable token instead of throwing', () => {
+            const auth = new Auth(config)
+            expect(auth.parseSlasJWT('not-a-valid-jwt')).toBeNull()
+        })
         test('isAccessTokenExpired clears an undecodable access token and treats it as expired', () => {
             const auth = new Auth(config)
             // @ts-expect-error private method
