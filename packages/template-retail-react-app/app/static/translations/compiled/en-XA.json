@@ -9361,20 +9361,6 @@
       "value": "]"
     }
   ],
-  "return_items_modal.button.retry": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Řḗḗŧřẏ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "return_items_modal.button.review_return": [
     {
       "type": 0,
@@ -9609,20 +9595,6 @@
       "value": "]"
     }
   ],
-  "return_items_modal.text.loading_reasons": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŀǿǿȧȧḓīƞɠ řḗḗŧŭŭřƞ řḗḗȧȧşǿǿƞş…"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "return_items_modal.text.quantity_exceeded_affected_generic": [
     {
       "type": 0,
@@ -9631,20 +9603,6 @@
     {
       "type": 0,
       "value": "Şǿǿḿḗḗ īŧḗḗḿş' ȧȧṽȧȧīŀȧȧƀŀḗḗ řḗḗŧŭŭřƞ ɋŭŭȧȧƞŧīŧīḗḗş ƈħȧȧƞɠḗḗḓ. Ƥŀḗḗȧȧşḗḗ řḗḗṽīḗḗẇ ŧħḗḗ ŭŭƥḓȧȧŧḗḗḓ ŀīḿīŧş ƀḗḗŀǿǿẇ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "return_items_modal.text.reasons_error": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ẇḗḗ ƈǿǿŭŭŀḓ ƞǿǿŧ ŀǿǿȧȧḓ ŧħḗḗ řḗḗŧŭŭřƞ řḗḗȧȧşǿǿƞş. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
     },
     {
       "type": 0,

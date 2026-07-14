@@ -70,7 +70,7 @@ Returnability is decided by the OMS, not the storefront. An order carries an `om
 
 ### Return reason codes
 
-The return modal populates its per-item "reason" dropdown from the OMS metadata API, read via `useOmsMetaData().data.returnReasonCodes`. Each entry is `{reason, default}`:
+The return modal populates its per-item "reason" dropdown from the OMS metadata API. The order-detail page fetches this once via `useOmsMetaData().data.returnReasonCodes` and forwards it into the modal as the `reasonCodes` prop (mirroring how it forwards `cancelReasonCodes` to `CancelOrderModal`). Each entry is `{reason, default}`:
 
 - Merchants define the available reasons (and mark exactly one as the default) **in the OMS**; the storefront renders them as-is.
 - When the shopper keeps the default reason, the submitted payload **omits** `reason` so the server applies its own default (see `buildReturnProductItems`). A non-default selection is sent as `reason`.

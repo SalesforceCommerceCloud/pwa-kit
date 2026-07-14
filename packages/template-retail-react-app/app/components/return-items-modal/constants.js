@@ -48,18 +48,6 @@ export const messages = defineMessages({
         defaultMessage: 'Select at least one item and choose a reason to continue.',
         id: 'return_items_modal.hint.review_disabled'
     },
-    loadingReasons: {
-        defaultMessage: 'Loading return reasons…',
-        id: 'return_items_modal.text.loading_reasons'
-    },
-    reasonsError: {
-        defaultMessage: 'We could not load the return reasons. Please try again.',
-        id: 'return_items_modal.text.reasons_error'
-    },
-    retryButton: {
-        defaultMessage: 'Retry',
-        id: 'return_items_modal.button.retry'
-    },
     itemCheckboxLabel: {
         defaultMessage: '{name}, {count, plural, one {# unit} other {# units}} available to return',
         id: 'return_items_modal.label.item_checkbox'

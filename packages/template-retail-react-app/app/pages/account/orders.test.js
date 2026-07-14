@@ -46,7 +46,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
                 : {mutateAsync: mockMutateAsync, isLoading: false},
         useOmsMetaData: () => ({
             data: {cancelReasonCodes: [], returnReasonCodes: mockOmsMetaDataReturnReasonCodes},
-            isLoading: false
+            isLoading: false,
+            refetch: jest.fn()
         }),
         useCustomerType: () => ({isRegistered: true, isGuest: false}),
         useCustomerId: () => 'testCustomerId'

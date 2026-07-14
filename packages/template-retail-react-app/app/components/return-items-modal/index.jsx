@@ -8,7 +8,6 @@
 import React, {useCallback, useEffect, useId, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useOmsMetaData} from '@salesforce/commerce-sdk-react'
 import {
     Alert,
     AlertDescription,
@@ -35,7 +34,6 @@ import {
     ModalOverlay,
     Select,
     SimpleGrid,
-    Skeleton,
     Stack,
     Text,
     VisuallyHidden,
@@ -46,8 +44,6 @@ import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/
 import {buildReturnProductItems} from '@salesforce/retail-react-app/app/utils/return-utils'
 import {ReturnErrorKind} from '@salesforce/retail-react-app/app/utils/return-error-utils'
 import {messages} from '@salesforce/retail-react-app/app/components/return-items-modal/constants'
-
-const onClient = typeof window !== 'undefined'
 
 /**
  * Format the variant attributes a shopper sees inline next to the product name.
@@ -214,10 +210,12 @@ const ReturnItemsModal = ({
     onClose,
     order,
     returnableItems,
+    reasonCodes,
     selection,
     onSelectionChange,
     onSubmit,
     onClearSubmitError,
+    onRefetchReasons,
     isSubmitting = false,
     submitError = null,
     finalFocusRef
@@ -237,13 +235,7 @@ const ReturnItemsModal = ({
         if (!isOpen) setView('select')
     }, [isOpen])
 
-    const reviewQuery = useOmsMetaData(
-        {},
-        {
-            enabled: isOpen && onClient
-        }
-    )
-    const reasons = reviewQuery.data?.returnReasonCodes || []
+    const reasons = reasonCodes || []
     const defaultReasonCode = useMemo(() => findDefaultReasonCode(reasons), [reasons])
 
     // Clear a stale submit error the moment the shopper edits their selection,
@@ -365,7 +357,7 @@ const ReturnItemsModal = ({
             // clear the stale reasonCode on every checked row, so the shopper
             // can't simply re-review/resubmit the same rejected reason (the
             // Review button stays disabled until a fresh reason is chosen).
-            reviewQuery.refetch?.()
+            onRefetchReasons?.()
             onSelectionChange((prev) => {
                 if (!prev) return prev
                 let next = prev
@@ -382,7 +374,7 @@ const ReturnItemsModal = ({
                 return changed ? next : prev
             })
         }
-    }, [submitError, isSelectViewError, errorKind, reviewQuery, onSelectionChange])
+    }, [submitError, isSelectViewError, errorKind, onRefetchReasons, onSelectionChange])
     useEffect(() => {
         if (!submitError) handledErrorRef.current = null
     }, [submitError])
@@ -476,32 +468,7 @@ const ReturnItemsModal = ({
         </Alert>
     ) : null
 
-    const selectBody = reviewQuery.isLoading ? (
-        <Stack spacing={3} data-testid="return-items-modal-loading" role="status">
-            <VisuallyHidden>
-                <FormattedMessage {...messages.loadingReasons} />
-            </VisuallyHidden>
-            <Skeleton h="64px" />
-            <Skeleton h="64px" />
-        </Stack>
-    ) : reviewQuery.isError ? (
-        <Alert status="error" data-testid="return-items-modal-error">
-            <AlertIcon />
-            <Stack spacing={2}>
-                <AlertDescription>
-                    <FormattedMessage {...messages.reasonsError} />
-                </AlertDescription>
-                <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => reviewQuery.refetch()}
-                    data-testid="return-items-modal-retry"
-                >
-                    <FormattedMessage {...messages.retryButton} />
-                </Button>
-            </Stack>
-        </Alert>
-    ) : (
+    const selectBody = (
         <Stack spacing={3}>
             {selectErrorBanner}
             {returnableItems.map((item) => (
@@ -755,17 +722,26 @@ ReturnItemsModal.propTypes = {
     onClose: PropTypes.func.isRequired,
     order: PropTypes.object,
     returnableItems: PropTypes.array.isRequired,
+    /** OMS-configured return reason codes, forwarded from the page-level useOmsMetaData fetch. */
+    reasonCodes: PropTypes.arrayOf(
+        PropTypes.shape({
+            reason: PropTypes.string.isRequired,
+            default: PropTypes.bool
+        })
+    ),
     selection: PropTypes.object,
     onSelectionChange: PropTypes.func.isRequired,
     /** Invoked with the API-shaped `productItems` array when the shopper submits. */
     onSubmit: PropTypes.func.isRequired,
     /** Invoked to clear a stale submit error when the shopper edits their selection (Back). */
     onClearSubmitError: PropTypes.func,
+    /** Refetch the page-level OMS metadata; invoked after an INVALID_REASON error so the shopper sees a fresh reason list. */
+    onRefetchReasons: PropTypes.func,
     /** True while the parent's `returnOmsOrder` mutation is in flight. */
     isSubmitting: PropTypes.bool,
     /**
      * Truthy when the submit failed: the classified `{kind}` object from
-     * `classifyReturnError`. Drives the inline review-view retry (network/unknown)
+     * `classifyReturnError`. Drives the inline review-view banner (network/unknown)
      * or the select-view banner (invalid reason / unknown items / quantity
      * exceeded) or the terminal no-retry banner (404/409).
      */

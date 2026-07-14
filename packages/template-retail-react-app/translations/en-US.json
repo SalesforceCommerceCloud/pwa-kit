@@ -1856,9 +1856,6 @@
   "return_items_modal.button.cancel": {
     "defaultMessage": "Cancel"
   },
-  "return_items_modal.button.retry": {
-    "defaultMessage": "Retry"
-  },
   "return_items_modal.button.review_return": {
     "defaultMessage": "Review Return"
   },
@@ -1892,14 +1889,8 @@
   "return_items_modal.text.available_to_return": {
     "defaultMessage": "Up to {count, plural, one {# unit} other {# units}} available to return"
   },
-  "return_items_modal.text.loading_reasons": {
-    "defaultMessage": "Loading return reasons…"
-  },
   "return_items_modal.text.quantity_exceeded_affected_generic": {
     "defaultMessage": "Some items' available return quantities changed. Please review the updated limits below."
-  },
-  "return_items_modal.text.reasons_error": {
-    "defaultMessage": "We could not load the return reasons. Please try again."
   },
   "return_items_modal.text.review_description": {
     "defaultMessage": "Confirm the items below. We'll email a return label once your request is submitted."

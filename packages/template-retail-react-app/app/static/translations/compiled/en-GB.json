@@ -4449,12 +4449,6 @@
       "value": "Cancel"
     }
   ],
-  "return_items_modal.button.retry": [
-    {
-      "type": 0,
-      "value": "Retry"
-    }
-  ],
   "return_items_modal.button.review_return": [
     {
       "type": 0,
@@ -4601,22 +4595,10 @@
       "value": " available to return"
     }
   ],
-  "return_items_modal.text.loading_reasons": [
-    {
-      "type": 0,
-      "value": "Loading return reasons…"
-    }
-  ],
   "return_items_modal.text.quantity_exceeded_affected_generic": [
     {
       "type": 0,
       "value": "Some items' available return quantities changed. Please review the updated limits below."
-    }
-  ],
-  "return_items_modal.text.reasons_error": [
-    {
-      "type": 0,
-      "value": "We could not load the return reasons. Please try again."
     }
   ],
   "return_items_modal.text.review_description": [

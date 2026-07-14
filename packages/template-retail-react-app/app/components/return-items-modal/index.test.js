@@ -26,26 +26,11 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
     }
 })
 
-let mockOmsMetaData = {
-    data: {
-        cancelReasonCodes: [],
-        returnReasonCodes: [
-            {reason: 'Wrong size', default: true},
-            {reason: 'Defect', default: false},
-            {reason: 'Changed my mind', default: false}
-        ]
-    },
-    isLoading: false,
-    isError: false,
-    refetch: jest.fn()
-}
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const actual = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...actual,
-        useOmsMetaData: () => mockOmsMetaData
-    }
-})
+const defaultReasonCodes = [
+    {reason: 'Wrong size', default: true},
+    {reason: 'Defect', default: false},
+    {reason: 'Changed my mind', default: false}
+]
 
 const baseOrder = {
     orderNo: '00123456',
@@ -76,6 +61,8 @@ const Harness = ({
     onSubmit = jest.fn(),
     onClose = jest.fn(),
     onClearSubmitError = jest.fn(),
+    onRefetchReasons = jest.fn(),
+    reasonCodes = defaultReasonCodes,
     initialSelection = {},
     isSubmitting = false,
     submitError = null,
@@ -88,10 +75,12 @@ const Harness = ({
             onClose={onClose}
             order={baseOrder}
             returnableItems={baseOrder.productItems}
+            reasonCodes={reasonCodes}
             selection={selection}
             onSelectionChange={setSelection}
             onSubmit={onSubmit}
             onClearSubmitError={onClearSubmitError}
+            onRefetchReasons={onRefetchReasons}
             isSubmitting={isSubmitting}
             submitError={submitError}
             finalFocusRef={finalFocusRef}
@@ -102,6 +91,8 @@ Harness.propTypes = {
     onSubmit: PropTypes.func,
     onClose: PropTypes.func,
     onClearSubmitError: PropTypes.func,
+    onRefetchReasons: PropTypes.func,
+    reasonCodes: PropTypes.array,
     initialSelection: PropTypes.object,
     isSubmitting: PropTypes.bool,
     submitError: PropTypes.any,
@@ -109,19 +100,6 @@ Harness.propTypes = {
 }
 
 afterEach(() => {
-    mockOmsMetaData = {
-        data: {
-            cancelReasonCodes: [],
-            returnReasonCodes: [
-                {reason: 'Wrong size', default: true},
-                {reason: 'Defect', default: false},
-                {reason: 'Changed my mind', default: false}
-            ]
-        },
-        isLoading: false,
-        isError: false,
-        refetch: jest.fn()
-    }
     jest.clearAllMocks()
     // clearAllMocks wipes the implementation too; restore the default
     // (undefined → desktop Modal branch) so order-independent tests are stable.
@@ -426,24 +404,23 @@ test('unknownItems error drops to the select view with a refresh-and-try-again b
 })
 
 test('invalidReason error shows the select-view banner and refetches OMS reasons', async () => {
-    const refetch = jest.fn()
-    mockOmsMetaData = {...mockOmsMetaData, refetch}
+    const onRefetchReasons = jest.fn()
     renderWithProviders(
         <Harness
+            onRefetchReasons={onRefetchReasons}
             submitError={{kind: ReturnErrorKind.INVALID_REASON}}
             initialSelection={{'item-1': {checked: true, quantity: 1, reasonCode: 'Defect'}}}
         />
     )
     const banner = await screen.findByTestId('return-items-modal-select-error')
     expect(within(banner).getByText(/selected reason is no longer available/i)).toBeInTheDocument()
-    expect(refetch).toHaveBeenCalled()
+    expect(onRefetchReasons).toHaveBeenCalled()
 })
 
 test('invalidReason error clears the stale reasonCode so the same reason cannot be resubmitted', async () => {
     // The rejected reason must not stay selected — otherwise the shopper could
     // immediately re-review/resubmit the same invalid reason. Clearing it drops
     // the row to invalid until a fresh reason is chosen, so Review is disabled.
-    mockOmsMetaData = {...mockOmsMetaData, refetch: jest.fn()}
     renderWithProviders(
         <Harness
             submitError={{kind: ReturnErrorKind.INVALID_REASON}}
@@ -477,12 +454,6 @@ test('editing a row after an error clears the stale submit error (onClearSubmitE
     expect(onClearSubmitError).toHaveBeenCalled()
 })
 
-test('renders skeleton placeholders while OMS metadata is loading', () => {
-    mockOmsMetaData = {data: undefined, isLoading: true, isError: false, refetch: jest.fn()}
-    renderWithProviders(<Harness />)
-    expect(screen.getByTestId('return-items-modal-loading')).toBeInTheDocument()
-})
-
 test('backfills the OMS default reason on already-checked rows when metadata is available', async () => {
     // Models the case where the parent has a checked row whose reasonCode
     // was never set (e.g. selection rehydrated from URL state in a future
@@ -514,16 +485,6 @@ test('two toggles in the same React batch both stick (no stale closure)', async 
     expect(second).toBeChecked()
 })
 
-test('renders an error alert + Retry when OMS metadata fails', async () => {
-    const user = userEvent.setup()
-    const refetch = jest.fn()
-    mockOmsMetaData = {data: undefined, isLoading: false, isError: true, refetch}
-    renderWithProviders(<Harness />)
-    expect(screen.getByTestId('return-items-modal-error')).toBeInTheDocument()
-    await user.click(screen.getByTestId('return-items-modal-retry'))
-    expect(refetch).toHaveBeenCalledTimes(1)
-})
-
 // Drives the open/close lifecycle from a real trigger so we can assert focus
 // returns to it on close (Chakra's finalFocusRef). Mirrors how order-detail.jsx
 // passes its heading ref, but a button is the clearer focus target under test.
@@ -545,6 +506,7 @@ const FocusHarness = () => {
                 onClose={() => setIsOpen(false)}
                 order={baseOrder}
                 returnableItems={baseOrder.productItems}
+                reasonCodes={defaultReasonCodes}
                 selection={selection}
                 onSelectionChange={setSelection}
                 onSubmit={jest.fn()}
