@@ -10,6 +10,7 @@ import useCommerceClientMessaging, {
     injectCommerceClientWidget
 } from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
 import {
+    DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
     DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
     DEFAULT_COMMERCE_CLIENT_THEME
@@ -19,6 +20,13 @@ const messagingFields = {
     scrt2Url: 'https://scrt2.example.salesforce-scrt.com',
     orgId: '00Dxx0000000001',
     esDeveloperName: 'My_Embedded_Service'
+}
+
+// The widget always receives a capabilitiesVersion; it defaults to '65' when the
+// caller does not provide one, so the expected messagingConfig includes it.
+const expectedMessagingConfig = {
+    ...messagingFields,
+    capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION
 }
 
 describe('injectCommerceClientWidget', () => {
@@ -62,7 +70,7 @@ describe('injectCommerceClientWidget', () => {
         expect(mockInject).toHaveBeenCalledWith({
             elementId: DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
             mode: 'messaging',
-            messagingConfig: {...messagingFields},
+            messagingConfig: {...expectedMessagingConfig},
             isDevelopment: false,
             componentConfig: {
                 ...DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
@@ -129,7 +137,7 @@ describe('injectCommerceClientWidget', () => {
 
         expect(mockInject).toHaveBeenCalledWith(
             expect.objectContaining({
-                messagingConfig: {...messagingFields, routingAttributes: {foo: 'bar'}}
+                messagingConfig: {...expectedMessagingConfig, routingAttributes: {foo: 'bar'}}
             })
         )
     })
@@ -141,9 +149,27 @@ describe('injectCommerceClientWidget', () => {
         })
 
         expect(mockInject).toHaveBeenCalledWith(
-            expect.objectContaining({messagingConfig: {...messagingFields}})
+            expect.objectContaining({messagingConfig: {...expectedMessagingConfig}})
         )
         expect(mockInject.mock.calls[0][0].messagingConfig).not.toHaveProperty('routingAttributes')
+    })
+
+    test('defaults capabilitiesVersion to 65 in messagingConfig when not provided', () => {
+        injectCommerceClientWidget(messagingFields)
+
+        expect(mockInject.mock.calls[0][0].messagingConfig.capabilitiesVersion).toBe(
+            DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION
+        )
+    })
+
+    test('forwards a provided capabilitiesVersion in messagingConfig', () => {
+        injectCommerceClientWidget({...messagingFields, capabilitiesVersion: '70'})
+
+        expect(mockInject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                messagingConfig: {...messagingFields, capabilitiesVersion: '70'}
+            })
+        )
     })
 
     test('forwards optional presentation fields only when provided', () => {

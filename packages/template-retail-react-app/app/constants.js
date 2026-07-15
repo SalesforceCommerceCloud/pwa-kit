@@ -290,6 +290,13 @@ export const SETUP_FUTURE_USAGE = {
 export const DEFAULT_COMMERCE_CLIENT_ELEMENT_ID = 'commerce-client-messaging-widget'
 
 /**
+ * Default Embedded Messaging capabilities version forwarded to the Commerce Client
+ * widget via `messagingConfig.capabilitiesVersion`. Override per environment through the
+ * `capabilitiesVersion` field in `COMMERCE_AGENT_SETTINGS`.
+ */
+export const DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION = '65'
+
+/**
  * Default theme applied to the Commerce Client widget. Individual values can be
  * overridden by passing a partial `theme` object to the hook.
  * These map internally to the `--cim-widget-*` CSS custom properties.
