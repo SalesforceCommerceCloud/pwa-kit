@@ -1002,6 +1002,50 @@ describe('Coupons tests', function () {
             expect(menSuit).not.toBeInTheDocument()
         })
     })
+
+    test('Does not show "Promotion applied" for a valid-but-ineligible coupon (W-23146854)', async () => {
+        // SCAPI addCouponToBasket returns HTTP 200 and parks the coupon on the
+        // basket with statusCode 'no_applicable_promotion' (valid: true) when the
+        // code is real but nothing in the cart qualifies. The UI must NOT report
+        // success or list it as an applied promotion.
+        global.server.use(
+            rest.post('*/baskets/:basketId/coupons', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({
+                        ...mockCustomerBaskets.baskets[0],
+                        couponItems: [
+                            {
+                                code: 'noapply',
+                                couponItemId: 'parked-coupon-item-id',
+                                statusCode: 'no_applicable_promotion',
+                                valid: true
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+
+        const {user} = renderWithProviders(<Cart />)
+        expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
+
+        await user.click(screen.getByText('Do you have a promo code?'))
+        await user.type(screen.getByLabelText('Promo Code'), 'NOAPPLY')
+        await user.click(screen.getByText('Apply'))
+
+        // Inline form error is shown instead of a success toast...
+        expect(
+            await screen.findByText(
+                /Check the code and try again, it may already be applied or the promo has expired\./i
+            )
+        ).toBeInTheDocument()
+        // ...no success toast...
+        expect(screen.queryByText('Promotion applied')).not.toBeInTheDocument()
+        // ...and the parked coupon is never listed as an applied promotion.
+        expect(screen.queryByText('Promotions applied:')).not.toBeInTheDocument()
+        expect(screen.queryByText(/NOAPPLY/i)).not.toBeInTheDocument()
+    })
 })
 describe('Update this is a gift option', function () {
     beforeEach(() => {
