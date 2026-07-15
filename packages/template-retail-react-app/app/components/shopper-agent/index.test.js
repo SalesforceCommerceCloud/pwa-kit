@@ -1569,6 +1569,24 @@ describe('ShopperAgent Component', () => {
             )
         })
 
+        test('defaults capabilitiesVersion to 65 in the widget options', () => {
+            renderCommerceClient()
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({capabilitiesVersion: '65'})
+            )
+        })
+
+        test('forwards a configured capabilitiesVersion to the widget options', () => {
+            renderCommerceClient({capabilitiesVersion: '70'})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({capabilitiesVersion: '70'})
+            )
+        })
+
         test('loads the Commerce Client bundle via useScript', () => {
             renderCommerceClient()
 
