@@ -1,4 +1,5 @@
 ## v10.2.0-dev (Jul 13, 2026)
+- Bump `vendor.js` bundle-size budget from 398 kB to 400 kB to accommodate the graceful invalid-JWT handling added in `commerce-sdk-react`.
 - [Feature] Add a configurable `capabilitiesVersion` for the Commerce Client (Embedded Messaging) shopper-agent widget, forwarded to the bundle as `messagingConfig.capabilitiesVersion` and defaulting to `'65'`. Enables Embedded Messaging action progress indicators; override per environment via the `capabilitiesVersion` field in `COMMERCE_AGENT_SETTINGS`.
 - [Bugfix] Only treat coupons SCAPI actually applied (`statusCode` `applied`/`adhoc`) as applied promotions. A valid-but-ineligible code (e.g. `no_applicable_promotion`) is parked on the basket with HTTP 200, so it no longer shows a false "Promotion applied" toast or appears under "Promotions applied" with no discount. The shared helper `app/utils/coupon-utils.js` (`isCouponApplied`) is the single source of truth — any override or downstream surface that renders `basket.couponItems` directly should filter through it to avoid displaying parked coupons as applied.
 

@@ -163,13 +163,11 @@ const useTrustedAgent = (): UseTrustedAgent => {
     }, [auth])
 
     useEffect(() => {
-        try {
-            const {isAgent, agentId, loginId} = auth.parseSlasJWT(auth.get('access_token'))
-            setIsAgent(isAgent)
-            setAgentId(agentId || '')
-            setLoginId(loginId)
-        } catch (e) {
-            /* here to catch invalid jwt errors */
+        const parsed = auth.parseSlasJWT(auth.get('access_token'))
+        if (parsed) {
+            setIsAgent(parsed.isAgent)
+            setAgentId(parsed.agentId || '')
+            setLoginId(parsed.loginId)
         }
     }, [auth.get('access_token')])
 
