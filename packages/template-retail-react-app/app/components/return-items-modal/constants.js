@@ -48,6 +48,10 @@ export const messages = defineMessages({
         defaultMessage: 'Select at least one item and choose a reason to continue.',
         id: 'return_items_modal.hint.review_disabled'
     },
+    reasonsUnavailable: {
+        defaultMessage: 'Return reasons are unavailable right now. Please try again in a moment.',
+        id: 'return_items_modal.text.reasons_unavailable'
+    },
     itemCheckboxLabel: {
         defaultMessage: '{name}, {count, plural, one {# unit} other {# units}} available to return',
         id: 'return_items_modal.label.item_checkbox'

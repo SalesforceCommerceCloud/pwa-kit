@@ -9609,6 +9609,20 @@
       "value": "]"
     }
   ],
+  "return_items_modal.text.reasons_unavailable": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗŧŭŭřƞ řḗḗȧȧşǿǿƞş ȧȧřḗḗ ŭŭƞȧȧṽȧȧīŀȧȧƀŀḗḗ řīɠħŧ ƞǿǿẇ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ īƞ ȧȧ ḿǿǿḿḗḗƞŧ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "return_items_modal.text.review_description": [
     {
       "type": 0,

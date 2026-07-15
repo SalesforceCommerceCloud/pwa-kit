@@ -468,9 +468,30 @@ const ReturnItemsModal = ({
         </Alert>
     ) : null
 
+    // Return requires a reason per row (unlike cancel, where reason is optional),
+    // so an empty reason list is a hard block: the dropdown has no options,
+    // isSelectionValid can never be true, and Review stays disabled. Show a
+    // non-blocking inline notice so the shopper knows why Review is greyed out.
+    // No retry button — mirrors cancel-order's "no bespoke recovery affordance"
+    // shape; the shopper closes/reopens or reloads to retry the page fetch.
+    const reasonsUnavailableBanner =
+        reasons.length === 0 ? (
+            <Alert
+                status="warning"
+                role="status"
+                data-testid="return-items-modal-reasons-unavailable"
+            >
+                <AlertIcon />
+                <AlertDescription>
+                    <FormattedMessage {...messages.reasonsUnavailable} />
+                </AlertDescription>
+            </Alert>
+        ) : null
+
     const selectBody = (
         <Stack spacing={3}>
             {selectErrorBanner}
+            {reasonsUnavailableBanner}
             {returnableItems.map((item) => (
                 <ReturnableItemRow
                     key={item.itemId}

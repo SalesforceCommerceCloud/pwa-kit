@@ -159,6 +159,23 @@ test('toggling a row expands it and pre-selects the OMS default reason', async (
     expect(within(row).getByLabelText(/^quantity$/i, {selector: 'input'})).toHaveValue('1')
 })
 
+test('reasons-unavailable banner renders when the page-level fetch fails and keeps Review disabled', async () => {
+    // Empty array is the shape the modal sees when the page's useOmsMetaData
+    // failed (data is undefined → returnReasonCodes is undefined → reasons=[]).
+    const user = userEvent.setup()
+    renderWithProviders(<Harness reasonCodes={[]} />)
+    expect(screen.getByTestId('return-items-modal-reasons-unavailable')).toHaveTextContent(
+        /return reasons are unavailable/i
+    )
+    // Checking a row can't produce a valid selection (no reasonCode possible),
+    // so Review stays aria-disabled and clicking it does not swap views.
+    await user.click(screen.getAllByRole('checkbox')[0])
+    const review = screen.getByTestId('return-items-modal-review')
+    expect(review).toHaveAttribute('aria-disabled', 'true')
+    await user.click(review)
+    expect(screen.queryByRole('heading', {name: /review your return/i})).not.toBeInTheDocument()
+})
+
 test('quantity field clamps to the available-to-return ceiling', async () => {
     const user = userEvent.setup()
     renderWithProviders(<Harness />)

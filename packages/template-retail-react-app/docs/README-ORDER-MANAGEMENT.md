@@ -59,7 +59,10 @@ partially-returned multi-unit lines.
    once and forwards `returnReasonCodes` (`{reason, default}` entries) into the
    modal via a `reasonCodes` prop — mirroring how `cancelReasonCodes` reaches
    `CancelOrderModal`. The OMS-default reason is pre-selected for every checked
-   item.
+   item. If the metadata fetch fails, the modal renders an inline "return reasons
+   are unavailable" notice above the rows so the shopper knows why **Review return**
+   is disabled; there is no in-modal retry (matching the cancel-order shape) — the
+   shopper closes and reopens the modal (or reloads the page) to retry the fetch.
 3. **Select and review.** The shopper checks items, sets a per-item quantity (capped
    at that line's available-to-return count), and picks a reason; a review step
    summarizes the request before submission.

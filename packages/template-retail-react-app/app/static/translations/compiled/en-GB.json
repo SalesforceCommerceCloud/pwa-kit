@@ -4601,6 +4601,12 @@
       "value": "Some items' available return quantities changed. Please review the updated limits below."
     }
   ],
+  "return_items_modal.text.reasons_unavailable": [
+    {
+      "type": 0,
+      "value": "Return reasons are unavailable right now. Please try again in a moment."
+    }
+  ],
   "return_items_modal.text.review_description": [
     {
       "type": 0,
