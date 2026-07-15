@@ -1,4 +1,5 @@
 ## v10.2.0-dev (Jul 13, 2026)
+- [Feature] Add a configurable `capabilitiesVersion` for the Commerce Client (Embedded Messaging) shopper-agent widget, forwarded to the bundle as `messagingConfig.capabilitiesVersion` and defaulting to `'65'`. Enables Embedded Messaging action progress indicators; override per environment via the `capabilitiesVersion` field in `COMMERCE_AGENT_SETTINGS`.
 
 ## v10.1.0 (Jul 13, 2026)
 - [Feature] Enable customer context for Shopper Agent: on conversation start, call Core's Token Bridge via a same-origin PWA Kit proxy that forwards the shopper's SLAS session (access token in the body for non-HttpOnly mode; both tokens read server-side from `cc-at_*` / `cc-nx_*` cookies in HttpOnly mode) and reset the embedded messaging session on guest ↔ registered transitions so the agent never picks up a stale shopper identity.
