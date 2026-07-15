@@ -7,6 +7,7 @@
 
 import {useEffect, useRef} from 'react'
 import {
+    DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
     DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
     DEFAULT_COMMERCE_CLIENT_THEME
@@ -28,6 +29,7 @@ const onClient = typeof window !== 'undefined'
  * @param {string} options.scrt2Url - SCRT2 instance URL for Salesforce messaging
  * @param {string} options.orgId - Salesforce organization ID
  * @param {string} options.esDeveloperName - Embedded Service developer name
+ * @param {string} [options.capabilitiesVersion] - Embedded Messaging capabilities version (defaults to '65')
  * @param {Object} [options.routingAttributes] - Optional Agentforce routing attributes
  * @param {string} [options.mode] - Widget mode forwarded to the bundle (defaults to 'messaging')
  * @param {string} [options.logoUrl] - URL of the logo shown in the widget
@@ -49,6 +51,7 @@ const injectCommerceClientWidget = ({
     scrt2Url,
     orgId,
     esDeveloperName,
+    capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     routingAttributes,
     mode = 'messaging',
     logoUrl,
@@ -71,7 +74,7 @@ const injectCommerceClientWidget = ({
             return false
         }
 
-        const messagingConfig = {scrt2Url, orgId, esDeveloperName}
+        const messagingConfig = {scrt2Url, orgId, esDeveloperName, capabilitiesVersion}
         if (routingAttributes && typeof routingAttributes === 'object') {
             messagingConfig.routingAttributes = routingAttributes
         }

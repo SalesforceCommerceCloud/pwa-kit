@@ -19,7 +19,10 @@ import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
-import {DEFAULT_COMMERCE_CLIENT_ELEMENT_ID} from '@salesforce/retail-react-app/app/constants'
+import {
+    DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
+    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID
+} from '@salesforce/retail-react-app/app/constants'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -582,6 +585,7 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID (passed to `messagingConfig.orgId`)
  * @param {string} [props.commerceAgentConfiguration.esDeveloperName] - Embedded Service developer name
  * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `esDeveloperName`
+ * @param {string} [props.commerceAgentConfiguration.capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
  * @param {string} props.commerceAgentConfiguration.commerceClientScriptSourceUrl - Commerce Client messaging bundle URL
  * @param {string} [props.commerceAgentConfiguration.commerceClientMode] - Widget mode forwarded to the bundle as `mode` (defaults to 'messaging')
  * @param {string} [props.commerceAgentConfiguration.commerceClientLogoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
@@ -604,6 +608,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         salesforceOrgId,
         esDeveloperName,
         embeddedServiceName,
+        capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
         commerceClientScriptSourceUrl,
         commerceClientMode = 'messaging',
         commerceClientLogoUrl,
@@ -634,6 +639,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             scrt2Url,
             orgId: salesforceOrgId,
             esDeveloperName: esDeveloperName || embeddedServiceName,
+            capabilitiesVersion,
             routingAttributes,
             mode: commerceClientMode,
             logoUrl: commerceClientLogoUrl,
@@ -661,6 +667,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             salesforceOrgId,
             esDeveloperName,
             embeddedServiceName,
+            capabilitiesVersion,
             routingAttributes,
             commerceClientMode,
             commerceClientLogoUrl,

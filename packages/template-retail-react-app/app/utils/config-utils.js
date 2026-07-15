@@ -6,6 +6,7 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION} from '@salesforce/retail-react-app/app/constants'
 
 export const getCommerceAgentConfig = () => {
     const defaults = {
@@ -27,6 +28,7 @@ export const getCommerceAgentConfig = () => {
         provider: 'miaw',
         commerceClientScriptSourceUrl: '',
         esDeveloperName: '',
+        capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
         headerText: '',
         disclaimerMarkdown: '',
         commerceClientDisplayMode: 'panel',
