@@ -22,6 +22,7 @@ import PromoCodeFields from '@salesforce/retail-react-app/app/components/forms/p
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {useShopperBasketsV2Mutation as useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {wasCouponApplied} from '@salesforce/retail-react-app/app/utils/coupon-utils'
 
 export const usePromoCode = () => {
     const {formatMessage} = useIntl()
@@ -32,14 +33,57 @@ export const usePromoCode = () => {
     const applyPromoCodeMutation = useShopperBasketsMutation('addCouponToBasket')
     const removePromoCodeMutation = useShopperBasketsMutation('removeCouponFromBasket')
 
+    const setPromoCodeError = () => {
+        form.setError(
+            'code',
+            {
+                type: 'manual',
+                message: formatMessage({
+                    defaultMessage:
+                        'Check the code and try again, it may already be applied or the promo has expired.',
+                    id: 'use_promocode.error.check_the_code'
+                })
+            },
+            {shouldFocus: true}
+        )
+    }
+
     const submitPromoCode = async ({code}) => {
         try {
-            await applyPromoCodeMutation.mutateAsync({
+            // Snapshot the basket before the mutation so we can identify the
+            // coupon the call adds (by couponItemId diff — see findAddedCoupon).
+            const priorBasket = basket
+
+            const updatedBasket = await applyPromoCodeMutation.mutateAsync({
                 parameters: {basketId: basket?.basketId},
                 body: {
                     code
                 }
             })
+
+            // SCAPI addCouponToBasket returns HTTP 200 and parks the coupon on the
+            // basket even when the code is valid but not applicable to the cart
+            // (e.g. statusCode 'no_applicable_promotion'). A non-throwing 2xx is
+            // therefore NOT sufficient to declare success — only applied/adhoc
+            // coupons actually discount the order.
+            if (!wasCouponApplied(priorBasket, updatedBasket)) {
+                // Deliberately leave the parked coupon on the basket rather than
+                // removing it: SCAPI keeps a valid-but-ineligible coupon so it
+                // auto-applies once a qualifying item is added to the cart. We
+                // just don't surface it as applied — order-summary filters it out
+                // via isCouponApplied, and the shopper sees the check-the-code
+                // error. Removing it here would defeat SCAPI's intended
+                // auto-apply-on-qualify behavior.
+                //
+                // We intentionally do not add a basket-watching effect to auto-
+                // clear this inline error if the parked coupon later qualifies
+                // (e.g. the shopper adds a matching item with the accordion still
+                // open). react-hook-form clears the error on the next submit/reset,
+                // and adding a live effect to a production template for that narrow
+                // case is deliberately out of scope for this fix.
+                setPromoCodeError()
+                return
+            }
 
             form.reset({code: ''})
 
@@ -53,18 +97,7 @@ export const usePromoCode = () => {
                 isClosable: true
             })
         } catch (e) {
-            form.setError(
-                'code',
-                {
-                    type: 'manual',
-                    message: formatMessage({
-                        defaultMessage:
-                            'Check the code and try again, it may already be applied or the promo has expired.',
-                        id: 'use_promocode.error.check_the_code'
-                    })
-                },
-                {shouldFocus: true}
-            )
+            setPromoCodeError()
         }
     }
 
