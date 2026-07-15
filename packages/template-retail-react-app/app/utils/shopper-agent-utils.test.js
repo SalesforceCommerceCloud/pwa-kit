@@ -12,8 +12,14 @@ import {
     openCommerceClientWidget,
     openShopperAgentWidget,
     validateCommerceClientDomain,
-    validateCommerceClientAgentSettings
+    validateCommerceClientAgentSettings,
+    isCommerceClientStaticLoadingMode,
+    resolveCommerceClientScriptUrl
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => ({
+    getAssetUrl: jest.fn((path) => `https://storefront.example.com/mobify/bundle/development/${path}`)
+}))
 
 describe('shopper-agent-utils', () => {
     let originalWindow
@@ -536,6 +542,85 @@ describe('shopper-agent-utils', () => {
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 'Commerce Client script URL must be served from a trusted cimulate.ai or sfcc-store-internal.net domain.'
             )
+        })
+
+        describe("with commerceClientLoadingMode 'static'", () => {
+            const staticConfig = {
+                commerceClientLoadingMode: 'static',
+                scrt2Url: 'https://test.salesforce-scrt.com',
+                salesforceOrgId: 'test-org-id',
+                esDeveloperName: 'My_Embedded_Service'
+            }
+
+            test('returns true without requiring commerceClientScriptSourceUrl', () => {
+                expect(validateCommerceClientAgentSettings(staticConfig)).toBe(true)
+            })
+
+            test('skips the cimulate-domain check for a same-origin bundle', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...staticConfig,
+                    commerceClientStaticAssetPath: 'static/commerce-client/messaging.umd.js'
+                })
+
+                expect(result).toBe(true)
+            })
+
+            test('still requires the messaging fields (scrt2Url, org id, es name)', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...staticConfig,
+                    scrt2Url: ''
+                })
+
+                expect(result).toBe(false)
+                expect(consoleErrorSpy).toHaveBeenCalledWith(
+                    'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, and esDeveloperName (or embeddedServiceName).'
+                )
+            })
+        })
+    })
+
+    describe('isCommerceClientStaticLoadingMode', () => {
+        test("returns false by default (cdn) when loading mode is not set", () => {
+            expect(isCommerceClientStaticLoadingMode({})).toBe(false)
+            expect(isCommerceClientStaticLoadingMode(undefined)).toBe(false)
+        })
+
+        test("returns false when explicitly set to 'cdn'", () => {
+            expect(isCommerceClientStaticLoadingMode({commerceClientLoadingMode: 'cdn'})).toBe(false)
+        })
+
+        test("returns true when set to 'static'", () => {
+            expect(isCommerceClientStaticLoadingMode({commerceClientLoadingMode: 'static'})).toBe(
+                true
+            )
+        })
+    })
+
+    describe('resolveCommerceClientScriptUrl', () => {
+        test("returns the CDN source URL as-is in 'cdn' mode", () => {
+            const url = 'https://cdn.search.cimulate.ai/copilot-widget/1.0.0/messaging.umd.js'
+            expect(
+                resolveCommerceClientScriptUrl({commerceClientScriptSourceUrl: url})
+            ).toBe(url)
+        })
+
+        test("returns empty string in 'cdn' mode when no source URL is provided", () => {
+            expect(resolveCommerceClientScriptUrl({})).toBe('')
+        })
+
+        test("resolves the default static asset path via getAssetUrl in 'static' mode", () => {
+            expect(resolveCommerceClientScriptUrl({commerceClientLoadingMode: 'static'})).toBe(
+                'https://storefront.example.com/mobify/bundle/development/static/commerce-client/messaging.umd.js'
+            )
+        })
+
+        test("resolves a custom static asset path via getAssetUrl in 'static' mode", () => {
+            expect(
+                resolveCommerceClientScriptUrl({
+                    commerceClientLoadingMode: 'static',
+                    commerceClientStaticAssetPath: 'static/custom/widget.umd.js'
+                })
+            ).toBe('https://storefront.example.com/mobify/bundle/development/static/custom/widget.umd.js')
         })
     })
 })

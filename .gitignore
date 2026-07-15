@@ -6,6 +6,10 @@ node_modules/
 *.log
 coverage/
 
+# Commerce Client widget bundle copied in for 'static' loading mode
+# (via `npm run copy:commerce-client`). Vendored artifact — not committed.
+packages/template-retail-react-app/app/static/commerce-client/
+
 # Local environment variables (secrets / per-developer config)
 .env
 .env.local

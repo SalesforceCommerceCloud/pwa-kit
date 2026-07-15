@@ -36,10 +36,21 @@ module.exports = {
             // 'commerce-client' (Commerce Client widget). Selecting 'commerce-client' uses the
             // fields below instead of the MIAW embedded-service fields above.
             provider: 'miaw',
+            // How the Commerce Client widget assets are loaded (mirrors the SFCC
+            // cartridge's cc_loadingMode): 'cdn' (default) loads the bundle from
+            // the external Cimulate CDN via commerceClientScriptSourceUrl; 'static'
+            // loads it from this app's own bundled static assets via
+            // commerceClientStaticAssetPath. Only used when provider === 'commerce-client'.
+            commerceClientLoadingMode: 'cdn',
             // URL of the Commerce Client messaging UMD bundle (e.g.
             // https://cdn.search.cimulate.ai/copilot-widget/<version>/messaging.umd.js).
-            // Only used when provider === 'commerce-client'.
+            // Used when commerceClientLoadingMode === 'cdn'.
             commerceClientScriptSourceUrl: '',
+            // Path (relative to the build directory) of the bundled Commerce Client
+            // messaging UMD bundle, served same-origin. Used when
+            // commerceClientLoadingMode === 'static'. Run `npm run copy:commerce-client`
+            // to place the bundle under app/static/ first.
+            commerceClientStaticAssetPath: 'static/commerce-client/messaging.umd.js',
             // Embedded Service developer name for the Commerce Client widget. Falls back
             // to embeddedServiceName when not set.
             esDeveloperName: '',

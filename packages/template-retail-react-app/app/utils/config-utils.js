@@ -26,7 +26,10 @@ export const getCommerceAgentConfig = () => {
         enableAgentFromSearchSuggestions: 'false',
         // Widget provider: 'miaw' (default) or 'commerce-client'. See config/default.js.
         provider: 'miaw',
+        // Commerce Client asset loading mode: 'cdn' (default) or 'static'. See config/default.js.
+        commerceClientLoadingMode: 'cdn',
         commerceClientScriptSourceUrl: '',
+        commerceClientStaticAssetPath: 'static/commerce-client/messaging.umd.js',
         esDeveloperName: '',
         capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
         headerText: '',

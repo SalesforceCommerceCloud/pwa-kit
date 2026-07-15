@@ -66,6 +66,12 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-script', () => ({
     default: jest.fn()
 }))
 
+// Mock getAssetUrl so 'static' loading mode resolves to a deterministic, same-origin URL
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => ({
+    __esModule: true,
+    getAssetUrl: jest.fn((path) => `/mobify/bundle/development/${path}`)
+}))
+
 // Mock the useCommerceClientMessaging hook (Commerce Client provider)
 jest.mock('@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging', () => ({
     __esModule: true,
@@ -1593,6 +1599,41 @@ describe('ShopperAgent Component', () => {
             expect(mockedUseScript).toHaveBeenCalledWith(
                 commerceClientSettings.commerceClientScriptSourceUrl
             )
+        })
+
+        describe("commerceClientLoadingMode 'static'", () => {
+            test('loads the bundle from the same-origin static asset path (no CDN URL required)', () => {
+                renderCommerceClient({
+                    commerceClientLoadingMode: 'static',
+                    commerceClientScriptSourceUrl: ''
+                })
+
+                expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
+                expect(mockedUseScript).toHaveBeenCalledWith(
+                    '/mobify/bundle/development/static/commerce-client/messaging.umd.js'
+                )
+            })
+
+            test('resolves a custom commerceClientStaticAssetPath', () => {
+                renderCommerceClient({
+                    commerceClientLoadingMode: 'static',
+                    commerceClientScriptSourceUrl: '',
+                    commerceClientStaticAssetPath: 'static/custom/widget.umd.js'
+                })
+
+                expect(mockedUseScript).toHaveBeenCalledWith(
+                    '/mobify/bundle/development/static/custom/widget.umd.js'
+                )
+            })
+
+            test('renders even without a cimulate.ai domain (allowlist skipped in static mode)', () => {
+                renderCommerceClient({
+                    commerceClientLoadingMode: 'static',
+                    commerceClientScriptSourceUrl: ''
+                })
+
+                expect(screen.getByTestId('shopper-agent')).toBeInTheDocument()
+            })
         })
 
         test('builds full-height side panel options in the default panel display mode', () => {

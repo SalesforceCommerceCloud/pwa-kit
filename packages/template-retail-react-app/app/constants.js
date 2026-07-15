@@ -297,6 +297,36 @@ export const DEFAULT_COMMERCE_CLIENT_ELEMENT_ID = 'commerce-client-messaging-wid
 export const DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION = '65'
 
 /**
+ * Supported Commerce Client asset loading modes, mirroring the SFCC cartridge's
+ * `cc_loadingMode` site preference.
+ *
+ * - `cdn`: load the messaging UMD bundle from the external Cimulate CDN
+ *   (`commerceClientScriptSourceUrl`, validated against the cimulate.ai allowlist).
+ * - `static`: load the bundle from this app's own bundled static assets
+ *   (`commerceClientStaticAssetPath`), served same-origin via the PWA Kit bundle
+ *   origin. Use the `copy:commerce-client` script to place the bundle under
+ *   `app/static/` first.
+ */
+export const COMMERCE_CLIENT_LOADING_MODE = {
+    CDN: 'cdn',
+    STATIC: 'static'
+}
+
+/**
+ * Default Commerce Client asset loading mode. Defaults to the external CDN so
+ * existing storefronts are unaffected.
+ */
+export const DEFAULT_COMMERCE_CLIENT_LOADING_MODE = COMMERCE_CLIENT_LOADING_MODE.CDN
+
+/**
+ * Default path (relative to the build directory) of the bundled Commerce Client
+ * messaging UMD bundle used when `commerceClientLoadingMode` is `static`. Resolved
+ * to an absolute, same-origin URL via `getAssetUrl`.
+ */
+export const DEFAULT_COMMERCE_CLIENT_STATIC_ASSET_PATH =
+    'static/commerce-client/messaging.umd.js'
+
+/**
  * Default theme applied to the Commerce Client widget. Individual values can be
  * overridden by passing a partial `theme` object to the hook.
  * These map internally to the `--cim-widget-*` CSS custom properties.

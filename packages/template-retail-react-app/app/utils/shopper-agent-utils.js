@@ -4,6 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {
+    COMMERCE_CLIENT_LOADING_MODE,
+    DEFAULT_COMMERCE_CLIENT_LOADING_MODE,
+    DEFAULT_COMMERCE_CLIENT_STATIC_ASSET_PATH
+} from '@salesforce/retail-react-app/app/constants'
+
 const onClient = typeof window !== 'undefined'
 
 /**
@@ -145,6 +152,48 @@ export function openShopperAgentWidget() {
 }
 
 /**
+ * Returns true when the Commerce Client widget should load its assets from this
+ * app's own bundled static assets rather than the external Cimulate CDN.
+ *
+ * Mirrors the SFCC cartridge's `cc_loadingMode` site preference. Defaults to CDN
+ * so existing storefronts are unaffected.
+ *
+ * @param {Object} commerceAgent - Commerce agent configuration object
+ * @param {string} [commerceAgent.commerceClientLoadingMode] - 'cdn' (default) or 'static'
+ * @returns {boolean} True when loading mode is 'static'
+ */
+export const isCommerceClientStaticLoadingMode = (commerceAgent) => {
+    const mode = commerceAgent?.commerceClientLoadingMode || DEFAULT_COMMERCE_CLIENT_LOADING_MODE
+    return mode === COMMERCE_CLIENT_LOADING_MODE.STATIC
+}
+
+/**
+ * Resolves the effective URL used to load the Commerce Client messaging UMD
+ * bundle, based on the configured loading mode.
+ *
+ * - `static`: resolves `commerceClientStaticAssetPath` (default
+ *   'static/commerce-client/messaging.umd.js') to an absolute, same-origin URL
+ *   via {@link getAssetUrl}. The bundle must be copied into `app/static/` first
+ *   (see the `copy:commerce-client` script).
+ * - `cdn` (default): returns `commerceClientScriptSourceUrl` as-is.
+ *
+ * @param {Object} commerceAgent - Commerce agent configuration object
+ * @param {string} [commerceAgent.commerceClientLoadingMode] - 'cdn' (default) or 'static'
+ * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - CDN bundle URL (used when mode is 'cdn')
+ * @param {string} [commerceAgent.commerceClientStaticAssetPath] - Bundle path relative to the build dir (used when mode is 'static')
+ * @returns {string} The URL to pass to the script loader
+ */
+export const resolveCommerceClientScriptUrl = (commerceAgent) => {
+    if (isCommerceClientStaticLoadingMode(commerceAgent)) {
+        const assetPath =
+            commerceAgent?.commerceClientStaticAssetPath ||
+            DEFAULT_COMMERCE_CLIENT_STATIC_ASSET_PATH
+        return getAssetUrl(assetPath)
+    }
+    return commerceAgent?.commerceClientScriptSourceUrl || ''
+}
+
+/**
  * Validates that a URL is served from a trusted Commerce Client domain.
  *
  * @param {string} url - The URL to validate (e.g., 'https://cdn.search.cimulate.ai/.../messaging.umd.js')
@@ -183,11 +232,16 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
         return false
     }
 
+    const isStatic = isCommerceClientStaticLoadingMode(commerceAgent)
+
     const requiredValues = {
         scrt2Url: commerceAgent.scrt2Url,
         salesforceOrgId: commerceAgent.salesforceOrgId,
         esDeveloperName: commerceAgent.esDeveloperName || commerceAgent.embeddedServiceName,
-        commerceClientScriptSourceUrl: commerceAgent.commerceClientScriptSourceUrl
+        // In 'static' mode the bundle is served from this app's own static assets
+        // (commerceClientStaticAssetPath, which has a default), so the CDN URL is
+        // not required. In 'cdn' mode the source URL must be provided.
+        ...(isStatic ? {} : {commerceClientScriptSourceUrl: commerceAgent.commerceClientScriptSourceUrl})
     }
 
     const isValid = Object.values(requiredValues).every(
@@ -196,12 +250,16 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
 
     if (!isValid) {
         console.error(
-            'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, esDeveloperName (or embeddedServiceName), and commerceClientScriptSourceUrl.'
+            isStatic
+                ? 'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, and esDeveloperName (or embeddedServiceName).'
+                : 'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, esDeveloperName (or embeddedServiceName), and commerceClientScriptSourceUrl.'
         )
         return false
     }
 
-    if (!validateCommerceClientDomain(commerceAgent.commerceClientScriptSourceUrl)) {
+    // Domain allowlist only applies to externally-hosted CDN bundles. In 'static'
+    // mode the bundle is served same-origin from this app, so skip the check.
+    if (!isStatic && !validateCommerceClientDomain(commerceAgent.commerceClientScriptSourceUrl)) {
         console.error(
             'Commerce Client script URL must be served from a trusted cimulate.ai or sfcc-store-internal.net domain.'
         )

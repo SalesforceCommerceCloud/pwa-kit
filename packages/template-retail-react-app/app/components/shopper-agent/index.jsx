@@ -28,6 +28,7 @@ import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origi
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
     resetEmbeddedMessagingForCommerceSessionChange,
+    resolveCommerceClientScriptUrl,
     validateCommerceClientAgentSettings
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
@@ -586,7 +587,9 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {string} [props.commerceAgentConfiguration.esDeveloperName] - Embedded Service developer name
  * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `esDeveloperName`
  * @param {string} [props.commerceAgentConfiguration.capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
- * @param {string} props.commerceAgentConfiguration.commerceClientScriptSourceUrl - Commerce Client messaging bundle URL
+ * @param {string} [props.commerceAgentConfiguration.commerceClientLoadingMode] - Asset loading mode: 'cdn' (default, external Cimulate CDN) or 'static' (this app's bundled static assets)
+ * @param {string} [props.commerceAgentConfiguration.commerceClientScriptSourceUrl] - Commerce Client messaging bundle URL (used when loading mode is 'cdn')
+ * @param {string} [props.commerceAgentConfiguration.commerceClientStaticAssetPath] - Bundle path relative to the build dir (used when loading mode is 'static'; defaults to 'static/commerce-client/messaging.umd.js')
  * @param {string} [props.commerceAgentConfiguration.commerceClientMode] - Widget mode forwarded to the bundle as `mode` (defaults to 'messaging')
  * @param {string} [props.commerceAgentConfiguration.commerceClientLogoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
  * @param {string} [props.commerceAgentConfiguration.headerText] - Header text shown at the top of the widget
@@ -609,7 +612,6 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         esDeveloperName,
         embeddedServiceName,
         capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
-        commerceClientScriptSourceUrl,
         commerceClientMode = 'messaging',
         commerceClientLogoUrl,
         headerText,
@@ -625,8 +627,13 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         routingAttributes
     } = commerceAgentConfiguration
 
+    // Resolve the bundle URL from the configured loading mode: the external
+    // Cimulate CDN ('cdn', default) or this app's own bundled static assets
+    // ('static'). Mirrors the SFCC cartridge's `cc_loadingMode` preference.
+    const commerceClientScriptUrl = resolveCommerceClientScriptUrl(commerceAgentConfiguration)
+
     // Load the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging
-    const scriptLoadStatus = useScript(commerceClientScriptSourceUrl)
+    const scriptLoadStatus = useScript(commerceClientScriptUrl)
 
     // In 'panel' mode we render the widget as a 'dialog' docked to the right and
     // use the widget's built-in full-height + width options to turn it
