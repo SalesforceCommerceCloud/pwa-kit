@@ -1869,7 +1869,7 @@
     "defaultMessage": "Review your return"
   },
   "return_items_modal.hint.review_disabled": {
-    "defaultMessage": "Select at least one item and choose a reason to continue."
+    "defaultMessage": "Select at least one item to continue."
   },
   "return_items_modal.label.item_checkbox": {
     "defaultMessage": "{name}, {count, plural, one {# unit} other {# units}} available to return"
@@ -1892,9 +1892,6 @@
   "return_items_modal.text.quantity_exceeded_affected_generic": {
     "defaultMessage": "Some items' available return quantities changed. Please review the updated limits below."
   },
-  "return_items_modal.text.reasons_unavailable": {
-    "defaultMessage": "Return reasons are unavailable right now. Please try again in a moment."
-  },
   "return_items_modal.text.review_description": {
     "defaultMessage": "Confirm the items below. We'll email a return label once your request is submitted."
   },
@@ -1908,7 +1905,7 @@
     "defaultMessage": "Select the items you want to return and tell us why."
   },
   "return_items_modal.text.submit_error": {
-    "defaultMessage": "Something went wrong submitting your return. Please try again."
+    "defaultMessage": "We couldn't submit your return. Your return wasn't processed. Please wait a moment and try again."
   },
   "return_items_modal.text.submit_error_invalid_reason": {
     "defaultMessage": "The selected reason is no longer available. Please choose another."

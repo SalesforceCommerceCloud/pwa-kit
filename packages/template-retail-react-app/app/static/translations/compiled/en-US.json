@@ -4480,7 +4480,7 @@
   "return_items_modal.hint.review_disabled": [
     {
       "type": 0,
-      "value": "Select at least one item and choose a reason to continue."
+      "value": "Select at least one item to continue."
     }
   ],
   "return_items_modal.label.item_checkbox": [
@@ -4601,12 +4601,6 @@
       "value": "Some items' available return quantities changed. Please review the updated limits below."
     }
   ],
-  "return_items_modal.text.reasons_unavailable": [
-    {
-      "type": 0,
-      "value": "Return reasons are unavailable right now. Please try again in a moment."
-    }
-  ],
   "return_items_modal.text.review_description": [
     {
       "type": 0,
@@ -4642,7 +4636,7 @@
   "return_items_modal.text.submit_error": [
     {
       "type": 0,
-      "value": "Something went wrong submitting your return. Please try again."
+      "value": "We couldn't submit your return. Your return wasn't processed. Please wait a moment and try again."
     }
   ],
   "return_items_modal.text.submit_error_invalid_reason": [

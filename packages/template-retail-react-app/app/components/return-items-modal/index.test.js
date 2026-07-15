@@ -159,21 +159,34 @@ test('toggling a row expands it and pre-selects the OMS default reason', async (
     expect(within(row).getByLabelText(/^quantity$/i, {selector: 'input'})).toHaveValue('1')
 })
 
-test('reasons-unavailable banner renders when the page-level fetch fails and keeps Review disabled', async () => {
+test('when reasons are unavailable the dropdown is hidden and the shopper can still proceed (cancel-flow parity)', async () => {
     // Empty array is the shape the modal sees when the page's useOmsMetaData
     // failed (data is undefined → returnReasonCodes is undefined → reasons=[]).
+    // Reason is optional per the OMS return API; the server backfills the
+    // default when omitted, so we mirror CancelOrderModal and let the shopper
+    // proceed without a reason dropdown.
     const user = userEvent.setup()
-    renderWithProviders(<Harness reasonCodes={[]} />)
-    expect(screen.getByTestId('return-items-modal-reasons-unavailable')).toHaveTextContent(
-        /return reasons are unavailable/i
-    )
-    // Checking a row can't produce a valid selection (no reasonCode possible),
-    // so Review stays aria-disabled and clicking it does not swap views.
+    const onSubmit = jest.fn()
+    renderWithProviders(<Harness reasonCodes={[]} onSubmit={onSubmit} />)
+
+    // No banner rendered — cancel flow makes reasons-missing silent-graceful.
+    expect(screen.queryByTestId('return-items-modal-reasons-unavailable')).not.toBeInTheDocument()
+
+    // Check a row. The Reason dropdown for the row is not rendered at all.
     await user.click(screen.getAllByRole('checkbox')[0])
+    const row = screen.getAllByTestId('return-items-modal-item-row')[0]
+    expect(within(row).queryByLabelText(/reason for /i, {selector: 'select'})).toBeNull()
+
+    // Review Return is enabled: reason is optional, so a checked row with a
+    // valid quantity is a valid selection.
     const review = screen.getByTestId('return-items-modal-review')
-    expect(review).toHaveAttribute('aria-disabled', 'true')
+    expect(review).toHaveAttribute('aria-disabled', 'false')
     await user.click(review)
-    expect(screen.queryByRole('heading', {name: /review your return/i})).not.toBeInTheDocument()
+    expect(await screen.findByText(/review your return/i)).toBeInTheDocument()
+
+    // Submit — the outbound payload omits `reason`, so OMS applies the default.
+    await user.click(screen.getByTestId('return-items-modal-submit'))
+    expect(onSubmit).toHaveBeenCalledWith([{itemId: 'item-1', quantity: 1}])
 })
 
 test('quantity field clamps to the available-to-return ceiling', async () => {
@@ -356,7 +369,7 @@ test('unknown error renders the generic inline retry message', async () => {
     )
     await user.click(screen.getByTestId('return-items-modal-review'))
     expect(await screen.findByTestId('return-items-modal-submit-error')).toBeInTheDocument()
-    expect(screen.getByText(/something went wrong submitting your return/i)).toBeInTheDocument()
+    expect(screen.getByText(/we couldn't submit your return/i)).toBeInTheDocument()
 })
 
 test('notFound terminal error shows a no-link banner and disables Submit', async () => {

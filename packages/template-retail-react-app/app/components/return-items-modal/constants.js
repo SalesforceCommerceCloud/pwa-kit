@@ -45,12 +45,8 @@ export const messages = defineMessages({
         id: 'return_items_modal.button.review_return'
     },
     reviewDisabledHint: {
-        defaultMessage: 'Select at least one item and choose a reason to continue.',
+        defaultMessage: 'Select at least one item to continue.',
         id: 'return_items_modal.hint.review_disabled'
-    },
-    reasonsUnavailable: {
-        defaultMessage: 'Return reasons are unavailable right now. Please try again in a moment.',
-        id: 'return_items_modal.text.reasons_unavailable'
     },
     itemCheckboxLabel: {
         defaultMessage: '{name}, {count, plural, one {# unit} other {# units}} available to return',
@@ -82,7 +78,8 @@ export const messages = defineMessages({
         id: 'return_items_modal.button.submit_return'
     },
     submitError: {
-        defaultMessage: 'Something went wrong submitting your return. Please try again.',
+        defaultMessage:
+            "We couldn't submit your return. Your return wasn't processed. Please wait a moment and try again.",
         id: 'return_items_modal.text.submit_error'
     },
     // --- error-code-specific inline messages ---

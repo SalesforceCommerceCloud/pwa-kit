@@ -119,7 +119,12 @@ const ReturnableItemRow = React.memo(function ReturnableItemRow({
                         <FormattedMessage {...messages.availableToReturn} values={{count: max}} />
                     </Text>
                     {row?.checked && (
-                        <SimpleGrid columns={{base: 1, sm: 2}} columnGap={4} rowGap={3} mt={2}>
+                        <SimpleGrid
+                            columns={{base: 1, sm: reasons.length > 0 ? 2 : 1}}
+                            columnGap={4}
+                            rowGap={3}
+                            mt={2}
+                        >
                             <FormControl id={quantityId}>
                                 <FormLabel fontSize="xs" mb={1}>
                                     <FormattedMessage {...messages.quantityLabel} />
@@ -135,29 +140,31 @@ const ReturnableItemRow = React.memo(function ReturnableItemRow({
                                     productName={displayName}
                                 />
                             </FormControl>
-                            <FormControl>
-                                <FormLabel htmlFor={reasonId} fontSize="xs" mb={1}>
-                                    <FormattedMessage {...messages.reasonLabel} />
-                                </FormLabel>
-                                <Select
-                                    id={reasonId}
-                                    size="sm"
-                                    value={row.reasonCode || ''}
-                                    onChange={handleReasonSelectChange}
-                                    aria-label={intl.formatMessage(messages.reasonFor, {
-                                        name: displayName
-                                    })}
-                                    placeholder={intl.formatMessage(
-                                        messages.selectReasonPlaceholder
-                                    )}
-                                >
-                                    {reasons.map((reason) => (
-                                        <option key={reason.reason} value={reason.reason}>
-                                            {reason.reason}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            {reasons.length > 0 && (
+                                <FormControl>
+                                    <FormLabel htmlFor={reasonId} fontSize="xs" mb={1}>
+                                        <FormattedMessage {...messages.reasonLabel} />
+                                    </FormLabel>
+                                    <Select
+                                        id={reasonId}
+                                        size="sm"
+                                        value={row.reasonCode || ''}
+                                        onChange={handleReasonSelectChange}
+                                        aria-label={intl.formatMessage(messages.reasonFor, {
+                                            name: displayName
+                                        })}
+                                        placeholder={intl.formatMessage(
+                                            messages.selectReasonPlaceholder
+                                        )}
+                                    >
+                                        {reasons.map((reason) => (
+                                            <option key={reason.reason} value={reason.reason}>
+                                                {reason.reason}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            )}
                         </SimpleGrid>
                     )}
                 </Stack>
@@ -180,14 +187,20 @@ ReturnableItemRow.propTypes = {
  */
 const findDefaultReasonCode = (reasons = []) => reasons.find((r) => r.default)?.reason
 
-const isSelectionValid = (selection, returnableItems) => {
+// Reason is optional per the OMS return API — when omitted, the server applies
+// the default reason code. So the UI treats reasonCode as required only when
+// the reason list is available; when the page-level fetch failed and reasons
+// is empty, we mirror cancel-order's shape (hide the dropdown, let the shopper
+// proceed) and let the server backfill.
+const isSelectionValid = (selection, returnableItems, requireReason) => {
     const selectedRows = Object.entries(selection || {}).filter(([, row]) => row?.checked)
     if (selectedRows.length === 0) return false
     return selectedRows.every(([itemId, row]) => {
         const item = returnableItems.find((i) => i.itemId === itemId)
         const max = item?.omsData?.quantityAvailableToReturn ?? 0
         const qty = Number(row.quantity)
-        return Number.isFinite(qty) && qty >= 1 && qty <= max && !!row.reasonCode
+        if (!Number.isFinite(qty) || qty < 1 || qty > max) return false
+        return requireReason ? !!row.reasonCode : true
     })
 }
 
@@ -318,8 +331,8 @@ const ReturnItemsModal = ({
     }, [isOpen, defaultReasonCode, selection, onSelectionChange])
 
     const reviewEnabled = useMemo(
-        () => isSelectionValid(selection, returnableItems),
-        [selection, returnableItems]
+        () => isSelectionValid(selection, returnableItems, reasons.length > 0),
+        [selection, returnableItems, reasons.length]
     )
 
     // The parent always supplies a classified `{kind, ...}` submit error,
@@ -468,30 +481,13 @@ const ReturnItemsModal = ({
         </Alert>
     ) : null
 
-    // Return requires a reason per row (unlike cancel, where reason is optional),
-    // so an empty reason list is a hard block: the dropdown has no options,
-    // isSelectionValid can never be true, and Review stays disabled. Show a
-    // non-blocking inline notice so the shopper knows why Review is greyed out.
-    // No retry button — mirrors cancel-order's "no bespoke recovery affordance"
-    // shape; the shopper closes/reopens or reloads to retry the page fetch.
-    const reasonsUnavailableBanner =
-        reasons.length === 0 ? (
-            <Alert
-                status="warning"
-                role="status"
-                data-testid="return-items-modal-reasons-unavailable"
-            >
-                <AlertIcon />
-                <AlertDescription>
-                    <FormattedMessage {...messages.reasonsUnavailable} />
-                </AlertDescription>
-            </Alert>
-        ) : null
-
+    // Reason per row is optional per the OMS return API (server backfills the
+    // default), so if the page-level fetch failed and reasons is empty we
+    // mirror CancelOrderModal: skip the dropdown entirely and let the shopper
+    // proceed. No banner, no retry — same silent-graceful shape as cancel.
     const selectBody = (
         <Stack spacing={3}>
             {selectErrorBanner}
-            {reasonsUnavailableBanner}
             {returnableItems.map((item) => (
                 <ReturnableItemRow
                     key={item.itemId}
