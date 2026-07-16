@@ -9,7 +9,7 @@ import {
     callTokenBridge,
     handleTokenBridge,
     registerTokenBridgeRoute,
-    resolveAncMyDomain,
+    resolveAgentforceMyDomain,
     TOKEN_BRIDGE_PROXY_PATH
 } from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
 
@@ -25,7 +25,7 @@ jest.mock('@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config', () =>
 }))
 
 const ORIGINAL_FETCH = global.fetch
-const ORIGINAL_ANC_MYDOMAIN = process.env.ANC_MYDOMAIN
+const ORIGINAL_AGENT_MYDOMAIN = process.env.AGENT_MYDOMAIN
 const ORIGINAL_HTTPONLY = process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
 
 const buildRes = () => {
@@ -59,10 +59,10 @@ beforeEach(() => {
 
 afterEach(() => {
     global.fetch = ORIGINAL_FETCH
-    if (ORIGINAL_ANC_MYDOMAIN === undefined) {
-        delete process.env.ANC_MYDOMAIN
+    if (ORIGINAL_AGENT_MYDOMAIN === undefined) {
+        delete process.env.AGENT_MYDOMAIN
     } else {
-        process.env.ANC_MYDOMAIN = ORIGINAL_ANC_MYDOMAIN
+        process.env.AGENT_MYDOMAIN = ORIGINAL_AGENT_MYDOMAIN
     }
     if (ORIGINAL_HTTPONLY === undefined) {
         delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
@@ -72,41 +72,41 @@ afterEach(() => {
     jest.restoreAllMocks()
 })
 
-describe('resolveAncMyDomain', () => {
+describe('resolveAgentforceMyDomain', () => {
     test('returns null when myDomain is undefined', () => {
-        expect(resolveAncMyDomain()).toBeNull()
+        expect(resolveAgentforceMyDomain()).toBeNull()
     })
 
     test('returns null when myDomain is null', () => {
-        expect(resolveAncMyDomain(null)).toBeNull()
+        expect(resolveAgentforceMyDomain(null)).toBeNull()
     })
 
     test('returns null when myDomain is not a string', () => {
-        expect(resolveAncMyDomain(123)).toBeNull()
+        expect(resolveAgentforceMyDomain(123)).toBeNull()
     })
 
     test('returns null when myDomain is empty after trim', () => {
-        expect(resolveAncMyDomain('   ')).toBeNull()
+        expect(resolveAgentforceMyDomain('   ')).toBeNull()
     })
 
     test('prepends https:// when scheme is missing', () => {
-        expect(resolveAncMyDomain('orgfarm-1234.test1.my.pc-rnd.salesforce.com')).toBe(
+        expect(resolveAgentforceMyDomain('orgfarm-1234.test1.my.pc-rnd.salesforce.com')).toBe(
             'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         )
     })
 
     test('preserves https:// when already present', () => {
-        expect(resolveAncMyDomain('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com')).toBe(
+        expect(resolveAgentforceMyDomain('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com')).toBe(
             'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         )
     })
 
     test('preserves http:// when already present (for local testing)', () => {
-        expect(resolveAncMyDomain('http://localhost:8080')).toBe('http://localhost:8080')
+        expect(resolveAgentforceMyDomain('http://localhost:8080')).toBe('http://localhost:8080')
     })
 
     test('strips trailing slashes', () => {
-        expect(resolveAncMyDomain('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com///')).toBe(
+        expect(resolveAgentforceMyDomain('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com///')).toBe(
             'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         )
     })
@@ -167,7 +167,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
     })
 
     test('allows same-origin requests', async () => {
-        process.env.ANC_MYDOMAIN = 'https://test.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://test.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -189,7 +189,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         // `hostname` (no port). Origin `https://localhost:3000` and host
         // `localhost:3000` are same-origin; using `hostname` would drop the port
         // and incorrectly return 403 FORBIDDEN_ORIGIN.
-        process.env.ANC_MYDOMAIN = 'https://test.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://test.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -207,7 +207,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
     })
 
     test('allows trusted Salesforce Origin (Storefront Preview)', async () => {
-        process.env.ANC_MYDOMAIN = 'https://test.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://test.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -225,7 +225,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
     })
 
     test('allows requests with no Origin header (some browsers/tools)', async () => {
-        process.env.ANC_MYDOMAIN = 'https://test.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://test.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -252,9 +252,9 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         expect(global.fetch).not.toHaveBeenCalled()
     })
 
-    test('returns 500 MYDOMAIN_NOT_CONFIGURED when ANC_MYDOMAIN is not set', async () => {
+    test('returns 500 MYDOMAIN_NOT_CONFIGURED when AGENT_MYDOMAIN is not set', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-        delete process.env.ANC_MYDOMAIN
+        delete process.env.AGENT_MYDOMAIN
         const req = buildReq({auth_link_key: 'k', slas_access_token: 'a'})
         const res = buildRes()
         await handleTokenBridge(req, res)
@@ -264,9 +264,9 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         errorSpy.mockRestore()
     })
 
-    test('returns 500 MYDOMAIN_NOT_CONFIGURED when ANC_MYDOMAIN is empty', async () => {
+    test('returns 500 MYDOMAIN_NOT_CONFIGURED when AGENT_MYDOMAIN is empty', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = '   '
+        process.env.AGENT_MYDOMAIN = '   '
         const req = buildReq({auth_link_key: 'k', slas_access_token: 'a'})
         const res = buildRes()
         await handleTokenBridge(req, res)
@@ -279,7 +279,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
     test('returns 400 UNTRUSTED_MYDOMAIN when host is not Salesforce domain', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://attacker.com'
+        process.env.AGENT_MYDOMAIN = 'https://attacker.com'
         const req = buildReq({
             auth_link_key: 'k',
             slas_access_token: 'a'
@@ -296,7 +296,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
     test('returns 400 UNTRUSTED_MYDOMAIN for AWS IMDS', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'http://169.254.169.254'
+        process.env.AGENT_MYDOMAIN = 'http://169.254.169.254'
         const req = buildReq({
             auth_link_key: 'k',
             slas_access_token: 'a'
@@ -312,7 +312,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
 
     test('accepts valid .salesforce.com domain', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://test.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://test.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -330,7 +330,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
 
     test('accepts valid .my.salesforce.com domain', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://org.my.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://org.my.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -348,7 +348,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
 
     test('accepts valid .pc-rnd.salesforce.com domain', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -364,13 +364,36 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         logSpy.mockRestore()
     })
 
-    test('accepts scheme-less ANC_MYDOMAIN and forwards to https origin', async () => {
-        // Regression: ANC_MYDOMAIN may be set without a scheme. It must be
-        // normalized (via resolveAncMyDomain) to an absolute https:// origin so
+    test('accepts scheme-less AGENT_MYDOMAIN and forwards to https origin', async () => {
+        // Regression: AGENT_MYDOMAIN may be set without a scheme. It must be
+        // normalized (via resolveAgentforceMyDomain) to an absolute https:// origin so
         // isTrustedSalesforceDomain's `new URL()` does not throw (which would
         // otherwise return 400 UNTRUSTED_MYDOMAIN) and the fetch URL is valid.
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a'
+        })
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(200)
+        const [url] = global.fetch.mock.calls[0]
+        expect(url).toBe(
+            'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com/agent/identity/bridge'
+        )
+        logSpy.mockRestore()
+    })
+
+    test('strips trailing slash from AGENT_MYDOMAIN so the Core URL has no double slash', async () => {
+        // Regression: AGENT_MYDOMAIN may include a trailing slash. Normalization
+        // must strip it so the forwarded URL is well-formed (no `//agent/...`).
+        const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com/'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -391,7 +414,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
 
     test('forwards to Core with refresh_token from cookie when provided', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -428,7 +451,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
     test('forwards to Core without refresh_token when cookie not present and logs debug', async () => {
         const debugSpy = jest.spyOn(console, 'debug').mockImplementation(() => {})
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -450,7 +473,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
 
     test('forwards Core status and body verbatim on non-200 responses', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 401,
             json: jest.fn().mockResolvedValue({error: 'INVALID_SLAS_TOKEN'})
@@ -472,7 +495,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
 
     test('returns null body when Core response is not JSON', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 502,
             json: jest.fn().mockRejectedValue(new Error('not json'))
@@ -495,7 +518,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
     test('returns 500 INTERNAL_ERROR when fetch throws', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockRejectedValueOnce(new Error('connection refused'))
         const req = buildReq(
             {
@@ -526,7 +549,7 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
 
     test('reads refresh token from cc-nx-g cookie for guest users', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -558,7 +581,7 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
 
     test('returns 401 INVALID_SLAS_TOKEN when access token cookie is missing', async () => {
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://test.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://test.salesforce.com'
         const req = buildReq({
             auth_link_key: 'k'
         })
@@ -574,7 +597,7 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
 
     test('reads access token from cc-at cookie in HttpOnly mode', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -604,7 +627,7 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
 
     test('reads refresh token from cc-nx-g cookie for guest users in HttpOnly mode', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -631,7 +654,7 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
     test('works without refresh token cookie in HttpOnly mode (logs debug)', async () => {
         const debugSpy = jest.spyOn(console, 'debug').mockImplementation(() => {})
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -654,7 +677,7 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
 
     test('ignores slas_access_token from body in HttpOnly mode (uses cookie)', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
@@ -679,7 +702,7 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
 
     test('uses custom siteId from x-site-id header for cookie name resolution', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-        process.env.ANC_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({result: 'ok'})
