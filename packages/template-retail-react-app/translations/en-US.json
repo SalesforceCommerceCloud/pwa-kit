@@ -1869,6 +1869,9 @@
     "defaultMessage": "Review your return"
   },
   "return_items_modal.hint.review_disabled": {
+    "defaultMessage": "Select at least one item and choose a reason to continue."
+  },
+  "return_items_modal.hint.review_disabled_no_reason": {
     "defaultMessage": "Select at least one item to continue."
   },
   "return_items_modal.label.item_checkbox": {

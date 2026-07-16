@@ -187,6 +187,10 @@ ReturnableItemRow.propTypes = {
  */
 const findDefaultReasonCode = (reasons = []) => reasons.find((r) => r.default)?.reason
 
+// Stable empty array so `reasons` keeps referential identity when `reasonCodes`
+// is undefined — avoids invalidating downstream useMemos on every render.
+const EMPTY_REASONS = []
+
 // Reason is optional per the OMS return API — when omitted, the server applies
 // the default reason code. So the UI treats reasonCode as required only when
 // the reason list is available; when the page-level fetch failed and reasons
@@ -248,7 +252,7 @@ const ReturnItemsModal = ({
         if (!isOpen) setView('select')
     }, [isOpen])
 
-    const reasons = reasonCodes || []
+    const reasons = reasonCodes || EMPTY_REASONS
     const defaultReasonCode = useMemo(() => findDefaultReasonCode(reasons), [reasons])
 
     // Clear a stale submit error the moment the shopper edits their selection,
@@ -644,7 +648,11 @@ const ReturnItemsModal = ({
                 <FormattedMessage {...messages.reviewButton} />
             </Button>
             <VisuallyHidden id={reviewDisabledHintId}>
-                <FormattedMessage {...messages.reviewDisabledHint} />
+                <FormattedMessage
+                    {...(reasons.length > 0
+                        ? messages.reviewDisabledHint
+                        : messages.reviewDisabledHintNoReason)}
+                />
             </VisuallyHidden>
         </Stack>
     )

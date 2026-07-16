@@ -4480,6 +4480,12 @@
   "return_items_modal.hint.review_disabled": [
     {
       "type": 0,
+      "value": "Select at least one item and choose a reason to continue."
+    }
+  ],
+  "return_items_modal.hint.review_disabled_no_reason": [
+    {
+      "type": 0,
       "value": "Select at least one item to continue."
     }
   ],

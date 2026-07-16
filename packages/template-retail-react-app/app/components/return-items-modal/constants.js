@@ -45,8 +45,12 @@ export const messages = defineMessages({
         id: 'return_items_modal.button.review_return'
     },
     reviewDisabledHint: {
-        defaultMessage: 'Select at least one item to continue.',
+        defaultMessage: 'Select at least one item and choose a reason to continue.',
         id: 'return_items_modal.hint.review_disabled'
+    },
+    reviewDisabledHintNoReason: {
+        defaultMessage: 'Select at least one item to continue.',
+        id: 'return_items_modal.hint.review_disabled_no_reason'
     },
     itemCheckboxLabel: {
         defaultMessage: '{name}, {count, plural, one {# unit} other {# units}} available to return',
