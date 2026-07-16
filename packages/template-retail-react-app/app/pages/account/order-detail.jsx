@@ -300,7 +300,10 @@ const AccountOrderDetail = () => {
           })
         : null
 
-    const {data: omsMetaData} = useOmsMetaData({parameters: {}}, {enabled: isOmsOrder && onClient})
+    const {data: omsMetaData, refetch: refetchOmsMetaData} = useOmsMetaData(
+        {parameters: {}},
+        {enabled: isOmsOrder && onClient}
+    )
 
     const handleCloseReturnModal = useCallback(() => {
         // Invalidate any in-flight submit so its async result is ignored.
@@ -1349,10 +1352,12 @@ const AccountOrderDetail = () => {
                     onClose={handleCloseReturnModal}
                     order={order}
                     returnableItems={returnableItems}
+                    reasonCodes={omsMetaData?.returnReasonCodes}
                     selection={returnSelection}
                     onSelectionChange={setReturnSelection}
                     onSubmit={handleSubmitReturn}
                     onClearSubmitError={() => setReturnSubmitError(null)}
+                    onRefetchReasons={refetchOmsMetaData}
                     isSubmitting={returnMutation.isLoading}
                     submitError={returnSubmitError}
                 />
