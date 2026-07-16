@@ -96,9 +96,9 @@ describe('resolveAgentforceMyDomain', () => {
     })
 
     test('preserves https:// when already present', () => {
-        expect(resolveAgentforceMyDomain('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com')).toBe(
-            'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-        )
+        expect(
+            resolveAgentforceMyDomain('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com')
+        ).toBe('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com')
     })
 
     test('preserves http:// when already present (for local testing)', () => {
@@ -106,9 +106,9 @@ describe('resolveAgentforceMyDomain', () => {
     })
 
     test('strips trailing slashes', () => {
-        expect(resolveAgentforceMyDomain('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com///')).toBe(
-            'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
-        )
+        expect(
+            resolveAgentforceMyDomain('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com///')
+        ).toBe('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com')
     })
 })
 
