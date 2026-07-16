@@ -17,8 +17,9 @@ import {
 import PropTypes from 'prop-types'
 
 // Localized labels for the four return display statuses, keyed by ORDER_DISPLAY_STATUS so the badge
-// can look up its label by status. Returns render in a neutral badge (no color/icon) — cancelled
-// remains the only colored terminal state, matching the Storefront-Next order-management UX.
+// can look up its label by status. In-progress returns (Return Initiated / Partial Return Initiated)
+// render in a blue/info badge; terminal returns (Return Complete / Partial Return Complete) render
+// in a neutral gray badge. Matches the Storefront-Next order-management badge mapping.
 const RETURN_STATUS_BADGE_MESSAGES = defineMessages({
     [ORDER_DISPLAY_STATUS.RETURN_INITIATED]: {
         defaultMessage: 'Return Initiated',
@@ -43,11 +44,12 @@ const RETURN_STATUS_BADGE_MESSAGES = defineMessages({
  * omsData.status via getOrderDisplayStatus (OMS-only); pure ECOM orders fall through to the raw
  * order.status string in a green badge.
  *
- * Precedence: cancelled (red, the only terminal colored state) wins over any return state. Return
- * states render in a neutral gray badge with their own localized label. When a return was just
- * submitted (returnFeedback success) and the order's own items do not yet reflect it, the badge
- * optimistically shows the generic "Return Initiated" until the next refetch reconciles the true
- * partial-vs-full state.
+ * Precedence: cancelled (red) wins over any return state. In-progress return states (Return
+ * Initiated / Partial Return Initiated) render in a blue/info badge; terminal return states
+ * (Return Complete / Partial Return Complete) render in a neutral gray badge. When a return was
+ * just submitted (returnFeedback success) and the order's own items do not yet reflect it, the
+ * badge optimistically shows the generic "Return Initiated" (blue) until the next refetch
+ * reconciles the true partial-vs-full state.
  */
 const OrderStatusBadge = ({order, cancelFeedback, returnFeedback}) => {
     const {formatMessage} = useIntl()
@@ -70,10 +72,26 @@ const OrderStatusBadge = ({order, cancelFeedback, returnFeedback}) => {
         return null
     }, [isCancelled, order, returnFeedback?.status])
 
+    // In-progress returns (initiated / partial-initiated) show as blue/info; terminal returns
+    // (complete / partial-complete) fall through to gray via the ternary below.
+    const isReturnInProgress =
+        returnDisplayStatus === ORDER_DISPLAY_STATUS.RETURN_INITIATED ||
+        returnDisplayStatus === ORDER_DISPLAY_STATUS.PARTIAL_RETURN_INITIATED
+
+    const colorScheme = isCancelled
+        ? 'red'
+        : isReturnInProgress
+        ? 'blue'
+        : returnDisplayStatus
+        ? 'gray'
+        : 'green'
+
     return (
         <Badge
-            colorScheme={isCancelled ? 'red' : returnDisplayStatus ? 'gray' : 'green'}
+            colorScheme={colorScheme}
             textTransform="capitalize"
+            data-testid="order-status-badge"
+            data-color-scheme={colorScheme}
         >
             {isCancelled ? (
                 <Flex display="inline-flex" alignItems="center" gap={1}>
