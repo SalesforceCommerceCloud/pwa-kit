@@ -137,7 +137,10 @@ export async function handleTokenBridge(req, res) {
         if (origin) {
             try {
                 const originUrl = new URL(origin)
-                const originHost = originUrl.hostname.toLowerCase()
+                // Use `host` (host:port) rather than `hostname` (no port) so the
+                // comparison matches `req.headers.host`, which includes the port
+                // (e.g. `localhost:3000` in local dev).
+                const originHost = originUrl.host.toLowerCase()
 
                 // Allow same-origin requests (PWA Kit storefront calling its own API)
                 const requestHost = req.headers.host?.toLowerCase()
@@ -210,8 +213,12 @@ export async function handleTokenBridge(req, res) {
             }
         }
 
-        // Extract myDomain from ANC_MYDOMAIN environment variable
-        const myDomain = extractMyDomainFromEnv()
+        // Extract myDomain from ANC_MYDOMAIN environment variable and normalize
+        // it to an absolute origin. ANC_MYDOMAIN may be scheme-less (e.g.
+        // `orgfarm-...pc-rnd.salesforce.com`); resolveAncMyDomain prepends
+        // `https://` so `new URL()` in isTrustedSalesforceDomain and the
+        // downstream fetch can parse it.
+        const myDomain = resolveAncMyDomain(extractMyDomainFromEnv())
 
         if (!myDomain) {
             console.error(

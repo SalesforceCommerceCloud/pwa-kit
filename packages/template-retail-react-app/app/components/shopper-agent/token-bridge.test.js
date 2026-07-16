@@ -184,6 +184,28 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         expect(global.fetch).toHaveBeenCalled()
     })
 
+    test('allows same-origin requests when host includes a port (local dev)', async () => {
+        // Regression: the same-origin check must compare `host` (host:port), not
+        // `hostname` (no port). Origin `https://localhost:3000` and host
+        // `localhost:3000` are same-origin; using `hostname` would drop the port
+        // and incorrectly return 403 FORBIDDEN_ORIGIN.
+        process.env.ANC_MYDOMAIN = 'https://test.salesforce.com'
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a'
+        })
+        req.headers.origin = 'https://localhost:3000'
+        req.headers.host = 'localhost:3000'
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(200)
+        expect(global.fetch).toHaveBeenCalled()
+    })
+
     test('allows trusted Salesforce Origin (Storefront Preview)', async () => {
         process.env.ANC_MYDOMAIN = 'https://test.salesforce.com'
         global.fetch.mockResolvedValueOnce({
@@ -339,6 +361,31 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         await handleTokenBridge(req, res)
         expect(res.statusCode).toBe(200)
         expect(global.fetch).toHaveBeenCalled()
+        logSpy.mockRestore()
+    })
+
+    test('accepts scheme-less ANC_MYDOMAIN and forwards to https origin', async () => {
+        // Regression: ANC_MYDOMAIN may be set without a scheme. It must be
+        // normalized (via resolveAncMyDomain) to an absolute https:// origin so
+        // isTrustedSalesforceDomain's `new URL()` does not throw (which would
+        // otherwise return 400 UNTRUSTED_MYDOMAIN) and the fetch URL is valid.
+        const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+        process.env.ANC_MYDOMAIN = 'orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq({
+            auth_link_key: 'k',
+            slas_access_token: 'a'
+        })
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(200)
+        const [url] = global.fetch.mock.calls[0]
+        expect(url).toBe(
+            'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com/agent/identity/bridge'
+        )
         logSpy.mockRestore()
     })
 
