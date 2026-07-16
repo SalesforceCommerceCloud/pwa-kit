@@ -4449,12 +4449,6 @@
       "value": "Cancel"
     }
   ],
-  "return_items_modal.button.retry": [
-    {
-      "type": 0,
-      "value": "Retry"
-    }
-  ],
   "return_items_modal.button.review_return": [
     {
       "type": 0,
@@ -4487,6 +4481,12 @@
     {
       "type": 0,
       "value": "Select at least one item and choose a reason to continue."
+    }
+  ],
+  "return_items_modal.hint.review_disabled_no_reason": [
+    {
+      "type": 0,
+      "value": "Select at least one item to continue."
     }
   ],
   "return_items_modal.label.item_checkbox": [
@@ -4601,22 +4601,10 @@
       "value": " available to return"
     }
   ],
-  "return_items_modal.text.loading_reasons": [
-    {
-      "type": 0,
-      "value": "Loading return reasons…"
-    }
-  ],
   "return_items_modal.text.quantity_exceeded_affected_generic": [
     {
       "type": 0,
       "value": "Some items' available return quantities changed. Please review the updated limits below."
-    }
-  ],
-  "return_items_modal.text.reasons_error": [
-    {
-      "type": 0,
-      "value": "We could not load the return reasons. Please try again."
     }
   ],
   "return_items_modal.text.review_description": [
@@ -4654,7 +4642,7 @@
   "return_items_modal.text.submit_error": [
     {
       "type": 0,
-      "value": "Something went wrong submitting your return. Please try again."
+      "value": "We couldn't submit your return. Your return wasn't processed. Please wait a moment and try again."
     }
   ],
   "return_items_modal.text.submit_error_invalid_reason": [

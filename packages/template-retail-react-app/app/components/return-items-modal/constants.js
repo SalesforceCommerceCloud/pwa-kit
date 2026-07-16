@@ -48,17 +48,9 @@ export const messages = defineMessages({
         defaultMessage: 'Select at least one item and choose a reason to continue.',
         id: 'return_items_modal.hint.review_disabled'
     },
-    loadingReasons: {
-        defaultMessage: 'Loading return reasons…',
-        id: 'return_items_modal.text.loading_reasons'
-    },
-    reasonsError: {
-        defaultMessage: 'We could not load the return reasons. Please try again.',
-        id: 'return_items_modal.text.reasons_error'
-    },
-    retryButton: {
-        defaultMessage: 'Retry',
-        id: 'return_items_modal.button.retry'
+    reviewDisabledHintNoReason: {
+        defaultMessage: 'Select at least one item to continue.',
+        id: 'return_items_modal.hint.review_disabled_no_reason'
     },
     itemCheckboxLabel: {
         defaultMessage: '{name}, {count, plural, one {# unit} other {# units}} available to return',
@@ -90,7 +82,8 @@ export const messages = defineMessages({
         id: 'return_items_modal.button.submit_return'
     },
     submitError: {
-        defaultMessage: 'Something went wrong submitting your return. Please try again.',
+        defaultMessage:
+            "We couldn't submit your return. Your return wasn't processed. Please wait a moment and try again.",
         id: 'return_items_modal.text.submit_error'
     },
     // --- error-code-specific inline messages ---

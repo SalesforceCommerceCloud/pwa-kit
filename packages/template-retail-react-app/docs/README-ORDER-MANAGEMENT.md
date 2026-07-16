@@ -54,10 +54,17 @@ partially-returned multi-unit lines.
    `order.productItems` to those whose `omsData.quantityAvailableToReturn` is a
    positive number. We trust that field verbatim rather than maintaining a
    client-side status allowlist.
-2. **Load return reasons.** The modal calls
+2. **Load return reasons.** The order-detail page calls
    [`useOmsMetaData`](https://github.com/SalesforceCommerceCloud/commerce-sdk-react)
-   and reads `returnReasonCodes` (`{reason, default}` entries). The OMS-default
-   reason is pre-selected for every checked item.
+   once and forwards `returnReasonCodes` (`{reason, default}` entries) into the
+   modal via a `reasonCodes` prop — mirroring how `cancelReasonCodes` reaches
+   `CancelOrderModal`. The OMS-default reason is pre-selected for every checked
+   item. If the metadata fetch fails, the modal drops the Reason column
+   entirely and lets the shopper proceed without one — reason is optional on
+   the return API and the server applies the OMS default when omitted, so this
+   matches the graceful behaviour of `CancelOrderModal` (which hides its reason
+   dropdown too). No banner and no retry — the shopper closes and reopens the
+   modal (or reloads the page) to retry the fetch.
 3. **Select and review.** The shopper checks items, sets a per-item quantity (capped
    at that line's available-to-return count), and picks a reason; a review step
    summarizes the request before submission.
@@ -78,10 +85,11 @@ partially-returned multi-unit lines.
 ### Return Reason Codes
 
 Reasons are not hard-coded—they come from OMS via
-`useOmsMetaData().data.returnReasonCodes`, where each entry is `{reason, default}`. The
-entry flagged `default: true` is pre-selected and omitted from the request body so
-the server applies it. Change the available reasons in Order Management; no
-storefront change is needed.
+`useOmsMetaData().data.returnReasonCodes`, fetched by the order-detail page and
+passed into the return modal as the `reasonCodes` prop. Each entry is
+`{reason, default}`. The entry flagged `default: true` is pre-selected and omitted
+from the request body so the server applies it. Change the available reasons in
+Order Management; no storefront change is needed.
 
 ### Error Handling
 
