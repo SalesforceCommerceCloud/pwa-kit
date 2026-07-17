@@ -26,11 +26,12 @@ import {
  *        sent automatically to same-origin proxy. Client sends auth_link_key
  *        in request body, and siteId as x-site-id header.
  *      - HttpOnly OFF: Access token in localStorage, refresh token in cookie.
- *        Client sends auth_link_key, slas_access_token (from localStorage)
- *        in request body, and siteId as x-site-id header.
+ *        Client sends auth_link_key in the request body, the access token in the
+ *        `Authorization: SLAS <token>` header, and siteId as x-site-id header.
  *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js):
  *      - Reads siteId from x-site-id header (standard PWA Kit pattern)
- *      - Reads tokens from cookies (HttpOnly mode) or request body (non-HttpOnly)
+ *      - Reads the access token from the cc-at cookie (HttpOnly mode) or the
+ *        Authorization header (non-HttpOnly); refresh token from the cookie
  *      - Reads my_domain directly from AGENT_MYDOMAIN environment variable
  *      - Validates my_domain against Salesforce domain allowlist (SSRF prevention)
  *      - Forwards to Core with `Authorization: SLAS <access_token>` and
@@ -84,6 +85,29 @@ export function resolveAgentforceMyDomain(myDomain) {
 }
 
 /**
+ * Extract the SLAS access token from an inbound Authorization header.
+ *
+ * In non-HttpOnly mode the browser reads the access token from localStorage
+ * and sends it as `Authorization: SLAS <token>` (bearer credentials belong in
+ * the Authorization header, not the request body — RFC 6750). Tolerates a
+ * `SLAS ` or `Bearer ` scheme prefix (case-insensitive) as well as a bare
+ * token, and returns null for anything empty or malformed.
+ *
+ * @param {string} [authorizationHeader] - The raw Authorization header value
+ * @returns {string|null} - The SLAS access token, or null if absent/invalid
+ */
+export function parseSlasAuthHeader(authorizationHeader) {
+    if (!authorizationHeader || typeof authorizationHeader !== 'string') return null
+    const trimmed = authorizationHeader.trim()
+    if (!trimmed) return null
+    // Strip a leading `SLAS`/`Bearer` scheme prefix if present. `\b\s*` (rather
+    // than `\s+`) also collapses a scheme-only value (e.g. `SLAS `) to empty so
+    // it is rejected, while leaving bare tokens like `slasher-token` untouched.
+    const token = trimmed.replace(/^(?:SLAS|Bearer)\b\s*/i, '').trim()
+    return token || null
+}
+
+/**
  * Validate that the myDomain hostname is a trusted Salesforce domain.
  * SSRF prevention: only allow requests to known Salesforce infrastructure.
  *
@@ -110,8 +134,7 @@ export function isTrustedSalesforceDomain(myDomain) {
 /** Express handler for POST /api/agent/identity/bridge. */
 export async function handleTokenBridge(req, res) {
     try {
-        const {auth_link_key: authLinkKey, slas_access_token: slasAccessTokenFromBody} =
-            req.body || {}
+        const {auth_link_key: authLinkKey} = req.body || {}
 
         if (!authLinkKey || typeof authLinkKey !== 'string') {
             return res.status(400).json({error: 'MISSING_AUTH_LINK_KEY'})
@@ -183,7 +206,9 @@ export async function handleTokenBridge(req, res) {
                 return res.status(401).json({error: 'INVALID_SLAS_TOKEN'})
             }
         } else {
-            // Non-HttpOnly mode: Access token from body (localStorage), refresh token from cookie
+            // Non-HttpOnly mode: the browser read the access token from localStorage
+            // and sent it in the Authorization header (`SLAS <token>`); the refresh
+            // token still comes from the cookie.
             const refreshTokenRegisteredCookie = getCookieName(
                 SESSION_COOKIE_CONFIG.refreshTokenRegistered,
                 siteId
@@ -193,7 +218,7 @@ export async function handleTokenBridge(req, res) {
                 siteId
             )
 
-            slasAccessToken = slasAccessTokenFromBody
+            slasAccessToken = parseSlasAuthHeader(req.headers.authorization)
             refreshToken = cookies[refreshTokenRegisteredCookie] || cookies[refreshTokenGuestCookie]
 
             if (!slasAccessToken || typeof slasAccessToken !== 'string') {
@@ -268,8 +293,8 @@ export function registerTokenBridgeRoute(app) {
  * Browser helper: POSTs to the same-origin proxy and returns Core's status + body.
  *
  * In HttpOnly mode, tokens are sent automatically via cookies. In non-HttpOnly mode,
- * the access token is read from localStorage and sent in the body, while the refresh
- * token is read from cookies server-side.
+ * the access token is read from localStorage and sent in the `Authorization` header
+ * (`SLAS <token>`), while the refresh token is read from cookies server-side.
  *
  * myDomain is now derived server-side from AGENT_MYDOMAIN environment variable.
  *
@@ -282,13 +307,14 @@ export const callTokenBridge = async ({authLinkKey, slasAccessToken, siteId}) =>
         auth_link_key: authLinkKey
     }
 
-    // Only include access token if provided (non-HttpOnly mode)
-    if (slasAccessToken) {
-        requestBody.slas_access_token = slasAccessToken
-    }
-
     const headers = {
         'Content-Type': 'application/json'
+    }
+
+    // Send the access token in the Authorization header (non-HttpOnly mode only).
+    // In HttpOnly mode the server reads it from the cc-at_{siteId} cookie instead.
+    if (slasAccessToken) {
+        headers['Authorization'] = `SLAS ${slasAccessToken}`
     }
 
     // Send siteId as x-site-id header (same pattern as other PWA Kit routes)
