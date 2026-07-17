@@ -8,6 +8,7 @@
 import {
     callTokenBridge,
     handleTokenBridge,
+    parseSlasAuthHeader,
     registerTokenBridgeRoute,
     resolveAgentforceMyDomain,
     TOKEN_BRIDGE_PROXY_PATH
@@ -44,13 +45,24 @@ const buildRes = () => {
     return res
 }
 
-const buildReq = (body = {}, cookies = '', siteId = 'RefArch') => ({
-    body,
-    headers: {
-        cookie: cookies,
-        'x-site-id': siteId
+// Build a mock Express request. In non-HttpOnly mode the browser sends the SLAS
+// access token in the `Authorization` header (`SLAS <token>`), not in the body.
+// For brevity, a convenience `slas_access_token` field in `body` is lifted into
+// the Authorization header here to mirror what the browser does — the handler
+// only ever reads the header. Pass `authorization` explicitly to exercise raw
+// header handling (scheme parsing, malformed/missing values).
+const buildReq = (body = {}, cookies = '', siteId = 'RefArch', authorization) => {
+    const {slas_access_token: bodyToken, ...restBody} = body
+    const authHeader = authorization ?? (bodyToken ? `SLAS ${bodyToken}` : undefined)
+    return {
+        body: restBody,
+        headers: {
+            cookie: cookies,
+            'x-site-id': siteId,
+            ...(authHeader ? {authorization: authHeader} : {})
+        }
     }
-})
+}
 
 beforeEach(() => {
     global.fetch = jest.fn()
@@ -109,6 +121,45 @@ describe('resolveAgentforceMyDomain', () => {
         expect(
             resolveAgentforceMyDomain('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com///')
         ).toBe('https://orgfarm-1234.test1.my.pc-rnd.salesforce.com')
+    })
+})
+
+describe('parseSlasAuthHeader', () => {
+    test('returns null when the header is undefined', () => {
+        expect(parseSlasAuthHeader()).toBeNull()
+    })
+
+    test('returns null when the header is not a string', () => {
+        expect(parseSlasAuthHeader(123)).toBeNull()
+    })
+
+    test('returns null when the header is empty after trim', () => {
+        expect(parseSlasAuthHeader('   ')).toBeNull()
+    })
+
+    test('strips a SLAS scheme prefix (case-insensitive)', () => {
+        expect(parseSlasAuthHeader('SLAS my-token')).toBe('my-token')
+        expect(parseSlasAuthHeader('slas my-token')).toBe('my-token')
+    })
+
+    test('strips a Bearer scheme prefix (case-insensitive)', () => {
+        expect(parseSlasAuthHeader('Bearer my-token')).toBe('my-token')
+        expect(parseSlasAuthHeader('bearer my-token')).toBe('my-token')
+    })
+
+    test('returns a bare token unchanged', () => {
+        expect(parseSlasAuthHeader('my-token')).toBe('my-token')
+    })
+
+    test('does not strip when the token merely starts with the scheme letters', () => {
+        // `\b` guards against clobbering a token like `slasher-token` (no word
+        // boundary between the scheme letters and the rest of the token).
+        expect(parseSlasAuthHeader('slasher-token')).toBe('slasher-token')
+    })
+
+    test('returns null when the header is only a scheme prefix', () => {
+        expect(parseSlasAuthHeader('SLAS ')).toBeNull()
+        expect(parseSlasAuthHeader('Bearer   ')).toBeNull()
     })
 })
 
@@ -241,10 +292,66 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         expect(global.fetch).toHaveBeenCalled()
     })
 
-    test('returns 401 INVALID_SLAS_TOKEN when slas_access_token is missing (non-HttpOnly)', async () => {
+    test('returns 401 INVALID_SLAS_TOKEN when Authorization header is missing (non-HttpOnly)', async () => {
         const req = buildReq({
             auth_link_key: 'k'
         })
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+        expect(res.statusCode).toBe(401)
+        expect(res.body).toEqual({error: 'INVALID_SLAS_TOKEN'})
+        expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    test('reads the access token from the Authorization header and forwards it to Core', async () => {
+        // The browser sends the SLAS access token in the Authorization header
+        // (non-HttpOnly mode); the token must never appear in the request body.
+        const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq(
+            {auth_link_key: 'auth-key'},
+            'cc-nx_RefArch=refresh-token',
+            'RefArch',
+            'SLAS header-access-token'
+        )
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+
+        expect(res.statusCode).toBe(200)
+        const [, init] = global.fetch.mock.calls[0]
+        expect(init.headers.Authorization).toBe('SLAS header-access-token')
+        expect(JSON.parse(init.body)).toEqual({
+            auth_link_key: 'auth-key',
+            refresh_token: 'refresh-token'
+        })
+        expect(JSON.parse(init.body).slas_access_token).toBeUndefined()
+        logSpy.mockRestore()
+    })
+
+    test('accepts a bare Authorization header with no scheme prefix', async () => {
+        const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+        process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
+        global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: jest.fn().mockResolvedValue({result: 'ok'})
+        })
+        const req = buildReq({auth_link_key: 'k'}, '', 'RefArch', 'bare-token')
+        const res = buildRes()
+        await handleTokenBridge(req, res)
+
+        expect(res.statusCode).toBe(200)
+        const [, init] = global.fetch.mock.calls[0]
+        expect(init.headers.Authorization).toBe('SLAS bare-token')
+        logSpy.mockRestore()
+    })
+
+    test('returns 401 INVALID_SLAS_TOKEN when Authorization header is only a scheme prefix', async () => {
+        process.env.AGENT_MYDOMAIN = 'https://test.salesforce.com'
+        const req = buildReq({auth_link_key: 'k'}, '', 'RefArch', 'SLAS ')
         const res = buildRes()
         await handleTokenBridge(req, res)
         expect(res.statusCode).toBe(401)
@@ -675,7 +782,7 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
         logSpy.mockRestore()
     })
 
-    test('ignores slas_access_token from body in HttpOnly mode (uses cookie)', async () => {
+    test('ignores an inbound Authorization header in HttpOnly mode (uses cookie)', async () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
         process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
@@ -684,18 +791,19 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
         })
         const req = buildReq(
             {
-                auth_link_key: 'auth-key',
-                slas_access_token: 'body-token-should-be-ignored'
+                auth_link_key: 'auth-key'
             },
             'cc-at_RefArch=httponly-cookie-token; cc-nx_RefArch=refresh-token',
-            'RefArch'
+            'RefArch',
+            'SLAS header-token-should-be-ignored'
         )
         const res = buildRes()
         await handleTokenBridge(req, res)
 
         expect(res.statusCode).toBe(200)
         const init = global.fetch.mock.calls[0][1]
-        // Should use cookie token, not body token
+        // HttpOnly mode must source the token from the cc-at cookie, never the
+        // inbound Authorization header — keeps the two modes isolated.
         expect(init.headers.Authorization).toBe('SLAS httponly-cookie-token')
         logSpy.mockRestore()
     })
@@ -740,7 +848,7 @@ describe('registerTokenBridgeRoute', () => {
 })
 
 describe('callTokenBridge (browser helper)', () => {
-    test('POSTs auth link key, access token and sends siteId as header (non-HttpOnly mode)', async () => {
+    test('sends access token in the Authorization header and siteId as header (non-HttpOnly mode)', async () => {
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({ok: true})
@@ -758,16 +866,17 @@ describe('callTokenBridge (browser helper)', () => {
         expect(init.method).toBe('POST')
         expect(init.headers).toEqual({
             'Content-Type': 'application/json',
-            'x-site-id': 'RefArch'
+            'x-site-id': 'RefArch',
+            Authorization: 'SLAS access-token'
         })
+        // The access token must NOT appear in the request body.
         expect(JSON.parse(init.body)).toEqual({
-            auth_link_key: 'auth-key',
-            slas_access_token: 'access-token'
+            auth_link_key: 'auth-key'
         })
         expect(result).toEqual({status: 200, body: {ok: true}})
     })
 
-    test('omits slas_access_token when not provided (HttpOnly mode)', async () => {
+    test('omits the Authorization header when no access token is provided (HttpOnly mode)', async () => {
         global.fetch.mockResolvedValueOnce({
             status: 200,
             json: jest.fn().mockResolvedValue({ok: true})
@@ -783,6 +892,7 @@ describe('callTokenBridge (browser helper)', () => {
             'Content-Type': 'application/json',
             'x-site-id': 'RefArch'
         })
+        expect(init.headers.Authorization).toBeUndefined()
         expect(JSON.parse(init.body)).toEqual({
             auth_link_key: 'auth-key'
         })
@@ -801,11 +911,11 @@ describe('callTokenBridge (browser helper)', () => {
 
         const init = global.fetch.mock.calls[0][1]
         expect(init.headers).toEqual({
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: 'SLAS access-token'
         })
         expect(JSON.parse(init.body)).toEqual({
-            auth_link_key: 'auth-key',
-            slas_access_token: 'access-token'
+            auth_link_key: 'auth-key'
         })
     })
 

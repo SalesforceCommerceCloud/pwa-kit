@@ -448,8 +448,9 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
                         const result = await callTokenBridge({
                             authLinkKey,
-                            // Only send access token in non-HttpOnly mode (from localStorage)
-                            // In HttpOnly mode, server reads from cc-at_{siteId} cookie
+                            // Only send access token in non-HttpOnly mode (from localStorage);
+                            // callTokenBridge puts it in the Authorization header. In HttpOnly
+                            // mode, the server reads it from the cc-at_{siteId} cookie instead.
                             slasAccessToken,
                             siteId: sid
                         })
