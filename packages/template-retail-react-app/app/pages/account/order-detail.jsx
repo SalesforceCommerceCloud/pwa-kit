@@ -92,28 +92,11 @@ const groupProductItemsByShipmentId = (productItems) =>
         return itemsByShipmentId
     }, {})
 
-const OrderProducts = ({productItems, currency}) => {
-    // Guard the map: a per-shipment box can pass an empty/undefined items list, and
-    // the consolidate call below is already `|| []`-guarded — keep this symmetric so
-    // a missing list never throws before that.
-    const orderProductIds = (productItems || []).map((product) => product.productId)
-    const {data: products, isLoading} = useProducts(
-        {
-            parameters: {
-                ids: orderProductIds
-            }
-        },
-        {
-            enabled: !!orderProductIds && onClient,
-            select: (result) => {
-                return result?.data?.reduce((result, item) => {
-                    const key = item.id
-                    result[key] = item
-                    return result
-                }, {})
-            }
-        }
-    )
+const OrderProducts = ({productItems, currency, productsById, isProductsLoading}) => {
+    // Parent already fetches products for the whole order (one request), so the child
+    // reads from `productsById`; no per-shipment useProducts call.
+    const products = productsById
+    const isLoading = isProductsLoading
     const consolidatedItems = consolidateDuplicateBonusProducts(productItems || [])
     const variants = consolidatedItems?.map((item) => {
         const product = products?.[item.productId]
@@ -164,7 +147,9 @@ const OrderProducts = ({productItems, currency}) => {
 
 OrderProducts.propTypes = {
     productItems: PropTypes.array.isRequired,
-    currency: PropTypes.string
+    currency: PropTypes.string,
+    productsById: PropTypes.object,
+    isProductsLoading: PropTypes.bool
 }
 
 const AccountOrderDetail = () => {
@@ -263,7 +248,39 @@ const AccountOrderDetail = () => {
     // none externalize, the button is shown disabled so the action stays visible.
     const firstTrackingUrl = trackingUrlOptions[0]?.url
 
-    const returnableItems = useMemo(() => getReturnableItems(order), [order])
+    // Batch-fetch every product referenced by the order once, keyed by productId.
+    // Downstream consumers (OrderProducts render, getReturnableItems filter, itemCount
+    // in the header) all read from this map, so the OMS-emitted shipping-cost surcharge
+    // (productId is a shipping-method id like `UK_Ground`, missing from Shopper Products)
+    // is dropped once, at the source, instead of leaking into any consumer.
+    const orderProductIds = useMemo(
+        () => (order?.productItems ?? []).map((item) => item.productId).filter(Boolean),
+        [order?.productItems]
+    )
+    const {data: productsById, isLoading: isProductsLoading} = useProducts(
+        {parameters: {ids: orderProductIds}},
+        {
+            enabled: orderProductIds.length > 0 && onClient,
+            select: (result) =>
+                result?.data?.reduce((acc, item) => {
+                    acc[item.id] = item
+                    return acc
+                }, {})
+        }
+    )
+    // Catalog-only view of productItems: drops non-catalog entries (shipping surcharges)
+    // once the products batch resolves. While the batch is in flight (or on failure —
+    // productsById is undefined) we fall through to the raw list so the page still renders
+    // instead of blanking every line.
+    const catalogProductItems = useMemo(() => {
+        if (!order?.productItems?.length) return order?.productItems
+        if (!productsById) return order.productItems
+        return order.productItems.filter((item) => item.productId && productsById[item.productId])
+    }, [order?.productItems, productsById])
+    const returnableItems = useMemo(
+        () => getReturnableItems(order, productsById),
+        [order, productsById]
+    )
     // Require a concrete customerId match — `undefined === undefined` would
     // otherwise grant ownership when both sides are missing. Mirrors canCancel.
     const ownsOrder = !!customerId && order?.customerInfo?.customerId === customerId
@@ -604,7 +621,7 @@ const AccountOrderDetail = () => {
 
     const paymentCard = order?.paymentInstruments?.[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
-    const itemCount = order?.productItems?.reduce((count, item) => item.quantity + count, 0) || 0
+    const itemCount = catalogProductItems?.reduce((count, item) => item.quantity + count, 0) || 0
 
     const headingRef = useRef()
     useEffect(() => {
@@ -1141,17 +1158,18 @@ const AccountOrderDetail = () => {
                               // section BELOW all the boxes (see after this Stack). The shopper, like
                               // the storefront, can't tell which tracking maps to which shipment, and
                               // the flat layout is honest about that rather than implying a false link.
-                              const itemsByShipmentId = groupProductItemsByShipmentId(
-                                  order.productItems
-                              )
+                              const itemsByShipmentId =
+                                  groupProductItemsByShipmentId(catalogProductItems)
                               // No delivery shipment to box the items under (e.g. BOPIS
                               // pickup-only orders) → render the items as one flat list. Tracking
                               // still renders in the flat section below this Stack.
                               if (deliveryShipments.length === 0) {
                                   return (
                                       <OrderProducts
-                                          productItems={order.productItems}
+                                          productItems={catalogProductItems}
                                           currency={order.currency}
+                                          productsById={productsById}
+                                          isProductsLoading={isProductsLoading}
                                       />
                                   )
                               }
@@ -1170,7 +1188,7 @@ const AccountOrderDetail = () => {
                                   // land under 'default'). For multiple shipments, match strictly
                                   // by shipmentId so items never duplicate across boxes.
                                   const items = isSingleShipment
-                                      ? order.productItems
+                                      ? catalogProductItems
                                       : itemsByShipmentId[sid] ?? []
                                   if (isSingleShipment) {
                                       // Single box owns every bucket.
@@ -1238,6 +1256,8 @@ const AccountOrderDetail = () => {
                                               <OrderProducts
                                                   productItems={items}
                                                   currency={order.currency}
+                                                  productsById={productsById}
+                                                  isProductsLoading={isProductsLoading}
                                               />
                                               {address && (
                                                   <Stack
@@ -1305,6 +1325,8 @@ const AccountOrderDetail = () => {
                                               <OrderProducts
                                                   productItems={leftoverItems}
                                                   currency={order.currency}
+                                                  productsById={productsById}
+                                                  isProductsLoading={isProductsLoading}
                                               />
                                           </Stack>
                                       </Box>

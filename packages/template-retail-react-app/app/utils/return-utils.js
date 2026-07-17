@@ -15,17 +15,28 @@
  * by `POST .../actions/oms-return-order` when the order is no longer in a
  * returnable state — there is no client-side status allowlist.
  *
+ * OMS also emits a shipping-cost surcharge as a `productItems[]` entry with a
+ * shipping-method id (e.g. `UK_Ground`) in `productId` and
+ * `quantityAvailableToReturn > 0` — shaped like a returnable product. When
+ * `productsById` is provided, entries whose `productId` misses the lookup are
+ * dropped: Shopper Products only returns real catalog entries, so a miss
+ * reliably identifies a shipping-method id. Pass an empty object (batch fetch
+ * failed) to skip filtering so a transient outage doesn't hide every line.
+ *
  * ECOM-only orders have no `omsData` on items, so they always return [].
  *
  * @param {Object} order Shopper Orders order document.
+ * @param {Object} [productsById] Optional map of catalog products keyed by `productId`.
  * @returns {Array<Object>} The subset of `order.productItems` that are returnable, or [].
  */
-export const getReturnableItems = (order) => {
+export const getReturnableItems = (order, productsById) => {
     if (!order?.productItems?.length) return []
-    return order.productItems.filter((item) => {
+    const returnable = order.productItems.filter((item) => {
         const qty = item?.omsData?.quantityAvailableToReturn
         return Number.isFinite(qty) && qty > 0
     })
+    if (!productsById || Object.keys(productsById).length === 0) return returnable
+    return returnable.filter((item) => item.productId && productsById[item.productId])
 }
 
 /**

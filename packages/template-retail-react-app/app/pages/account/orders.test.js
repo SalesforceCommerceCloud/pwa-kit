@@ -629,6 +629,47 @@ describe('OMS/SOM Integration - Order Details', () => {
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
         expect(screen.queryByRole('heading', {name: /payment method/i})).not.toBeInTheDocument()
     })
+
+    test('shipping-cost surcharge (productId absent from products response) is excluded from item count', async () => {
+        // OMS emits shipping-cost surcharges as productItems entries with a shipping-method
+        // id in `productId` (e.g. UK_Ground). Shopper Products doesn't return them, so a
+        // productsById lookup miss reliably identifies the surcharge. Item count should
+        // reflect real catalog products only (1 item, not 2).
+        global.server.use(
+            rest.get('*/products', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({
+                        data: [{id: '701642852179M', name: 'Real Catalog Product'}],
+                        total: 1
+                    })
+                )
+            })
+        )
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '701642852179M',
+                        productName: 'Real Catalog Product',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 1}
+                    },
+                    {
+                        productId: 'UK_Ground',
+                        productName: 'Item Shipping Cost (Surcharge)',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 1}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        // Wait for products fetch to resolve (async) — the surcharge line disappears once
+        // productsById is populated.
+        expect(await screen.findByText(/^1 item$/i)).toBeInTheDocument()
+        expect(screen.queryByText(/^2 items$/i)).not.toBeInTheDocument()
+    })
 })
 
 describe('Return Items CTA', () => {
@@ -1297,6 +1338,37 @@ describe('OMS/SOM Integration - Order History', () => {
         })
         expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
         expect(await screen.findByText(/Shipped to: Alex Johnson/i)).toBeInTheDocument()
+    })
+
+    test('shipping-cost surcharge (productId absent from products response) is excluded from item count', async () => {
+        // OMS emits shipping-cost surcharges as productItems entries with a
+        // shipping-method id in `productId` (e.g. UK_Ground). Shopper Products
+        // doesn't return them, so a productsById lookup miss is the discriminator.
+        // The label must read "1 item" (not "2"), matching the real catalog line.
+        setupOrderHistoryMock(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '701642852179M',
+                        productName: 'Real Catalog Product',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 1}
+                    },
+                    {
+                        productId: 'UK_Ground',
+                        productName: 'Item Shipping Cost (Surcharge)',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 1}
+                    }
+                ]
+            })
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('1 item')).toBeInTheDocument()
+        expect(screen.queryByText('2 items')).not.toBeInTheDocument()
     })
 })
 

@@ -33,22 +33,40 @@ import PropTypes from 'prop-types'
 import {DEFAULT_ORDERS_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/constants'
 import OrderStatusBadge from '@salesforce/retail-react-app/app/components/order-status-badge'
 
-const OrderProductImages = ({productItems}) => {
-    const ids = productItems.map((item) => item.productId).join(',') ?? ''
+// Fetches products for an order's `productItems` and returns the catalog-only subset —
+// entries whose `productId` misses the Shopper Products response are dropped. This
+// catches the OMS-emitted shipping-cost surcharge (productId is a shipping-method id
+// like `UK_Ground`, missing from the catalog), so image thumbnails and the "N items"
+// count both reflect real products. Falls through to the raw list while the batch is
+// in flight or on failure, so a transient outage doesn't blank the card.
+const useCatalogProductItems = (productItems) => {
+    const ids = (productItems || []).map((item) => item.productId).join(',') ?? ''
     const {data: {data: products} = {}, isLoading} = useProducts({
-        parameters: {
-            ids: ids
-        }
+        parameters: {ids}
     })
+    const productsById = products?.reduce((acc, p) => {
+        acc[p.id] = p
+        return acc
+    }, {})
+    const filtered =
+        productsById && Object.keys(productsById).length > 0
+            ? (productItems || []).filter((item) => item.productId && productsById[item.productId])
+            : productItems
+    return {productItems: filtered, productsById, isLoading}
+}
 
-    const images = products?.map((product) => {
-        return product?.imageGroups?.find((group) => group.viewType === 'small').images[0]
+const OrderProductImages = ({productItems}) => {
+    const {productItems: filtered, productsById, isLoading} = useCatalogProductItems(productItems)
+
+    const images = filtered?.map((item) => {
+        const product = productsById?.[item.productId]
+        return product?.imageGroups?.find((group) => group.viewType === 'small')?.images?.[0]
     })
 
     return (
         <>
-            {!isLoading && products
-                ? images.map((image, index) => {
+            {!isLoading && productsById
+                ? images?.map((image, index) => {
                       return (
                           <AspectRatio
                               key={index}
@@ -66,13 +84,31 @@ const OrderProductImages = ({productItems}) => {
                           </AspectRatio>
                       )
                   })
-                : productItems.map((item, index) => {
+                : (productItems || []).map((item, index) => {
                       return <Skeleton key={index} h="88px" w="88px" />
                   })}
         </>
     )
 }
 OrderProductImages.propTypes = {
+    productItems: PropTypes.array
+}
+
+// Renders the catalog-only item count so shipping-surcharge lines don't inflate it.
+// Reuses the same useProducts query as OrderProductImages, so tanstack-query dedupes
+// the two calls and no extra request is made.
+const OrderItemCount = ({productItems}) => {
+    const {productItems: filtered} = useCatalogProductItems(productItems)
+    return (
+        <FormattedMessage
+            defaultMessage="{count, plural, one {# item} other {# items}}"
+            id="account_order_history.label.num_of_items"
+            description="Number of items in order"
+            values={{count: filtered?.length ?? 0}}
+        />
+    )
+}
+OrderItemCount.propTypes = {
     productItems: PropTypes.array
 }
 
@@ -201,12 +237,7 @@ const AccountOrderHistory = () => {
                                     }
                                 >
                                     <Text>
-                                        <FormattedMessage
-                                            defaultMessage="{count, plural, one {# item} other {# items}}"
-                                            id="account_order_history.label.num_of_items"
-                                            description="Number of items in order"
-                                            values={{count: order.productItems.length}}
-                                        />
+                                        <OrderItemCount productItems={order.productItems} />
                                     </Text>
                                     <Text>
                                         <FormattedNumber

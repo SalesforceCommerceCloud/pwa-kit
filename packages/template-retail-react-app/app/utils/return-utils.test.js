@@ -58,6 +58,29 @@ describe('getReturnableItems', () => {
         }
         expect(getReturnableItems(order).map((i) => i.productId)).toEqual(['ok'])
     })
+
+    test('drops OMS shipping-cost surcharge (productId misses productsById) when the lookup is provided', () => {
+        // OMS emits shipping surcharges as productItems entries with a shipping-method
+        // id (e.g. UK_Ground) in `productId` and `quantityAvailableToReturn > 0`. Shopper
+        // Products doesn't return them, so a productsById miss identifies the surcharge.
+        const order = {productItems: [item('013742002997M', 5), item('UK_Ground', 5)]}
+        const productsById = {'013742002997M': {id: '013742002997M', name: 'Bracelet'}}
+        expect(getReturnableItems(order, productsById).map((i) => i.productId)).toEqual([
+            '013742002997M'
+        ])
+    })
+
+    test('leaves the list intact when productsById is empty (batch getProducts failed)', () => {
+        // Defense in depth: if the products batch fetch is empty, do NOT hide every line —
+        // that would blank the entire return dialog on a transient outage.
+        const order = {productItems: [item('a', 1), item('b', 2)]}
+        expect(getReturnableItems(order, {}).map((i) => i.productId)).toEqual(['a', 'b'])
+    })
+
+    test('leaves the list intact when productsById is undefined (loading state)', () => {
+        const order = {productItems: [item('a', 1)]}
+        expect(getReturnableItems(order, undefined).map((i) => i.productId)).toEqual(['a'])
+    })
 })
 
 describe('buildReturnProductItems', () => {
