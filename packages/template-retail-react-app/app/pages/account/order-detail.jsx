@@ -269,12 +269,14 @@ const AccountOrderDetail = () => {
         }
     )
     // Catalog-only view of productItems: drops non-catalog entries (shipping surcharges)
-    // once the products batch resolves. While the batch is in flight (or on failure —
-    // productsById is undefined) we fall through to the raw list so the page still renders
-    // instead of blanking every line.
+    // once the products batch resolves. While the batch is in flight (productsById is
+    // undefined) or resolves empty (the `select` reduces to `{}` when the batch returns
+    // no data — a partial outage or all-invalid ids), we fall through to the raw list so
+    // the page still renders instead of blanking every line. Mirrors the empty-object
+    // guard in getReturnableItems and order-history's useCatalogProductItems.
     const catalogProductItems = useMemo(() => {
         if (!order?.productItems?.length) return order?.productItems
-        if (!productsById) return order.productItems
+        if (!productsById || Object.keys(productsById).length === 0) return order.productItems
         return order.productItems.filter((item) => item.productId && productsById[item.productId])
     }, [order?.productItems, productsById])
     const returnableItems = useMemo(

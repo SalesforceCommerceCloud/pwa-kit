@@ -670,6 +670,43 @@ describe('OMS/SOM Integration - Order Details', () => {
         expect(await screen.findByText(/^1 item$/i)).toBeInTheDocument()
         expect(screen.queryByText(/^2 items$/i)).not.toBeInTheDocument()
     })
+
+    test('empty products response falls through to the raw list instead of blanking every item', async () => {
+        // Partial outage / all-invalid ids: Shopper Products returns 200 with an empty
+        // payload, so the `select` reduces to `{}` (truthy). Without the empty-object
+        // guard, the filter drops every line once the batch resolves and blanks the
+        // Items Ordered section. The rows render only after loading finishes, so
+        // asserting on the product names proves the guard fell through to the raw list
+        // POST-resolution (a bare "2 items" would also match the transient loading state).
+        global.server.use(
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json({data: [], total: 0}))
+            })
+        )
+        setupOrderDetailsPage(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '701642852179M',
+                        productName: 'Real Catalog Product',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 1}
+                    },
+                    {
+                        productId: '701642852180M',
+                        productName: 'Another Catalog Product',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 1}
+                    }
+                ]
+            })
+        )
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        // Both catalog lines survive the empty-batch fallback and render post-resolution.
+        expect(await screen.findByText('Real Catalog Product')).toBeInTheDocument()
+        expect(await screen.findByText('Another Catalog Product')).toBeInTheDocument()
+        expect(await screen.findByText(/^2 items$/i)).toBeInTheDocument()
+    })
 })
 
 describe('Return Items CTA', () => {
@@ -1369,6 +1406,45 @@ describe('OMS/SOM Integration - Order History', () => {
         expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
         expect(await screen.findByText('1 item')).toBeInTheDocument()
         expect(screen.queryByText('2 items')).not.toBeInTheDocument()
+    })
+
+    test('empty products response keeps the item count instead of zeroing it', async () => {
+        // Empty batch → productsById is `{}` (truthy). useCatalogProductItems' Object.keys
+        // guard must fall through to the raw list so the count still reads "2 items". The
+        // count comes straight from the hook, so this is a regression guard on that guard
+        // (the render-branch fix in OrderProductImages is covered by the order-detail
+        // Items-Ordered test, where rows render only post-resolution).
+        setupOrderHistoryMock(
+            createMockOmsOrder({
+                productItems: [
+                    {
+                        productId: '701642852179M',
+                        productName: 'Real Catalog Product',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 1}
+                    },
+                    {
+                        productId: '701642852180M',
+                        productName: 'Another Catalog Product',
+                        quantity: 1,
+                        omsData: {status: 'shipped', quantityAvailableToReturn: 1}
+                    }
+                ]
+            })
+        )
+        // Register AFTER setupOrderHistoryMock so this empty response wins over the
+        // helper's default `*/products` handler.
+        global.server.use(
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json({data: [], total: 0}))
+            })
+        )
+        renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+        expect(await screen.findByText('2 items')).toBeInTheDocument()
+        expect(screen.queryByText('0 items')).not.toBeInTheDocument()
     })
 })
 

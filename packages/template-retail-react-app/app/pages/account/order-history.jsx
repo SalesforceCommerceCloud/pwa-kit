@@ -65,7 +65,7 @@ const OrderProductImages = ({productItems}) => {
 
     return (
         <>
-            {!isLoading && productsById
+            {!isLoading && productsById && Object.keys(productsById).length > 0
                 ? images?.map((image, index) => {
                       return (
                           <AspectRatio
