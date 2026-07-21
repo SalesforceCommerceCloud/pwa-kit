@@ -1,3 +1,6 @@
+## v5.4.0-nightly-20260721085048 (Jul 21, 2026)
+## v5.4.0-dev (Jul 21, 2026)
+## v3.20.0-nightly-20260721085048 (Jul 21, 2026)
 ## v5.4.0-dev (Jul 13, 2026)
 - [Bugfix] Gracefully handle stale or malformed session tokens on load. A truncated `cc-at` cookie chunk or a value left by an older token format could be handed to `jwt-decode`, surfacing an `Invalid token specified: missing part #2` error to the storefront during `ready()`. The auth module now decodes such tokens defensively: an undecodable access token is discarded (and its cookie cleared) and treated as expired, an undecodable SFRA `cc-at` handoff token is cleared with a fallback to the local store, and a malformed `fetchedToken` is ignored — in every case the flow falls through to a refresh / guest login instead of throwing. Only affects non-HttpOnly / SSR / hybrid mode.
 
