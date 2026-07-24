@@ -31,7 +31,6 @@ const onClient = typeof window !== 'undefined'
  * @param {string} options.esDeveloperName - Embedded Service developer name
  * @param {string} [options.capabilitiesVersion] - Embedded Messaging capabilities version (defaults to '65')
  * @param {Object} [options.routingAttributes] - Optional Agentforce routing attributes
- * @param {string} [options.mode] - Widget mode forwarded to the bundle (defaults to 'messaging')
  * @param {string} [options.logoUrl] - URL of the logo shown in the widget
  * @param {string} [options.headerText] - Header text shown at the top of the widget
  * @param {string} [options.disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
@@ -53,7 +52,6 @@ const injectCommerceClientWidget = ({
     esDeveloperName,
     capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     routingAttributes,
-    mode = 'messaging',
     logoUrl,
     headerText,
     disclaimerMarkdown,
@@ -81,7 +79,7 @@ const injectCommerceClientWidget = ({
 
         commerceClient.injectMessagingWidget({
             elementId,
-            ...(mode ? {mode} : {}),
+            mode: 'messaging',
             messagingConfig,
             ...(logoUrl ? {logoUrl} : {}),
             ...(headerText ? {headerText} : {}),

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {COMMERCE_CLIENT_CDN_BASE_URL} from '@salesforce/retail-react-app/app/constants'
+
 const onClient = typeof window !== 'undefined'
 
 /**
@@ -145,6 +147,32 @@ export function openShopperAgentWidget() {
 }
 
 /**
+ * Resolves the Commerce Client messaging bundle URL from the agent configuration.
+ *
+ * `cc_cdnVersion` (e.g. '1.18.0') is the common path: it is interpolated into the
+ * Cimulate CDN URL. An explicit `commerceClientScriptSourceUrl` takes precedence
+ * when set, which supports local dev (localhost) and SFCC self-hosted bundles.
+ *
+ * @param {Object} commerceAgent - Commerce agent configuration object
+ * @param {string} [commerceAgent.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0')
+ * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override
+ * @returns {string} The resolved bundle URL, or '' when neither field is set
+ */
+export const resolveCommerceClientScriptUrl = (commerceAgent) => {
+    const override = commerceAgent?.commerceClientScriptSourceUrl
+    if (typeof override === 'string' && override.trim() !== '') {
+        return override.trim()
+    }
+
+    const version = commerceAgent?.cc_cdnVersion
+    if (typeof version === 'string' && version.trim() !== '') {
+        return `${COMMERCE_CLIENT_CDN_BASE_URL}/${version.trim()}/messaging.umd.js`
+    }
+
+    return ''
+}
+
+/**
  * Validates that a URL is served from a trusted Commerce Client domain.
  *
  * @param {string} url - The URL to validate (e.g., 'https://cdn.search.cimulate.ai/.../messaging.umd.js')
@@ -172,9 +200,10 @@ export const validateCommerceClientDomain = (url) => {
  * @param {Object} commerceAgent - Commerce agent configuration object
  * @param {string} commerceAgent.scrt2Url - SCRT2 instance URL
  * @param {string} commerceAgent.salesforceOrgId - Salesforce organization ID (passed as `orgId`)
- * @param {string} [commerceAgent.esDeveloperName] - Embedded Service developer name
- * @param {string} [commerceAgent.embeddedServiceName] - Fallback for `esDeveloperName`
- * @param {string} commerceAgent.commerceClientScriptSourceUrl - URL of the Commerce Client messaging bundle
+ * @param {string} [commerceAgent.cc_esDeveloperName] - Embedded Service developer name
+ * @param {string} [commerceAgent.embeddedServiceName] - Fallback for `cc_esDeveloperName`
+ * @param {string} [commerceAgent.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0')
+ * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting)
  * @returns {boolean} True if configuration is valid, false otherwise
  */
 export const validateCommerceClientAgentSettings = (commerceAgent) => {
@@ -183,11 +212,12 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
         return false
     }
 
+    const scriptSourceUrl = resolveCommerceClientScriptUrl(commerceAgent)
     const requiredValues = {
         scrt2Url: commerceAgent.scrt2Url,
         salesforceOrgId: commerceAgent.salesforceOrgId,
-        esDeveloperName: commerceAgent.esDeveloperName || commerceAgent.embeddedServiceName,
-        commerceClientScriptSourceUrl: commerceAgent.commerceClientScriptSourceUrl
+        esDeveloperName: commerceAgent.cc_esDeveloperName || commerceAgent.embeddedServiceName,
+        scriptSourceUrl
     }
 
     const isValid = Object.values(requiredValues).every(
@@ -196,12 +226,12 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
 
     if (!isValid) {
         console.error(
-            'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, esDeveloperName (or embeddedServiceName), and commerceClientScriptSourceUrl.'
+            'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, cc_esDeveloperName (or embeddedServiceName), and cc_cdnVersion (or commerceClientScriptSourceUrl).'
         )
         return false
     }
 
-    if (!validateCommerceClientDomain(commerceAgent.commerceClientScriptSourceUrl)) {
+    if (!validateCommerceClientDomain(scriptSourceUrl)) {
         console.error(
             'Commerce Client script URL must be served from a trusted cimulate.ai or sfcc-store-internal.net domain.'
         )

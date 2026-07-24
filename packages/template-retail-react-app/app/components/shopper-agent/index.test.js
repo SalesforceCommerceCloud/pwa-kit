@@ -39,6 +39,7 @@ jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/token-bridg
 
 // Import ShopperAgent after all mocks are set up
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
+import {COMMERCE_CLIENT_CDN_BASE_URL} from '@salesforce/retail-react-app/app/constants'
 
 // Mock the embedded messaging service
 const mockEmbeddedService = {
@@ -1507,9 +1508,8 @@ describe('ShopperAgent Component', () => {
             provider: 'commerce-client',
             scrt2Url: 'https://test.salesforce-scrt.com',
             salesforceOrgId: 'test-org-id',
-            esDeveloperName: 'My_Embedded_Service',
-            commerceClientScriptSourceUrl:
-                'https://cdn.search.cimulate.ai/copilot-widget/1.0.0/messaging.umd.js'
+            cc_esDeveloperName: 'My_Embedded_Service',
+            cc_cdnVersion: '1.0.0'
         }
 
         const renderCommerceClient = (overrides = {}) =>
@@ -1535,16 +1535,18 @@ describe('ShopperAgent Component', () => {
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledTimes(1)
         })
 
-        test('does not render when the script URL is not a trusted cimulate.ai domain', () => {
+        test('does not render when the script URL override is not a trusted cimulate.ai domain', () => {
             renderCommerceClient({
+                cc_cdnVersion: undefined,
                 commerceClientScriptSourceUrl: 'https://evil.example.com/messaging.umd.js'
             })
 
             expect(screen.queryByTestId('shopper-agent')).toBeNull()
         })
 
-        test('renders when the script URL is served from a trusted sfcc-store-internal.net domain', () => {
+        test('renders when the script URL override is served from a trusted sfcc-store-internal.net domain', () => {
             renderCommerceClient({
+                cc_cdnVersion: undefined,
                 commerceClientScriptSourceUrl:
                     'https://www.shop.prd.tbdp.sfcc-store-internal.net/on/demandware.static/Sites-nto-Site/-/en_US/v1782164019601/jscript/cimulate/messaging.umd.js'
             })
@@ -1559,8 +1561,8 @@ describe('ShopperAgent Component', () => {
             expect(screen.queryByTestId('shopper-agent')).toBeNull()
         })
 
-        test('falls back to embeddedServiceName when esDeveloperName is not provided', () => {
-            renderCommerceClient({esDeveloperName: '', embeddedServiceName: 'Fallback_Service'})
+        test('falls back to embeddedServiceName when cc_esDeveloperName is not provided', () => {
+            renderCommerceClient({cc_esDeveloperName: '', embeddedServiceName: 'Fallback_Service'})
 
             expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
@@ -1579,7 +1581,7 @@ describe('ShopperAgent Component', () => {
         })
 
         test('forwards a configured capabilitiesVersion to the widget options', () => {
-            renderCommerceClient({capabilitiesVersion: '70'})
+            renderCommerceClient({cc_capabilitiesVersion: '70'})
 
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
                 expect.anything(),
@@ -1587,16 +1589,25 @@ describe('ShopperAgent Component', () => {
             )
         })
 
-        test('loads the Commerce Client bundle via useScript', () => {
+        test('loads the Commerce Client bundle via useScript, resolving cc_cdnVersion to a CDN URL', () => {
             renderCommerceClient()
 
             expect(mockedUseScript).toHaveBeenCalledWith(
-                commerceClientSettings.commerceClientScriptSourceUrl
+                `${COMMERCE_CLIENT_CDN_BASE_URL}/1.0.0/messaging.umd.js`
             )
         })
 
-        test('builds full-height side panel options in the default panel display mode', () => {
-            renderCommerceClient({commerceClientPanelWidth: '500px'})
+        test('loads an explicit commerceClientScriptSourceUrl override via useScript', () => {
+            renderCommerceClient({
+                cc_cdnVersion: undefined,
+                commerceClientScriptSourceUrl: 'http://localhost:5050/messaging.umd.js'
+            })
+
+            expect(mockedUseScript).toHaveBeenCalledWith('http://localhost:5050/messaging.umd.js')
+        })
+
+        test('builds full-height side panel options by default (cc_dialogFullHeight defaults to true)', () => {
+            renderCommerceClient({cc_dialogWidth: '500px'})
 
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
                 expect.anything(),
@@ -1613,18 +1624,27 @@ describe('ShopperAgent Component', () => {
             )
         })
 
-        test('does not apply panel-specific options in dialog display mode', () => {
+        test('forwards cc_widgetPosition as the dialogPosition', () => {
+            renderCommerceClient({cc_widgetPosition: 'bottom-left'})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.options.dialogPosition).toBe('bottom-left')
+        })
+
+        test('does not apply full-height options when cc_dialogFullHeight is false', () => {
             renderCommerceClient({
-                commerceClientDisplayMode: 'dialog',
-                commerceClientComponentType: 'modal',
-                commerceClientDialogPosition: 'top-left'
+                cc_dialogFullHeight: 'false',
+                cc_displayType: 'modal',
+                cc_widgetPosition: 'bottom-left'
             })
 
             const calls = mockedUseCommerceClientMessaging.mock.calls
             const widgetOptions = calls[calls.length - 1][1]
 
             expect(widgetOptions.componentConfig.type).toBe('modal')
-            expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'top-left'})
+            expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'bottom-left'})
         })
     })
 })

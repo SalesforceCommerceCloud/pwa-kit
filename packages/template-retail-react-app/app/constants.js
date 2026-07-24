@@ -290,9 +290,17 @@ export const SETUP_FUTURE_USAGE = {
 export const DEFAULT_COMMERCE_CLIENT_ELEMENT_ID = 'commerce-client-messaging-widget'
 
 /**
+ * Base URL of the Cimulate CDN that hosts the Commerce Client messaging bundle.
+ * The `cc_cdnVersion` field in `COMMERCE_AGENT_SETTINGS` is interpolated into the
+ * full bundle URL as `${COMMERCE_CLIENT_CDN_BASE_URL}/<version>/messaging.umd.js`.
+ * Set `commerceClientScriptSourceUrl` to override this entirely (local dev / self-hosting).
+ */
+export const COMMERCE_CLIENT_CDN_BASE_URL = 'https://cdn.search.cimulate.ai/copilot-widget'
+
+/**
  * Default Embedded Messaging capabilities version forwarded to the Commerce Client
  * widget via `messagingConfig.capabilitiesVersion`. Override per environment through the
- * `capabilitiesVersion` field in `COMMERCE_AGENT_SETTINGS`.
+ * `cc_capabilitiesVersion` field in `COMMERCE_AGENT_SETTINGS`.
  */
 export const DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION = '65'
 

@@ -175,7 +175,6 @@ describe('injectCommerceClientWidget', () => {
     test('forwards optional presentation fields only when provided', () => {
         injectCommerceClientWidget({
             ...messagingFields,
-            mode: 'custom-mode',
             logoUrl: 'https://cdn.example.com/logo.png',
             headerText: 'Need help?',
             disclaimerMarkdown: 'This is AI. See [details](https://example.com).',
@@ -186,7 +185,6 @@ describe('injectCommerceClientWidget', () => {
 
         expect(mockInject).toHaveBeenCalledWith(
             expect.objectContaining({
-                mode: 'custom-mode',
                 logoUrl: 'https://cdn.example.com/logo.png',
                 headerText: 'Need help?',
                 disclaimerMarkdown: 'This is AI. See [details](https://example.com).',
@@ -208,10 +206,10 @@ describe('injectCommerceClientWidget', () => {
         expect(config).not.toHaveProperty('globalClassName')
     })
 
-    test('omits mode when an empty mode is provided', () => {
-        injectCommerceClientWidget({...messagingFields, mode: ''})
+    test('always forwards mode as "messaging"', () => {
+        injectCommerceClientWidget(messagingFields)
 
-        expect(mockInject.mock.calls[0][0]).not.toHaveProperty('mode')
+        expect(mockInject.mock.calls[0][0].mode).toBe('messaging')
     })
 
     test('returns false and logs when injectMessagingWidget throws', () => {

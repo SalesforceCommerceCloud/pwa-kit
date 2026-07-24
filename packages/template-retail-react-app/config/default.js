@@ -36,31 +36,39 @@ module.exports = {
             // 'commerce-client' (Commerce Client widget). Selecting 'commerce-client' uses the
             // fields below instead of the MIAW embedded-service fields above.
             provider: 'miaw',
-            // URL of the Commerce Client messaging UMD bundle (e.g.
-            // https://cdn.search.cimulate.ai/copilot-widget/<version>/messaging.umd.js).
+            // Cimulate CDN version of the Commerce Client messaging UMD bundle (e.g.
+            // '1.18.0'). Resolved into
+            // https://cdn.search.cimulate.ai/copilot-widget/<version>/messaging.umd.js.
             // Only used when provider === 'commerce-client'.
+            cc_cdnVersion: '',
+            // Optional explicit bundle URL. Overrides cc_cdnVersion when set; use for local
+            // dev (http://localhost:...) or an SFCC self-hosted bundle.
             commerceClientScriptSourceUrl: '',
             // Embedded Service developer name for the Commerce Client widget. Falls back
             // to embeddedServiceName when not set.
-            esDeveloperName: '',
+            cc_esDeveloperName: '',
             // Header text shown at the top of the Commerce Client widget.
-            headerText: '',
+            cc_headerText: '',
             // Markdown disclaimer shown in the Commerce Client widget. Supports links and
             // basic markdown (e.g. 'This is AI. See [details](https://example.com).').
-            disclaimerMarkdown: '',
-            // Commerce Client widget layout: 'panel' (default) renders a full-height side
-            // panel docked to the right that slides in/out; 'dialog' renders the
-            // default floating corner dialog; 'modal' renders a centered modal.
-            commerceClientDisplayMode: 'panel',
-            // Width of the side panel when commerceClientDisplayMode is 'panel'.
-            commerceClientPanelWidth: '420px',
-            // Widget mode forwarded to the Commerce Client bundle as `mode` ('messaging').
-            commerceClientMode: 'messaging',
+            cc_disclaimerMarkdown: '',
+            // When 'true' (default) the widget renders as a full-height side panel
+            // docked to the configured corner; when 'false' it renders as a standard
+            // floating corner dialog. Forwarded to the widget as `dialogFullHeight`.
+            cc_dialogFullHeight: 'true',
+            // Width of the side panel when cc_dialogFullHeight is 'true'.
+            cc_dialogWidth: '420px',
+            // Corner the widget docks to: 'bottom-left' or 'bottom-right' (default).
+            // Forwarded to the widget as `dialogPosition`.
+            cc_widgetPosition: 'bottom-right',
             // Optional URL of a logo shown in the widget, forwarded as `logoUrl`.
-            commerceClientLogoUrl: ''
-            // Optional: pass `commerceClientSearchConfig` (object) via COMMERCE_AGENT_SETTINGS
+            cc_logoUrl: ''
+            // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
+            // Optional: pass `cc_theme` (object) via COMMERCE_AGENT_SETTINGS to override
+            // the widget theme (primaryColor, secondaryColor, backgroundColor, fontColor,
+            // borderColor, fontFamily).
         },
         url: {
             site: 'path',

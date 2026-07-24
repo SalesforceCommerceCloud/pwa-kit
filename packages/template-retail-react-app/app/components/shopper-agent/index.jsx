@@ -28,6 +28,7 @@ import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origi
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
     resetEmbeddedMessagingForCommerceSessionChange,
+    resolveCommerceClientScriptUrl,
     validateCommerceClientAgentSettings
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
@@ -566,7 +567,7 @@ const COMMERCE_CLIENT_GLOBAL_CLASS = 'commerce-client-shopper-agent'
 
 /**
  * Default width of the Commerce Client side panel. Applied through the widget's
- * `componentConfig.options.dialogWidth` option when in 'panel' display mode.
+ * `componentConfig.options.dialogWidth` option when `cc_dialogFullHeight` is 'true'.
  */
 const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
 
@@ -583,22 +584,22 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {Object} props.commerceAgentConfiguration - Commerce agent configuration object
  * @param {string} props.commerceAgentConfiguration.scrt2Url - SCRT2 URL (passed to `messagingConfig.scrt2Url`)
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID (passed to `messagingConfig.orgId`)
- * @param {string} [props.commerceAgentConfiguration.esDeveloperName] - Embedded Service developer name
- * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `esDeveloperName`
- * @param {string} [props.commerceAgentConfiguration.capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
- * @param {string} props.commerceAgentConfiguration.commerceClientScriptSourceUrl - Commerce Client messaging bundle URL
- * @param {string} [props.commerceAgentConfiguration.commerceClientMode] - Widget mode forwarded to the bundle as `mode` (defaults to 'messaging')
- * @param {string} [props.commerceAgentConfiguration.commerceClientLogoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
- * @param {string} [props.commerceAgentConfiguration.headerText] - Header text shown at the top of the widget
- * @param {string} [props.commerceAgentConfiguration.disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
- * @param {Object} [props.commerceAgentConfiguration.commerceClientSearchConfig] - Search input config forwarded to the widget as `searchConfig` (e.g. `placeholder`, `buttonLabel`, `buttonType`, `buttonIconUrl`)
+ * @param {string} [props.commerceAgentConfiguration.cc_esDeveloperName] - Embedded Service developer name
+ * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `cc_esDeveloperName`
+ * @param {string} [props.commerceAgentConfiguration.cc_capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
+ * @param {string} [props.commerceAgentConfiguration.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0'); resolved into the full messaging bundle URL
+ * @param {string} [props.commerceAgentConfiguration.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting); wins over cc_cdnVersion
+ * @param {string} [props.commerceAgentConfiguration.cc_logoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
+ * @param {string} [props.commerceAgentConfiguration.cc_headerText] - Header text shown at the top of the widget
+ * @param {string} [props.commerceAgentConfiguration.cc_disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
+ * @param {Object} [props.commerceAgentConfiguration.cc_searchConfig] - Search input config forwarded to the widget as `searchConfig` (e.g. `placeholder`, `buttonLabel`, `buttonType`, `buttonIconUrl`)
  * @param {string} [props.commerceAgentConfiguration.commerceClientElementId] - Container element id (defaults to 'commerce-client-messaging-widget')
- * @param {string} [props.commerceAgentConfiguration.commerceClientDisplayMode] - 'panel' (default, full-height right drawer), 'dialog', or 'modal'
- * @param {string} [props.commerceAgentConfiguration.commerceClientPanelWidth] - Width of the side panel when display mode is 'panel' (e.g. '420px')
- * @param {string} [props.commerceAgentConfiguration.commerceClientComponentType] - Widget type when display mode is 'dialog': 'chat' | 'dialog' | 'modal'
- * @param {string} [props.commerceAgentConfiguration.commerceClientDialogPosition] - Dialog position when display mode is 'dialog'
+ * @param {string} [props.commerceAgentConfiguration.cc_dialogFullHeight] - 'true' (default) renders a full-height side panel; 'false' renders a standard corner dialog
+ * @param {string} [props.commerceAgentConfiguration.cc_dialogWidth] - Width of the side panel when cc_dialogFullHeight is 'true' (e.g. '420px')
+ * @param {string} [props.commerceAgentConfiguration.cc_displayType] - Widget type: 'chat' | 'dialog' | 'modal'
+ * @param {string} [props.commerceAgentConfiguration.cc_widgetPosition] - Widget corner position: 'bottom-left' | 'bottom-right' (default)
  * @param {string} [props.commerceAgentConfiguration.isDevelopment] - When 'true', logs widget events to the console
- * @param {Object} [props.commerceAgentConfiguration.commerceClientTheme] - Partial theme overrides for the widget
+ * @param {Object} [props.commerceAgentConfiguration.cc_theme] - Partial theme overrides for the widget
  * @param {Object} [props.commerceAgentConfiguration.routingAttributes] - Optional Agentforce routing attributes
  * @returns {JSX.Element} A container element the Commerce Client widget is rendered into
  */
@@ -606,80 +607,77 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
     const {
         scrt2Url,
         salesforceOrgId,
-        esDeveloperName,
+        cc_esDeveloperName,
         embeddedServiceName,
-        capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
-        commerceClientScriptSourceUrl,
-        commerceClientMode = 'messaging',
-        commerceClientLogoUrl,
-        headerText,
-        disclaimerMarkdown,
+        cc_capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
+        cc_logoUrl,
+        cc_headerText,
+        cc_disclaimerMarkdown,
         commerceClientElementId = DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
-        commerceClientDisplayMode = 'panel',
-        commerceClientPanelWidth = DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH,
-        commerceClientComponentType = 'dialog',
-        commerceClientDialogPosition = 'bottom-right',
+        cc_dialogFullHeight = 'true',
+        cc_dialogWidth = DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH,
+        cc_displayType = 'dialog',
+        cc_widgetPosition = 'bottom-right',
         isDevelopment = 'false',
-        commerceClientTheme,
-        commerceClientSearchConfig,
+        cc_theme,
+        cc_searchConfig,
         routingAttributes
     } = commerceAgentConfiguration
 
-    // Load the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging
-    const scriptLoadStatus = useScript(commerceClientScriptSourceUrl)
+    // Resolve the bundle URL from cc_cdnVersion (or an explicit override) and load the
+    // Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging
+    const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
 
-    // In 'panel' mode we render the widget as a 'dialog' docked to the right and
-    // use the widget's built-in full-height + width options to turn it
-    // into a full-height side panel.
-    const isPanel = commerceClientDisplayMode === 'panel'
+    // When cc_dialogFullHeight is 'true' the widget is rendered as a full-height
+    // side panel docked to the configured corner, using the widget's built-in
+    // full-height + width options. Otherwise it renders as a standard corner dialog.
+    const isFullHeight = cc_dialogFullHeight === 'true'
 
     const widgetOptions = useMemo(
         () => ({
             elementId: commerceClientElementId,
             scrt2Url,
             orgId: salesforceOrgId,
-            esDeveloperName: esDeveloperName || embeddedServiceName,
-            capabilitiesVersion,
+            esDeveloperName: cc_esDeveloperName || embeddedServiceName,
+            capabilitiesVersion: cc_capabilitiesVersion,
             routingAttributes,
-            mode: commerceClientMode,
-            logoUrl: commerceClientLogoUrl,
-            headerText,
-            disclaimerMarkdown,
-            searchConfig: commerceClientSearchConfig,
+            logoUrl: cc_logoUrl,
+            headerText: cc_headerText,
+            disclaimerMarkdown: cc_disclaimerMarkdown,
+            searchConfig: cc_searchConfig,
             globalClassName: COMMERCE_CLIENT_GLOBAL_CLASS,
             isDevelopment: isDevelopment === 'true',
             componentConfig: {
                 isOpen: false,
-                type: isPanel ? 'dialog' : commerceClientComponentType,
+                type: cc_displayType,
                 options: {
-                    dialogPosition: isPanel ? 'bottom-right' : commerceClientDialogPosition,
-                    ...(isPanel && {
+                    dialogPosition: cc_widgetPosition,
+                    ...(isFullHeight && {
                         dialogFullHeight: true,
-                        dialogWidth: commerceClientPanelWidth
+                        dialogWidth: cc_dialogWidth
                     })
                 }
             },
-            theme: commerceClientTheme
+            theme: cc_theme
         }),
         [
             commerceClientElementId,
             scrt2Url,
             salesforceOrgId,
-            esDeveloperName,
+            cc_esDeveloperName,
             embeddedServiceName,
-            capabilitiesVersion,
+            cc_capabilitiesVersion,
             routingAttributes,
-            commerceClientMode,
-            commerceClientLogoUrl,
-            headerText,
-            disclaimerMarkdown,
-            commerceClientSearchConfig,
+            cc_logoUrl,
+            cc_headerText,
+            cc_disclaimerMarkdown,
+            cc_searchConfig,
             isDevelopment,
-            isPanel,
-            commerceClientComponentType,
-            commerceClientDialogPosition,
-            commerceClientPanelWidth,
-            commerceClientTheme
+            isFullHeight,
+            cc_displayType,
+            cc_widgetPosition,
+            cc_dialogWidth,
+            cc_theme
         ]
     )
 
