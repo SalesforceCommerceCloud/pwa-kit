@@ -208,6 +208,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         salesforceOrgId,
         commerceOrgId,
         siteId,
+        provider = 'miaw',
         enableConversationContext = 'false',
         conversationContext = [],
         enableAgentFromFloatingButton = 'true'
@@ -234,6 +235,12 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     /**
      * Reset embedded messaging whenever customerType changes (login, logout, registration).
      * This ensures the chat context is cleared when user authentication state changes.
+     *
+     * MIAW-only: resetEmbeddedMessagingForCommerceSessionChange() drives
+     * window.embeddedservice_bootstrap.userVerificationAPI.clearSession, which
+     * exists only for the Salesforce Embedded Messaging (MIAW) provider. The
+     * Commerce Client provider re-links its conversation in place instead of
+     * clearing the session, so we no-op here for any non-MIAW provider.
      */
     useEffect(() => {
         const prev = prevCommerceCustomerTypeRef.current
@@ -244,11 +251,11 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             return
         }
 
-        // Reset on any customerType change (login, logout, register)
-        if (prev !== customerType) {
+        // Reset on any customerType change (login, logout, register) — MIAW only.
+        if (prev !== customerType && provider === 'miaw') {
             resetEmbeddedMessagingForCommerceSessionChange()
         }
-    }, [customerType])
+    }, [customerType, provider])
 
     const formatMessageRef = useRef(formatMessage)
     formatMessageRef.current = formatMessage
@@ -656,8 +663,17 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
     getTokenWhenReadyRef.current = getTokenWhenReady
 
     const {organizationId, siteId: configSiteId} = useConfig()
-    const configRef = useRef({organizationId, configSiteId})
-    configRef.current = {organizationId, configSiteId}
+
+    // Fetch my_domain from the Shopper Configurations API. Auth-linking calls
+    // Core (via the Token Bridge), which is only reachable once my_domain has
+    // resolved, so we gate performAuthLink on it exactly like the MIAW provider.
+    const {data: configurationsData} = useConfigurations({})
+    const myDomain = configurationsData?.configurations?.find(
+        (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
+    )?.value
+
+    const configRef = useRef({organizationId, configSiteId, myDomain})
+    configRef.current = {organizationId, configSiteId, myDomain}
 
     const formatMessageRef = useRef(formatMessage)
     formatMessageRef.current = formatMessage
@@ -1401,9 +1417,20 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
      * @param {string} opts.reason - Diagnostic label for the triggering signal.
      */
     const performAuthLink = async ({reason}) => {
-        const {organizationId: orgId, configSiteId: sid} = configRef.current
+        const {organizationId: orgId, configSiteId: sid, myDomain: domain} = configRef.current
         if (!orgId || !sid) {
             console.error('[Commerce Client] performAuthLink: missing organizationId or siteId')
+            return
+        }
+
+        // Auth-linking reaches Core through the Token Bridge, which needs the
+        // org's my_domain to have resolved. Defensive guard mirroring the MIAW
+        // conversation-started flow: <ShopperAgent> already gates this component's
+        // mount on !isConfigurationsLoading, so my_domain is normally present by
+        // the time any trigger fires — but skip rather than call the bridge with
+        // an unresolved domain if that ever changes.
+        if (!domain) {
+            console.warn(`[Commerce Client] performAuthLink(${reason}): my_domain not resolved yet`)
             return
         }
 

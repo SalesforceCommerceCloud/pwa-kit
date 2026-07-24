@@ -1751,5 +1751,97 @@ describe('ShopperAgent Component', () => {
 
             expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'bottom-right'})
         })
+
+        describe('my_domain guard', () => {
+            // Same StorageMock enumeration workaround as the remount block.
+            const trackedKeys = new Set()
+            const seedKey = (key, value) => {
+                window.sessionStorage.setItem(key, value)
+                window.sessionStorage[key] = value
+                trackedKeys.add(key)
+            }
+            const seedWidgetStorage = () => {
+                seedKey(
+                    'cim_af_ct_test-org-id_My_Embedded_Service',
+                    JSON.stringify({accessToken: 'jwt.token.here', lastEventId: '1', storedAt: 1})
+                )
+                seedKey(
+                    'cim_af_conv_test-org-id_My_Embedded_Service',
+                    JSON.stringify({conversationId: 'conv-md', storedAt: 1})
+                )
+            }
+            const fireWidgetReady = async () => {
+                await act(async () => {
+                    window.dispatchEvent(new Event('onCimulateWidgetReady'))
+                })
+            }
+
+            afterEach(() => {
+                window.sessionStorage.clear()
+                window.localStorage.clear()
+                trackedKeys.forEach((key) => {
+                    delete window.sessionStorage[key]
+                })
+                trackedKeys.clear()
+            })
+
+            test('does NOT auth-link when my_domain is not configured', async () => {
+                mockedUseConfigurations.mockReturnValue({data: {configurations: []}})
+                seedWidgetStorage()
+
+                renderCommerceClient()
+                await fireWidgetReady()
+
+                await waitFor(() => {})
+                expect(mockCallAuthLinkProxy).not.toHaveBeenCalled()
+                expect(mockCallTokenBridge).not.toHaveBeenCalled()
+            })
+
+            test('does NOT auth-link when my_domain value is empty', async () => {
+                mockedUseConfigurations.mockReturnValue({
+                    data: {
+                        configurations: [
+                            {
+                                configurationType: 'globalConfiguration',
+                                id: 'my_domain',
+                                value: ''
+                            }
+                        ]
+                    }
+                })
+                seedWidgetStorage()
+
+                renderCommerceClient()
+                await fireWidgetReady()
+
+                await waitFor(() => {})
+                expect(mockCallAuthLinkProxy).not.toHaveBeenCalled()
+                expect(mockCallTokenBridge).not.toHaveBeenCalled()
+            })
+
+            test('does NOT auth-link when useConfigurations returns undefined', async () => {
+                mockedUseConfigurations.mockReturnValue({data: undefined})
+                seedWidgetStorage()
+
+                renderCommerceClient()
+                await fireWidgetReady()
+
+                await waitFor(() => {})
+                expect(mockCallAuthLinkProxy).not.toHaveBeenCalled()
+                expect(mockCallTokenBridge).not.toHaveBeenCalled()
+            })
+
+            test('auth-links once my_domain is configured', async () => {
+                // beforeEach already mocks a resolved my_domain. A resumed
+                // conversation in storage links via Trigger 2 on mount (no
+                // widget-ready needed), so the guard passing means the bridge is
+                // reached exactly once.
+                seedWidgetStorage()
+
+                renderCommerceClient()
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+            })
+        })
     })
 })
