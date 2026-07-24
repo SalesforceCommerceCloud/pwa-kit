@@ -1589,6 +1589,51 @@ describe('ShopperAgent Component', () => {
             )
         })
 
+        test('forwards cc_routingAttributes to the widget options as routingAttributes', () => {
+            renderCommerceClient({cc_routingAttributes: {foo: 'bar'}})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({routingAttributes: {foo: 'bar'}})
+            )
+        })
+
+        test('opens the widget automatically when cc_isOpen is true', () => {
+            renderCommerceClient({cc_isOpen: 'true'})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.isOpen).toBe(true)
+        })
+
+        test('keeps the widget closed by default (cc_isOpen defaults to false)', () => {
+            renderCommerceClient()
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.isOpen).toBe(false)
+        })
+
+        test('forwards cc_isDevelopment as the boolean isDevelopment widget option', () => {
+            renderCommerceClient({cc_isDevelopment: 'true'})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({isDevelopment: true})
+            )
+        })
+
+        test('defaults isDevelopment to false when cc_isDevelopment is not set', () => {
+            renderCommerceClient()
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({isDevelopment: false})
+            )
+        })
+
         test('loads the Commerce Client bundle via useScript, resolving cc_cdnVersion to a CDN URL', () => {
             renderCommerceClient()
 

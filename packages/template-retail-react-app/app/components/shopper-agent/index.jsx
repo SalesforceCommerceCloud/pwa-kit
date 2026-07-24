@@ -598,9 +598,10 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {string} [props.commerceAgentConfiguration.cc_dialogWidth] - Width of the side panel when cc_dialogFullHeight is 'true' (e.g. '420px')
  * @param {string} [props.commerceAgentConfiguration.cc_displayType] - Widget type: 'chat' | 'dialog' | 'modal'
  * @param {string} [props.commerceAgentConfiguration.cc_widgetPosition] - Widget corner position: 'bottom-left' | 'bottom-right' (default)
- * @param {string} [props.commerceAgentConfiguration.isDevelopment] - When 'true', logs widget events to the console
+ * @param {string} [props.commerceAgentConfiguration.cc_isOpen] - When 'true', the widget opens automatically on page load (forwarded as `componentConfig.isOpen`); defaults to 'false'
+ * @param {string} [props.commerceAgentConfiguration.cc_isDevelopment] - When 'true', logs widget events to the console (forwarded as `isDevelopment`)
  * @param {Object} [props.commerceAgentConfiguration.cc_theme] - Partial theme overrides for the widget
- * @param {Object} [props.commerceAgentConfiguration.routingAttributes] - Optional Agentforce routing attributes
+ * @param {Object} [props.commerceAgentConfiguration.cc_routingAttributes] - Optional Agentforce routing attributes forwarded to the widget as `routingAttributes`
  * @returns {JSX.Element} A container element the Commerce Client widget is rendered into
  */
 const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
@@ -618,10 +619,11 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         cc_dialogWidth = DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH,
         cc_displayType = 'dialog',
         cc_widgetPosition = 'bottom-right',
-        isDevelopment = 'false',
+        cc_isOpen = 'false',
+        cc_isDevelopment = 'false',
         cc_theme,
         cc_searchConfig,
-        routingAttributes
+        cc_routingAttributes
     } = commerceAgentConfiguration
 
     // Resolve the bundle URL from cc_cdnVersion (or an explicit override) and load the
@@ -640,15 +642,15 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             orgId: salesforceOrgId,
             esDeveloperName: cc_esDeveloperName || embeddedServiceName,
             capabilitiesVersion: cc_capabilitiesVersion,
-            routingAttributes,
+            routingAttributes: cc_routingAttributes,
             logoUrl: cc_logoUrl,
             headerText: cc_headerText,
             disclaimerMarkdown: cc_disclaimerMarkdown,
             searchConfig: cc_searchConfig,
             globalClassName: COMMERCE_CLIENT_GLOBAL_CLASS,
-            isDevelopment: isDevelopment === 'true',
+            isDevelopment: cc_isDevelopment === 'true',
             componentConfig: {
-                isOpen: false,
+                isOpen: cc_isOpen === 'true',
                 type: cc_displayType,
                 options: {
                     dialogPosition: cc_widgetPosition,
@@ -667,12 +669,13 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             cc_esDeveloperName,
             embeddedServiceName,
             cc_capabilitiesVersion,
-            routingAttributes,
+            cc_routingAttributes,
             cc_logoUrl,
             cc_headerText,
             cc_disclaimerMarkdown,
             cc_searchConfig,
-            isDevelopment,
+            cc_isDevelopment,
+            cc_isOpen,
             isFullHeight,
             cc_displayType,
             cc_widgetPosition,

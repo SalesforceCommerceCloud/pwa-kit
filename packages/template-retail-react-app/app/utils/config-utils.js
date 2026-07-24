@@ -35,7 +35,9 @@ export const getCommerceAgentConfig = () => {
         cc_dialogFullHeight: 'true',
         cc_dialogWidth: '420px',
         cc_widgetPosition: 'bottom-right',
-        cc_logoUrl: ''
+        cc_logoUrl: '',
+        cc_isOpen: 'false',
+        cc_isDevelopment: 'false'
     }
     return getConfig().app.commerceAgent ?? defaults
 }

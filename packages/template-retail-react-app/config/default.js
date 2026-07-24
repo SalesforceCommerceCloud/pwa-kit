@@ -62,13 +62,21 @@ module.exports = {
             // Forwarded to the widget as `dialogPosition`.
             cc_widgetPosition: 'bottom-right',
             // Optional URL of a logo shown in the widget, forwarded as `logoUrl`.
-            cc_logoUrl: ''
+            cc_logoUrl: '',
+            // When 'true', the widget opens automatically as the page loads. Forwarded
+            // to the widget as `componentConfig.isOpen`. Defaults to 'false'.
+            cc_isOpen: 'false',
+            // When 'true', the widget logs its events to the console. Forwarded to the
+            // widget as `isDevelopment`. Defaults to 'false'.
+            cc_isDevelopment: 'false'
             // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
             // Optional: pass `cc_theme` (object) via COMMERCE_AGENT_SETTINGS to override
             // the widget theme (primaryColor, secondaryColor, backgroundColor, fontColor,
             // borderColor, fontFamily).
+            // Optional: pass `cc_routingAttributes` (object) via COMMERCE_AGENT_SETTINGS to
+            // forward Agentforce routing attributes to the widget as `routingAttributes`.
         },
         url: {
             site: 'path',
