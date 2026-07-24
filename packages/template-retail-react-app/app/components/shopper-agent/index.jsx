@@ -587,6 +587,8 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {string} [props.commerceAgentConfiguration.cc_esDeveloperName] - Embedded Service developer name
  * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `cc_esDeveloperName`
  * @param {string} [props.commerceAgentConfiguration.cc_capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
+ * @param {string} [props.commerceAgentConfiguration.cc_enableEscalationToAgent] - 'true' (default) lets shoppers escalate to a human agent; forwarded as `messagingConfig.enableEscalationToAgent`
+ * @param {string} [props.commerceAgentConfiguration.cc_enableDownloadTranscript] - 'true' (default) lets shoppers download the chat transcript; forwarded as `messagingConfig.enableDownloadTranscript`
  * @param {string} [props.commerceAgentConfiguration.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0'); resolved into the full messaging bundle URL
  * @param {string} [props.commerceAgentConfiguration.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting); wins over cc_cdnVersion
  * @param {string} [props.commerceAgentConfiguration.cc_logoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
@@ -621,6 +623,8 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         cc_widgetPosition = 'bottom-right',
         cc_isOpen = 'false',
         cc_isDevelopment = 'false',
+        cc_enableEscalationToAgent = 'true',
+        cc_enableDownloadTranscript = 'true',
         cc_theme,
         cc_searchConfig,
         cc_routingAttributes
@@ -638,6 +642,8 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             orgId: salesforceOrgId,
             esDeveloperName: cc_esDeveloperName || embeddedServiceName,
             capabilitiesVersion: cc_capabilitiesVersion,
+            enableEscalationToAgent: cc_enableEscalationToAgent !== 'false',
+            enableDownloadTranscript: cc_enableDownloadTranscript !== 'false',
             routingAttributes: cc_routingAttributes,
             logoUrl: cc_logoUrl,
             headerText: cc_headerText,
@@ -665,6 +671,8 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             cc_esDeveloperName,
             embeddedServiceName,
             cc_capabilitiesVersion,
+            cc_enableEscalationToAgent,
+            cc_enableDownloadTranscript,
             cc_routingAttributes,
             cc_logoUrl,
             cc_headerText,

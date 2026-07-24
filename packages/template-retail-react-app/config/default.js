@@ -72,7 +72,13 @@ module.exports = {
             cc_isOpen: 'false',
             // When 'true', the widget logs its events to the console. Forwarded to the
             // widget as `isDevelopment`. Defaults to 'false'.
-            cc_isDevelopment: 'false'
+            cc_isDevelopment: 'false',
+            // When 'true' (default), shoppers can escalate the conversation to a human
+            // agent. Forwarded as `messagingConfig.enableEscalationToAgent`.
+            cc_enableEscalationToAgent: 'true',
+            // When 'true' (default), shoppers can download the chat transcript.
+            // Forwarded as `messagingConfig.enableDownloadTranscript`.
+            cc_enableDownloadTranscript: 'true'
             // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.

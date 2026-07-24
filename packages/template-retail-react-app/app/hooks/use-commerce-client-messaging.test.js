@@ -22,11 +22,14 @@ const messagingFields = {
     esDeveloperName: 'My_Embedded_Service'
 }
 
-// The widget always receives a capabilitiesVersion; it defaults to '65' when the
-// caller does not provide one, so the expected messagingConfig includes it.
+// The widget always receives capabilitiesVersion (defaults to '65') plus the
+// escalation/transcript toggles (default true) when the caller omits them, so the
+// expected messagingConfig includes them.
 const expectedMessagingConfig = {
     ...messagingFields,
-    capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION
+    capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
+    enableEscalationToAgent: true,
+    enableDownloadTranscript: true
 }
 
 describe('injectCommerceClientWidget', () => {
@@ -167,7 +170,33 @@ describe('injectCommerceClientWidget', () => {
 
         expect(mockInject).toHaveBeenCalledWith(
             expect.objectContaining({
-                messagingConfig: {...messagingFields, capabilitiesVersion: '70'}
+                messagingConfig: {...expectedMessagingConfig, capabilitiesVersion: '70'}
+            })
+        )
+    })
+
+    test('defaults escalation and transcript toggles to true in messagingConfig', () => {
+        injectCommerceClientWidget(messagingFields)
+
+        const {messagingConfig} = mockInject.mock.calls[0][0]
+        expect(messagingConfig.enableEscalationToAgent).toBe(true)
+        expect(messagingConfig.enableDownloadTranscript).toBe(true)
+    })
+
+    test('forwards escalation and transcript toggles when disabled', () => {
+        injectCommerceClientWidget({
+            ...messagingFields,
+            enableEscalationToAgent: false,
+            enableDownloadTranscript: false
+        })
+
+        expect(mockInject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                messagingConfig: {
+                    ...expectedMessagingConfig,
+                    enableEscalationToAgent: false,
+                    enableDownloadTranscript: false
+                }
             })
         )
     })
