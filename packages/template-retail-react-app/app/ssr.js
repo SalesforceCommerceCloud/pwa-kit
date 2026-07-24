@@ -29,6 +29,7 @@ import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {registerAuthLinkRoute} from './components/shopper-agent/auth-link-proxy.js'
 import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
 
 const config = getConfig()
@@ -44,7 +45,7 @@ const options = {
     mobify: config,
 
     // The port that the local dev server listens on
-    port: 3000,
+    port: 3001,
 
     // The protocol on which the development Express app listens.
     // Set DEV_SERVER_PROTOCOL to 'https' for HTTPS; defaults to 'http' when unset.
@@ -61,7 +62,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
     // To extend the SLAS private-client proxy allow-list, supply
     // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
@@ -551,6 +552,18 @@ const {handler} = runtime.createHandler(options, (app) => {
     // the access token in an `Authorization: SLAS` header and the refresh
     // token in the body.
     registerTokenBridgeRoute(app)
+
+    // Shopper Agent — Auth Link proxy for Commerce Client.
+    // Browser POSTs the Commerce Client JWT (from the *_WEB_STORAGE localStorage
+    // key) in the request body and siteId as the x-site-id header.
+    // Server reads the SCRT2 origin from scrt2Url in the COMMERCE_AGENT_SETTINGS
+    // environment variable (NOT ANC_MYDOMAIN — the /iamessage/* auth link API is
+    // served by SCRT2 on *.salesforce-scrt.com, a different host from Core's
+    // MyDomain), validates it's a trusted Salesforce host (SSRF prevention), then
+    // calls SCRT's `/iamessage/v1/authorization/authlink` endpoint with the
+    // Commerce Client JWT in an `Authorization: Bearer` header.
+    // Returns { auth_link_key: "..." } which is then used with Token Bridge.
+    registerAuthLinkRoute(app)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))

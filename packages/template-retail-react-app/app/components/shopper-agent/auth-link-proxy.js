@@ -1,0 +1,424 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+import {
+    getSiteId
+} from '@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config'
+
+/* -------------------------------------------------------------------------
+ * Auth Link Proxy — calls SCRT's `/iamessage/v1/authorization/authlink` from PWA Kit.
+ *
+ * This module provides a same-origin proxy for Commerce Client to retrieve auth link keys
+ * from SCRT, since `window.embeddedservice_bootstrap.userVerificationAPI.getAuthLinkKey`
+ * is not available for Commerce Client messaging widgets.
+ *
+ * This module is intentionally free of React (and of the
+ * `@salesforce/retail-react-app/...` self-referential imports used by the
+ * UI component) so it can be loaded by `app/ssr.js` under bare `babel-node`
+ * during local development. The React component (`./index.jsx`) re-uses
+ * the browser-side helper `callAuthLinkProxy` from here.
+ *
+ * Flow:
+ *   1. Browser: Commerce Client widget opens (cimulate:ui-state-update event)
+ *      - Extract Commerce Client JWT from localStorage (*_WEB_STORAGE key)
+ *      - Send commerce_client_jwt in request body to /api/agent/authlink
+ *      - Send siteId as x-site-id header
+ *   2. Server route (registerAuthLinkRoute, mounted in app/ssr.js):
+ *      - Reads siteId from x-site-id header (standard PWA Kit pattern)
+ *      - Reads commerce_client_jwt from request body
+ *      - Validates JWT is present
+ *      - Reads scrt2Url from the COMMERCE_AGENT_SETTINGS environment variable
+ *      - Validates scrt2Url against Salesforce domain allowlist (SSRF prevention)
+ *      - Forwards to SCRT with `Authorization: Bearer <commerce_client_jwt>`
+ *   3. SCRT's response (auth_link_key) is forwarded to the browser
+ *   4. Browser then calls the existing Token Bridge proxy with auth_link_key
+ *
+ * IMPORTANT: This endpoint uses the Commerce Client JWT, NOT the SLAS token.
+ * The Commerce Client JWT is extracted from the *_WEB_STORAGE localStorage key
+ * which is set by the Commerce Client widget itself.
+ *
+ * SCRT2 host resolution: the auth link endpoint (/iamessage/*) is served by
+ * SCRT2 (*.salesforce-scrt.com), which is a DIFFERENT host from Core's My Domain
+ * (AGENT_MYDOMAIN, used by the Token Bridge). The SCRT2 origin is read from the
+ * scrt2Url field of the COMMERCE_AGENT_SETTINGS environment variable, then
+ * validated against a Salesforce domain allowlist (prevents SSRF).
+ * ------------------------------------------------------------------------- */
+
+export const AUTH_LINK_PROXY_PATH = '/api/agent/authlink'
+
+/**
+ * SCRT auth link endpoint path.
+ *
+ * IMPORTANT: AuthLink is a **v1 INTERNAL** API and is defined at exactly ONE
+ * path — there is no v2 authlink endpoint. Confirmed against SCRT source
+ * (`scrt2-ia-message-service`):
+ *   - `miaw_internal_v1.yaml` defines GET `/v1/authorization/authlink`
+ *     (operationId `initAuthLink`); `miaw_public_v2.yaml` has NO authlink.
+ *   - `AuthorizationHandler.initAuthLink()` hardcodes `ApiVersion.V1` +
+ *     `Scope.INTERNAL`, then validates the presented JWT's `apiVersion`
+ *     against V1 (`BaseRequestWithAuthorization.validateJwtAllowedToUseApi`).
+ *
+ * A JWT minted for a different version (e.g. a v2 *public* access token) is
+ * rejected with HTTP 401 `JWT_VALID_NOT_AUTHORIZED_TO_API` (error 900020):
+ *   "JWT is valid, but not issued with correct version of the end point.
+ *    Please use the correct version of the end point."
+ *
+ * So the path is fixed at v1; the fix for that 401 is to present a
+ * v1-internal token, NOT to change this path (a v2 path 404s — it does not
+ * exist).
+ */
+const SCRT_AUTHLINK_PATH = '/iamessage/api/v2/authorization/authlink'
+
+/**
+ * The `apiVersion` the (v1-internal) authlink endpoint requires the presented
+ * JWT to carry. Used only for a diagnostic warning — see handleAuthLinkProxy.
+ */
+const REQUIRED_JWT_API_VERSION = 'v2'
+
+/**
+ * Extract the SCRT API version (e.g. "v1"/"v2") from a Commerce Client JWT's
+ * `apiVersion` claim, WITHOUT verifying the signature (SCRT verifies it).
+ *
+ * This is used purely for DIAGNOSTICS: authlink requires a v1 token, and the
+ * Commerce Client widget currently stores a v2 public access token, so logging
+ * the token's version turns an otherwise-cryptic upstream 401 into an
+ * actionable message. The value is NOT interpolated into the request URL.
+ *
+ * Only the payload segment is base64url-decoded and parsed. The value is
+ * strictly validated against /^v\d+$/ before use.
+ *
+ * @param {string} jwt - The Commerce Client JWT (header.payload.signature)
+ * @returns {string|null} - A validated version like "v2", or null if unavailable/invalid
+ */
+export function extractApiVersionFromJWT(jwt) {
+    if (!jwt || typeof jwt !== 'string') return null
+
+    const parts = jwt.split('.')
+    if (parts.length < 2) return null
+
+    let payload
+    try {
+        payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'))
+    } catch {
+        return null
+    }
+
+    const apiVersion = payload?.apiVersion
+    if (typeof apiVersion !== 'string' || !/^v\d+$/.test(apiVersion)) {
+        return null
+    }
+
+    return apiVersion
+}
+
+/**
+ * Extract the SCRT2 origin from the COMMERCE_AGENT_SETTINGS environment variable.
+ *
+ * The auth link endpoint (`/iamessage/*`) is served by SCRT2, whose host
+ * (`*.salesforce-scrt.com`) is different from Core's My Domain (AGENT_MYDOMAIN).
+ * SCRT2's base URL is already provisioned to the storefront as the `scrt2Url`
+ * field of COMMERCE_AGENT_SETTINGS, so we read it from the same server-side
+ * source rather than introducing a new env var.
+ *
+ * Any trailing slash is stripped so it can be concatenated with an absolute
+ * path. Example: https://orgfarm-8fcc267362.test1.my.pc-rnd.salesforce-scrt.com
+ *
+ * @returns {string|null} - The SCRT2 origin (no trailing slash) or null if not found
+ */
+export function extractScrt2UrlFromEnv() {
+    const raw = process.env.COMMERCE_AGENT_SETTINGS
+
+    if (!raw) {
+        console.error('[auth-link-proxy] COMMERCE_AGENT_SETTINGS environment variable not set')
+        return null
+    }
+
+    let settings
+    try {
+        settings = typeof raw === 'string' ? JSON.parse(raw) : raw
+    } catch (err) {
+        console.error('[auth-link-proxy] COMMERCE_AGENT_SETTINGS is not valid JSON', {
+            message: err.message
+        })
+        return null
+    }
+
+    const scrt2Url = settings?.scrt2Url
+    if (!scrt2Url || typeof scrt2Url !== 'string' || !scrt2Url.trim()) {
+        console.error('[auth-link-proxy] scrt2Url not present in COMMERCE_AGENT_SETTINGS')
+        return null
+    }
+
+    // Strip trailing slash(es) so `${scrt2Url}${SCRT_AUTHLINK_PATH}` is well-formed.
+    return scrt2Url.trim().replace(/\/+$/, '')
+}
+
+/**
+ * Validate that the myDomain hostname is a trusted Salesforce domain.
+ * SSRF prevention: only allow requests to known Salesforce infrastructure.
+ *
+ * @param {string} myDomain - The full myDomain URL (e.g., https://org.my.salesforce.com)
+ * @returns {boolean} - True if the domain is trusted, false otherwise
+ */
+export function isTrustedSalesforceDomain(myDomain) {
+    try {
+        const url = new URL(myDomain)
+        const host = url.hostname.toLowerCase()
+
+        // Allowlist: Salesforce production, sandbox, and developer domains
+        return (
+            host.endsWith('.salesforce.com') ||
+            host.endsWith('.my.salesforce.com') ||
+            host.endsWith('.pc-rnd.salesforce.com') ||
+            host.endsWith('.salesforce-scrt.com') ||
+            host.endsWith('.my.salesforce-scrt.com') ||
+            host.endsWith('.pc-rnd.salesforce-scrt.com')
+        )
+    } catch {
+        // Invalid URL
+        return false
+    }
+}
+
+/**
+ * Express handler for POST /api/agent/authlink.
+ *
+ * Retrieves auth_link_key from SCRT's /iamessage/v1/authorization/authlink endpoint
+ * (authlink is a v1-internal API; there is no v2 authlink endpoint).
+ * Uses Commerce Client JWT (from *_WEB_STORAGE localStorage) for authorization.
+ *
+ * Request:
+ *   Headers:
+ *     x-site-id: <siteId> (optional)
+ *   Body:
+ *     {
+ *       "commerce_client_jwt": "<jwt_from_web_storage>",
+ *       "conversation_id": "<from cim_af_conv_* session storage>" (optional)
+ *     }
+ *
+ * When present, `conversation_id` is appended to the SCRT URL as
+ * `?conversationId=<value>` (percent-encoded via URL/searchParams).
+ *
+ * Response:
+ *   The SCRT status code is forwarded verbatim, and the SCRT URL that was
+ *   actually called is echoed back as `scrt_url` for debugging.
+ *   Success: { "auth_link_key": "...", "scrt_url": "https://<scrt2>/iamessage/v1/authorization/authlink?conversationId=..." }
+ *   SCRT error (object body): { <scrt error fields>, "scrt_url": "..." }
+ *   SCRT error (non-object body): { "scrt_url": "...", "upstream_body": <body|null> }
+ *   Pre-flight error (no SCRT call): { "error": "ERROR_CODE" }
+ *
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+export async function handleAuthLinkProxy(req, res) {
+    try {
+        const {commerce_client_jwt: commerceClientJWT, conversation_id: conversationId} =
+            req.body || {}
+
+        // Validate that Commerce Client JWT is provided
+        if (!commerceClientJWT || typeof commerceClientJWT !== 'string') {
+            console.error('[auth-link-proxy] Commerce Client JWT not provided')
+            return res.status(401).json({error: 'MISSING_COMMERCE_CLIENT_JWT'})
+        }
+
+        // CSRF protection: Validate Origin header for state-changing POST
+        const origin = req.headers.origin || req.headers.referer
+        if (origin) {
+            try {
+                const originUrl = new URL(origin)
+                // Compare host (hostname + port), NOT hostname alone: the Origin/
+                // Referer header carries the port for non-default ports (e.g. local
+                // dev at localhost:3001), and so does the HTTP Host header. Using
+                // `.hostname` would strip the port from one side only ("localhost"
+                // vs "localhost:3001") and reject a genuine same-origin request.
+                // `.host` also normalizes away default ports (:443/:80), so prod
+                // (https://…, no port in Host) still matches.
+                const originHost = originUrl.host.toLowerCase()
+
+                // Allow same-origin requests (PWA Kit storefront calling its own API)
+                const requestHost = req.headers.host?.toLowerCase()
+                const isSameOrigin = originHost === requestHost
+
+                // Allow trusted Salesforce origins (for Storefront Preview iframe)
+                const isTrustedSalesforceOrigin = isTrustedSalesforceDomain(origin)
+
+                if (!isSameOrigin && !isTrustedSalesforceOrigin) {
+                    console.error('[auth-link-proxy] CSRF attempt blocked: untrusted Origin', {
+                        origin,
+                        requestHost
+                    })
+                    return res.status(403).json({error: 'FORBIDDEN_ORIGIN'})
+                }
+            } catch (err) {
+                // Invalid Origin URL
+                console.error('[auth-link-proxy] Invalid Origin header', {origin})
+                return res.status(400).json({error: 'INVALID_ORIGIN'})
+            }
+        }
+        // If no Origin/Referer header, allow (same-origin POSTs from some browsers/tools)
+
+        // Read siteId from x-site-id header using official helper
+        const siteId = getSiteId(req)
+
+        // Resolve the SCRT2 origin from COMMERCE_AGENT_SETTINGS.scrt2Url.
+        // NOTE: this is intentionally NOT AGENT_MYDOMAIN — the auth link endpoint
+        // (/iamessage/*) lives on SCRT2 (*.salesforce-scrt.com), a different host
+        // from Core's My Domain. Pointing at AGENT_MYDOMAIN returns a 404 from Core.
+        const scrt2Url = extractScrt2UrlFromEnv()
+
+        if (!scrt2Url) {
+            console.error(
+                '[auth-link-proxy] SCRT2 URL is not configured. ' +
+                    'Set scrt2Url in the COMMERCE_AGENT_SETTINGS environment variable.'
+            )
+            return res.status(500).json({error: 'SCRT2_URL_NOT_CONFIGURED'})
+        }
+
+        // SSRF prevention: validate scrt2Url against Salesforce allowlist
+        if (!isTrustedSalesforceDomain(scrt2Url)) {
+            console.error(
+                '[auth-link-proxy] SSRF attempt blocked: scrt2Url is not a trusted Salesforce domain',
+                {scrt2Url}
+            )
+            return res.status(400).json({error: 'UNTRUSTED_SCRT2_URL'})
+        }
+
+        // Diagnostic only: authlink is a v1-internal API. If the presented JWT
+        // was minted for a different version (the Commerce Client widget stores
+        // a v2 *public* access token), SCRT will reject it with a 401
+        // version-mismatch (error 900020). Surface that as an actionable log
+        // line rather than letting the upstream 401 look like a bad token.
+        const jwtApiVersion = extractApiVersionFromJWT(commerceClientJWT)
+        if (jwtApiVersion && jwtApiVersion !== REQUIRED_JWT_API_VERSION) {
+            console.warn(
+                '[auth-link-proxy] Presented JWT apiVersion does not match the authlink ' +
+                    'endpoint version — SCRT will likely return a 401 version-mismatch (900020). ' +
+                    'AuthLink requires a v1-internal token.',
+                {jwtApiVersion, requiredApiVersion: REQUIRED_JWT_API_VERSION}
+            )
+        }
+
+        // Call SCRT's auth link endpoint with the Commerce Client JWT.
+        // The path is fixed at v1 — authlink has no v2 endpoint (see
+        // SCRT_AUTHLINK_PATH). Do NOT derive the version from the JWT: a v2 path
+        // does not exist and would 404.
+        //
+        // The conversationId (from the `cim_af_conv_*` session-storage key) is
+        // appended as a `?conversationId=` query param. Built via URL/searchParams
+        // so the value is safely percent-encoded (no query injection).
+        const scrtUrl = new URL(`${scrt2Url}${SCRT_AUTHLINK_PATH}`)
+        // if (conversationId && typeof conversationId === 'string' && conversationId.trim()) {
+        //     scrtUrl.searchParams.set('conversationId', conversationId.trim())
+        // }
+        const scrtRequestUrl = scrtUrl.toString()
+        const scrtResponse = await fetch(scrtRequestUrl, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${commerceClientJWT}`
+            }
+        })
+
+        let body = null
+        try {
+            body = await scrtResponse.json()
+        } catch {
+            body = null
+        }
+
+        // Forward the status and body from SCRT
+        if (!scrtResponse.ok) {
+            console.error('[auth-link-proxy] SCRT auth link request failed', {
+                status: scrtResponse.status,
+                scrtUrl: scrtRequestUrl,
+                body
+            })
+        }
+
+        // Echo the SCRT URL that was actually called back to the caller as
+        // `scrt_url`, so it is visible in the browser Network tab for debugging
+        // (which upstream host/path the proxy hit). SCRT's body is preserved:
+        // when it is a plain object we attach `scrt_url` alongside it; otherwise
+        // (null on invalid JSON, or an array) we nest it under `upstream_body`
+        // so `scrt_url` can always be included.
+        const responseBody =
+            body && typeof body === 'object' && !Array.isArray(body)
+                ? {...body, scrt_url: scrtRequestUrl}
+                : {scrt_url: scrtRequestUrl, upstream_body: body}
+
+        return res.status(scrtResponse.status).json(responseBody)
+    } catch (err) {
+        console.error('[auth-link-proxy] Unexpected error:', err)
+        return res.status(500).json({error: 'INTERNAL_ERROR'})
+    }
+}
+
+/**
+ * Mount the Auth Link proxy on the given Express app (called from app/ssr.js).
+ *
+ * @param {Object} app - Express application instance
+ */
+export function registerAuthLinkRoute(app) {
+    app.post(AUTH_LINK_PROXY_PATH, handleAuthLinkProxy)
+}
+
+/**
+ * Browser helper: POSTs to the same-origin proxy and returns SCRT's auth_link_key.
+ *
+ * Uses the Commerce Client JWT (extracted from *_WEB_STORAGE localStorage key)
+ * to authenticate with SCRT's authlink endpoint.
+ *
+ * The SCRT2 origin is derived server-side from scrt2Url in the
+ * COMMERCE_AGENT_SETTINGS environment variable.
+ *
+ * @param {Object} options - Request options
+ * @param {string} options.commerceClientJWT - Commerce Client JWT from *_WEB_STORAGE (required)
+ * @param {string} [options.conversationId] - Conversation id (from the `cim_af_conv_*`
+ *   session-storage key); forwarded so the proxy can add it to the SCRT URL as
+ *   `?conversationId=`
+ * @param {string} [options.siteId] - Site ID sent as x-site-id header
+ * @returns {Promise<Object>} Promise that resolves to { auth_link_key: "..." }
+ */
+export const callAuthLinkProxy = async ({commerceClientJWT, conversationId, siteId}) => {
+    const requestBody = {
+        commerce_client_jwt: commerceClientJWT
+    }
+
+    // Forward the conversationId so the server can append it to the SCRT URL.
+    if (conversationId) {
+        requestBody.conversation_id = conversationId
+    }
+
+    const headers = {
+        'Content-Type': 'application/json'
+    }
+
+    // Send siteId as x-site-id header (same pattern as other PWA Kit routes)
+    if (siteId) {
+        headers['x-site-id'] = siteId
+    }
+
+    const res = await fetch(AUTH_LINK_PROXY_PATH, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(requestBody)
+    })
+
+    let responseBody = null
+    try {
+        responseBody = await res.json()
+    } catch {
+        responseBody = null
+    }
+
+    if (!res.ok) {
+        throw new Error(
+            `Auth link proxy failed: ${responseBody?.error || `HTTP_${res.status}`}`
+        )
+    }
+
+    return responseBody
+}

@@ -37,6 +37,7 @@ import {
 import {resolveCommerceClientOverrideOptions} from '@salesforce/retail-react-app/app/utils/commerce-client-overrides'
 import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
 import CommerceClientFab from '@salesforce/retail-react-app/app/components/shopper-agent/commerce-client-fab'
+import {callAuthLinkProxy} from '@salesforce/retail-react-app/app/components/shopper-agent/auth-link-proxy'
 
 const onClient = typeof window !== 'undefined'
 
@@ -589,17 +590,18 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {Object} props.commerceAgentConfiguration - Commerce agent configuration object
  * @param {string} props.commerceAgentConfiguration.scrt2Url - SCRT2 URL (passed to `messagingConfig.scrt2Url`)
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID (passed to `messagingConfig.orgId`)
- * @param {string} [props.commerceAgentConfiguration.cc_esDeveloperName] - Embedded Service developer name
- * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `cc_esDeveloperName`
- * @param {string} [props.commerceAgentConfiguration.cc_capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
- * @param {string} [props.commerceAgentConfiguration.cc_enableEscalationToAgent] - When 'true', lets shoppers escalate to a human agent; forwarded as `messagingConfig.enableEscalationToAgent`. Defaults to 'false'
- * @param {string} [props.commerceAgentConfiguration.cc_enableDownloadTranscript] - 'true' (default) lets shoppers download the chat transcript; forwarded as `messagingConfig.enableDownloadTranscript`
- * @param {string} [props.commerceAgentConfiguration.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0'); resolved into the full messaging bundle URL
- * @param {string} [props.commerceAgentConfiguration.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting); wins over cc_cdnVersion
- * @param {string} [props.commerceAgentConfiguration.cc_logoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
- * @param {string} [props.commerceAgentConfiguration.cc_headerText] - Header text shown at the top of the widget
- * @param {string} [props.commerceAgentConfiguration.cc_disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
- * @param {Object} [props.commerceAgentConfiguration.cc_searchConfig] - Search input config forwarded to the widget as `searchConfig` (e.g. `placeholder`, `buttonLabel`, `buttonType`, `buttonIconUrl`)
+ * @param {string} [props.commerceAgentConfiguration.esDeveloperName] - Embedded Service developer name
+ * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `esDeveloperName`
+ * @param {string} [props.commerceAgentConfiguration.capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
+ * @param {string} props.commerceAgentConfiguration.commerceClientScriptSourceUrl - Commerce Client messaging bundle URL
+ * @param {string} [props.commerceAgentConfiguration.commerceClientLoadingMode] - Asset loading mode: 'cdn' (default, external Cimulate CDN) or 'static' (this app's bundled static assets)
+ * @param {string} [props.commerceAgentConfiguration.commerceClientScriptSourceUrl] - Commerce Client messaging bundle URL (used when loading mode is 'cdn')
+ * @param {string} [props.commerceAgentConfiguration.commerceClientStaticAssetPath] - Bundle path relative to the build dir (used when loading mode is 'static'; defaults to 'static/commerce-client/messaging.umd.js')
+ * @param {string} [props.commerceAgentConfiguration.commerceClientMode] - Widget mode forwarded to the bundle as `mode` (defaults to 'messaging')
+ * @param {string} [props.commerceAgentConfiguration.commerceClientLogoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
+ * @param {string} [props.commerceAgentConfiguration.headerText] - Header text shown at the top of the widget
+ * @param {string} [props.commerceAgentConfiguration.disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
+ * @param {Object} [props.commerceAgentConfiguration.commerceClientSearchConfig] - Search input config forwarded to the widget as `searchConfig` (e.g. `placeholder`, `buttonLabel`, `buttonType`, `buttonIconUrl`)
  * @param {string} [props.commerceAgentConfiguration.commerceClientElementId] - Container element id (defaults to 'commerce-client-messaging-widget')
  * @param {string} [props.commerceAgentConfiguration.cc_dialogFullHeight] - 'true' (default) renders a full-height side panel; 'false' renders a standard corner dialog
  * @param {string} [props.commerceAgentConfiguration.cc_dialogWidth] - Width of the side panel when cc_dialogFullHeight is 'true' (e.g. '420px')
@@ -643,6 +645,891 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
 
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
     const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
+    const {formatMessage} = useIntl()
+    const toast = useToast()
+    const toastRef = useRef(toast)
+    toastRef.current = toast
+
+    // Customer details and auth tokens for Commerce Client session init
+    const {getTokenWhenReady} = useAccessToken()
+    const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    getTokenWhenReadyRef.current = getTokenWhenReady
+
+    const {organizationId, siteId: configSiteId} = useConfig()
+    const configRef = useRef({organizationId, configSiteId})
+    configRef.current = {organizationId, configSiteId}
+
+    const formatMessageRef = useRef(formatMessage)
+    formatMessageRef.current = formatMessage
+
+    // Track if we've already initialized the session for this widget open.
+    // NOTE: only consumed by the commented-out OLD open-based flow below;
+    // retained so that flow can be restored verbatim if we roll back.
+    // eslint-disable-next-line no-unused-vars
+    const sessionInitializedRef = useRef(false)
+
+    // --- NEW auth-link triggers (alongside the commented-out open-based flow) ---
+    // The SLAS shopper identity. Auth-linking binds the Commerce Client
+    // conversation to THIS shopper, so a change on either side (new
+    // conversation, or guest<->registered / account switch) must re-link.
+    const {usid} = useUsid()
+    const {customerType} = useCustomerType()
+
+    // Latest identity values, read from a ref so the (stable, mount-once)
+    // window listeners always see current values without re-subscribing.
+    const identityRef = useRef({usid, customerType})
+    identityRef.current = {usid, customerType}
+
+    // Composite dedup key of the last SUCCESSFUL link: `${conversationId}:${slasIdentity}`.
+    // Replaces the per-open `sessionInitializedRef` boolean — it tracks *whose*
+    // identity is linked to *which* conversation, so redundant re-opens are
+    // skipped while a genuine identity change on either side still re-links.
+    const lastAuthLinkKeyRef = useRef(null)
+
+    // Resolve the bundle URL from the configured loading mode: the external
+    // Cimulate CDN ('cdn', default) or this app's own bundled static assets
+    // ('static'). Mirrors the SFCC cartridge's `cc_loadingMode` preference.
+    const commerceClientScriptUrl = resolveCommerceClientScriptUrl(commerceAgentConfiguration)
+
+    // Load the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging
+    const scriptLoadStatus = useScript(commerceClientScriptUrl)
+
+    /**
+     * DEBUG: Intercept window event listeners to discover Commerce Client events
+     * This intercepts all addEventListener calls and logs any that might be related
+     * to Commerce Client messaging (commerce, cimulate, conversation, chat, message, agent, session)
+     */
+    useEffect(() => {
+        if (!scriptLoadStatus?.loaded || scriptLoadStatus?.error) {
+            return
+        }
+
+        console.log('[Commerce Client DEBUG] Setting up event interception...')
+
+        // Store the original addEventListener
+        const originalAddEventListener = window.addEventListener.bind(window)
+        const originalRemoveEventListener = window.removeEventListener.bind(window)
+
+        // Intercept addEventListener
+        window.addEventListener = function (type, listener, options) {
+            const keywords = [
+                'commerce',
+                'cimulate',
+                'conversation',
+                'chat',
+                'message',
+                'messaging',
+                'agent',
+                'session',
+                'connect',
+                'start',
+                'open',
+                'ready',
+                'init'
+            ]
+
+            const isRelevant = keywords.some((keyword) => type.toLowerCase().includes(keyword))
+
+            if (isRelevant) {
+                console.log('[Commerce Client DEBUG] Event listener registered:', {
+                    eventType: type,
+                    listenerFunction: listener.toString().substring(0, 200)
+                })
+
+                // Wrap the listener to log when it fires
+                const wrappedListener = function (event) {
+                    console.log('[Commerce Client DEBUG] Event FIRED:', {
+                        eventType: type,
+                        eventDetail: event.detail,
+                        eventData: event.data,
+                        event: event
+                    })
+                    return listener.call(this, event)
+                }
+
+                return originalAddEventListener.call(this, type, wrappedListener, options)
+            }
+
+            return originalAddEventListener.call(this, type, listener, options)
+        }
+
+        // Restore on unmount
+        return () => {
+            window.addEventListener = originalAddEventListener
+            window.removeEventListener = originalRemoveEventListener
+            console.log('[Commerce Client DEBUG] Event interception cleaned up')
+        }
+    }, [scriptLoadStatus])
+
+    /**
+     * Intercept fetch calls to fix API compatibility issues and store V1 tokens.
+     *
+     * 1. The Commerce Client SDK incorrectly includes 'esDeveloperName' in the POST body
+     *    when creating conversations, but the /iamessage/v1/conversation API rejects it
+     *    with "Unrecognized property: 'esDeveloperName'". This interceptor strips it out.
+     *
+     * 2. For V1 API, the SDK does NOT store tokens in sessionStorage/cookies. This
+     *    interceptor captures the V1 token response and stores it manually.
+     */
+    useEffect(() => {
+        if (!scriptLoadStatus?.loaded || scriptLoadStatus?.error) {
+            return
+        }
+
+        const originalFetch = window.fetch
+
+        window.fetch = async function(url, options) {
+            // Intercept conversation creation API calls
+            if (typeof url === 'string' && url.includes('/iamessage/v1/conversation')) {
+                console.log('[Commerce Client] Intercepting conversation API call')
+
+                // Parse and modify the request body
+                if (options?.body) {
+                    try {
+                        const body = JSON.parse(options.body)
+
+                        // Log the original body for debugging
+                        console.log('[Commerce Client] Original request body:', body)
+
+                        // Remove esDeveloperName if present
+                        if (body.esDeveloperName) {
+                            console.log('[Commerce Client] Removing esDeveloperName from request')
+                            delete body.esDeveloperName
+                        }
+
+                        // Update the options with the cleaned body
+                        options.body = JSON.stringify(body)
+                        console.log('[Commerce Client] Modified request body:', body)
+                    } catch (e) {
+                        console.warn('[Commerce Client] Failed to parse/modify request body:', e)
+                    }
+                }
+            }
+
+            // Intercept V1 token API calls to manually store the token
+            if (typeof url === 'string' && url.includes('/iamessage/v1/authorization/unauthenticated/accessToken')) {
+                console.log('[Commerce Client] Intercepting V1 token API call')
+
+                try {
+                    // Call the original fetch
+                    const response = await originalFetch.call(this, url, options)
+
+                    // Clone the response so we can read it without consuming the original
+                    const clone = response.clone()
+                    const data = await clone.json()
+
+                    if (data.accessToken) {
+                        console.log('[Commerce Client] V1 token received, storing manually...')
+
+                        // Extract orgId and esDeveloperName from the request body
+                        let orgId, esDeveloperName
+                        try {
+                            if (options?.body) {
+                                const requestBody = JSON.parse(options.body)
+                                orgId = requestBody.orgId
+                                esDeveloperName = requestBody.developerName
+                            }
+                        } catch (e) {
+                            console.warn('[Commerce Client] Failed to parse request body for orgId/esDeveloperName:', e)
+                        }
+
+                        if (orgId && esDeveloperName) {
+                            // Store in sessionStorage (same format as V2 SDK uses)
+                            const storageKey = `cim_af_ct_${orgId}_${esDeveloperName}`
+                            const storageData = {
+                                accessToken: data.accessToken,
+                                lastEventId: data.lastEventId || "0",
+                                storedAt: Date.now()
+                            }
+
+                            try {
+                                sessionStorage.setItem(storageKey, JSON.stringify(storageData))
+                                console.log('[Commerce Client] V1 token stored in sessionStorage:', storageKey)
+                            } catch (e) {
+                                console.error('[Commerce Client] Failed to store in sessionStorage:', e)
+                            }
+
+                            // Also store in cookie for server-side access
+                            try {
+                                const cookieName = `cim_af_ct_${orgId}_${esDeveloperName}`
+                                const cookieValue = encodeURIComponent(JSON.stringify(storageData))
+
+                                // Set cookie with appropriate flags
+                                // Max-Age: 1 hour (3600 seconds)
+                                // Path: / (available to entire site)
+                                // SameSite: Lax (CSRF protection)
+                                // Note: Not setting HttpOnly so JavaScript can access it
+                                const cookieString = `${cookieName}=${cookieValue}; Max-Age=3600; Path=/; SameSite=Lax; Secure`
+
+                                document.cookie = cookieString
+                                console.log('[Commerce Client] V1 token stored in cookie:', cookieName)
+                            } catch (e) {
+                                console.error('[Commerce Client] Failed to store in cookie:', e)
+                            }
+                        } else {
+                            console.warn('[Commerce Client] Cannot store V1 token: missing orgId or esDeveloperName')
+                        }
+                    }
+
+                    // Return the original response
+                    return response
+                } catch (e) {
+                    console.error('[Commerce Client] Error intercepting V1 token response:', e)
+                    throw e
+                }
+            }
+
+            // Call the original fetch for all other requests
+            return originalFetch.call(this, url, options)
+        }
+
+        console.log('[Commerce Client] Fetch interceptor installed (with V1 token storage)')
+
+        // Restore original fetch on unmount
+        return () => {
+            window.fetch = originalFetch
+            console.log('[Commerce Client] Fetch interceptor removed')
+        }
+    }, [scriptLoadStatus])
+
+    /**
+     * DEBUG: Inspect the CimulateMessaging API after script loads
+     */
+    useEffect(() => {
+        if (!scriptLoadStatus?.loaded || scriptLoadStatus?.error) {
+            return
+        }
+
+        // Wait a bit for the widget to initialize
+        const timer = setTimeout(() => {
+            if (typeof window !== 'undefined' && window.CimulateMessaging) {
+                console.log(
+                    '[Commerce Client DEBUG] CimulateMessaging API available:',
+                    Object.keys(window.CimulateMessaging)
+                )
+
+                if (window.CimulateMessaging.eventHandlers) {
+                    console.log(
+                        '[Commerce Client DEBUG] eventHandlers:',
+                        window.CimulateMessaging.eventHandlers
+                    )
+                    console.log(
+                        '[Commerce Client DEBUG] eventHandlers keys:',
+                        Object.keys(window.CimulateMessaging.eventHandlers)
+                    )
+
+                    // Check for 'on' method or similar
+                    if (typeof window.CimulateMessaging.eventHandlers.on === 'function') {
+                        console.log('[Commerce Client DEBUG] eventHandlers.on() method found!')
+                    }
+
+                    // Check components
+                    if (window.CimulateMessaging.eventHandlers.components) {
+                        console.log(
+                            '[Commerce Client DEBUG] eventHandlers.components:',
+                            Object.keys(window.CimulateMessaging.eventHandlers.components)
+                        )
+                    }
+                }
+
+                // Check for other potential APIs
+                if (window.CimulateMessaging.getState) {
+                    console.log('[Commerce Client DEBUG] getState() method found')
+                    try {
+                        const state = window.CimulateMessaging.getState()
+                        console.log('[Commerce Client DEBUG] Current state:', state)
+                    } catch (e) {
+                        console.log('[Commerce Client DEBUG] getState() error:', e)
+                    }
+                }
+
+                // Log all methods
+                console.log('[Commerce Client DEBUG] All CimulateMessaging properties:', {
+                    ...window.CimulateMessaging
+                })
+            } else {
+                console.warn('[Commerce Client DEBUG] CimulateMessaging not available on window')
+            }
+        }, 1000)
+
+        return () => clearTimeout(timer)
+    }, [scriptLoadStatus])
+
+    /**
+     * DEBUG: Log when the Commerce Client widget signals it is ready.
+     */
+    useEffect(() => {
+        const handleCimulateWidgetReady = (event) => {
+            console.log('[Commerce Client] onCimulateWidgetReady', event)
+        }
+
+        window.addEventListener('onCimulateWidgetReady', handleCimulateWidgetReady)
+
+        return () => {
+            window.removeEventListener('onCimulateWidgetReady', handleCimulateWidgetReady)
+        }
+    }, [])
+
+    /**
+     * DEBUG: Intercept postMessage events to see if Commerce Client uses message passing
+     */
+    useEffect(() => {
+        const handleMessage = (event) => {
+            // Log any messages that might be from Commerce Client
+            if (
+                event.data &&
+                typeof event.data === 'object' &&
+                (event.data.type?.includes('commerce') ||
+                    event.data.type?.includes('cimulate') ||
+                    event.data.type?.includes('conversation') ||
+                    event.data.type?.includes('chat') ||
+                    event.data.type?.includes('message') ||
+                    event.data.type?.includes('agent') ||
+                    event.data.type?.includes('session'))
+            ) {
+                console.log('[Commerce Client DEBUG] postMessage received:', {
+                    type: event.data.type,
+                    payload: event.data.payload,
+                    data: event.data,
+                    origin: event.origin
+                })
+            }
+        }
+
+        window.addEventListener('message', handleMessage)
+
+        return () => {
+            window.removeEventListener('message', handleMessage)
+        }
+    }, [])
+
+    // =====================================================================
+    // OLD auth-link flow (COMMENTED OUT — kept for reference / rollback).
+    // Triggered on every widget open via `cimulate:ui-state-update`
+    // (isOpen=true), deduped only by the per-open `sessionInitializedRef`
+    // boolean. Superseded by the identity-change triggers below, which
+    // re-link when EITHER the Commerce Client conversation OR the SLAS
+    // shopper identity changes. Do not delete without removing the new flow.
+    // =====================================================================
+
+//     /**
+//      * Handle Commerce Client widget open event and initialize session with Token Bridge.
+//      * Listens for 'cimulate:ui-state-update' event with isOpen=true to detect when
+//      * the widget opens, then calls Auth Link Proxy followed by Token Bridge.
+//      */
+//     useEffect(() => {
+//         if (!scriptLoadStatus?.loaded || scriptLoadStatus?.error) {
+//             return
+//         }
+// 
+//         const failSessionInit = () => {
+//             toastRef.current({
+//                 title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+//                 status: 'error'
+//             })
+//             sessionInitializedRef.current = false
+//         }
+// 
+//         const handleCommerceClientOpen = async (event) => {
+//             // Only proceed if widget is opening (isOpen: true)
+//             if (event?.detail?.property !== 'isOpen' || event?.detail?.value !== true) {
+//                 return
+//             }
+// 
+//             // Prevent duplicate initialization for the same widget open
+//             if (sessionInitializedRef.current) {
+//                 console.log('[Commerce Client] Session already initialized for this widget open')
+//                 return
+//             }
+// 
+//             sessionInitializedRef.current = true
+//             console.log('[Commerce Client] Widget opened, initializing session...')
+// 
+//             const {organizationId: orgId, configSiteId: sid} = configRef.current
+// 
+//             if (!orgId || !sid) {
+//                 console.error('[Commerce Client] Missing organizationId or siteId')
+//                 failSessionInit()
+//                 return
+//             }
+// 
+//             try {
+//                 // Check if HttpOnly mode is enabled
+//                 const isHttpOnly =
+//                     typeof window !== 'undefined'
+//                         ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
+//                         : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+// 
+//                 // In non-HttpOnly mode, fetch the access token from localStorage
+//                 const slasAccessToken = isHttpOnly
+//                     ? undefined
+//                     : await getTokenWhenReadyRef.current()
+// 
+//                 /**
+//                  * Extract JWT from storage with retry logic.
+//                  * The Commerce Client SDK needs time to complete its auth flow and store the JWT,
+//                  * so we poll storage for up to 5 seconds before giving up.
+//                  */
+//                 const extractJWTFromStorage = () => {
+//                     const localStorage = event?.target?.localStorage || window.localStorage
+//                     const sessionStorage = event?.target?.sessionStorage || window.sessionStorage
+// 
+//                     // Pattern 1: Look for *_WEB_STORAGE key with JWT field
+//                     let storageKey = Object.keys(localStorage).find(key =>
+//                         key.endsWith('_WEB_STORAGE')
+//                     )
+// 
+//                     if (storageKey) {
+//                         const value = localStorage.getItem(storageKey)
+//                         if (value) {
+//                             const data = JSON.parse(value)
+//                             if (data?.JWT) {
+//                                 console.log('[Commerce Client] Extracted JWT from localStorage (*_WEB_STORAGE):',
+//                                     data.JWT.substring(0, 50) + '...')
+//                                 return data.JWT
+//                             }
+//                         }
+//                     }
+// 
+//                     // Pattern 2: Look for cim_af_ct_* key with accessToken field (localStorage)
+//                     storageKey = Object.keys(localStorage).find(key =>
+//                         key.startsWith('cim_af_ct_')
+//                     )
+// 
+//                     if (storageKey) {
+//                         const value = localStorage.getItem(storageKey)
+//                         if (value) {
+//                             const data = JSON.parse(value)
+//                             if (data?.accessToken) {
+//                                 console.log('[Commerce Client] Extracted JWT from localStorage (cim_af_ct_):',
+//                                     data.accessToken.substring(0, 50) + '...')
+//                                 return data.accessToken
+//                             }
+//                         }
+//                     }
+// 
+//                     // Pattern 3: Try sessionStorage with *_WEB_STORAGE pattern
+//                     storageKey = Object.keys(sessionStorage).find(key =>
+//                         key.endsWith('_WEB_STORAGE')
+//                     )
+// 
+//                     if (storageKey) {
+//                         const value = sessionStorage.getItem(storageKey)
+//                         if (value) {
+//                             const data = JSON.parse(value)
+//                             if (data?.JWT) {
+//                                 console.log('[Commerce Client] Extracted JWT from sessionStorage (*_WEB_STORAGE):',
+//                                     data.JWT.substring(0, 50) + '...')
+//                                 return data.JWT
+//                             }
+//                         }
+//                     }
+// 
+//                     // Pattern 4: Try sessionStorage with cim_af_ct_* pattern
+//                     storageKey = Object.keys(sessionStorage).find(key =>
+//                         key.startsWith('cim_af_ct_')
+//                     )
+// 
+//                     if (storageKey) {
+//                         const value = sessionStorage.getItem(storageKey)
+//                         if (value) {
+//                             const data = JSON.parse(value)
+//                             if (data?.accessToken) {
+//                                 console.log('[Commerce Client] Extracted JWT from sessionStorage (cim_af_ct_):',
+//                                     data.accessToken.substring(0, 50) + '...')
+//                                 return data.accessToken
+//                             }
+//                         }
+//                     }
+// 
+//                     return null
+//                 }
+// 
+//                 // Poll for JWT with exponential backoff
+//                 let commerceClientJWT
+//                 const maxRetries = 10
+//                 const initialDelay = 100 // Start with 100ms
+// 
+//                 console.log('[Commerce Client] Waiting for SDK to store JWT...')
+// 
+//                 for (let attempt = 0; attempt < maxRetries; attempt++) {
+//                     try {
+//                         commerceClientJWT = extractJWTFromStorage()
+// 
+//                         if (commerceClientJWT) {
+//                             console.log(`[Commerce Client] JWT found after ${attempt} retries`)
+//                             break
+//                         }
+// 
+//                         // Debug: Log all storage keys on first attempt
+//                         if (attempt === 0) {
+//                             const localStorage = event?.target?.localStorage || window.localStorage
+//                             const sessionStorage = event?.target?.sessionStorage || window.sessionStorage
+//                             console.log('[Commerce Client] localStorage keys:', Object.keys(localStorage))
+//                             console.log('[Commerce Client] sessionStorage keys:', Object.keys(sessionStorage))
+//                         }
+// 
+//                         // Wait with exponential backoff (100ms, 200ms, 400ms, 800ms, 1600ms)
+//                         const delay = initialDelay * Math.pow(2, attempt)
+//                         await new Promise(resolve => setTimeout(resolve, delay))
+// 
+//                     } catch (jwtError) {
+//                         console.error('[Commerce Client] Failed to extract JWT from storage:', jwtError)
+//                     }
+//                 }
+// 
+//                 if (!commerceClientJWT) {
+//                     console.warn('[Commerce Client] No Commerce Client JWT found after polling storage')
+//                     // Final debug: dump all storage to help diagnose the issue
+//                     const localStorage = event?.target?.localStorage || window.localStorage
+//                     const sessionStorage = event?.target?.sessionStorage || window.sessionStorage
+//                     console.log('[Commerce Client] Final localStorage keys:', Object.keys(localStorage))
+//                     console.log('[Commerce Client] Final sessionStorage keys:', Object.keys(sessionStorage))
+//                 }
+// 
+//                 // Extract the conversationId from the cim_af_conv_* session-storage
+//                 // key (value shape: {"conversationId":"...","storedAt":...}). It is
+//                 // forwarded to the Auth Link Proxy and added to the SCRT URL as
+//                 // ?conversationId=. Best-effort: a missing id just omits the param.
+//                 let conversationId
+//                 try {
+//                     const sessionStorage = event?.target?.sessionStorage || window.sessionStorage
+//                     const convKey = Object.keys(sessionStorage).find((key) =>
+//                         key.startsWith('cim_af_conv_')
+//                     )
+//                     if (convKey) {
+//                         const value = sessionStorage.getItem(convKey)
+//                         if (value) {
+//                             conversationId = JSON.parse(value)?.conversationId
+//                             if (conversationId) {
+//                                 console.log('[Commerce Client] Found conversationId in sessionStorage:', conversationId)
+//                             }
+//                         }
+//                     }
+//                     if (!conversationId) {
+//                         console.warn('[Commerce Client] No conversationId found in sessionStorage (cim_af_conv_*)')
+//                     }
+//                 } catch (convError) {
+//                     console.error('[Commerce Client] Failed to extract conversationId from storage:', convError)
+//                 }
+// 
+//                 // Verify we have the Commerce Client JWT before proceeding
+//                 if (!commerceClientJWT) {
+//                     console.error('[Commerce Client] Commerce Client JWT not available, cannot proceed with auth')
+//                     failSessionInit()
+//                     return
+//                 }
+// 
+//                 // Step 1: Get auth link key from SCRT via Auth Link Proxy
+//                 console.log('[Commerce Client] Calling Auth Link Proxy...')
+//                 const authLinkResponse = await callAuthLinkProxy({
+//                     commerceClientJWT, // Commerce Client JWT (required)
+//                     conversationId, // From cim_af_conv_* session storage (optional)
+//                     siteId: sid
+//                 })
+// 
+//                 // SCRT returns the key as camelCase `authLinkKey`; the proxy
+//                 // forwards SCRT's body verbatim. Accept both casings so a change
+//                 // in the upstream contract doesn't silently break the chain.
+//                 const authLinkKey =
+//                     authLinkResponse?.auth_link_key || authLinkResponse?.authLinkKey
+// 
+//                 if (!authLinkKey || typeof authLinkKey !== 'string') {
+//                     console.error(
+//                         '[Commerce Client] Auth Link Proxy did not return an auth link key',
+//                         authLinkResponse
+//                     )
+//                     failSessionInit()
+//                     return
+//                 }
+// 
+//                 console.log('[Commerce Client] Auth link key obtained, calling Token Bridge...')
+// 
+//                 // Step 2: Call Token Bridge with auth link key
+//                 const result = await callTokenBridge({
+//                     authLinkKey,
+//                     slasAccessToken, // Only sent in non-HttpOnly mode
+//                     siteId: sid
+//                 })
+// 
+//                 if (result.status !== HTTP_OK) {
+//                     const errorCode = result.body?.error || `HTTP_${result.status}`
+//                     console.error('[Commerce Client] Token Bridge failed', {
+//                         status: result.status,
+//                         error: errorCode
+//                     })
+//                     failSessionInit()
+//                 } else {
+//                     console.log('[Commerce Client] Session initialized successfully')
+//                 }
+//             } catch (error) {
+//                 console.error('[Commerce Client] Session initialization threw', error)
+//                 failSessionInit()
+//             }
+//         }
+// 
+//         // Listen for Commerce Client widget open event
+//         window.addEventListener('cimulate:ui-state-update', handleCommerceClientOpen)
+// 
+//         return () => {
+//             window.removeEventListener('cimulate:ui-state-update', handleCommerceClientOpen)
+//         }
+//     }, [scriptLoadStatus])
+// 
+//     /**
+//      * Reset session initialized flag when widget closes.
+//      * This allows re-initialization on the next open.
+//      */
+//     useEffect(() => {
+//         if (!scriptLoadStatus?.loaded || scriptLoadStatus?.error) {
+//             return
+//         }
+// 
+//         const handleCommerceClientClose = (event) => {
+//             // Reset flag when widget closes (isOpen: false)
+//             if (event?.detail?.property === 'isOpen' && event?.detail?.value === false) {
+//                 console.log('[Commerce Client] Widget closed, resetting session flag')
+//                 sessionInitializedRef.current = false
+//             }
+//         }
+// 
+//         window.addEventListener('cimulate:ui-state-update', handleCommerceClientClose)
+// 
+//         return () => {
+//             window.removeEventListener('cimulate:ui-state-update', handleCommerceClientClose)
+//         }
+//     }, [scriptLoadStatus])
+
+    // =====================================================================
+    // NEW auth-link flow (identity-change driven).
+    //
+    // Auth-linking binds the Commerce Client CONVERSATION (identified by the
+    // Commerce Client JWT in *_WEB_STORAGE / cim_af_ct_*) to the SLAS SHOPPER
+    // (access/refresh token forwarded by the Token Bridge). The link is stale
+    // whenever EITHER endpoint changes, so we (re)link on two signals:
+    //
+    //   1. `onCimulateWidgetReady` — the widget fires this ONLY when it creates
+    //      a NEW conversation (never on resume). New conversation => new
+    //      Commerce Client JWT that has never been linked to anyone.
+    //   2. SLAS identity transition — guest <-> registered, or usid/account
+    //      switch. Same conversation, but now the wrong (or anonymous) shopper.
+    //
+    // Both converge on a single idempotent performAuthLink(), deduped by the
+    // composite key `${conversationId}:${slasIdentity}` so redundant opens do
+    // not re-link while a genuine identity change on either side still does.
+    // =====================================================================
+
+    /**
+     * Resolve a stable identifier for the current SLAS shopper. Guests share
+     * the sentinel "guest" so a guest re-open does not look like a new identity,
+     * while a login/logout/account-switch produces a different value.
+     */
+    const getSlasIdentity = () => {
+        const {usid: currentUsid, customerType: currentType} = identityRef.current
+        if (currentType === 'registered') {
+            return `registered:${currentUsid || ''}`
+        }
+        return 'guest'
+    }
+
+    /**
+     * Read the Commerce Client conversationId from the cim_af_conv_* session
+     * key (value shape: {"conversationId":"...","storedAt":...}). Returns null
+     * if not present yet (e.g. conversation still being created).
+     */
+    const readConversationId = () => {
+        try {
+            const convKey = Object.keys(window.sessionStorage).find((key) =>
+                key.startsWith('cim_af_conv_')
+            )
+            if (!convKey) return null
+            const value = window.sessionStorage.getItem(convKey)
+            return value ? JSON.parse(value)?.conversationId || null : null
+        } catch (err) {
+            console.error('[Commerce Client] Failed to read conversationId', err)
+            return null
+        }
+    }
+
+    /**
+     * Extract the Commerce Client JWT from storage. Checks, in order:
+     * localStorage *_WEB_STORAGE (.JWT), localStorage cim_af_ct_* (.accessToken),
+     * then the same two in sessionStorage. Returns null if none are present.
+     */
+    const extractCommerceClientJWT = () => {
+        const stores = [window.localStorage, window.sessionStorage]
+        for (const store of stores) {
+            try {
+                const webKey = Object.keys(store).find((k) => k.endsWith('_WEB_STORAGE'))
+                if (webKey) {
+                    const data = JSON.parse(store.getItem(webKey) || 'null')
+                    if (data?.JWT) return data.JWT
+                }
+                const ctKey = Object.keys(store).find((k) => k.startsWith('cim_af_ct_'))
+                if (ctKey) {
+                    const data = JSON.parse(store.getItem(ctKey) || 'null')
+                    if (data?.accessToken) return data.accessToken
+                }
+            } catch (err) {
+                console.error('[Commerce Client] Failed to parse storage for JWT', err)
+            }
+        }
+        return null
+    }
+
+    /**
+     * Poll storage for the Commerce Client JWT with exponential backoff.
+     * The SDK stores the JWT asynchronously after a conversation is created,
+     * so on the `onCimulateWidgetReady` signal the token may not exist yet.
+     */
+    const waitForCommerceClientJWT = async (maxRetries = 10, initialDelay = 100) => {
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
+            const jwt = extractCommerceClientJWT()
+            if (jwt) return jwt
+            const delay = initialDelay * Math.pow(2, attempt)
+            await new Promise((resolve) => setTimeout(resolve, delay))
+        }
+        return null
+    }
+
+    /**
+     * Idempotently link the current Commerce Client conversation to the current
+     * SLAS shopper. Deduped by `${conversationId}:${slasIdentity}` — a no-op if
+     * that exact pair was already linked successfully.
+     *
+     * @param {Object} opts
+     * @param {string} opts.reason - Diagnostic label for the triggering signal.
+     */
+    const performAuthLink = async ({reason}) => {
+        const {organizationId: orgId, configSiteId: sid} = configRef.current
+        if (!orgId || !sid) {
+            console.error('[Commerce Client] performAuthLink: missing organizationId or siteId')
+            return
+        }
+
+        // Dedup: skip if this exact (conversation, shopper) pair is already linked.
+        // conversationId may be null here (conversation still creating) — the JWT
+        // poll below gives it time to appear, and we re-read it before the key check.
+        const slasIdentity = getSlasIdentity()
+
+        try {
+            const commerceClientJWT = await waitForCommerceClientJWT()
+            if (!commerceClientJWT) {
+                console.warn(`[Commerce Client] performAuthLink(${reason}): no JWT after polling`)
+                return
+            }
+
+            const conversationId = readConversationId()
+            const linkKey = `${conversationId || 'unknown'}:${slasIdentity}`
+            if (lastAuthLinkKeyRef.current === linkKey) {
+                console.log(`[Commerce Client] performAuthLink(${reason}): already linked (${linkKey})`)
+                return
+            }
+
+            const isHttpOnly =
+                typeof window !== 'undefined'
+                    ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
+                    : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+
+            const slasAccessToken = isHttpOnly ? undefined : await getTokenWhenReadyRef.current()
+
+            // Step 1: auth link key from SCRT (uses the Commerce Client JWT)
+            const authLinkResponse = await callAuthLinkProxy({
+                commerceClientJWT,
+                conversationId,
+                siteId: sid
+            })
+            const authLinkKey =
+                authLinkResponse?.auth_link_key || authLinkResponse?.authLinkKey
+            if (!authLinkKey || typeof authLinkKey !== 'string') {
+                console.error(
+                    `[Commerce Client] performAuthLink(${reason}): no auth link key`,
+                    authLinkResponse
+                )
+                return
+            }
+
+            // Step 2: token bridge (links conversation to the SLAS shopper)
+            const result = await callTokenBridge({authLinkKey, slasAccessToken, siteId: sid})
+            if (result.status !== HTTP_OK) {
+                const errorCode = result.body?.error || `HTTP_${result.status}`
+                console.error(`[Commerce Client] performAuthLink(${reason}): token bridge failed`, {
+                    status: result.status,
+                    error: errorCode
+                })
+                toastRef.current({
+                    title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+                    status: 'error'
+                })
+                return
+            }
+
+            lastAuthLinkKeyRef.current = linkKey
+            console.log(`[Commerce Client] performAuthLink(${reason}): linked (${linkKey})`)
+        } catch (error) {
+            console.error(`[Commerce Client] performAuthLink(${reason}) threw`, error)
+            toastRef.current({
+                title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+                status: 'error'
+            })
+        }
+    }
+
+    // Keep a stable ref so window listeners registered once always call the
+    // latest performAuthLink closure (which reads current config/identity).
+    const performAuthLinkRef = useRef(performAuthLink)
+    performAuthLinkRef.current = performAuthLink
+
+    /**
+     * Trigger 1 — new Commerce Client conversation.
+     * `onCimulateWidgetReady` is a cancelable handshake the widget dispatches
+     * ONLY when it creates a NEW conversation (not on sessionStorage resume).
+     * We use it purely as the "new conversation identity" signal and run the
+     * link asynchronously — we do NOT call preventDefault()/done() here, so the
+     * widget proceeds immediately; the JWT poll in performAuthLink waits for the
+     * new conversation's token to land.
+     */
+    useEffect(() => {
+        if (!scriptLoadStatus?.loaded || scriptLoadStatus?.error) {
+            return
+        }
+        const handleWidgetReady = () => {
+            console.log('[Commerce Client] onCimulateWidgetReady -> auth link (new conversation)')
+            performAuthLinkRef.current({reason: 'widget-ready'})
+        }
+        window.addEventListener('onCimulateWidgetReady', handleWidgetReady)
+        return () => {
+            window.removeEventListener('onCimulateWidgetReady', handleWidgetReady)
+        }
+    }, [scriptLoadStatus])
+
+    /**
+     * Trigger 2 — SLAS shopper identity transition.
+     * Login, logout, registration and account switch all rotate the SLAS token
+     * (reflected here as a change in customerType/usid). The conversation is
+     * unchanged but is now linked to the wrong (or anonymous) shopper, so we
+     * re-link. Skips the initial mount; the composite dedup key in
+     * performAuthLink prevents a redundant link if nothing effectively changed.
+     */
+    const prevSlasIdentityRef = useRef(undefined)
+    useEffect(() => {
+        if (!scriptLoadStatus?.loaded || scriptLoadStatus?.error) {
+            return
+        }
+        const identity = getSlasIdentity()
+        const prev = prevSlasIdentityRef.current
+        prevSlasIdentityRef.current = identity
+
+        // Skip initial mount — the widget-ready trigger handles first link.
+        if (prev === undefined) {
+            return
+        }
+        if (prev !== identity) {
+            console.log(`[Commerce Client] SLAS identity change (${prev} -> ${identity}) -> auth link`)
+            performAuthLinkRef.current({reason: 'slas-identity-change'})
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [customerType, usid, scriptLoadStatus])
 
     const isDialog = cc_displayType === 'dialog'
     const isFullHeight = isDialog && cc_dialogFullHeight === 'true'
