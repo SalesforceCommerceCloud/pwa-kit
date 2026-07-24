@@ -987,7 +987,7 @@ describe('Item-level return error states', () => {
         const banner = await screen.findByTestId('return-items-modal-select-error')
         expect(banner).toBeInTheDocument()
         // Generic "quantities changed" copy (the API does not name specific items).
-        expect(banner).toHaveTextContent(/available return quantities changed/i)
+        expect(banner).toHaveTextContent(/available return quantities for some items changed/i)
         // Still on the select view (item checkboxes visible), not the terminal banner.
         expect(screen.queryByText(/unable to submit return/i)).not.toBeInTheDocument()
     })
@@ -1087,7 +1087,7 @@ describe('Item-level return error states', () => {
         await user.click(submit)
 
         const banner = await screen.findByTestId('return-items-modal-terminal-error')
-        expect(banner).toHaveTextContent(/we could not find this order/i)
+        expect(banner).toHaveTextContent(/we can't find this order/i)
         // No recovery link — the shopper closes the modal to dismiss the banner.
         expect(screen.queryByTestId('return-items-modal-terminal-link')).not.toBeInTheDocument()
     })
