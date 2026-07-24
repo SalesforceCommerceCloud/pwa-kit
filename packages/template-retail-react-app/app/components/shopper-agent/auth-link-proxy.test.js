@@ -12,7 +12,7 @@ import {
     isTrustedSalesforceDomain,
     callAuthLinkProxy,
     AUTH_LINK_PROXY_PATH
-} from './auth-link-proxy'
+} from '@salesforce/retail-react-app/app/components/shopper-agent/auth-link-proxy'
 
 // The module only consumes getSiteId from the runtime cookie-config helper.
 jest.mock('@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config', () => ({
@@ -91,7 +91,9 @@ describe('auth-link-proxy', () => {
 
         it('returns null when the payload segment is not valid JSON', () => {
             const badPayload = Buffer.from('not-json').toString('base64url')
-            expect(extractApiVersionFromJWT(`${encode({alg: 'none'})}.${badPayload}.sig`)).toBeNull()
+            expect(
+                extractApiVersionFromJWT(`${encode({alg: 'none'})}.${badPayload}.sig`)
+            ).toBeNull()
         })
     })
 
@@ -586,9 +588,9 @@ describe('auth-link-proxy', () => {
                 json: async () => ({error: 'MISSING_COMMERCE_CLIENT_JWT'})
             })
 
-            await expect(
-                callAuthLinkProxy({commerceClientJWT: V2_JWT})
-            ).rejects.toThrow('MISSING_COMMERCE_CLIENT_JWT')
+            await expect(callAuthLinkProxy({commerceClientJWT: V2_JWT})).rejects.toThrow(
+                'MISSING_COMMERCE_CLIENT_JWT'
+            )
         })
     })
 })

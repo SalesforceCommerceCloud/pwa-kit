@@ -5,10 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {
-    getSiteId
-} from '@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config'
-
 /* -------------------------------------------------------------------------
  * Auth Link Proxy — calls SCRT's `/iamessage/api/v2/authorization/authlink` from PWA Kit.
  *
@@ -249,9 +245,6 @@ export async function handleAuthLinkProxy(req, res) {
         }
         // If no Origin/Referer header, allow (same-origin POSTs from some browsers/tools)
 
-        // Read siteId from x-site-id header using official helper
-        const siteId = getSiteId(req)
-
         // Resolve the SCRT2 origin from COMMERCE_AGENT_SETTINGS.scrt2Url.
         // NOTE: this is intentionally NOT AGENT_MYDOMAIN — the auth link endpoint
         // (/iamessage/*) lives on SCRT2 (*.salesforce-scrt.com), a different host
@@ -384,9 +377,7 @@ export const callAuthLinkProxy = async ({commerceClientJWT, siteId}) => {
     }
 
     if (!res.ok) {
-        throw new Error(
-            `Auth link proxy failed: ${responseBody?.error || `HTTP_${res.status}`}`
-        )
+        throw new Error(`Auth link proxy failed: ${responseBody?.error || `HTTP_${res.status}`}`)
     }
 
     return responseBody
