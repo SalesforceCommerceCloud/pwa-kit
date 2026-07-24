@@ -45,7 +45,7 @@ const options = {
     mobify: config,
 
     // The port that the local dev server listens on
-    port: 3001,
+    port: 3000,
 
     // The protocol on which the development Express app listens.
     // Set DEV_SERVER_PROTOCOL to 'https' for HTTPS; defaults to 'http' when unset.
@@ -62,7 +62,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: true,
+    useSLASPrivateClient: false,
 
     // To extend the SLAS private-client proxy allow-list, supply
     // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
