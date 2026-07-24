@@ -10,7 +10,7 @@ import {
 } from '@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config'
 
 /* -------------------------------------------------------------------------
- * Auth Link Proxy — calls SCRT's `/iamessage/v1/authorization/authlink` from PWA Kit.
+ * Auth Link Proxy — calls SCRT's `/iamessage/api/v2/authorization/authlink` from PWA Kit.
  *
  * This module provides a same-origin proxy for Commerce Client to retrieve auth link keys
  * from SCRT, since `window.embeddedservice_bootstrap.userVerificationAPI.getAuthLinkKey`
@@ -23,8 +23,8 @@ import {
  * the browser-side helper `callAuthLinkProxy` from here.
  *
  * Flow:
- *   1. Browser: Commerce Client widget opens (cimulate:ui-state-update event)
- *      - Extract Commerce Client JWT from localStorage (*_WEB_STORAGE key)
+ *   1. Browser: Commerce Client widget is ready (onCimulateWidgetReady event)
+ *      - Extract Commerce Client JWT from the cim_af_ct_* storage key
  *      - Send commerce_client_jwt in request body to /api/agent/authlink
  *      - Send siteId as x-site-id header
  *   2. Server route (registerAuthLinkRoute, mounted in app/ssr.js):
@@ -38,7 +38,7 @@ import {
  *   4. Browser then calls the existing Token Bridge proxy with auth_link_key
  *
  * IMPORTANT: This endpoint uses the Commerce Client JWT, NOT the SLAS token.
- * The Commerce Client JWT is extracted from the *_WEB_STORAGE localStorage key
+ * The Commerce Client JWT is extracted from the cim_af_ct_* storage key
  * which is set by the Commerce Client widget itself.
  *
  * SCRT2 host resolution: the auth link endpoint (/iamessage/*) is served by
@@ -53,29 +53,23 @@ export const AUTH_LINK_PROXY_PATH = '/api/agent/authlink'
 /**
  * SCRT auth link endpoint path.
  *
- * IMPORTANT: AuthLink is a **v1 INTERNAL** API and is defined at exactly ONE
- * path — there is no v2 authlink endpoint. Confirmed against SCRT source
- * (`scrt2-ia-message-service`):
- *   - `miaw_internal_v1.yaml` defines GET `/v1/authorization/authlink`
- *     (operationId `initAuthLink`); `miaw_public_v2.yaml` has NO authlink.
- *   - `AuthorizationHandler.initAuthLink()` hardcodes `ApiVersion.V1` +
- *     `Scope.INTERNAL`, then validates the presented JWT's `apiVersion`
- *     against V1 (`BaseRequestWithAuthorization.validateJwtAllowedToUseApi`).
+ * AuthLink is served by the **v2** IA-message API. The presented JWT must be
+ * minted for the same version: the Commerce Client (Cimulate) widget stores a
+ * v2 public continuation token, which is what this endpoint expects.
  *
- * A JWT minted for a different version (e.g. a v2 *public* access token) is
- * rejected with HTTP 401 `JWT_VALID_NOT_AUTHORIZED_TO_API` (error 900020):
+ * If a JWT minted for a different version is presented, SCRT rejects it with
+ * HTTP 401 `JWT_VALID_NOT_AUTHORIZED_TO_API` (error 900020):
  *   "JWT is valid, but not issued with correct version of the end point.
  *    Please use the correct version of the end point."
  *
- * So the path is fixed at v1; the fix for that 401 is to present a
- * v1-internal token, NOT to change this path (a v2 path 404s — it does not
- * exist).
+ * The fix for that 401 is to present a token minted for this endpoint's
+ * version (v2), NOT to change this path.
  */
 const SCRT_AUTHLINK_PATH = '/iamessage/api/v2/authorization/authlink'
 
 /**
- * The `apiVersion` the (v1-internal) authlink endpoint requires the presented
- * JWT to carry. Used only for a diagnostic warning — see handleAuthLinkProxy.
+ * The `apiVersion` the authlink endpoint requires the presented JWT to carry.
+ * Used only for a diagnostic warning — see handleAuthLinkProxy.
  */
 const REQUIRED_JWT_API_VERSION = 'v2'
 
@@ -83,8 +77,7 @@ const REQUIRED_JWT_API_VERSION = 'v2'
  * Extract the SCRT API version (e.g. "v1"/"v2") from a Commerce Client JWT's
  * `apiVersion` claim, WITHOUT verifying the signature (SCRT verifies it).
  *
- * This is used purely for DIAGNOSTICS: authlink requires a v1 token, and the
- * Commerce Client widget currently stores a v2 public access token, so logging
+ * This is used purely for DIAGNOSTICS: authlink requires a v2 token, so logging
  * the token's version turns an otherwise-cryptic upstream 401 into an
  * actionable message. The value is NOT interpolated into the request URL.
  *
@@ -187,26 +180,22 @@ export function isTrustedSalesforceDomain(myDomain) {
 /**
  * Express handler for POST /api/agent/authlink.
  *
- * Retrieves auth_link_key from SCRT's /iamessage/v1/authorization/authlink endpoint
- * (authlink is a v1-internal API; there is no v2 authlink endpoint).
- * Uses Commerce Client JWT (from *_WEB_STORAGE localStorage) for authorization.
+ * Retrieves auth_link_key from SCRT's /iamessage/api/v2/authorization/authlink
+ * endpoint. Uses Commerce Client JWT (from the cim_af_ct_* storage key) for
+ * authorization.
  *
  * Request:
  *   Headers:
  *     x-site-id: <siteId> (optional)
  *   Body:
  *     {
- *       "commerce_client_jwt": "<jwt_from_web_storage>",
- *       "conversation_id": "<from cim_af_conv_* session storage>" (optional)
+ *       "commerce_client_jwt": "<jwt_from_cim_af_ct_storage>"
  *     }
- *
- * When present, `conversation_id` is appended to the SCRT URL as
- * `?conversationId=<value>` (percent-encoded via URL/searchParams).
  *
  * Response:
  *   The SCRT status code is forwarded verbatim, and the SCRT URL that was
  *   actually called is echoed back as `scrt_url` for debugging.
- *   Success: { "auth_link_key": "...", "scrt_url": "https://<scrt2>/iamessage/v1/authorization/authlink?conversationId=..." }
+ *   Success: { "auth_link_key": "...", "scrt_url": "https://<scrt2>/iamessage/api/v2/authorization/authlink" }
  *   SCRT error (object body): { <scrt error fields>, "scrt_url": "..." }
  *   SCRT error (non-object body): { "scrt_url": "...", "upstream_body": <body|null> }
  *   Pre-flight error (no SCRT call): { "error": "ERROR_CODE" }
@@ -216,8 +205,7 @@ export function isTrustedSalesforceDomain(myDomain) {
  */
 export async function handleAuthLinkProxy(req, res) {
     try {
-        const {commerce_client_jwt: commerceClientJWT, conversation_id: conversationId} =
-            req.body || {}
+        const {commerce_client_jwt: commerceClientJWT} = req.body || {}
 
         // Validate that Commerce Client JWT is provided
         if (!commerceClientJWT || typeof commerceClientJWT !== 'string') {
@@ -287,9 +275,8 @@ export async function handleAuthLinkProxy(req, res) {
             return res.status(400).json({error: 'UNTRUSTED_SCRT2_URL'})
         }
 
-        // Diagnostic only: authlink is a v1-internal API. If the presented JWT
-        // was minted for a different version (the Commerce Client widget stores
-        // a v2 *public* access token), SCRT will reject it with a 401
+        // Diagnostic only: authlink is served by the v2 API. If the presented
+        // JWT was minted for a different version, SCRT will reject it with a 401
         // version-mismatch (error 900020). Surface that as an actionable log
         // line rather than letting the upstream 401 look like a bad token.
         const jwtApiVersion = extractApiVersionFromJWT(commerceClientJWT)
@@ -297,24 +284,14 @@ export async function handleAuthLinkProxy(req, res) {
             console.warn(
                 '[auth-link-proxy] Presented JWT apiVersion does not match the authlink ' +
                     'endpoint version — SCRT will likely return a 401 version-mismatch (900020). ' +
-                    'AuthLink requires a v1-internal token.',
+                    'AuthLink requires a v2 token.',
                 {jwtApiVersion, requiredApiVersion: REQUIRED_JWT_API_VERSION}
             )
         }
 
         // Call SCRT's auth link endpoint with the Commerce Client JWT.
-        // The path is fixed at v1 — authlink has no v2 endpoint (see
-        // SCRT_AUTHLINK_PATH). Do NOT derive the version from the JWT: a v2 path
-        // does not exist and would 404.
-        //
-        // The conversationId (from the `cim_af_conv_*` session-storage key) is
-        // appended as a `?conversationId=` query param. Built via URL/searchParams
-        // so the value is safely percent-encoded (no query injection).
-        const scrtUrl = new URL(`${scrt2Url}${SCRT_AUTHLINK_PATH}`)
-        // if (conversationId && typeof conversationId === 'string' && conversationId.trim()) {
-        //     scrtUrl.searchParams.set('conversationId', conversationId.trim())
-        // }
-        const scrtRequestUrl = scrtUrl.toString()
+        // The path is fixed at v2 (see SCRT_AUTHLINK_PATH).
+        const scrtRequestUrl = `${scrt2Url}${SCRT_AUTHLINK_PATH}`
         const scrtResponse = await fetch(scrtRequestUrl, {
             method: 'GET',
             headers: {
@@ -368,28 +345,20 @@ export function registerAuthLinkRoute(app) {
 /**
  * Browser helper: POSTs to the same-origin proxy and returns SCRT's auth_link_key.
  *
- * Uses the Commerce Client JWT (extracted from *_WEB_STORAGE localStorage key)
+ * Uses the Commerce Client JWT (extracted from the cim_af_ct_* storage key)
  * to authenticate with SCRT's authlink endpoint.
  *
  * The SCRT2 origin is derived server-side from scrt2Url in the
  * COMMERCE_AGENT_SETTINGS environment variable.
  *
  * @param {Object} options - Request options
- * @param {string} options.commerceClientJWT - Commerce Client JWT from *_WEB_STORAGE (required)
- * @param {string} [options.conversationId] - Conversation id (from the `cim_af_conv_*`
- *   session-storage key); forwarded so the proxy can add it to the SCRT URL as
- *   `?conversationId=`
+ * @param {string} options.commerceClientJWT - Commerce Client JWT from the cim_af_ct_* storage key (required)
  * @param {string} [options.siteId] - Site ID sent as x-site-id header
  * @returns {Promise<Object>} Promise that resolves to { auth_link_key: "..." }
  */
-export const callAuthLinkProxy = async ({commerceClientJWT, conversationId, siteId}) => {
+export const callAuthLinkProxy = async ({commerceClientJWT, siteId}) => {
     const requestBody = {
         commerce_client_jwt: commerceClientJWT
-    }
-
-    // Forward the conversationId so the server can append it to the SCRT URL.
-    if (conversationId) {
-        requestBody.conversation_id = conversationId
     }
 
     const headers = {

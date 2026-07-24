@@ -222,10 +222,9 @@ describe('auth-link-proxy', () => {
             }
         })
 
-        it('retrieves the auth link key, calling SCRT at the fixed v1 authlink path', async () => {
-            // authlink is v1-internal only; the path is fixed regardless of the
-            // JWT (this beforeEach presents a v2 JWT — SCRT would 401 it in real
-            // life, but the proxy must still target the v1 path, never a v2 one).
+        it('retrieves the auth link key, calling SCRT at the fixed v2 authlink path', async () => {
+            // authlink is served by the v2 API; the path is fixed regardless of
+            // the JWT (this beforeEach presents a v2 JWT, which matches).
             mockFetch.mockResolvedValue({
                 ok: true,
                 status: 200,
@@ -235,7 +234,7 @@ describe('auth-link-proxy', () => {
             await handleAuthLinkProxy(req, res)
 
             expect(mockFetch).toHaveBeenCalledWith(
-                `${TRUSTED_SCRT2_URL}/iamessage/v1/authorization/authlink`,
+                `${TRUSTED_SCRT2_URL}/iamessage/api/v2/authorization/authlink`,
                 {
                     method: 'GET',
                     headers: {Authorization: `Bearer ${V2_JWT}`}
@@ -246,13 +245,13 @@ describe('auth-link-proxy', () => {
             // alongside SCRT's own body.
             expect(res.json).toHaveBeenCalledWith({
                 auth_link_key: 'test-auth-link-key',
-                scrt_url: `${TRUSTED_SCRT2_URL}/iamessage/v1/authorization/authlink`
+                scrt_url: `${TRUSTED_SCRT2_URL}/iamessage/api/v2/authorization/authlink`
             })
         })
 
-        it('always targets the v1 path — never derives a v2 path from the JWT', async () => {
-            // Regression guard for the reverted bug: a v2 JWT must NOT produce a
-            // /iamessage/v2/... request (that endpoint does not exist -> 404).
+        it('always targets the fixed v2 path — never derives the version from the JWT', async () => {
+            // Regression guard: the path is hardcoded (SCRT_AUTHLINK_PATH) and
+            // must not be derived from the presented JWT's apiVersion claim.
             mockFetch.mockResolvedValue({
                 ok: true,
                 status: 200,
@@ -262,87 +261,33 @@ describe('auth-link-proxy', () => {
             await handleAuthLinkProxy(req, res)
 
             const calledUrl = mockFetch.mock.calls[0][0]
-            expect(calledUrl).toBe(`${TRUSTED_SCRT2_URL}/iamessage/v1/authorization/authlink`)
-            expect(calledUrl).not.toContain('/iamessage/v2/')
+            expect(calledUrl).toBe(`${TRUSTED_SCRT2_URL}/iamessage/api/v2/authorization/authlink`)
         })
 
-        describe('conversationId query param', () => {
-            it('appends conversationId to the SCRT URL when provided', async () => {
-                req.body = {
-                    commerce_client_jwt: V2_JWT,
-                    conversation_id: '3d55ae6f-9775-426e-a7d0-192b197d08d8'
-                }
-                mockFetch.mockResolvedValue({
-                    ok: true,
-                    status: 200,
-                    json: async () => ({auth_link_key: 'k'})
-                })
-
-                await handleAuthLinkProxy(req, res)
-
-                const expectedUrl =
-                    `${TRUSTED_SCRT2_URL}/iamessage/v1/authorization/authlink` +
-                    '?conversationId=3d55ae6f-9775-426e-a7d0-192b197d08d8'
-                expect(mockFetch).toHaveBeenCalledWith(
-                    expectedUrl,
-                    expect.objectContaining({method: 'GET'})
-                )
-                // scrt_url in the response reflects the query param too.
-                expect(res.json).toHaveBeenCalledWith({
-                    auth_link_key: 'k',
-                    scrt_url: expectedUrl
-                })
+        it('ignores conversation_id in the body — it never reaches the SCRT URL', async () => {
+            // conversation_id is no longer part of the authlink flow. A stray
+            // value in the request body must be dropped, not forwarded to SCRT.
+            req.body = {
+                commerce_client_jwt: V2_JWT,
+                conversation_id: '3d55ae6f-9775-426e-a7d0-192b197d08d8'
+            }
+            mockFetch.mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: async () => ({auth_link_key: 'k'})
             })
 
-            it('omits the query param when conversation_id is absent', async () => {
-                // beforeEach body has no conversation_id.
-                mockFetch.mockResolvedValue({
-                    ok: true,
-                    status: 200,
-                    json: async () => ({auth_link_key: 'k'})
-                })
+            await handleAuthLinkProxy(req, res)
 
-                await handleAuthLinkProxy(req, res)
-
-                const calledUrl = mockFetch.mock.calls[0][0]
-                expect(calledUrl).toBe(`${TRUSTED_SCRT2_URL}/iamessage/v1/authorization/authlink`)
-                expect(calledUrl).not.toContain('conversationId')
-            })
-
-            it('omits the query param when conversation_id is blank/whitespace', async () => {
-                req.body = {commerce_client_jwt: V2_JWT, conversation_id: '   '}
-                mockFetch.mockResolvedValue({
-                    ok: true,
-                    status: 200,
-                    json: async () => ({auth_link_key: 'k'})
-                })
-
-                await handleAuthLinkProxy(req, res)
-
-                const calledUrl = mockFetch.mock.calls[0][0]
-                expect(calledUrl).not.toContain('conversationId')
-            })
-
-            it('percent-encodes a conversationId containing URL-unsafe characters', async () => {
-                req.body = {commerce_client_jwt: V2_JWT, conversation_id: 'a b&c=d'}
-                mockFetch.mockResolvedValue({
-                    ok: true,
-                    status: 200,
-                    json: async () => ({auth_link_key: 'k'})
-                })
-
-                await handleAuthLinkProxy(req, res)
-
-                const calledUrl = mockFetch.mock.calls[0][0]
-                // No raw '&' or '=' from the value leaks into the query string.
-                expect(calledUrl).toContain('conversationId=a+b%26c%3Dd')
-                expect(calledUrl).not.toContain('a b&c=d')
-            })
+            const calledUrl = mockFetch.mock.calls[0][0]
+            expect(calledUrl).toBe(`${TRUSTED_SCRT2_URL}/iamessage/api/v2/authorization/authlink`)
+            expect(calledUrl).not.toContain('conversationId')
         })
 
-        it('warns when the presented JWT version will not match the v1 authlink endpoint', async () => {
+        it('warns when the presented JWT version will not match the v2 authlink endpoint', async () => {
             const consoleSpy = jest.spyOn(console, 'warn').mockImplementation()
-            // beforeEach already sets a v2 JWT in req.body.
+            // Present a v1 JWT — authlink requires v2, so this should warn.
+            req.body = {commerce_client_jwt: V1_JWT}
             mockFetch.mockResolvedValue({
                 ok: false,
                 status: 401,
@@ -353,14 +298,14 @@ describe('auth-link-proxy', () => {
 
             expect(consoleSpy).toHaveBeenCalledWith(
                 expect.stringContaining('does not match the authlink'),
-                expect.objectContaining({jwtApiVersion: 'v2', requiredApiVersion: 'v1'})
+                expect.objectContaining({jwtApiVersion: 'v1', requiredApiVersion: 'v2'})
             )
             consoleSpy.mockRestore()
         })
 
-        it('does not warn when the presented JWT is already v1', async () => {
+        it('does not warn when the presented JWT is already v2', async () => {
             const consoleSpy = jest.spyOn(console, 'warn').mockImplementation()
-            req.body = {commerce_client_jwt: V1_JWT}
+            // beforeEach already sets a v2 JWT in req.body.
             mockFetch.mockResolvedValue({
                 ok: true,
                 status: 200,
@@ -482,7 +427,7 @@ describe('auth-link-proxy', () => {
         })
 
         describe('SCRT endpoint errors are forwarded verbatim (with scrt_url echoed)', () => {
-            const SCRT_URL = `${TRUSTED_SCRT2_URL}/iamessage/v1/authorization/authlink`
+            const SCRT_URL = `${TRUSTED_SCRT2_URL}/iamessage/api/v2/authorization/authlink`
 
             it('forwards a 401 Unauthorized from SCRT, adding scrt_url', async () => {
                 mockFetch.mockResolvedValue({
@@ -620,36 +565,17 @@ describe('auth-link-proxy', () => {
             expect(JSON.parse(opts.body)).toEqual({commerce_client_jwt: V2_JWT})
         })
 
-        it('forwards conversationId as conversation_id in the POST body', async () => {
+        it('never includes conversation_id in the POST body', async () => {
             mockFetch.mockResolvedValue({
                 ok: true,
                 status: 200,
                 json: async () => ({auth_link_key: 'k'})
             })
 
-            await callAuthLinkProxy({
-                commerceClientJWT: V2_JWT,
-                conversationId: 'ee051d12-0a3b-4858-a3e6-57abf2fe7b72',
-                siteId: 'RefArch'
-            })
+            await callAuthLinkProxy({commerceClientJWT: V2_JWT, siteId: 'RefArch'})
 
             const sentBody = JSON.parse(mockFetch.mock.calls[0][1].body)
-            expect(sentBody).toEqual({
-                commerce_client_jwt: V2_JWT,
-                conversation_id: 'ee051d12-0a3b-4858-a3e6-57abf2fe7b72'
-            })
-        })
-
-        it('omits conversation_id from the body when conversationId is not provided', async () => {
-            mockFetch.mockResolvedValue({
-                ok: true,
-                status: 200,
-                json: async () => ({auth_link_key: 'k'})
-            })
-
-            await callAuthLinkProxy({commerceClientJWT: V2_JWT})
-
-            const sentBody = JSON.parse(mockFetch.mock.calls[0][1].body)
+            expect(sentBody).toEqual({commerce_client_jwt: V2_JWT})
             expect(sentBody).not.toHaveProperty('conversation_id')
         })
 
