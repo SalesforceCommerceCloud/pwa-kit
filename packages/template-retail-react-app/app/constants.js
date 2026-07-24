@@ -290,12 +290,19 @@ export const SETUP_FUTURE_USAGE = {
 export const DEFAULT_COMMERCE_CLIENT_ELEMENT_ID = 'commerce-client-messaging-widget'
 
 /**
- * Base URL of the Cimulate CDN that hosts the Commerce Client messaging bundle.
- * The `cc_cdnVersion` field in `COMMERCE_AGENT_SETTINGS` is interpolated into the
- * full bundle URL as `${COMMERCE_CLIENT_CDN_BASE_URL}/<version>/messaging.umd.js`.
- * Set `commerceClientScriptSourceUrl` to override this entirely (local dev / self-hosting).
+ * Base URL of the Cimulate CDN hosting the Commerce Client messaging bundle.
+ * `cc_cdnVersion` is interpolated as `${COMMERCE_CLIENT_CDN_BASE_URL}/<version>/messaging.umd.js`;
+ * `commerceClientScriptSourceUrl` overrides it entirely (local dev / self-hosting).
  */
 export const COMMERCE_CLIENT_CDN_BASE_URL = 'https://cdn.search.cimulate.ai/copilot-widget'
+
+/**
+ * Window event the Commerce Client widget dispatches on every UI state change,
+ * with `detail` of `{property, value}` (e.g. `{property: 'isOpen', value: true}`).
+ * It fires regardless of source — our `toggleWidgetOpen` calls and the panel's own
+ * close/minimize buttons alike — so it is the reliable signal for panel open-state.
+ */
+export const COMMERCE_CLIENT_UI_STATE_EVENT = 'cimulate:ui-state-update'
 
 /**
  * Default Embedded Messaging capabilities version forwarded to the Commerce Client

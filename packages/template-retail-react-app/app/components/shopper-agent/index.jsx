@@ -626,13 +626,9 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         cc_routingAttributes
     } = commerceAgentConfiguration
 
-    // Resolve the bundle URL from cc_cdnVersion (or an explicit override) and load the
-    // Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging
+    // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
     const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
 
-    // When cc_dialogFullHeight is 'true' the widget is rendered as a full-height
-    // side panel docked to the configured corner, using the widget's built-in
-    // full-height + width options. Otherwise it renders as a standard corner dialog.
     const isFullHeight = cc_dialogFullHeight === 'true'
 
     const widgetOptions = useMemo(

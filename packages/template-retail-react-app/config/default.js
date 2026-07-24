@@ -61,6 +61,10 @@ module.exports = {
             // Corner the widget docks to: 'bottom-left' or 'bottom-right' (default).
             // Forwarded to the widget as `dialogPosition`.
             cc_widgetPosition: 'bottom-right',
+            // When 'true', storefront content shifts aside for the open side panel
+            // instead of being overlaid by it. Handled template-side by
+            // useCommerceClientPagePush; needs cc_dialogFullHeight 'true' and `lg`+ width.
+            cc_pagePush: 'false',
             // Optional URL of a logo shown in the widget, forwarded as `logoUrl`.
             cc_logoUrl: '',
             // When 'true', the widget opens automatically as the page loads. Forwarded
