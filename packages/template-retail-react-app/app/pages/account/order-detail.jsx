@@ -439,12 +439,12 @@ const AccountOrderDetail = () => {
     // from the adjacent Cancelled badge, so it intentionally carries no hint.
     const cancelDisabledHint = cancelTerminal
         ? formatMessage({
-              defaultMessage: 'This order can no longer be cancelled.',
+              defaultMessage: 'This order can no longer be canceled.',
               id: 'account_order_detail.hint.cancel_unavailable'
           })
         : !canCancel
         ? formatMessage({
-              defaultMessage: 'This order is not eligible for cancellation.',
+              defaultMessage: "This order isn't eligible for cancellation.",
               id: 'account_order_detail.hint.not_cancellable'
           })
         : null

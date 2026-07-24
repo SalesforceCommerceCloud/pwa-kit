@@ -180,7 +180,7 @@
     "defaultMessage": "Tracking"
   },
   "account_order_detail.hint.cancel_unavailable": {
-    "defaultMessage": "This order can no longer be cancelled."
+    "defaultMessage": "This order can no longer be canceled."
   },
   "account_order_detail.hint.no_returnable_items": {
     "defaultMessage": "No items on this order are available to return."
@@ -189,7 +189,7 @@
     "defaultMessage": "Tracking is not available for this order yet."
   },
   "account_order_detail.hint.not_cancellable": {
-    "defaultMessage": "This order is not eligible for cancellation."
+    "defaultMessage": "This order isn't eligible for cancellation."
   },
   "account_order_detail.hint.return_unavailable": {
     "defaultMessage": "This order can no longer be returned."
@@ -1893,7 +1893,7 @@
     "defaultMessage": "Up to {count, plural, one {# unit} other {# units}} available to return"
   },
   "return_items_modal.text.quantity_exceeded_affected_generic": {
-    "defaultMessage": "Some items' available return quantities changed. Please review the updated limits below."
+    "defaultMessage": "The available return quantities for some items changed. Review the updated limits."
   },
   "return_items_modal.text.review_description": {
     "defaultMessage": "Confirm the items below. We'll email a return label once your request is submitted."
@@ -1911,22 +1911,22 @@
     "defaultMessage": "We couldn't submit your return. Your return wasn't processed. Please wait a moment and try again."
   },
   "return_items_modal.text.submit_error_invalid_reason": {
-    "defaultMessage": "The selected reason is no longer available. Please choose another."
+    "defaultMessage": "The selected reason is no longer available. Choose another reason."
   },
   "return_items_modal.text.submit_error_network": {
-    "defaultMessage": "We're unable to process your request right now. Please try again in a few minutes."
+    "defaultMessage": "We're unable to process your request right now. Try again in a few minutes."
   },
   "return_items_modal.text.submit_error_unknown_items": {
-    "defaultMessage": "One or more items couldn't be found on this order. Please refresh and try again."
+    "defaultMessage": "We can't find one or more items on this order. Refresh and try again."
   },
   "return_items_modal.text.terminal_error_conflict": {
-    "defaultMessage": "This order can't be returned at this time. Please reach out to the merchant."
+    "defaultMessage": "This order can't be returned at this time. Reach out to the merchant."
   },
   "return_items_modal.text.terminal_error_not_found": {
-    "defaultMessage": "We could not find this order."
+    "defaultMessage": "We can't find this order."
   },
   "return_items_modal.text.terminal_error_title": {
-    "defaultMessage": "Unable to submit return"
+    "defaultMessage": "We're unable to submit this return."
   },
   "search.action.cancel": {
     "defaultMessage": "Cancel"

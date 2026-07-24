@@ -383,7 +383,7 @@ test('notFound terminal error shows a no-link banner and disables Submit', async
     await user.click(screen.getByTestId('return-items-modal-review'))
     const banner = await screen.findByTestId('return-items-modal-terminal-error')
     expect(banner).toHaveAttribute('role', 'alert')
-    expect(within(banner).getByText(/could not find this order/i)).toBeInTheDocument()
+    expect(within(banner).getByText(/can't find this order/i)).toBeInTheDocument()
     // No recovery link — the shopper closes the modal — and Submit is disabled.
     expect(screen.queryByTestId('return-items-modal-terminal-link')).not.toBeInTheDocument()
     expect(screen.getByTestId('return-items-modal-submit')).toBeDisabled()
@@ -417,7 +417,9 @@ test('quantityExceeded error drops to the select view and shows the quantity-cha
     const banner = screen.getByTestId('return-items-modal-select-error')
     expect(banner).toHaveAttribute('role', 'alert')
     // Generic "quantities changed" copy (the API does not name specific items).
-    expect(within(banner).getByText(/available return quantities changed/i)).toBeInTheDocument()
+    expect(
+        within(banner).getByText(/available return quantities for some items changed/i)
+    ).toBeInTheDocument()
     // No inline review-view error in this state.
     expect(screen.queryByTestId('return-items-modal-submit-error')).not.toBeInTheDocument()
 })
@@ -430,7 +432,9 @@ test('unknownItems error drops to the select view with a refresh-and-try-again b
         />
     )
     const banner = await screen.findByTestId('return-items-modal-select-error')
-    expect(within(banner).getByText(/couldn't be found on this order/i)).toBeInTheDocument()
+    expect(
+        within(banner).getByText(/can't find one or more items on this order/i)
+    ).toBeInTheDocument()
 })
 
 test('invalidReason error shows the select-view banner and refetches OMS reasons', async () => {
