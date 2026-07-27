@@ -1,4 +1,5 @@
 ## v10.2.0-dev (Jul 13, 2026)
+- [Feature] Add guest order access Express endpoints (POST /api/order-access/verify, GET /api/order-access/order) and app.guestOrderAccess config block (disabled by default). Requires ECOM 26.8 and allowCookies/MRT_ALLOW_COOKIES.
 - [Feature] Add flag-gated /order-access, /order-access/verify, /order-access/order routes and "Find Your Order" footer link (guestOrderAccess.enabled, off by default). Authenticated users redirected to /account/orders.
 - [Bugfix] Render in-progress return states (Return Initiated / Partial Return Initiated) in the order status badge with the info/blue color scheme, matching the Storefront-Next order-management badge mapping. Terminal returns (Return Complete / Partial Return Complete) remain neutral gray.
 - Bump `vendor.js` bundle-size budget from 398 kB to 400 kB to accommodate the graceful invalid-JWT handling added in `commerce-sdk-react`.
