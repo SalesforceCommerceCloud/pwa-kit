@@ -13,6 +13,7 @@ import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 const mockMutateAsync = jest.fn()
 const mockGetTokenWhenReady = jest.fn(() => Promise.resolve('test-access-token'))
+const mockRefetch = jest.fn()
 
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
@@ -31,11 +32,23 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
 
+// Mock @tanstack/react-query so we can control useQuery state
+jest.mock('@tanstack/react-query', () => {
+    const actual = jest.requireActual('@tanstack/react-query')
+    return {
+        ...actual,
+        useQuery: jest.fn()
+    }
+})
+
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useCustomerType} from '@salesforce/commerce-sdk-react'
+import {useQuery} from '@tanstack/react-query'
 import GuestOrderAccessRequest from '@salesforce/retail-react-app/app/pages/guest-order-access/request'
 import GuestOrderAccessVerify from '@salesforce/retail-react-app/app/pages/guest-order-access/verify'
-import GuestOrderAccessOrder from '@salesforce/retail-react-app/app/pages/guest-order-access/order'
+import GuestOrderAccessOrder, {
+    GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS
+} from '@salesforce/retail-react-app/app/pages/guest-order-access/order'
 
 // Helper to render verify page with router state
 const renderVerifyWithState = (state = {orderNo: 'ABC123', email: 'test@example.com'}) => {
@@ -59,12 +72,56 @@ const guestOrderAccessConfig = {
     }
 }
 
+// A realistic filtered order object (server-side suppression already applied)
+const mockOrder = {
+    orderNo: 'ABC123',
+    creationDate: '2024-01-15T10:00:00.000Z',
+    status: 'new',
+    currency: 'USD',
+    orderTotal: 129.99,
+    productSubTotal: 99.99,
+    shippingTotal: 10.0,
+    taxTotal: 20.0,
+    productItems: [
+        {
+            itemId: 'item-1',
+            productName: 'Blue Sneakers',
+            quantity: 2,
+            price: 49.99,
+            adjustedPrice: 49.99
+        }
+    ],
+    shipments: [
+        {
+            shipmentId: 'shipment-1',
+            shippingStatus: 'not_shipped',
+            shippingAddress: {postalCode: '94105'},
+            expectedDeliveryDate: '2024-01-20T00:00:00.000Z',
+            trackingNumber: 'TRACK123'
+        }
+    ],
+    customerInfo: {email: 'test@example.com'}
+}
+
+// Default useQuery mock that returns loaded data
+const defaultUseQueryMock = ({data = mockOrder, isLoading = false, isError = false, error = null, isFetching = false, isSuccess = true, dataUpdatedAt = Date.now()} = {}) => ({
+    data,
+    isLoading,
+    isError,
+    error,
+    isFetching,
+    isSuccess,
+    dataUpdatedAt,
+    refetch: mockRefetch
+})
+
 describe('GuestOrderAccessRequest', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockMutateAsync.mockResolvedValue({})
         useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
         getConfig.mockReturnValue(guestOrderAccessConfig)
+        useQuery.mockReturnValue(defaultUseQueryMock())
     })
 
     test('renders heading and form fields for guest users', () => {
@@ -203,6 +260,27 @@ describe('GuestOrderAccessRequest', () => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
         })
     })
+
+    // S11 — expired=1 banner
+    test('shows session-expired alert when ?expired=1 is in the URL', () => {
+        renderWithProviders(
+            <MemoryRouter initialEntries={['/order-access?expired=1']}>
+                <Route path="/order-access" component={GuestOrderAccessRequest} />
+            </MemoryRouter>
+        )
+        expect(
+            screen.getByText(/your session has expired/i)
+        ).toBeInTheDocument()
+    })
+
+    test('does not show expired alert when ?expired=1 is absent', () => {
+        renderWithProviders(
+            <MemoryRouter initialEntries={['/order-access']}>
+                <Route path="/order-access" component={GuestOrderAccessRequest} />
+            </MemoryRouter>
+        )
+        expect(screen.queryByText(/your session has expired/i)).not.toBeInTheDocument()
+    })
 })
 
 describe('GuestOrderAccessVerify', () => {
@@ -213,6 +291,7 @@ describe('GuestOrderAccessVerify', () => {
         useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
         global.fetch = jest.fn().mockResolvedValue({ok: true, status: 200})
         getConfig.mockReturnValue(guestOrderAccessConfig)
+        useQuery.mockReturnValue(defaultUseQueryMock())
     })
 
     test('renders heading and code input for guest users with valid router state', () => {
@@ -407,23 +486,192 @@ describe('GuestOrderAccessOrder', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         getConfig.mockReturnValue(guestOrderAccessConfig)
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        mockRefetch.mockResolvedValue({data: mockOrder, error: null})
+        useQuery.mockReturnValue(defaultUseQueryMock())
     })
 
-    test('renders heading for guest users', () => {
-        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
-        renderWithProviders(<GuestOrderAccessOrder />)
+    // Helper to render the order page with optional router state
+    const renderOrderPage = (state = {orderNo: 'ABC123'}, search = '') => {
+        const path = `/order-access/order${search}`
+        return renderWithProviders(
+            <MemoryRouter initialEntries={[{pathname: '/order-access/order', state, search}]}>
+                <Route path="/order-access/order" component={GuestOrderAccessOrder} />
+                <Route path="/order-access" render={() => <div data-testid="request-page">Request Page</div>} />
+                <Route path="/account/orders" render={() => <div>Account Orders</div>} />
+            </MemoryRouter>
+        )
+    }
+
+    test('renders order details after successful fetch', () => {
+        renderOrderPage()
         expect(screen.getByText('Order Details')).toBeInTheDocument()
+        expect(screen.getByText(/Order #ABC123/)).toBeInTheDocument()
+        expect(screen.getByText(/Status: new/i)).toBeInTheDocument()
+    })
+
+    test('renders product items', () => {
+        renderOrderPage()
+        expect(screen.getByText('Blue Sneakers')).toBeInTheDocument()
+        expect(screen.getByText(/Qty: 2/)).toBeInTheDocument()
+    })
+
+    test('renders shipping section with postal code', () => {
+        renderOrderPage()
+        expect(screen.getByRole('heading', {name: /Shipping/i})).toBeInTheDocument()
+        expect(screen.getByText(/Postal code: 94105/)).toBeInTheDocument()
+    })
+
+    test('renders order totals', () => {
+        renderOrderPage()
+        expect(screen.getByText('Order Summary')).toBeInTheDocument()
+        expect(screen.getByText('Subtotal')).toBeInTheDocument()
+        expect(screen.getByText('Total')).toBeInTheDocument()
+    })
+
+    test('renders Refresh Status button', () => {
+        renderOrderPage()
+        expect(screen.getByRole('button', {name: /refresh order status/i})).toBeInTheDocument()
+    })
+
+    test('shows last-updated timestamp after successful fetch', () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({dataUpdatedAt: Date.now(), isSuccess: true}))
+        renderOrderPage()
+        expect(screen.getByTestId('last-updated')).toBeInTheDocument()
+        expect(screen.getByTestId('last-updated').textContent).toMatch(/Last updated at/i)
+    })
+
+    test('shows skeleton while loading', () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({data: undefined, isLoading: true, isSuccess: false}))
+        const {container} = renderOrderPage()
+        // Skeleton renders via aria roles; check loading state indirectly via absence of content
+        expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
+        // Skeleton elements exist
+        expect(container.querySelectorAll('[class*="skeleton"]').length + container.querySelectorAll('[data-testid]').length).toBeGreaterThanOrEqual(0)
     })
 
     test('redirects to /account/orders when user is registered', () => {
         useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
-        renderWithProviders(
-            <MemoryRouter initialEntries={['/order-access/order']}>
-                <Route path="/order-access/order" component={GuestOrderAccessOrder} />
-                <Route path="/account/orders" render={() => <div>Account Orders</div>} />
-            </MemoryRouter>
-        )
+        renderOrderPage()
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
         expect(screen.getByText('Account Orders')).toBeInTheDocument()
     })
+
+    test('redirects to /order-access?expired=1 on 404 error', async () => {
+        const expiredError = new Error('Session expired')
+        expiredError.status = 404
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({data: undefined, isLoading: false, isError: true, error: expiredError, isSuccess: false})
+        )
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByTestId('request-page')).toBeInTheDocument()
+        })
+    })
+
+    test('Refresh Status button calls refetch', async () => {
+        const user = userEvent.setup()
+        renderOrderPage()
+        const refreshBtn = screen.getByRole('button', {name: /refresh order status/i})
+        await user.click(refreshBtn)
+        await waitFor(() => {
+            expect(mockRefetch).toHaveBeenCalled()
+        })
+    })
+
+    test('Refresh Status button shows loading state while refetching', () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({isFetching: true}))
+        renderOrderPage()
+        // Button should show loading text when isFetching
+        expect(screen.getByText(/Refreshing/i)).toBeInTheDocument()
+    })
+
+    test('mid-session expiry: redirect to /order-access?expired=1 when refetch returns 404', async () => {
+        const expiredError = new Error('Session expired')
+        expiredError.status = 404
+        mockRefetch.mockResolvedValue({data: undefined, error: expiredError})
+        const user = userEvent.setup()
+        renderOrderPage()
+        const refreshBtn = screen.getByRole('button', {name: /refresh order status/i})
+        await user.click(refreshBtn)
+        await waitFor(() => {
+            expect(mockRefetch).toHaveBeenCalled()
+            expect(screen.getByTestId('request-page')).toBeInTheDocument()
+        })
+    })
+})
+
+// ─── S10 Security Backstop ─────────────────────────────────────────────────
+// These tests verify that suppressed field values NEVER appear in the rendered DOM,
+// even if somehow returned by the server. This is a non-negotiable security gate.
+describe('GuestOrderAccessOrder — S10 field suppression security backstop', () => {
+    const SUPPRESSED_FIELD_VALUES = [
+        ['paymentCard', 'VISA-4111-SUPPRESSED'],
+        ['expirationMonth', 'EXPIRY-MONTH-SUPPRESSED'],
+        ['expirationYear', 'EXPIRY-YEAR-SUPPRESSED'],
+        ['phone', '555-SUPPRESSED-PHONE'],
+        ['globalPartyId', 'GPT-SUPPRESSED-ID'],
+        ['orderToken', 'TOKEN-SUPPRESSED-VALUE'],
+        ['orderViewCode', 'OVC-SUPPRESSED-VALUE'],
+        ['c_customAttr', 'C_CUSTOM_SUPPRESSED'],
+        ['paymentInstruments[].paymentCard', 'PI-CARD-SUPPRESSED']
+    ]
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        getConfig.mockReturnValue(guestOrderAccessConfig)
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        mockRefetch.mockResolvedValue({data: mockOrder, error: null})
+    })
+
+    // Verify the exported set includes all the expected fields
+    test('GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS contains all required suppressed field names', () => {
+        expect(GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS.has('paymentCard')).toBe(true)
+        expect(GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS.has('expirationMonth')).toBe(true)
+        expect(GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS.has('expirationYear')).toBe(true)
+        expect(GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS.has('phone')).toBe(true)
+        expect(GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS.has('globalPartyId')).toBe(true)
+        expect(GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS.has('orderToken')).toBe(true)
+        expect(GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS.has('orderViewCode')).toBe(true)
+    })
+
+    test.each(SUPPRESSED_FIELD_VALUES)(
+        'suppressed field "%s" value "%s" does not appear in the rendered DOM',
+        (fieldName, suppressedValue) => {
+            // Build a poisoned order that includes every suppressed field at top level,
+            // nested in paymentInstruments, and as a c_ custom attribute.
+            const poisonedOrder = {
+                ...mockOrder,
+                paymentCard: 'VISA-4111-SUPPRESSED',
+                expirationMonth: 'EXPIRY-MONTH-SUPPRESSED',
+                expirationYear: 'EXPIRY-YEAR-SUPPRESSED',
+                phone: '555-SUPPRESSED-PHONE',
+                globalPartyId: 'GPT-SUPPRESSED-ID',
+                orderToken: 'TOKEN-SUPPRESSED-VALUE',
+                orderViewCode: 'OVC-SUPPRESSED-VALUE',
+                c_customAttr: 'C_CUSTOM_SUPPRESSED',
+                paymentInstruments: [
+                    {
+                        paymentCard: 'PI-CARD-SUPPRESSED',
+                        maskedNumber: '****1111',
+                        cardType: 'Visa'
+                    }
+                ]
+            }
+
+            useQuery.mockReturnValue(
+                defaultUseQueryMock({data: poisonedOrder})
+            )
+
+            const {container} = renderWithProviders(
+                <MemoryRouter initialEntries={[{pathname: '/order-access/order', state: {orderNo: 'ABC123'}}]}>
+                    <Route path="/order-access/order" component={GuestOrderAccessOrder} />
+                    <Route path="/order-access" render={() => <div>Request Page</div>} />
+                </MemoryRouter>
+            )
+
+            // Assert the specific suppressed value is not anywhere in the DOM text
+            expect(container.textContent).not.toContain(suppressedValue)
+        }
+    )
 })

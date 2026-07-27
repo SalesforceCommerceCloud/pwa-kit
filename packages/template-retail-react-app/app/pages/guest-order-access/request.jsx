@@ -8,6 +8,8 @@ import React from 'react'
 import {useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
+    Alert,
+    AlertIcon,
     Box,
     Button,
     Container,
@@ -16,7 +18,7 @@ import {
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCustomerType, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
-import {Redirect, useHistory} from 'react-router-dom'
+import {Redirect, useHistory, useLocation} from 'react-router-dom'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import Field from '@salesforce/retail-react-app/app/components/field'
 
@@ -24,6 +26,8 @@ const GuestOrderAccessRequest = () => {
     const {formatMessage} = useIntl()
     const {isRegistered} = useCustomerType()
     const history = useHistory()
+    const location = useLocation()
+    const isExpired = new URLSearchParams(location.search).get('expired') === '1'
 
     // @ts-expect-error SDK 26.8 pending — requestOrderAccessCode is not yet in commerce-sdk-isomorphic 5.4.0
     const {mutateAsync: requestOrderAccessCode, isLoading} =
@@ -65,6 +69,16 @@ const GuestOrderAccessRequest = () => {
     return (
         <Container maxW="md" py={12}>
             <Stack spacing={8}>
+                {isExpired && (
+                    <Alert status="warning" borderRadius="md" role="alert">
+                        <AlertIcon />
+                        {formatMessage({
+                            id: 'guestOrderAccess.request.alert.sessionExpired',
+                            defaultMessage:
+                                'Your session has expired. Please request a new access code.'
+                        })}
+                    </Alert>
+                )}
                 <Box>
                     <Heading as="h1" fontSize="2xl" mb={2}>
                         {formatMessage({
