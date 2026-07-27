@@ -2778,7 +2778,7 @@ describe('Cancel order — eligibility and full flow', () => {
 
         // Success feedback appears
         await waitFor(() => {
-            expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
+            expect(screen.getByText(/order canceled/i)).toBeInTheDocument()
         })
     })
 
@@ -2800,7 +2800,7 @@ describe('Cancel order — eligibility and full flow', () => {
         expect(mockMutateAsync.mock.calls[0][0].body).toEqual({})
 
         await waitFor(() => {
-            expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
+            expect(screen.getByText(/order canceled/i)).toBeInTheDocument()
         })
     })
 
@@ -2818,7 +2818,7 @@ describe('Cancel order — eligibility and full flow', () => {
         await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
 
         await waitFor(() => {
-            expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
+            expect(screen.getByText(/order canceled/i)).toBeInTheDocument()
         })
 
         // Button should now be disabled (aria-disabled, stays focusable)

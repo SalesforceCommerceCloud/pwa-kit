@@ -453,11 +453,11 @@ const AccountOrderDetail = () => {
         setCancelFeedback({
             status: 'success',
             title: formatMessage({
-                defaultMessage: 'Order cancelled',
+                defaultMessage: 'Order canceled',
                 id: 'account_order_detail.alert.cancellation_success_title'
             }),
             description: formatMessage({
-                defaultMessage: 'Your order was cancelled successfully.',
+                defaultMessage: 'Your order was canceled successfully.',
                 id: 'account_order_detail.alert.cancellation_success_description'
             })
         })
@@ -475,7 +475,7 @@ const AccountOrderDetail = () => {
             } else if (status === 409) {
                 description = formatMessage({
                     defaultMessage:
-                        'This order is already being processed and cannot be cancelled. Please reach out to the merchant.',
+                        'This order is already being processed and cannot be canceled. Please reach out to the merchant.',
                     id: 'account_order_detail.alert.cancellation_error_conflict'
                 })
             } else {
