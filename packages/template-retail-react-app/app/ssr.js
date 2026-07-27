@@ -26,6 +26,7 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
+import {ShopperOrders} from 'commerce-sdk-isomorphic'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 
@@ -676,7 +677,6 @@ const {handler} = runtime.createHandler(options, (app) => {
 
         try {
             // Instantiate ShopperOrders server-side using config params + forwarded SLAS token
-            const {ShopperOrders} = require('commerce-sdk-isomorphic')
             const {clientId, organizationId, shortCode, siteId: configSiteId} =
                 appConfig.commerceAPI.parameters
             const shopperOrders = new ShopperOrders({
@@ -756,7 +756,6 @@ const {handler} = runtime.createHandler(options, (app) => {
         const start = Date.now()
 
         try {
-            const {ShopperOrders} = require('commerce-sdk-isomorphic')
             const {clientId, organizationId, shortCode, siteId: configSiteId} =
                 appConfig.commerceAPI.parameters
             const shopperOrders = new ShopperOrders({
