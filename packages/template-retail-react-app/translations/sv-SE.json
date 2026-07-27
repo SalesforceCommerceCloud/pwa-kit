@@ -1785,5 +1785,68 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Logga in för att fortsätta!"
+  },
+  "guestOrderAccess.request.heading": {
+    "defaultMessage": "Find Your Order"
+  },
+  "guestOrderAccess.request.subtext": {
+    "defaultMessage": "Enter your order number and email address to receive a one-time access code."
+  },
+  "guestOrderAccess.request.label.orderNumber": {
+    "defaultMessage": "Order Number"
+  },
+  "guestOrderAccess.request.label.email": {
+    "defaultMessage": "Email Address"
+  },
+  "guestOrderAccess.request.error.orderNumberRequired": {
+    "defaultMessage": "Order number is required"
+  },
+  "guestOrderAccess.request.error.orderNumberInvalid": {
+    "defaultMessage": "Enter a valid order number"
+  },
+  "guestOrderAccess.request.error.emailRequired": {
+    "defaultMessage": "Email address is required"
+  },
+  "guestOrderAccess.request.error.emailInvalid": {
+    "defaultMessage": "Enter a valid email address"
+  },
+  "guestOrderAccess.request.button.submit": {
+    "defaultMessage": "Send Access Code"
+  },
+  "guestOrderAccess.verify.heading": {
+    "defaultMessage": "Enter Your Access Code"
+  },
+  "guestOrderAccess.verify.subtext": {
+    "defaultMessage": "We've sent a 6-digit code to {email}. It may take a moment to arrive."
+  },
+  "guestOrderAccess.verify.label.code": {
+    "defaultMessage": "Access Code"
+  },
+  "guestOrderAccess.verify.error.codeRequired": {
+    "defaultMessage": "Access code is required"
+  },
+  "guestOrderAccess.verify.error.codeInvalid": {
+    "defaultMessage": "Enter the 6-digit code from your email"
+  },
+  "guestOrderAccess.verify.error.invalidCode": {
+    "defaultMessage": "Code invalid or expired. Please try again or request a new code."
+  },
+  "guestOrderAccess.verify.error.tooManyAttempts": {
+    "defaultMessage": "Too many attempts. Please wait a moment and try again."
+  },
+  "guestOrderAccess.verify.error.generic": {
+    "defaultMessage": "Something went wrong. Please try again."
+  },
+  "guestOrderAccess.verify.button.submit": {
+    "defaultMessage": "Verify Code"
+  },
+  "guestOrderAccess.verify.resend.prompt": {
+    "defaultMessage": "Didn't receive a code?"
+  },
+  "guestOrderAccess.verify.resend.link": {
+    "defaultMessage": "Resend code"
+  },
+  "guestOrderAccess.verify.toast.resent": {
+    "defaultMessage": "Check your inbox — it may take a moment."
   }
 }
