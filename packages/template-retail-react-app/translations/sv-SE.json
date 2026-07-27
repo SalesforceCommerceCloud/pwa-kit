@@ -615,6 +615,9 @@
   "footer.link.site_map": {
     "defaultMessage": "Webbplatskarta"
   },
+  "footer.link.find_your_order": {
+    "defaultMessage": "Find Your Order"
+  },
   "footer.link.store_locator": {
     "defaultMessage": "Butikslokaliserare"
   },
