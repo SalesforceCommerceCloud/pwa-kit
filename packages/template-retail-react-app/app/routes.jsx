@@ -52,6 +52,9 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
 })
 const PaymentProcessing = loadable(() => import('./pages/checkout/payment-processing'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
+const GuestOrderAccessRequest = loadable(() => import('./pages/guest-order-access/request'), {fallback})
+const GuestOrderAccessVerify = loadable(() => import('./pages/guest-order-access/verify'), {fallback})
+const GuestOrderAccessOrder = loadable(() => import('./pages/guest-order-access/order'), {fallback})
 
 export const routes = [
     {
@@ -136,6 +139,7 @@ export default () => {
     const socialRedirectURI = loginConfig?.social?.redirectURI
     const passwordlessLoginEnabled = loginConfig?.passwordless?.enabled
     const passwordlessLoginLandingPath = loginConfig?.passwordless?.landingPath
+    const guestOrderAccessEnabled = getConfig()?.app?.guestOrderAccess?.enabled
 
     // Add dynamic routes conditionally (only if features are enabled and paths are defined)
     const dynamicRoutes = [
@@ -155,7 +159,22 @@ export default () => {
                 path: socialRedirectURI,
                 component: SocialLoginRedirect,
                 exact: true
-            }
+            },
+        guestOrderAccessEnabled && {
+            path: '/order-access',
+            component: GuestOrderAccessRequest,
+            exact: true
+        },
+        guestOrderAccessEnabled && {
+            path: '/order-access/verify',
+            component: GuestOrderAccessVerify,
+            exact: true
+        },
+        guestOrderAccessEnabled && {
+            path: '/order-access/order',
+            component: GuestOrderAccessOrder,
+            exact: true
+        }
     ].filter(Boolean)
 
     const allRoutes = configureRoutes([...routes, ...dynamicRoutes], config, {
