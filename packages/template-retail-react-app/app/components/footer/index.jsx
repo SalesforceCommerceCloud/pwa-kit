@@ -38,6 +38,7 @@ const Footer = ({...otherProps}) => {
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const guestOrderAccessEnabled = getConfig()?.app?.guestOrderAccess?.enabled
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
@@ -56,6 +57,14 @@ const Footer = ({...otherProps}) => {
                 text: intl.formatMessage({
                     id: 'footer.link.store_locator',
                     defaultMessage: 'Store Locator'
+                })
+            })
+        if (guestOrderAccessEnabled)
+            links.push({
+                href: '/order-access',
+                text: intl.formatMessage({
+                    id: 'footer.link.find_your_order',
+                    defaultMessage: 'Find Your Order'
                 })
             })
         links.push({
