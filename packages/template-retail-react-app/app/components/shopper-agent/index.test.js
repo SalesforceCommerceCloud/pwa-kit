@@ -1670,12 +1670,14 @@ describe('ShopperAgent Component', () => {
         })
 
         test('loads an explicit commerceClientScriptSourceUrl override via useScript', () => {
+            const overrideUrl =
+                'https://www.shop.prd.tbdp.sfcc-store-internal.net/jscript/messaging.umd.js'
             renderCommerceClient({
                 cc_cdnVersion: undefined,
-                commerceClientScriptSourceUrl: 'http://localhost:5050/messaging.umd.js'
+                commerceClientScriptSourceUrl: overrideUrl
             })
 
-            expect(mockedUseScript).toHaveBeenCalledWith('http://localhost:5050/messaging.umd.js')
+            expect(mockedUseScript).toHaveBeenCalledWith(overrideUrl)
         })
 
         test('builds full-height side panel options by default (cc_dialogFullHeight defaults to true)', () => {
