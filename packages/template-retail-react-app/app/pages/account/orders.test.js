@@ -989,7 +989,7 @@ describe('Item-level return error states', () => {
         // Generic "quantities changed" copy (the API does not name specific items).
         expect(banner).toHaveTextContent(/available return quantities for some items changed/i)
         // Still on the select view (item checkboxes visible), not the terminal banner.
-        expect(screen.queryByText(/unable to submit return/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/unable to submit this return/i)).not.toBeInTheDocument()
     })
 
     test('prunes a checked row that is no longer returnable after the post-error refetch', async () => {
