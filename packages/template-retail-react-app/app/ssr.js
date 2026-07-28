@@ -436,6 +436,47 @@ export async function jwksCaching(req, res, options) {
     }
 }
 
+// ─── S15: In-process throttle middleware for /api/order-lookup/verify ────────
+// Keyed on the first IP from X-Forwarded-For (or req.ip). Uses a Map with
+// {count, resetAt} per key. No external library — zero new dependencies.
+// Reads windowMs/max from app.guestOrderLookup.requestCodeThrottle at request
+// time so config hot-reload works without restarting the server.
+export function createVerifyThrottle() {
+    /** @type {Map<string, {count: number, resetAt: number}>} */
+    const store = new Map()
+
+    return function verifyThrottleMiddleware(req, res, next) {
+        const appConfig = getConfig()?.app
+        // No-op when feature is disabled
+        if (!appConfig?.guestOrderLookup?.enabled) return next()
+        // Only throttle /api/order-lookup/ requests
+        if (!req.path?.startsWith('/api/order-lookup/')) return next()
+
+        const throttleConfig = appConfig?.guestOrderLookup?.requestCodeThrottle
+        const windowMs = throttleConfig?.windowMs ?? 60000
+        const max = throttleConfig?.max ?? 5
+
+        // Throttle keyed on x-forwarded-for. In MRT deployments this header is set
+        // by the trusted CDN edge. In non-MRT environments (local dev, custom hosting)
+        // it may be spoofable — SCAPI rate limiting is the authoritative backstop.
+        const ip =
+            (req.headers['x-forwarded-for']?.split(',')[0]?.trim()) || req.ip || 'unknown'
+        const now = Date.now()
+        const entry = store.get(ip)
+
+        if (!entry || now >= entry.resetAt) {
+            store.set(ip, {count: 1, resetAt: now + windowMs})
+            return next()
+        }
+
+        entry.count += 1
+        if (entry.count > max) {
+            return res.status(429).json({error: 'Too many requests'})
+        }
+        return next()
+    }
+}
+
 // Guest order lookup: warn if feature is enabled but cookies are not allowed
 const _golConfig = getConfig()?.app?.guestOrderLookup
 if (_golConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_COOKIES) {
@@ -669,6 +710,9 @@ const {handler} = runtime.createHandler(options, (app) => {
             })
         }
     })
+
+    // S15: defense-in-depth throttle on /api/order-lookup/* endpoints
+    app.use(createVerifyThrottle())
 
     app.post('/api/order-lookup/verify', async (req, res) => {
         const appConfig = getConfig()?.app
