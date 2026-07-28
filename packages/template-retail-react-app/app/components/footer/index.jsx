@@ -61,7 +61,7 @@ const Footer = ({...otherProps}) => {
             })
         if (guestOrderLookupEnabled)
             links.push({
-                href: '/order-lookup',
+                href: buildUrl('/order-lookup'),
                 text: intl.formatMessage({
                     id: 'footer.link.find_your_order',
                     defaultMessage: 'Find Your Order'
