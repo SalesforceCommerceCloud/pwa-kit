@@ -21,12 +21,15 @@ import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
 import {
     DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
-    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID
+    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
+    COMMERCE_CLIENT_UI_STATE_EVENT
 } from '@salesforce/retail-react-app/app/constants'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
+    getPersistedCommerceClientOpenState,
+    persistCommerceClientOpenState,
     resetEmbeddedMessagingForCommerceSessionChange,
     resolveCommerceClientScriptUrl,
     validateCommerceClientAgentSettings
@@ -635,6 +638,29 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
 
     const isFullHeight = cc_dialogFullHeight === 'true'
 
+    // Restore open-state after navigation (read once on mount); falls back to
+    // cc_isOpen when nothing is persisted (fresh tab).
+    const persistedOpenRef = useRef(getPersistedCommerceClientOpenState())
+    const initialIsOpen =
+        persistedOpenRef.current === undefined ? cc_isOpen === 'true' : persistedOpenRef.current
+
+    // Persist open-state on every change so the panel carries across pages.
+    useEffect(() => {
+        if (!onClient) return undefined
+
+        const handleUiStateUpdate = (event) => {
+            const {property, value} = event?.detail || {}
+            if (property === 'isOpen') {
+                persistCommerceClientOpenState(Boolean(value))
+            }
+        }
+
+        window.addEventListener(COMMERCE_CLIENT_UI_STATE_EVENT, handleUiStateUpdate)
+        return () => {
+            window.removeEventListener(COMMERCE_CLIENT_UI_STATE_EVENT, handleUiStateUpdate)
+        }
+    }, [])
+
     const widgetOptions = useMemo(
         () => ({
             elementId: commerceClientElementId,
@@ -652,7 +678,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             globalClassName: COMMERCE_CLIENT_GLOBAL_CLASS,
             isDevelopment: cc_isDevelopment === 'true',
             componentConfig: {
-                isOpen: cc_isOpen === 'true',
+                isOpen: initialIsOpen,
                 type: cc_displayType,
                 options: {
                     dialogPosition: cc_widgetPosition,
@@ -679,7 +705,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             cc_disclaimerMarkdown,
             cc_searchConfig,
             cc_isDevelopment,
-            cc_isOpen,
+            initialIsOpen,
             isFullHeight,
             cc_displayType,
             cc_widgetPosition,

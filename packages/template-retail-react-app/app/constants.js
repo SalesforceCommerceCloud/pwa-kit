@@ -305,6 +305,12 @@ export const COMMERCE_CLIENT_CDN_BASE_URL = 'https://cdn.search.cimulate.ai/copi
 export const COMMERCE_CLIENT_UI_STATE_EVENT = 'cimulate:ui-state-update'
 
 /**
+ * `sessionStorage` key remembering whether the Commerce Client panel is open, so it
+ * stays open across page navigations until the shopper closes it.
+ */
+export const COMMERCE_CLIENT_OPEN_STATE_KEY = 'commerce-client-agent-open'
+
+/**
  * Default Embedded Messaging capabilities version forwarded to the Commerce Client
  * widget via `messagingConfig.capabilitiesVersion`. Override per environment through the
  * `cc_capabilitiesVersion` field in `COMMERCE_AGENT_SETTINGS`.

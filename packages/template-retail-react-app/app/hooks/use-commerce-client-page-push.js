@@ -7,6 +7,7 @@
 
 import {useEffect, useState} from 'react'
 import {COMMERCE_CLIENT_UI_STATE_EVENT} from '@salesforce/retail-react-app/app/constants'
+import {getPersistedCommerceClientOpenState} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
 const onClient = typeof window !== 'undefined'
 
@@ -45,13 +46,19 @@ export const useCommerceClientPagePush = (commerceAgentConfiguration = {}) => {
     const isPagePushEnabled =
         provider === 'commerce-client' && cc_pagePush === 'true' && cc_dialogFullHeight === 'true'
 
-    // Seed from cc_isOpen so the shift is applied on first paint when the panel
-    // auto-opens, keeping SSR and client markup consistent.
+    // Seed from cc_isOpen for SSR/hydration consistency; the persisted open-state is
+    // reconciled client-side in the mount effect below (sessionStorage is SSR-unsafe).
     const [isPanelOpen, setIsPanelOpen] = useState(cc_isOpen === 'true')
 
     useEffect(() => {
         if (!onClient || !isPagePushEnabled) {
             return undefined
+        }
+
+        // Restore the shift after navigation to match the panel the widget re-injects.
+        const persistedOpen = getPersistedCommerceClientOpenState()
+        if (persistedOpen !== undefined) {
+            setIsPanelOpen(persistedOpen)
         }
 
         const handleUiStateUpdate = (event) => {

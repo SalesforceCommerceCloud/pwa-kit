@@ -39,7 +39,10 @@ jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/token-bridg
 
 // Import ShopperAgent after all mocks are set up
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
-import {COMMERCE_CLIENT_CDN_BASE_URL} from '@salesforce/retail-react-app/app/constants'
+import {
+    COMMERCE_CLIENT_CDN_BASE_URL,
+    COMMERCE_CLIENT_OPEN_STATE_KEY
+} from '@salesforce/retail-react-app/app/constants'
 
 // Mock the embedded messaging service
 const mockEmbeddedService = {
@@ -1614,6 +1617,46 @@ describe('ShopperAgent Component', () => {
             const widgetOptions = calls[calls.length - 1][1]
 
             expect(widgetOptions.componentConfig.isOpen).toBe(false)
+        })
+
+        describe('persisted open-state', () => {
+            afterEach(() => {
+                window.sessionStorage.removeItem(COMMERCE_CLIENT_OPEN_STATE_KEY)
+            })
+
+            test('reopens the widget when the shopper left it open before navigating', () => {
+                // Simulate the shopper having left the panel open on a prior page.
+                window.sessionStorage.setItem(COMMERCE_CLIENT_OPEN_STATE_KEY, 'true')
+
+                renderCommerceClient({cc_isOpen: 'false'})
+
+                const calls = mockedUseCommerceClientMessaging.mock.calls
+                const widgetOptions = calls[calls.length - 1][1]
+
+                // Persisted open-state wins over the cc_isOpen default.
+                expect(widgetOptions.componentConfig.isOpen).toBe(true)
+            })
+
+            test('keeps the widget closed when the shopper closed it before navigating', () => {
+                window.sessionStorage.setItem(COMMERCE_CLIENT_OPEN_STATE_KEY, 'false')
+
+                // Even with cc_isOpen true, the shopper's explicit close must stick.
+                renderCommerceClient({cc_isOpen: 'true'})
+
+                const calls = mockedUseCommerceClientMessaging.mock.calls
+                const widgetOptions = calls[calls.length - 1][1]
+
+                expect(widgetOptions.componentConfig.isOpen).toBe(false)
+            })
+
+            test('falls back to cc_isOpen when nothing is persisted (fresh tab)', () => {
+                renderCommerceClient({cc_isOpen: 'true'})
+
+                const calls = mockedUseCommerceClientMessaging.mock.calls
+                const widgetOptions = calls[calls.length - 1][1]
+
+                expect(widgetOptions.componentConfig.isOpen).toBe(true)
+            })
         })
 
         test('forwards cc_isDevelopment as the boolean isDevelopment widget option', () => {

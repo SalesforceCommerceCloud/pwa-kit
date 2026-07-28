@@ -8,6 +8,20 @@
 import {act, renderHook} from '@testing-library/react'
 import {useCommerceClientPagePush} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-push'
 import {COMMERCE_CLIENT_UI_STATE_EVENT} from '@salesforce/retail-react-app/app/constants'
+import {getPersistedCommerceClientOpenState} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+
+jest.mock('@salesforce/retail-react-app/app/utils/shopper-agent-utils', () => ({
+    getPersistedCommerceClientOpenState: jest.fn()
+}))
+
+beforeEach(() => {
+    // Default: nothing persisted, so the hook falls back to the cc_isOpen default.
+    getPersistedCommerceClientOpenState.mockReturnValue(undefined)
+})
+
+afterEach(() => {
+    jest.clearAllMocks()
+})
 
 // Base config that satisfies every gate: Commerce Client provider, page-push on,
 // full-height side panel. Individual tests override fields to exercise the gates.
@@ -74,6 +88,26 @@ describe('useCommerceClientPagePush', () => {
             )
 
             expect(result.current.paddingRight).toEqual({base: 0, lg: '420px'})
+        })
+
+        test('restores the shift from a persisted open-state after navigation', () => {
+            // Shopper left the panel open, then clicked an in-panel result and navigated.
+            getPersistedCommerceClientOpenState.mockReturnValue(true)
+
+            const {result} = renderHook(() => useCommerceClientPagePush(enabledConfig))
+
+            expect(result.current.paddingRight).toEqual({base: 0, lg: '420px'})
+        })
+
+        test('persisted closed-state overrides a cc_isOpen default of true', () => {
+            // Shopper closed the panel; it must stay closed even though cc_isOpen is true.
+            getPersistedCommerceClientOpenState.mockReturnValue(false)
+
+            const {result} = renderHook(() =>
+                useCommerceClientPagePush({...enabledConfig, cc_isOpen: 'true'})
+            )
+
+            expect(result.current.paddingRight).toBe(0)
         })
 
         test('shifts content on the docked side when the panel opens', () => {

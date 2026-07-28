@@ -11,11 +11,16 @@ import {
     resetEmbeddedMessagingForCommerceSessionChange,
     openCommerceClientWidget,
     openShopperAgentWidget,
+    persistCommerceClientOpenState,
+    getPersistedCommerceClientOpenState,
     resolveCommerceClientScriptUrl,
     validateCommerceClientDomain,
     validateCommerceClientAgentSettings
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
-import {COMMERCE_CLIENT_CDN_BASE_URL} from '@salesforce/retail-react-app/app/constants'
+import {
+    COMMERCE_CLIENT_CDN_BASE_URL,
+    COMMERCE_CLIENT_OPEN_STATE_KEY
+} from '@salesforce/retail-react-app/app/constants'
 
 describe('shopper-agent-utils', () => {
     let originalWindow
@@ -365,6 +370,103 @@ describe('shopper-agent-utils', () => {
                 'Shopper Agent: Error toggling Commerce Client widget',
                 expect.any(Error)
             )
+        })
+    })
+
+    describe('Commerce Client open-state persistence', () => {
+        let store
+
+        beforeEach(() => {
+            store = {}
+            global.window = {
+                sessionStorage: {
+                    getItem: jest.fn((key) => (key in store ? store[key] : null)),
+                    setItem: jest.fn((key, value) => {
+                        store[key] = value
+                    })
+                }
+            }
+        })
+
+        describe('persistCommerceClientOpenState', () => {
+            test('should return early if not on client side', () => {
+                delete global.window
+
+                expect(() => persistCommerceClientOpenState(true)).not.toThrow()
+            })
+
+            test('should store true when the panel is open', () => {
+                persistCommerceClientOpenState(true)
+
+                expect(window.sessionStorage.setItem).toHaveBeenCalledWith(
+                    COMMERCE_CLIENT_OPEN_STATE_KEY,
+                    'true'
+                )
+            })
+
+            test('should store false when the panel is closed', () => {
+                persistCommerceClientOpenState(false)
+
+                expect(store[COMMERCE_CLIENT_OPEN_STATE_KEY]).toBe('false')
+            })
+
+            test('should coerce non-boolean values to a boolean before storing', () => {
+                persistCommerceClientOpenState('truthy')
+
+                expect(store[COMMERCE_CLIENT_OPEN_STATE_KEY]).toBe('true')
+            })
+
+            test('should log and not throw when sessionStorage throws', () => {
+                window.sessionStorage.setItem.mockImplementation(() => {
+                    throw new Error('quota exceeded')
+                })
+
+                expect(() => persistCommerceClientOpenState(true)).not.toThrow()
+                expect(consoleErrorSpy).toHaveBeenCalledWith(
+                    'Shopper Agent: Error persisting Commerce Client open state',
+                    expect.any(Error)
+                )
+            })
+        })
+
+        describe('getPersistedCommerceClientOpenState', () => {
+            test('should return undefined if not on client side', () => {
+                delete global.window
+
+                expect(getPersistedCommerceClientOpenState()).toBeUndefined()
+            })
+
+            test('should return undefined when nothing has been persisted', () => {
+                expect(getPersistedCommerceClientOpenState()).toBeUndefined()
+            })
+
+            test('should return true when the stored value is true', () => {
+                store[COMMERCE_CLIENT_OPEN_STATE_KEY] = 'true'
+
+                expect(getPersistedCommerceClientOpenState()).toBe(true)
+            })
+
+            test('should return false when the stored value is false', () => {
+                store[COMMERCE_CLIENT_OPEN_STATE_KEY] = 'false'
+
+                expect(getPersistedCommerceClientOpenState()).toBe(false)
+            })
+
+            test('should round-trip a value written by persistCommerceClientOpenState', () => {
+                persistCommerceClientOpenState(true)
+
+                expect(getPersistedCommerceClientOpenState()).toBe(true)
+            })
+
+            test('should log and return undefined when the stored value is malformed', () => {
+                store[COMMERCE_CLIENT_OPEN_STATE_KEY] = '{not json'
+
+                expect(getPersistedCommerceClientOpenState()).toBeUndefined()
+                expect(consoleErrorSpy).toHaveBeenCalledWith(
+                    'Shopper Agent: Error reading Commerce Client open state',
+                    expect.any(Error)
+                )
+            })
         })
     })
 

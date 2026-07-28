@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {COMMERCE_CLIENT_CDN_BASE_URL} from '@salesforce/retail-react-app/app/constants'
+import {
+    COMMERCE_CLIENT_CDN_BASE_URL,
+    COMMERCE_CLIENT_OPEN_STATE_KEY
+} from '@salesforce/retail-react-app/app/constants'
 
 const onClient = typeof window !== 'undefined'
 
@@ -116,6 +119,47 @@ export function openCommerceClientWidget(show = true) {
         }
     } catch (error) {
         console.error('Shopper Agent: Error toggling Commerce Client widget', error)
+    }
+}
+
+/**
+ * Persist whether the Commerce Client panel is open to `sessionStorage`, so it
+ * survives page navigation and resets to the configured default in a fresh tab.
+ *
+ * @function persistCommerceClientOpenState
+ * @param {boolean} isOpen - Whether the panel is currently open
+ * @returns {void}
+ */
+export function persistCommerceClientOpenState(isOpen) {
+    if (!onClient) return
+
+    try {
+        window.sessionStorage.setItem(
+            COMMERCE_CLIENT_OPEN_STATE_KEY,
+            JSON.stringify(Boolean(isOpen))
+        )
+    } catch (error) {
+        console.error('Shopper Agent: Error persisting Commerce Client open state', error)
+    }
+}
+
+/**
+ * Read the persisted Commerce Client panel open-state. Returns `undefined` when
+ * nothing is stored so callers can fall back to the configured `cc_isOpen` default.
+ *
+ * @function getPersistedCommerceClientOpenState
+ * @returns {boolean|undefined} The stored open-state, or `undefined` when unset
+ */
+export function getPersistedCommerceClientOpenState() {
+    if (!onClient) return undefined
+
+    try {
+        const stored = window.sessionStorage.getItem(COMMERCE_CLIENT_OPEN_STATE_KEY)
+        if (stored === null) return undefined
+        return JSON.parse(stored) === true
+    } catch (error) {
+        console.error('Shopper Agent: Error reading Commerce Client open state', error)
+        return undefined
     }
 }
 
