@@ -4789,6 +4789,20 @@
       "value": "]"
     }
   ],
+  "footer.link.find_your_order": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƒīƞḓ Ẏǿǿŭŭř Ǿřḓḗḗř"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "footer.link.order_status": [
     {
       "type": 0,
