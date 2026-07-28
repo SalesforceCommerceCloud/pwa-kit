@@ -1003,39 +1003,9 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
         expect(mockRefetch).toHaveBeenCalled()
     })
 
-    test('cancel API error (409 not_cancellable): does not show success alert', async () => {
-        const user = userEvent.setup()
-        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
-        global.fetch = jest.fn().mockImplementation((url) => {
-            if (url === '/api/order-lookup/oms-meta') {
-                return Promise.resolve({
-                    ok: true,
-                    json: () => Promise.resolve(mockOmsMeta)
-                })
-            }
-            if (url === '/api/order-lookup/cancel') {
-                return Promise.resolve({
-                    ok: false,
-                    status: 409,
-                    json: () => Promise.resolve({errorKind: 'not_cancellable'})
-                })
-            }
-            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
-        })
-        renderOrderPage()
-        await waitFor(() => {
-            expect(screen.getByRole('button', {name: /cancel order/i})).toBeInTheDocument()
-        })
-        await user.click(screen.getByRole('button', {name: /cancel order/i}))
-        await waitFor(() => {
-            expect(screen.getByRole('button', {name: /confirm cancellation/i})).toBeInTheDocument()
-        })
-        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
-        await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/cancel', expect.objectContaining({method: 'POST'}))
-        })
-        expect(screen.queryByText(/your order has been cancelled/i)).not.toBeInTheDocument()
-    })
+    // NOTE: The more complete cancel error test (including error UI assertion) is below
+    // in this same describe block: 'cancel API error (409 not_cancellable): does not show
+    // success alert and shows error state'
 
     test('successful return: calls POST /api/order-lookup/return, shows success alert', async () => {
         const user = userEvent.setup()
@@ -1126,6 +1096,104 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
         await waitFor(() => {
             expect(screen.queryByRole('button', {name: /cancel order/i})).not.toBeInTheDocument()
         })
+    })
+
+    test('isCancellable returns false when quantityAvailableToCancel < quantityOrdered — Cancel button not shown', async () => {
+        // An order where every item has omsData but one unit has already been cancelled
+        // (quantityAvailableToCancel: 0, quantityOrdered: 1). isCancellable requires
+        // strict equality, so this order must not show the Cancel button.
+        const orderWithPartialCancelled = {
+            ...mockOrder,
+            productItems: [
+                {
+                    itemId: 'item-1',
+                    productName: 'Test Product',
+                    quantity: 1,
+                    price: 29.99,
+                    omsData: {
+                        quantityAvailableToCancel: 0, // already cancelled
+                        quantityOrdered: 1,
+                        quantityAvailableToReturn: 0
+                    }
+                }
+            ]
+        }
+        useQuery.mockReturnValue(defaultUseQueryMock({data: orderWithPartialCancelled}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockOmsMeta)
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/oms-meta', expect.anything())
+        })
+        await waitFor(() => {
+            expect(screen.queryByRole('button', {name: /cancel order/i})).not.toBeInTheDocument()
+        })
+    })
+
+    test('cancel API error (409 not_cancellable): does not show success alert and shows error state', async () => {
+        const user = userEvent.setup()
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockOmsMeta)
+                })
+            }
+            if (url === '/api/order-lookup/cancel') {
+                return Promise.resolve({
+                    ok: false,
+                    status: 409,
+                    json: () => Promise.resolve({errorKind: 'not_cancellable'})
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /cancel order/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /cancel order/i}))
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /confirm cancellation/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/cancel', expect.objectContaining({method: 'POST'}))
+        })
+        // Success banner must NOT appear
+        expect(screen.queryByText(/your order has been cancelled/i)).not.toBeInTheDocument()
+    })
+
+    test('OMS meta fetch failure on page load: buttons stay hidden (graceful degradation)', async () => {
+        // Simulate /api/order-lookup/oms-meta returning a non-ok response.
+        // order.jsx silently swallows this and keeps omsActive: false,
+        // so Cancel and Return buttons must not appear.
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: false,
+                    status: 502,
+                    json: () => Promise.resolve({error: 'Service unavailable'})
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/oms-meta', expect.anything())
+        })
+        // Buttons must remain hidden when OMS meta fetch fails
+        expect(screen.queryByRole('button', {name: /cancel order/i})).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', {name: /return items/i})).not.toBeInTheDocument()
     })
 })
 
