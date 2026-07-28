@@ -4,10 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {useIntl} from 'react-intl'
 import {useQuery} from '@tanstack/react-query'
 import {
+    Alert,
+    AlertIcon,
     Box,
     Button,
     Container,
@@ -20,6 +22,9 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCustomerType, useAccessToken} from '@salesforce/commerce-sdk-react'
 import {Redirect, useHistory, useLocation} from 'react-router-dom'
+import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
+import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
+import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
 
 // Fields suppressed by the server — asserted here as a client-side security backstop (S10).
 // Any value from this set must never appear rendered in the DOM.
@@ -32,6 +37,25 @@ export const GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS = new Set([
     'orderToken',
     'orderViewCode'
 ])
+
+/**
+ * All-or-nothing cancel eligibility: every product item must have its full
+ * ordered quantity available to cancel via OMS. Items lacking `omsData` (pure
+ * ECOM orders) always return false.
+ */
+const isCancellable = (order) => {
+    if (!order?.productItems?.length) return false
+    if (!order.productItems.every((item) => item.omsData)) return false
+    return order.productItems.every((item) => {
+        const {quantityAvailableToCancel, quantityOrdered} = item.omsData
+        return (
+            Number.isFinite(quantityAvailableToCancel) &&
+            Number.isFinite(quantityOrdered) &&
+            quantityAvailableToCancel > 0 &&
+            quantityAvailableToCancel === quantityOrdered
+        )
+    })
+}
 
 const GuestOrderLookupOrder = () => {
     const {formatMessage, formatDate, formatTime, formatNumber} = useIntl()
@@ -87,12 +111,130 @@ const GuestOrderLookupOrder = () => {
         staleTime: 0
     })
 
+    // OMS metadata: omsActive flag + cancel/return reason codes.
+    const [omsMeta, setOmsMeta] = useState({
+        omsActive: false,
+        cancelReasonCodes: [],
+        returnReasonCodes: []
+    })
+    const [omsMetaLoading, setOmsMetaLoading] = useState(true)
+
+    useEffect(() => {
+        let cancelled = false
+        const fetchMeta = async () => {
+            try {
+                const token = await getTokenWhenReady()
+                const res = await fetch('/api/order-lookup/oms-meta', {
+                    headers: {Authorization: `Bearer ${token}`}
+                })
+                if (res.ok && !cancelled) {
+                    setOmsMeta(await res.json())
+                }
+            } catch {
+                // Swallow — omsActive stays false, buttons stay hidden
+            }
+            if (!cancelled) setOmsMetaLoading(false)
+        }
+        fetchMeta()
+        return () => {
+            cancelled = true
+        }
+    }, [getTokenWhenReady])
+
+    // Cancel state
+    const [cancelModalOpen, setCancelModalOpen] = useState(false)
+    const [cancelSubmitting, setCancelSubmitting] = useState(false)
+    const [cancelError, setCancelError] = useState(null)
+    const [cancelSuccess, setCancelSuccess] = useState(false)
+
+    // Return state
+    const [returnModalOpen, setReturnModalOpen] = useState(false)
+    const [returnSubmitting, setReturnSubmitting] = useState(false)
+    const [returnError, setReturnError] = useState(null)
+    const [returnSuccess, setReturnSuccess] = useState(false)
+    const [returnSelection, setReturnSelection] = useState({})
+
+    // Derived cancel/return eligibility — computed unconditionally (Rules of Hooks)
+    // and gated behind omsActive in the render path below.
+    const returnableItems = useMemo(() => getReturnableItems(order), [order])
+
     // Redirect on 404 (expired session) — useEffect so redirect happens after render
     useEffect(() => {
         if (isError && error?.status === 404) {
             history.replace('/order-lookup?expired=1')
         }
     }, [isError, error, history])
+
+    const handleCancel = async (orderArg, reason) => {
+        setCancelError(null)
+        setCancelSubmitting(true)
+        try {
+            const token = await getTokenWhenReady()
+            const res = await fetch('/api/order-lookup/cancel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    orderNo: orderArg.orderNo,
+                    ...(reason ? {reason} : {})
+                })
+            })
+            const data = await res.json()
+            if (res.ok) {
+                setCancelModalOpen(false)
+                setCancelSuccess(true)
+                refetch()
+            } else {
+                setCancelError(data.errorKind ?? 'transient')
+            }
+        } catch {
+            setCancelError('transient')
+        } finally {
+            setCancelSubmitting(false)
+        }
+    }
+
+    const handleReturn = async (productItems) => {
+        setReturnError(null)
+        setReturnSubmitting(true)
+        try {
+            const token = await getTokenWhenReady()
+            const res = await fetch('/api/order-lookup/return', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({orderNo: order.orderNo, productItems})
+            })
+            const data = await res.json()
+            if (res.ok) {
+                setReturnModalOpen(false)
+                setReturnSuccess(true)
+                refetch()
+            } else {
+                setReturnError({kind: data.errorKind ?? 'transient'})
+            }
+        } catch {
+            setReturnError({kind: 'transient'})
+        } finally {
+            setReturnSubmitting(false)
+        }
+    }
+
+    const handleRefetchReasons = async () => {
+        try {
+            const token = await getTokenWhenReady()
+            const res = await fetch('/api/order-lookup/oms-meta', {
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            if (res.ok) setOmsMeta(await res.json())
+        } catch {
+            // Swallow — stale reasons remain; the modal handles it gracefully
+        }
+    }
 
     if (isRegistered) return <Redirect to="/account/orders" />
 
@@ -159,6 +301,10 @@ const GuestOrderLookupOrder = () => {
             history.replace('/order-lookup?expired=1')
         }
     }
+
+    const canCancel = !cancelSuccess && isCancellable(order)
+    const canReturn = returnableItems.length > 0
+    const showActions = omsMeta.omsActive && !omsMetaLoading && (canCancel || canReturn)
 
     return (
         <Container maxW="2xl" py={12}>
@@ -465,7 +611,87 @@ const GuestOrderLookupOrder = () => {
                         )}
                     </Stack>
                 </Box>
+
+                {/* Cancel / Return action buttons — only shown when OMS is active */}
+                {showActions && (
+                    <Stack direction="row" spacing={3}>
+                        {canCancel && (
+                            <Button
+                                variant="outline"
+                                colorScheme="red"
+                                onClick={() => {
+                                    setCancelError(null)
+                                    setCancelModalOpen(true)
+                                }}
+                            >
+                                {formatMessage({
+                                    id: 'guestOrderLookup.order.button.cancel',
+                                    defaultMessage: 'Cancel Order'
+                                })}
+                            </Button>
+                        )}
+                        {canReturn && (
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setReturnError(null)
+                                    setReturnModalOpen(true)
+                                }}
+                            >
+                                {formatMessage({
+                                    id: 'guestOrderLookup.order.button.return',
+                                    defaultMessage: 'Return Items'
+                                })}
+                            </Button>
+                        )}
+                    </Stack>
+                )}
+
+                {/* Post-action success banners */}
+                {cancelSuccess && (
+                    <Alert status="success">
+                        <AlertIcon />
+                        {formatMessage({
+                            id: 'guestOrderLookup.order.cancel.success',
+                            defaultMessage: 'Your order has been cancelled.'
+                        })}
+                    </Alert>
+                )}
+                {returnSuccess && (
+                    <Alert status="success">
+                        <AlertIcon />
+                        {formatMessage({
+                            id: 'guestOrderLookup.order.return.success',
+                            defaultMessage: 'Your return has been submitted.'
+                        })}
+                    </Alert>
+                )}
             </Stack>
+
+            {/* Modals — rendered outside Stack so they don't affect layout */}
+            <CancelOrderModal
+                isOpen={cancelModalOpen}
+                onClose={() => setCancelModalOpen(false)}
+                order={order}
+                onCancel={handleCancel}
+                isSubmitting={cancelSubmitting}
+                reasonCodes={omsMeta.cancelReasonCodes}
+            />
+
+            <ReturnItemsModal
+                isOpen={returnModalOpen}
+                onClose={() => setReturnModalOpen(false)}
+                order={order}
+                returnableItems={returnableItems}
+                reasonCodes={omsMeta.returnReasonCodes}
+                selection={returnSelection}
+                onSelectionChange={setReturnSelection}
+                onSubmit={handleReturn}
+                isSubmitting={returnSubmitting}
+                submitError={returnError}
+                onClearSubmitError={() => setReturnError(null)}
+                onRefetchReasons={handleRefetchReasons}
+            />
         </Container>
     )
 }

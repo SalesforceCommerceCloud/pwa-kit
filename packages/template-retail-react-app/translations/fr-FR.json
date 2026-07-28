@@ -1950,5 +1950,17 @@
   },
   "guestOrderLookup.order.totals.total": {
     "defaultMessage": "Total"
+  },
+  "guestOrderLookup.order.button.cancel": {
+    "defaultMessage": "Cancel Order"
+  },
+  "guestOrderLookup.order.button.return": {
+    "defaultMessage": "Return Items"
+  },
+  "guestOrderLookup.order.cancel.success": {
+    "defaultMessage": "Your order has been cancelled."
+  },
+  "guestOrderLookup.order.return.success": {
+    "defaultMessage": "Your return has been submitted."
   }
 }
