@@ -9,14 +9,14 @@ import {Box, Heading} from '@salesforce/retail-react-app/app/components/shared/u
 import {useCustomerType} from '@salesforce/commerce-sdk-react'
 import {Redirect} from 'react-router-dom'
 
-const GuestOrderAccessVerify = () => {
+const GuestOrderLookupOrder = () => {
     const {isRegistered} = useCustomerType()
     if (isRegistered) return <Redirect to="/account/orders" />
     return (
         <Box>
-            <Heading>Enter Access Code</Heading>
+            <Heading>Order Details</Heading>
         </Box>
     )
 }
 
-export default GuestOrderAccessVerify
+export default GuestOrderLookupOrder
