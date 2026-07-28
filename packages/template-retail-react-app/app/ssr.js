@@ -436,16 +436,19 @@ export function createVerifyThrottle() {
     const store = new Map()
 
     return function verifyThrottleMiddleware(req, res, next) {
-        const {app: appConfig} = getConfig()
+        const appConfig = getConfig()?.app
         // No-op when feature is disabled
         if (!appConfig?.guestOrderLookup?.enabled) return next()
         // Only throttle /api/order-lookup/ requests
         if (!req.path?.startsWith('/api/order-lookup/')) return next()
 
-        const throttleCfg = appConfig.guestOrderLookup.requestCodeThrottle || {}
-        const windowMs = throttleCfg.windowMs ?? 60000
-        const max = throttleCfg.max ?? 5
+        const throttleConfig = appConfig?.guestOrderLookup?.requestCodeThrottle
+        const windowMs = throttleConfig?.windowMs ?? 60000
+        const max = throttleConfig?.max ?? 5
 
+        // Throttle keyed on x-forwarded-for. In MRT deployments this header is set
+        // by the trusted CDN edge. In non-MRT environments (local dev, custom hosting)
+        // it may be spoofable — SCAPI rate limiting is the authoritative backstop.
         const ip =
             (req.headers['x-forwarded-for']?.split(',')[0]?.trim()) || req.ip || 'unknown'
         const now = Date.now()
