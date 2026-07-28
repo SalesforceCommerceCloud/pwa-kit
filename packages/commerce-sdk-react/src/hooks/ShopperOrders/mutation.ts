@@ -64,13 +64,16 @@ The payment instrument is added with the provided details. The payment method mu
      * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `returnOmsOrder` endpoint.
      */
     ReturnOmsOrder: 'returnOmsOrder',
-    /**
-     * Requests an order access code (OTP) for guest order lookup. Stub pending SDK 26.8 release of
-     * requestOrderAccessCode in commerce-sdk-isomorphic (currently absent from 5.4.0).
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `requestOrderAccessCode` endpoint.
-     */
-    // @ts-expect-error SDK 26.8 pending — requestOrderAccessCode is not yet in commerce-sdk-isomorphic 5.4.0
-    RequestOrderAccessCode: 'requestOrderAccessCode'
+} as const
+
+// requestOrderAccessCode is pending commerce-sdk-isomorphic 5.4.x / ECOM 26.8.
+// Kept outside ShopperOrdersMutations so it does not pollute the Client[Mutation]
+// type constraint — the hook bypasses type-checking for this method at the call site.
+export const ShopperOrdersMutationsUnsafe = {
+    ...ShopperOrdersMutations,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore SDK 26.8 pending — requestOrderAccessCode not yet in commerce-sdk-isomorphic
+    RequestOrderAccessCode: 'requestOrderAccessCode' as 'requestOrderAccessCode'
 } as const
 
 /**
