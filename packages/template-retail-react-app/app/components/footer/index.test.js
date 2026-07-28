@@ -43,7 +43,7 @@ test('renders SubscribeForm within Footer', () => {
     expect(signUpButtons.length).toBeGreaterThanOrEqual(1)
 })
 
-describe('Guest Order Access footer link', () => {
+describe('Guest Order Lookup footer link', () => {
     test('does not render "Find Your Order" link when flag is off', () => {
         getConfig.mockReturnValue({
             ...mockConfig,

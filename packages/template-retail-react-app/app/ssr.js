@@ -26,10 +26,88 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
+import {ShopperOrders} from 'commerce-sdk-isomorphic'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 
 const config = getConfig()
+
+// Guest order access helpers
+function getSiteIdFromRequest(req) {
+    return req.headers['x-site-id'] || null
+}
+
+export function parseGuestOrderCookie(req, cookieName) {
+    try {
+        const raw = req.headers?.cookie
+            ?.split(';')
+            .map((c) => c.trim())
+            .find((c) => c.startsWith(cookieName + '='))
+        if (!raw) return {}
+        return JSON.parse(decodeURIComponent(raw.slice(cookieName.length + 1)))
+    } catch {
+        return {}
+    }
+}
+
+export function evictIfNeeded(cookieMap) {
+    // FIFO eviction if raw JSON would exceed ~2500 bytes (leaves headroom for URL-encoding expansion)
+    let entries = Object.entries(cookieMap)
+    while (JSON.stringify(Object.fromEntries(entries)).length > 2500 && entries.length > 0) {
+        entries.shift()
+    }
+    return Object.fromEntries(entries)
+}
+
+const GUEST_ORDER_SUPPRESSED_FIELDS = new Set([
+    'paymentCard',
+    'expirationMonth',
+    'expirationYear',
+    'phone',
+    'globalPartyId',
+    'orderToken',
+    'orderViewCode'
+])
+
+export function filterGuestOrderFields(order) {
+    if (!order || typeof order !== 'object') return order
+    const filtered = {}
+    for (const [key, val] of Object.entries(order)) {
+        if (key.startsWith('c_')) continue // suppress all custom attributes
+        if (GUEST_ORDER_SUPPRESSED_FIELDS.has(key)) continue
+        if (key === 'customerInfo') {
+            // Keep only email echo; suppress phone, globalPartyId
+            const {email, customerEmail} = val || {}
+            filtered.customerInfo = {email: email || customerEmail}
+            continue
+        }
+        if (key === 'paymentInstruments') {
+            // Keep maskedNumber + cardType only
+            filtered.paymentInstruments = (val || []).map((pi) => ({
+                maskedNumber: pi.maskedNumber,
+                cardType: pi.cardType,
+                paymentMethodId: pi.paymentMethodId
+            }))
+            continue
+        }
+        if (key === 'shipments') {
+            // Keep shippingAddress (postalCode only), trackingNumber, trackingUrl, expectedDeliveryDate
+            filtered.shipments = (val || []).map((s) => ({
+                trackingNumber: s.trackingNumber,
+                trackingUrl: s.trackingUrl,
+                expectedDeliveryDate: s.expectedDeliveryDate,
+                shippingStatus: s.shippingStatus,
+                shippingAddress: s.shippingAddress
+                    ? {postalCode: s.shippingAddress.postalCode}
+                    : undefined,
+                shippingMethod: s.shippingMethod
+            }))
+            continue
+        }
+        filtered[key] = val
+    }
+    return filtered
+}
 
 const options = {
     // The build directory (an absolute path)
@@ -348,6 +426,15 @@ export async function jwksCaching(req, res, options) {
     }
 }
 
+// Guest order lookup: warn if feature is enabled but cookies are not allowed
+const _golConfig = getConfig()?.app?.guestOrderLookup
+if (_golConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_COOKIES) {
+    logger.warn(
+        'guestOrderLookup.enabled is true but neither localAllowCookies nor MRT_ALLOW_COOKIES is set. The cc-goa_* HttpOnly cookie will not be written. Set localAllowCookies: true for local dev or MRT_ALLOW_COOKIES=true for MRT.',
+        {namespace: 'guest-order-lookup'}
+    )
+}
+
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
     app.use(express.urlencoded({extended: true}))
@@ -570,6 +657,153 @@ const {handler} = runtime.createHandler(options, (app) => {
                 error: 'Failed to fetch metadata',
                 details: error.message
             })
+        }
+    })
+
+    app.post('/api/order-lookup/verify', async (req, res) => {
+        const appConfig = getConfig()?.app
+        if (!appConfig?.guestOrderLookup?.enabled)
+            return res.status(503).json({error: 'Feature not enabled'})
+
+        const {orderNo, email, accessCode} = req.body || {}
+        if (!orderNo || !email || !accessCode)
+            return res.status(400).json({error: 'Missing required fields'})
+
+        const authorization = req.headers['authorization']
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
+
+        const correlationId = req.headers['x-correlation-id']
+        const start = Date.now()
+
+        try {
+            // Instantiate ShopperOrders server-side using config params + forwarded SLAS token
+            const {clientId, organizationId, shortCode, siteId: configSiteId} =
+                appConfig.commerceAPI.parameters
+            const shopperOrders = new ShopperOrders({
+                clientId,
+                organizationId,
+                shortCode,
+                siteId: configSiteId,
+                headers: {authorization}
+            })
+
+            const order = await shopperOrders.guestOrderLookup({
+                parameters: {orderNo},
+                body: {orderViewCode: accessCode, email}
+            })
+
+            // Apply guest field allowlist
+            const filtered = filterGuestOrderFields(order)
+
+            // Write HttpOnly session cookie
+            const siteId = getSiteIdFromRequest(req) || configSiteId
+            const cookieName = `cc-goa_${siteId}`
+            const existing = parseGuestOrderCookie(req, cookieName)
+            existing[orderNo] = {email, accessCode}
+            const cookieVal = evictIfNeeded(existing)
+            res.setHeader(
+                'Set-Cookie',
+                `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+            )
+
+            logger.info('guest-order-lookup verify success', {
+                namespace: 'guest-order-lookup',
+                additionalProperties: {
+                    correlationId,
+                    orderNoPrefix: orderNo?.slice(0, 4),
+                    scapiStatus: 200,
+                    durationMs: Date.now() - start
+                }
+            })
+            res.json(filtered)
+        } catch (err) {
+            const scapiStatus = err?.response?.status || 500
+            const errorKind = scapiStatus === 404 ? 'invalid_code' : 'scapi_error'
+            logger.warn('guest-order-lookup verify error', {
+                namespace: 'guest-order-lookup',
+                additionalProperties: {
+                    correlationId,
+                    orderNoPrefix: orderNo?.slice(0, 4),
+                    scapiStatus,
+                    errorKind,
+                    durationMs: Date.now() - start
+                }
+            })
+            if (scapiStatus === 404) return res.status(404).json({error: 'Invalid or expired access code'})
+            res.status(502).json({error: 'Service error'})
+        }
+    })
+
+    app.get('/api/order-lookup/order', async (req, res) => {
+        const appConfig = getConfig()?.app
+        if (!appConfig?.guestOrderLookup?.enabled)
+            return res.status(503).json({error: 'Feature not enabled'})
+
+        const authorization = req.headers['authorization']
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
+
+        const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const cookieName = `cc-goa_${siteId}`
+        const cookieData = parseGuestOrderCookie(req, cookieName)
+
+        // orderNo passed as query param (never in path — security constraint)
+        const orderNo = req.query?.orderNo
+        if (!orderNo || !cookieData[orderNo])
+            return res.status(404).json({error: 'No session for this order'})
+
+        const {email, accessCode} = cookieData[orderNo]
+        const correlationId = req.headers['x-correlation-id']
+        const start = Date.now()
+
+        try {
+            const {clientId, organizationId, shortCode, siteId: configSiteId} =
+                appConfig.commerceAPI.parameters
+            const shopperOrders = new ShopperOrders({
+                clientId,
+                organizationId,
+                shortCode,
+                siteId: configSiteId,
+                headers: {authorization}
+            })
+            const order = await shopperOrders.guestOrderLookup({
+                parameters: {orderNo},
+                body: {orderViewCode: accessCode, email}
+            })
+            const filtered = filterGuestOrderFields(order)
+            logger.info('guest-order-lookup order fetch success', {
+                namespace: 'guest-order-lookup',
+                additionalProperties: {
+                    correlationId,
+                    orderNoPrefix: orderNo?.slice(0, 4),
+                    scapiStatus: 200,
+                    durationMs: Date.now() - start
+                }
+            })
+            res.json(filtered)
+        } catch (err) {
+            const scapiStatus = err?.response?.status || 500
+            const errorKind = scapiStatus === 404 ? 'expired_code' : 'scapi_error'
+            logger.warn('guest-order-lookup order fetch error', {
+                namespace: 'guest-order-lookup',
+                additionalProperties: {
+                    correlationId,
+                    orderNoPrefix: orderNo?.slice(0, 4),
+                    scapiStatus,
+                    errorKind,
+                    durationMs: Date.now() - start
+                }
+            })
+            if (scapiStatus === 404) {
+                // Clear this order's cookie entry
+                const cookieData2 = parseGuestOrderCookie(req, cookieName)
+                delete cookieData2[orderNo]
+                res.setHeader(
+                    'Set-Cookie',
+                    `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+                )
+                return res.status(404).json({error: 'Session expired'})
+            }
+            res.status(502).json({error: 'Service error'})
         }
     })
 

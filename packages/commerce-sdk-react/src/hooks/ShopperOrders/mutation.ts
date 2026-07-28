@@ -63,7 +63,14 @@ The payment instrument is added with the provided details. The payment method mu
      * Initiates the return of one or more items of an order that is integrated with Order Management (OMS).
      * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `returnOmsOrder` endpoint.
      */
-    ReturnOmsOrder: 'returnOmsOrder'
+    ReturnOmsOrder: 'returnOmsOrder',
+    /**
+     * Requests an order access code (OTP) for guest order lookup. Stub pending SDK 26.8 release of
+     * requestOrderAccessCode in commerce-sdk-isomorphic (currently absent from 5.4.0).
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `requestOrderAccessCode` endpoint.
+     */
+    // @ts-expect-error SDK 26.8 pending — requestOrderAccessCode is not yet in commerce-sdk-isomorphic 5.4.0
+    RequestOrderAccessCode: 'requestOrderAccessCode'
 } as const
 
 /**
