@@ -20,7 +20,7 @@ import {Redirect, useHistory} from 'react-router-dom'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import Field from '@salesforce/retail-react-app/app/components/field'
 
-const GuestOrderAccessRequest = () => {
+const GuestOrderLookupRequest = () => {
     const {formatMessage} = useIntl()
     const {isRegistered} = useCustomerType()
     const history = useHistory()
@@ -30,7 +30,7 @@ const GuestOrderAccessRequest = () => {
         useShopperOrdersMutation('requestOrderAccessCode')
 
     const orderNumberRegex =
-        getConfig()?.app?.guestOrderAccess?.orderNumberRegex ?? '^[A-Za-z0-9]{6,20}$'
+        getConfig()?.app?.guestOrderLookup?.orderNumberRegex ?? '^[A-Za-z0-9]{6,20}$'
 
     const form = useForm({
         defaultValues: {orderNo: '', email: ''}
@@ -55,11 +55,11 @@ const GuestOrderAccessRequest = () => {
             // 400 errors are also routed to verify — the server rejects
             // malformed payloads, but the UI must never leak order existence.
             if (err?.response?.status === 400) {
-                history.push('/order-access/verify', {orderNo, email})
+                history.push('/order-lookup/verify', {orderNo, email})
                 return
             }
         }
-        history.push('/order-access/verify', {orderNo, email})
+        history.push('/order-lookup/verify', {orderNo, email})
     }
 
     return (
@@ -68,13 +68,13 @@ const GuestOrderAccessRequest = () => {
                 <Box>
                     <Heading as="h1" fontSize="2xl" mb={2}>
                         {formatMessage({
-                            id: 'guestOrderAccess.request.heading',
+                            id: 'guestOrderLookup.request.heading',
                             defaultMessage: 'Find Your Order'
                         })}
                     </Heading>
                     <Text color="gray.600">
                         {formatMessage({
-                            id: 'guestOrderAccess.request.subtext',
+                            id: 'guestOrderLookup.request.subtext',
                             defaultMessage:
                                 'Enter your order number and email address to receive a one-time access code.'
                         })}
@@ -85,7 +85,7 @@ const GuestOrderAccessRequest = () => {
                         <Field
                             name="orderNo"
                             label={formatMessage({
-                                id: 'guestOrderAccess.request.label.orderNumber',
+                                id: 'guestOrderLookup.request.label.orderNumber',
                                 defaultMessage: 'Order Number'
                             })}
                             type="text"
@@ -93,13 +93,13 @@ const GuestOrderAccessRequest = () => {
                             defaultValue=""
                             rules={{
                                 required: formatMessage({
-                                    id: 'guestOrderAccess.request.error.orderNumberRequired',
+                                    id: 'guestOrderLookup.request.error.orderNumberRequired',
                                     defaultMessage: 'Order number is required'
                                 }),
                                 pattern: {
                                     value: new RegExp(orderNumberRegex),
                                     message: formatMessage({
-                                        id: 'guestOrderAccess.request.error.orderNumberInvalid',
+                                        id: 'guestOrderLookup.request.error.orderNumberInvalid',
                                         defaultMessage: 'Enter a valid order number'
                                     })
                                 }
@@ -110,7 +110,7 @@ const GuestOrderAccessRequest = () => {
                         <Field
                             name="email"
                             label={formatMessage({
-                                id: 'guestOrderAccess.request.label.email',
+                                id: 'guestOrderLookup.request.label.email',
                                 defaultMessage: 'Email Address'
                             })}
                             type="email"
@@ -118,13 +118,13 @@ const GuestOrderAccessRequest = () => {
                             defaultValue=""
                             rules={{
                                 required: formatMessage({
-                                    id: 'guestOrderAccess.request.error.emailRequired',
+                                    id: 'guestOrderLookup.request.error.emailRequired',
                                     defaultMessage: 'Email address is required'
                                 }),
                                 pattern: {
                                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                     message: formatMessage({
-                                        id: 'guestOrderAccess.request.error.emailInvalid',
+                                        id: 'guestOrderLookup.request.error.emailInvalid',
                                         defaultMessage: 'Enter a valid email address'
                                     })
                                 }
@@ -140,7 +140,7 @@ const GuestOrderAccessRequest = () => {
                             width="full"
                         >
                             {formatMessage({
-                                id: 'guestOrderAccess.request.button.submit',
+                                id: 'guestOrderLookup.request.button.submit',
                                 defaultMessage: 'Send Access Code'
                             })}
                         </Button>
@@ -151,4 +151,4 @@ const GuestOrderAccessRequest = () => {
     )
 }
 
-export default GuestOrderAccessRequest
+export default GuestOrderLookupRequest

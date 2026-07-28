@@ -52,9 +52,9 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
 })
 const PaymentProcessing = loadable(() => import('./pages/checkout/payment-processing'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
-const GuestOrderAccessRequest = loadable(() => import('./pages/guest-order-access/request'), {fallback})
-const GuestOrderAccessVerify = loadable(() => import('./pages/guest-order-access/verify'), {fallback})
-const GuestOrderAccessOrder = loadable(() => import('./pages/guest-order-access/order'), {fallback})
+const GuestOrderLookupRequest = loadable(() => import('./pages/guest-order-lookup/request'), {fallback})
+const GuestOrderLookupVerify = loadable(() => import('./pages/guest-order-lookup/verify'), {fallback})
+const GuestOrderLookupOrder = loadable(() => import('./pages/guest-order-lookup/order'), {fallback})
 
 export const routes = [
     {
@@ -139,7 +139,7 @@ export default () => {
     const socialRedirectURI = loginConfig?.social?.redirectURI
     const passwordlessLoginEnabled = loginConfig?.passwordless?.enabled
     const passwordlessLoginLandingPath = loginConfig?.passwordless?.landingPath
-    const guestOrderAccessEnabled = getConfig()?.app?.guestOrderAccess?.enabled
+    const guestOrderLookupEnabled = getConfig()?.app?.guestOrderLookup?.enabled
 
     // Add dynamic routes conditionally (only if features are enabled and paths are defined)
     const dynamicRoutes = [
@@ -160,19 +160,19 @@ export default () => {
                 component: SocialLoginRedirect,
                 exact: true
             },
-        guestOrderAccessEnabled && {
-            path: '/order-access',
-            component: GuestOrderAccessRequest,
+        guestOrderLookupEnabled && {
+            path: '/order-lookup',
+            component: GuestOrderLookupRequest,
             exact: true
         },
-        guestOrderAccessEnabled && {
-            path: '/order-access/verify',
-            component: GuestOrderAccessVerify,
+        guestOrderLookupEnabled && {
+            path: '/order-lookup/verify',
+            component: GuestOrderLookupVerify,
             exact: true
         },
-        guestOrderAccessEnabled && {
-            path: '/order-access/order',
-            component: GuestOrderAccessOrder,
+        guestOrderLookupEnabled && {
+            path: '/order-lookup/order',
+            component: GuestOrderLookupOrder,
             exact: true
         }
     ].filter(Boolean)
