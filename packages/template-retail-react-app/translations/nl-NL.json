@@ -1786,139 +1786,139 @@
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Meld je aan om verder te gaan."
   },
-  "guestOrderAccess.request.heading": {
+  "guestOrderLookup.request.heading": {
     "defaultMessage": "Find Your Order"
   },
-  "guestOrderAccess.request.subtext": {
+  "guestOrderLookup.request.subtext": {
     "defaultMessage": "Enter your order number and email address to receive a one-time access code."
   },
-  "guestOrderAccess.request.label.orderNumber": {
+  "guestOrderLookup.request.label.orderNumber": {
     "defaultMessage": "Order Number"
   },
-  "guestOrderAccess.request.label.email": {
+  "guestOrderLookup.request.label.email": {
     "defaultMessage": "Email Address"
   },
-  "guestOrderAccess.request.error.orderNumberRequired": {
+  "guestOrderLookup.request.error.orderNumberRequired": {
     "defaultMessage": "Order number is required"
   },
-  "guestOrderAccess.request.error.orderNumberInvalid": {
+  "guestOrderLookup.request.error.orderNumberInvalid": {
     "defaultMessage": "Enter a valid order number"
   },
-  "guestOrderAccess.request.error.emailRequired": {
+  "guestOrderLookup.request.error.emailRequired": {
     "defaultMessage": "Email address is required"
   },
-  "guestOrderAccess.request.error.emailInvalid": {
+  "guestOrderLookup.request.error.emailInvalid": {
     "defaultMessage": "Enter a valid email address"
   },
-  "guestOrderAccess.request.button.submit": {
+  "guestOrderLookup.request.button.submit": {
     "defaultMessage": "Send Access Code"
   },
-  "guestOrderAccess.verify.heading": {
+  "guestOrderLookup.verify.heading": {
     "defaultMessage": "Enter Your Access Code"
   },
-  "guestOrderAccess.verify.subtext": {
+  "guestOrderLookup.verify.subtext": {
     "defaultMessage": "We've sent a 6-digit code to {email}. It may take a moment to arrive."
   },
-  "guestOrderAccess.verify.label.code": {
+  "guestOrderLookup.verify.label.code": {
     "defaultMessage": "Access Code"
   },
-  "guestOrderAccess.verify.error.codeRequired": {
+  "guestOrderLookup.verify.error.codeRequired": {
     "defaultMessage": "Access code is required"
   },
-  "guestOrderAccess.verify.error.codeInvalid": {
+  "guestOrderLookup.verify.error.codeInvalid": {
     "defaultMessage": "Enter the 6-digit code from your email"
   },
-  "guestOrderAccess.verify.error.invalidCode": {
+  "guestOrderLookup.verify.error.invalidCode": {
     "defaultMessage": "Code invalid or expired. Please try again or request a new code."
   },
-  "guestOrderAccess.verify.error.tooManyAttempts": {
+  "guestOrderLookup.verify.error.tooManyAttempts": {
     "defaultMessage": "Too many attempts. Please wait a moment and try again."
   },
-  "guestOrderAccess.verify.error.generic": {
+  "guestOrderLookup.verify.error.generic": {
     "defaultMessage": "Something went wrong. Please try again."
   },
-  "guestOrderAccess.verify.button.submit": {
+  "guestOrderLookup.verify.button.submit": {
     "defaultMessage": "Verify Code"
   },
-  "guestOrderAccess.verify.resend.prompt": {
+  "guestOrderLookup.verify.resend.prompt": {
     "defaultMessage": "Didn't receive a code?"
   },
-  "guestOrderAccess.verify.resend.link": {
+  "guestOrderLookup.verify.resend.link": {
     "defaultMessage": "Resend code"
   },
-  "guestOrderAccess.verify.toast.resent": {
+  "guestOrderLookup.verify.toast.resent": {
     "defaultMessage": "Check your inbox — it may take a moment."
   },
-  "guestOrderAccess.request.alert.sessionExpired": {
+  "guestOrderLookup.request.alert.sessionExpired": {
     "defaultMessage": "Your session has expired. Please request a new access code."
   },
-  "guestOrderAccess.order.heading": {
+  "guestOrderLookup.order.heading": {
     "defaultMessage": "Order Details"
   },
-  "guestOrderAccess.order.orderNumber": {
+  "guestOrderLookup.order.orderNumber": {
     "defaultMessage": "Order #{orderNo}"
   },
-  "guestOrderAccess.order.placedOn": {
+  "guestOrderLookup.order.placedOn": {
     "defaultMessage": "Placed on {date}"
   },
-  "guestOrderAccess.order.status": {
+  "guestOrderLookup.order.status": {
     "defaultMessage": "Status: {status}"
   },
-  "guestOrderAccess.order.button.refreshStatus": {
+  "guestOrderLookup.order.button.refreshStatus": {
     "defaultMessage": "Refresh Status"
   },
-  "guestOrderAccess.order.button.refreshStatus.aria": {
+  "guestOrderLookup.order.button.refreshStatus.aria": {
     "defaultMessage": "Refresh order status"
   },
-  "guestOrderAccess.order.button.refreshing": {
+  "guestOrderLookup.order.button.refreshing": {
     "defaultMessage": "Refreshing…"
   },
-  "guestOrderAccess.order.button.retry": {
+  "guestOrderLookup.order.button.retry": {
     "defaultMessage": "Try Again"
   },
-  "guestOrderAccess.order.lastUpdated": {
+  "guestOrderLookup.order.lastUpdated": {
     "defaultMessage": "Last updated at {time}"
   },
-  "guestOrderAccess.order.error.generic": {
+  "guestOrderLookup.order.error.generic": {
     "defaultMessage": "Something went wrong loading your order. Please try again."
   },
-  "guestOrderAccess.order.section.items": {
+  "guestOrderLookup.order.section.items": {
     "defaultMessage": "Items"
   },
-  "guestOrderAccess.order.item.unnamed": {
+  "guestOrderLookup.order.item.unnamed": {
     "defaultMessage": "Product"
   },
-  "guestOrderAccess.order.item.qty": {
+  "guestOrderLookup.order.item.qty": {
     "defaultMessage": "Qty: {qty}"
   },
-  "guestOrderAccess.order.section.shipping": {
+  "guestOrderLookup.order.section.shipping": {
     "defaultMessage": "Shipping"
   },
-  "guestOrderAccess.order.shipping.status": {
+  "guestOrderLookup.order.shipping.status": {
     "defaultMessage": "Shipping status: {status}"
   },
-  "guestOrderAccess.order.shipping.postalCode": {
+  "guestOrderLookup.order.shipping.postalCode": {
     "defaultMessage": "Postal code: {postalCode}"
   },
-  "guestOrderAccess.order.shipping.expectedDelivery": {
+  "guestOrderLookup.order.shipping.expectedDelivery": {
     "defaultMessage": "Expected delivery: {date}"
   },
-  "guestOrderAccess.order.shipping.tracking": {
+  "guestOrderLookup.order.shipping.tracking": {
     "defaultMessage": "Tracking: {trackingNumber}"
   },
-  "guestOrderAccess.order.section.totals": {
+  "guestOrderLookup.order.section.totals": {
     "defaultMessage": "Order Summary"
   },
-  "guestOrderAccess.order.totals.subtotal": {
+  "guestOrderLookup.order.totals.subtotal": {
     "defaultMessage": "Subtotal"
   },
-  "guestOrderAccess.order.totals.shipping": {
+  "guestOrderLookup.order.totals.shipping": {
     "defaultMessage": "Shipping"
   },
-  "guestOrderAccess.order.totals.tax": {
+  "guestOrderLookup.order.totals.tax": {
     "defaultMessage": "Tax"
   },
-  "guestOrderAccess.order.totals.total": {
+  "guestOrderLookup.order.totals.total": {
     "defaultMessage": "Total"
   }
 }
