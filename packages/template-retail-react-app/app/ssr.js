@@ -426,6 +426,44 @@ export async function jwksCaching(req, res, options) {
     }
 }
 
+// ─── S15: In-process throttle middleware for /api/order-access/verify ────────
+// Keyed on the first IP from X-Forwarded-For (or req.ip). Uses a Map with
+// {count, resetAt} per key. No external library — zero new dependencies.
+// Reads windowMs/max from app.guestOrderAccess.requestCodeThrottle at request
+// time so config hot-reload works without restarting the server.
+export function createVerifyThrottle() {
+    /** @type {Map<string, {count: number, resetAt: number}>} */
+    const store = new Map()
+
+    return function verifyThrottleMiddleware(req, res, next) {
+        const {app: appConfig} = getConfig()
+        // No-op when feature is disabled
+        if (!appConfig?.guestOrderAccess?.enabled) return next()
+        // Only throttle /api/order-access/ requests
+        if (!req.path?.startsWith('/api/order-access/')) return next()
+
+        const throttleCfg = appConfig.guestOrderAccess.requestCodeThrottle || {}
+        const windowMs = throttleCfg.windowMs ?? 60000
+        const max = throttleCfg.max ?? 5
+
+        const ip =
+            (req.headers['x-forwarded-for']?.split(',')[0]?.trim()) || req.ip || 'unknown'
+        const now = Date.now()
+        const entry = store.get(ip)
+
+        if (!entry || now >= entry.resetAt) {
+            store.set(ip, {count: 1, resetAt: now + windowMs})
+            return next()
+        }
+
+        entry.count += 1
+        if (entry.count > max) {
+            return res.status(429).json({error: 'Too many requests'})
+        }
+        return next()
+    }
+}
+
 // Guest order access: warn if feature is enabled but cookies are not allowed
 const _goaConfig = getConfig()?.app?.guestOrderAccess
 if (_goaConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_COOKIES) {
@@ -659,6 +697,9 @@ const {handler} = runtime.createHandler(options, (app) => {
             })
         }
     })
+
+    // S15: defense-in-depth throttle on /api/order-access/* endpoints
+    app.use(createVerifyThrottle())
 
     app.post('/api/order-access/verify', async (req, res) => {
         const {app: appConfig} = getConfig()

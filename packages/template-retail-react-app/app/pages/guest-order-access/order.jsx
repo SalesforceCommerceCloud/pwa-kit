@@ -229,7 +229,14 @@ const GuestOrderAccessOrder = () => {
                             })}
                         </Button>
                         {lastUpdatedTime && (
-                            <Text fontSize="xs" color="gray.500" mt={1} data-testid="last-updated">
+                            <Text
+                                fontSize="xs"
+                                color="gray.500"
+                                mt={1}
+                                data-testid="last-updated"
+                                aria-live="polite"
+                                aria-atomic="true"
+                            >
                                 {formatMessage(
                                     {
                                         id: 'guestOrderAccess.order.lastUpdated',

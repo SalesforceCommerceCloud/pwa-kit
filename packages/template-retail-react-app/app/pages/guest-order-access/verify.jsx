@@ -37,6 +37,7 @@ const GuestOrderAccessVerify = () => {
     const {getTokenWhenReady} = useAccessToken()
 
     const [serverError, setServerError] = useState(null)
+    const [serverErrorType, setServerErrorType] = useState(null) // 'invalidCode' | 'throttle' | 'generic'
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [resendDisabled, setResendDisabled] = useState(false)
 
@@ -46,7 +47,8 @@ const GuestOrderAccessVerify = () => {
     const {
         register,
         handleSubmit,
-        formState: {errors}
+        formState: {errors},
+        setFocus
     } = useForm({defaultValues: {accessCode: ''}})
 
     if (isRegistered) return <Redirect to="/account/orders" />
@@ -60,6 +62,7 @@ const GuestOrderAccessVerify = () => {
 
     const onSubmit = async ({accessCode}) => {
         setServerError(null)
+        setServerErrorType(null)
         setIsSubmitting(true)
         try {
             const token = await getTokenWhenReady()
@@ -72,10 +75,11 @@ const GuestOrderAccessVerify = () => {
                 body: JSON.stringify({orderNo, email, accessCode})
             })
             if (res.ok) {
-                history.push('/order-access/order')
+                history.push('/order-access/order', {orderNo})
                 return
             }
             if (res.status === 404) {
+                setServerErrorType('invalidCode')
                 setServerError(
                     formatMessage({
                         id: 'guestOrderAccess.verify.error.invalidCode',
@@ -84,6 +88,7 @@ const GuestOrderAccessVerify = () => {
                     })
                 )
             } else if (res.status === 429) {
+                setServerErrorType('throttle')
                 setServerError(
                     formatMessage({
                         id: 'guestOrderAccess.verify.error.tooManyAttempts',
@@ -91,6 +96,7 @@ const GuestOrderAccessVerify = () => {
                     })
                 )
             } else {
+                setServerErrorType('generic')
                 setServerError(
                     formatMessage({
                         id: 'guestOrderAccess.verify.error.generic',
@@ -99,6 +105,7 @@ const GuestOrderAccessVerify = () => {
                 )
             }
         } catch {
+            setServerErrorType('generic')
             setServerError(
                 formatMessage({
                     id: 'guestOrderAccess.verify.error.generic',
@@ -107,6 +114,8 @@ const GuestOrderAccessVerify = () => {
             )
         } finally {
             setIsSubmitting(false)
+            // S17: return focus to the OTP input after a server error so keyboard users can retry
+            setTimeout(() => setFocus('accessCode'), 0)
         }
     }
 
@@ -168,6 +177,14 @@ const GuestOrderAccessVerify = () => {
                                 inputMode="numeric"
                                 maxLength={6}
                                 autoComplete="one-time-code"
+                                aria-invalid={!!errors.accessCode || !!serverError}
+                                aria-describedby={
+                                    errors.accessCode
+                                        ? 'accessCode-error'
+                                        : serverError
+                                        ? 'accessCode-server-error'
+                                        : undefined
+                                }
                                 {...register('accessCode', {
                                     required: formatMessage({
                                         id: 'guestOrderAccess.verify.error.codeRequired',
@@ -183,10 +200,30 @@ const GuestOrderAccessVerify = () => {
                                 })}
                             />
                             {errors.accessCode && (
-                                <FormErrorMessage>{errors.accessCode.message}</FormErrorMessage>
+                                <FormErrorMessage id="accessCode-error" role="alert">
+                                    {errors.accessCode.message}
+                                </FormErrorMessage>
                             )}
                             {serverError && !errors.accessCode && (
-                                <FormErrorMessage>{serverError}</FormErrorMessage>
+                                <FormErrorMessage id="accessCode-server-error" role="alert">
+                                    {serverError}
+                                    {serverErrorType === 'invalidCode' && (
+                                        <>
+                                            {' '}
+                                            <Link
+                                                as="a"
+                                                href="/order-access"
+                                                color="blue.600"
+                                                textDecoration="underline"
+                                            >
+                                                {formatMessage({
+                                                    id: 'guestOrderAccess.verify.error.requestNewCode',
+                                                    defaultMessage: 'Request a new code'
+                                                })}
+                                            </Link>
+                                        </>
+                                    )}
+                                </FormErrorMessage>
                             )}
                         </FormControl>
                         <Button

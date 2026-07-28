@@ -2632,6 +2632,9 @@
   "guestOrderAccess.verify.error.invalidCode": {
     "defaultMessage": "Code invalid or expired. Please try again or request a new code."
   },
+  "guestOrderAccess.verify.error.requestNewCode": {
+    "defaultMessage": "Request a new code"
+  },
   "guestOrderAccess.verify.error.tooManyAttempts": {
     "defaultMessage": "Too many attempts. Please wait a moment and try again."
   },

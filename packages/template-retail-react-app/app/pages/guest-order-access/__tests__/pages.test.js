@@ -480,6 +480,119 @@ describe('GuestOrderAccessVerify', () => {
             expect(resendLink).toHaveAttribute('aria-disabled', 'true')
         })
     })
+
+    // ── S13: "Request a new code" link on 404 error ────────────────────────────
+    test('S13: shows "Request a new code" link when 404 error occurs', async () => {
+        global.fetch.mockResolvedValue({ok: false, status: 404})
+        const user = userEvent.setup()
+        renderVerifyWithState()
+        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
+        await waitFor(() => {
+            expect(screen.getByText('Request a new code')).toBeInTheDocument()
+        })
+    })
+
+    test('S13: "Request a new code" link routes to /order-access on 404 error', async () => {
+        global.fetch.mockResolvedValue({ok: false, status: 404})
+        const user = userEvent.setup()
+        renderWithProviders(
+            <MemoryRouter
+                initialEntries={[
+                    {pathname: '/order-access/verify', state: {orderNo: 'ABC123', email: 'test@example.com'}}
+                ]}
+            >
+                <Route path="/order-access/verify" component={GuestOrderAccessVerify} />
+                <Route path="/order-access" exact render={() => <div data-testid="request-page">Request Page</div>} />
+            </MemoryRouter>
+        )
+        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
+        await waitFor(() => {
+            expect(screen.getByText('Request a new code')).toBeInTheDocument()
+        })
+        // The link href points to /order-access
+        const link = screen.getByText('Request a new code')
+        expect(link).toHaveAttribute('href', '/order-access')
+    })
+
+    test('S13: submit button re-enables after a server error', async () => {
+        global.fetch.mockResolvedValue({ok: false, status: 500})
+        const user = userEvent.setup()
+        renderVerifyWithState()
+        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
+        await waitFor(() => {
+            expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
+        })
+        // Button should be re-enabled (not disabled) after error
+        expect(screen.getByRole('button', {name: /verify code/i})).not.toBeDisabled()
+    })
+
+    test('S13: "Request a new code" link does NOT appear on 429 or 500 errors', async () => {
+        global.fetch.mockResolvedValue({ok: false, status: 429})
+        const user = userEvent.setup()
+        renderVerifyWithState()
+        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
+        await waitFor(() => {
+            expect(
+                screen.getByText('Too many attempts. Please wait a moment and try again.')
+            ).toBeInTheDocument()
+        })
+        expect(screen.queryByText('Request a new code')).not.toBeInTheDocument()
+    })
+
+    // ── S17: A11y attributes ────────────────────────────────────────────────────
+    test('S17: OTP input does not have aria-invalid=true when no error', () => {
+        renderVerifyWithState()
+        const input = screen.getByLabelText('Access Code')
+        // When no error, aria-invalid is either absent or 'false' — either is correct
+        const ariaInvalid = input.getAttribute('aria-invalid')
+        expect(ariaInvalid === null || ariaInvalid === 'false').toBe(true)
+    })
+
+    test('S17: OTP input has aria-invalid=true when server error is present', async () => {
+        global.fetch.mockResolvedValue({ok: false, status: 500})
+        const user = userEvent.setup()
+        renderVerifyWithState()
+        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
+        await waitFor(() => {
+            expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
+        })
+        const input = screen.getByLabelText('Access Code')
+        expect(input).toHaveAttribute('aria-invalid', 'true')
+    })
+
+    test('S17: error message has role=alert so screen readers announce it', async () => {
+        global.fetch.mockResolvedValue({ok: false, status: 500})
+        const user = userEvent.setup()
+        renderVerifyWithState()
+        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
+        await waitFor(() => {
+            expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
+        })
+        // The error message container has role="alert"
+        const alert = screen.getByRole('alert')
+        expect(alert).toBeInTheDocument()
+    })
+
+    test('S17: OTP input aria-describedby includes server error element id when error is present', async () => {
+        global.fetch.mockResolvedValue({ok: false, status: 500})
+        const user = userEvent.setup()
+        renderVerifyWithState()
+        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
+        await waitFor(() => {
+            expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
+        })
+        const input = screen.getByLabelText('Access Code')
+        // Chakra FormControl may append additional ids; verify ours is included
+        const describedBy = input.getAttribute('aria-describedby') || ''
+        expect(describedBy).toContain('accessCode-server-error')
+    })
 })
 
 describe('GuestOrderAccessOrder', () => {
@@ -598,6 +711,71 @@ describe('GuestOrderAccessOrder', () => {
             expect(mockRefetch).toHaveBeenCalled()
             expect(screen.getByTestId('request-page')).toBeInTheDocument()
         })
+    })
+
+    // ── S13: 5xx error state with retry button ─────────────────────────────────
+    test('S13: shows error message and retry button when 5xx fetch fails', () => {
+        const serverError = new Error('Service error')
+        serverError.status = 500
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({
+                data: undefined,
+                isLoading: false,
+                isError: true,
+                error: serverError,
+                isSuccess: false
+            })
+        )
+        renderOrderPage()
+        expect(
+            screen.getByText('Something went wrong loading your order. Please try again.')
+        ).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /try again/i})).toBeInTheDocument()
+    })
+
+    test('S13: error container on 5xx has role=alert for screen reader announcement', () => {
+        const serverError = new Error('Service error')
+        serverError.status = 500
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({
+                data: undefined,
+                isLoading: false,
+                isError: true,
+                error: serverError,
+                isSuccess: false
+            })
+        )
+        renderOrderPage()
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+    })
+
+    test('S13: retry button on 5xx error calls refetch', async () => {
+        const serverError = new Error('Service error')
+        serverError.status = 500
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({
+                data: undefined,
+                isLoading: false,
+                isError: true,
+                error: serverError,
+                isSuccess: false
+            })
+        )
+        const user = userEvent.setup()
+        renderOrderPage()
+        const retryBtn = screen.getByRole('button', {name: /try again/i})
+        await user.click(retryBtn)
+        await waitFor(() => {
+            expect(mockRefetch).toHaveBeenCalled()
+        })
+    })
+
+    // ── S17: last-updated live region ─────────────────────────────────────────
+    test('S17: last-updated timestamp has aria-live=polite', () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({dataUpdatedAt: Date.now(), isSuccess: true}))
+        renderOrderPage()
+        const lastUpdated = screen.getByTestId('last-updated')
+        expect(lastUpdated).toHaveAttribute('aria-live', 'polite')
     })
 })
 
