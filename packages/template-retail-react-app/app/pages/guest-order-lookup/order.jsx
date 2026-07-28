@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useIntl} from 'react-intl'
 import {useQuery} from '@tanstack/react-query'
 import {
@@ -119,11 +119,21 @@ const GuestOrderLookupOrder = () => {
     })
     const [omsMetaLoading, setOmsMetaLoading] = useState(true)
 
+    // useAccessToken returns a new getTokenWhenReady function on every render (not
+    // memoized). Using it directly in a useEffect dep array would cause an infinite
+    // re-render loop: state update → re-render → new function ref → effect fires again.
+    // We store it in a ref so the effect can always call the latest version while
+    // keeping the dep array empty (runs once on mount).
+    const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    useEffect(() => {
+        getTokenWhenReadyRef.current = getTokenWhenReady
+    })
+
     useEffect(() => {
         let cancelled = false
         const fetchMeta = async () => {
             try {
-                const token = await getTokenWhenReady()
+                const token = await getTokenWhenReadyRef.current()
                 const res = await fetch('/api/order-lookup/oms-meta', {
                     headers: {Authorization: `Bearer ${token}`}
                 })
@@ -139,7 +149,7 @@ const GuestOrderLookupOrder = () => {
         return () => {
             cancelled = true
         }
-    }, [getTokenWhenReady])
+    }, []) // empty deps — fires once on mount; getTokenWhenReady accessed via ref above
 
     // Cancel state
     const [cancelModalOpen, setCancelModalOpen] = useState(false)
@@ -224,9 +234,9 @@ const GuestOrderLookupOrder = () => {
         }
     }
 
-    const handleRefetchReasons = async () => {
+    const handleRefetchReasons = useCallback(async () => {
         try {
-            const token = await getTokenWhenReady()
+            const token = await getTokenWhenReadyRef.current()
             const res = await fetch('/api/order-lookup/oms-meta', {
                 headers: {Authorization: `Bearer ${token}`}
             })
@@ -234,7 +244,7 @@ const GuestOrderLookupOrder = () => {
         } catch {
             // Swallow — stale reasons remain; the modal handles it gracefully
         }
-    }
+    }, []) // getTokenWhenReady accessed via ref — stable dep array
 
     if (isRegistered) return <Redirect to="/account/orders" />
 
@@ -612,6 +622,14 @@ const GuestOrderLookupOrder = () => {
                     </Stack>
                 </Box>
 
+                {/* Skeleton placeholder while OMS metadata is loading — prevents layout shift */}
+                {omsMetaLoading && (
+                    <Stack direction="row" spacing={3}>
+                        <Skeleton height="40px" width="120px" borderRadius="md" />
+                        <Skeleton height="40px" width="120px" borderRadius="md" />
+                    </Stack>
+                )}
+
                 {/* Cancel / Return action buttons — only shown when OMS is active */}
                 {showActions && (
                     <Stack direction="row" spacing={3}>
@@ -619,6 +637,7 @@ const GuestOrderLookupOrder = () => {
                             <Button
                                 variant="outline"
                                 colorScheme="red"
+                                isDisabled={cancelSubmitting || isFetching}
                                 onClick={() => {
                                     setCancelError(null)
                                     setCancelModalOpen(true)
@@ -633,6 +652,7 @@ const GuestOrderLookupOrder = () => {
                         {canReturn && (
                             <Button
                                 variant="outline"
+                                isDisabled={returnSubmitting}
                                 onClick={() => {
                                     setReturnError(null)
                                     setReturnModalOpen(true)
@@ -680,7 +700,10 @@ const GuestOrderLookupOrder = () => {
 
             <ReturnItemsModal
                 isOpen={returnModalOpen}
-                onClose={() => setReturnModalOpen(false)}
+                onClose={() => {
+                    setReturnModalOpen(false)
+                    setReturnSelection({})
+                }}
                 order={order}
                 returnableItems={returnableItems}
                 reasonCodes={omsMeta.returnReasonCodes}
