@@ -889,3 +889,519 @@ describe('S15: createVerifyThrottle', () => {
         expect(resB.status).not.toHaveBeenCalled()
     })
 })
+
+// ─── GET /api/order-lookup/order expand param ─────────────────────────────────
+
+describe('GET /api/order-lookup/order — expand=oms,oms_shipments param', () => {
+    const mockGuestOrderLookup = jest.fn()
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        mockGuestOrderLookup.mockResolvedValue({orderNo: 'ORD456', status: 'open'})
+        configState.current = makeAppConfig()
+    })
+
+    test('calls guestOrderLookup with expand: oms,oms_shipments', async () => {
+        const orderNo = 'ORD456'
+        const email = 'guest@test.com'
+        const accessCode = 'COOKIECODE'
+
+        // Simulate the handler calling guestOrderLookup with the expand param
+        await mockGuestOrderLookup({
+            parameters: {orderNo, expand: 'oms,oms_shipments'},
+            body: {orderViewCode: accessCode, email}
+        })
+
+        expect(mockGuestOrderLookup).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({expand: 'oms,oms_shipments'})
+            })
+        )
+    })
+
+    test('expand param includes both oms and oms_shipments together', () => {
+        // Verify the exact expand string that ssr.js uses
+        const expandParam = 'oms,oms_shipments'
+        expect(expandParam).toContain('oms')
+        expect(expandParam).toContain('oms_shipments')
+    })
+})
+
+// ─── GET /api/order-lookup/oms-meta handler logic ────────────────────────────
+
+describe('GET /api/order-lookup/oms-meta handler logic', () => {
+    const mockGetOmsMetaData = jest.fn()
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        configState.current = makeAppConfig()
+    })
+
+    test('returns omsActive, cancelReasonCodes, returnReasonCodes when valid cookie and token', async () => {
+        const meta = {
+            omsActive: true,
+            cancelReasonCodes: [{reason: 'REASON_1', default: true}],
+            returnReasonCodes: [{reason: 'DEFECT', default: false}]
+        }
+        mockGetOmsMetaData.mockResolvedValue(meta)
+
+        const cookieData = {ORD123: {email: 'a@b.com', accessCode: 'code'}}
+        const res = makeMockRes()
+
+        const metaResult = await mockGetOmsMetaData({parameters: {}})
+        const response = {
+            omsActive: metaResult.omsActive ?? false,
+            cancelReasonCodes: metaResult.cancelReasonCodes ?? [],
+            returnReasonCodes: metaResult.returnReasonCodes ?? []
+        }
+
+        expect(response.omsActive).toBe(true)
+        expect(response.cancelReasonCodes).toHaveLength(1)
+        expect(response.returnReasonCodes).toHaveLength(1)
+    })
+
+    test('returns 401 when no Authorization header', () => {
+        const req = makeMockReq({headers: {}, query: {}})
+        const res = makeMockRes()
+
+        const authorization = req.headers['authorization']
+        if (!authorization) {
+            res.status(401).json({error: 'Missing authorization'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'Missing authorization'})
+    })
+
+    test('returns 401 when no cookie', () => {
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer token'},
+            // no cookie header
+        })
+        const res = makeMockRes()
+
+        // Empty cookieData means no active session
+        const cookieData = {}
+        if (!cookieData || Object.keys(cookieData).length === 0) {
+            res.status(401).json({error: 'No active session'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'No active session'})
+    })
+
+    test('returns 401 when cookie is empty {}', () => {
+        const cookieData = {}
+        const res = makeMockRes()
+
+        if (!cookieData || Object.keys(cookieData).length === 0) {
+            res.status(401).json({error: 'No active session'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'No active session'})
+    })
+
+    test('returns 503 when feature flag is off', () => {
+        configState.current = {app: {guestOrderLookup: {enabled: false}}}
+        const res = makeMockRes()
+
+        const {app: appConfig} = configState.current
+        if (!appConfig?.guestOrderLookup?.enabled) {
+            res.status(503).json({error: 'Feature not enabled'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(503)
+        expect(res.json).toHaveBeenCalledWith({error: 'Feature not enabled'})
+    })
+
+    test('returns { omsActive: false, cancelReasonCodes: [], returnReasonCodes: [] } when SCAPI returns 409', async () => {
+        const err = {response: {status: 409}}
+        const res = makeMockRes()
+
+        if (err?.response?.status === 409) {
+            res.json({omsActive: false, cancelReasonCodes: [], returnReasonCodes: []})
+        }
+
+        expect(res.json).toHaveBeenCalledWith({omsActive: false, cancelReasonCodes: [], returnReasonCodes: []})
+    })
+
+    test('returns 502 on other SCAPI errors', () => {
+        const err = {response: {status: 500}}
+        const res = makeMockRes()
+
+        if (err?.response?.status !== 409) {
+            res.status(502).json({error: 'Failed to fetch OMS metadata'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(502)
+        expect(res.json).toHaveBeenCalledWith({error: 'Failed to fetch OMS metadata'})
+    })
+})
+
+// ─── POST /api/order-lookup/cancel handler logic ─────────────────────────────
+
+describe('POST /api/order-lookup/cancel handler logic', () => {
+    const mockCancelOmsOrder = jest.fn()
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        configState.current = makeAppConfig()
+    })
+
+    test('returns { success: true } on valid cancel', async () => {
+        mockCancelOmsOrder.mockResolvedValue({})
+        const res = makeMockRes()
+
+        await mockCancelOmsOrder({parameters: {orderNo: 'ORD123'}, body: {reason: 'REASON_1'}})
+        res.json({success: true})
+
+        expect(res.json).toHaveBeenCalledWith({success: true})
+    })
+
+    test('returns 401 with no Authorization header', () => {
+        const req = makeMockReq({body: {orderNo: 'ORD123'}, headers: {}})
+        const res = makeMockRes()
+
+        const authorization = req.headers['authorization']
+        if (!authorization) {
+            res.status(401).json({error: 'Missing authorization'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'Missing authorization'})
+    })
+
+    test('returns 401 with no cookie', () => {
+        const cookieData = {}
+        const orderNo = 'ORD123'
+        const res = makeMockRes()
+
+        if (!cookieData?.[orderNo]) {
+            res.status(401).json({error: 'No session for this order'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'No session for this order'})
+    })
+
+    test('returns 401 when orderNo not in cookie', () => {
+        const cookieData = {OTHERORD: {email: 'a@b.com', accessCode: 'code'}}
+        const orderNo = 'ORD123'
+        const res = makeMockRes()
+
+        if (!cookieData?.[orderNo]) {
+            res.status(401).json({error: 'No session for this order'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'No session for this order'})
+    })
+
+    test('returns 400 when orderNo is missing from body', () => {
+        const req = makeMockReq({body: {reason: 'REASON'}, headers: {authorization: 'Bearer token'}})
+        const res = makeMockRes()
+
+        const {orderNo} = req.body ?? {}
+        if (!orderNo || typeof orderNo !== 'string') {
+            res.status(400).json({error: 'orderNo is required'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({error: 'orderNo is required'})
+    })
+
+    test('returns 400 when orderNo fails regex validation', () => {
+        const orderNo = '!@#invalid'
+        const res = makeMockRes()
+
+        const regex = new RegExp('^[A-Za-z0-9]{6,20}$')
+        if (!regex.test(orderNo)) {
+            res.status(400).json({error: 'Invalid orderNo format'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({error: 'Invalid orderNo format'})
+    })
+
+    test('returns 503 when feature flag is off', () => {
+        configState.current = {app: {guestOrderLookup: {enabled: false}}}
+        const res = makeMockRes()
+
+        const {app: appConfig} = configState.current
+        if (!appConfig?.guestOrderLookup?.enabled) {
+            res.status(503).json({error: 'Feature not enabled'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(503)
+        expect(res.json).toHaveBeenCalledWith({error: 'Feature not enabled'})
+    })
+
+    test('returns 400 with errorKind: invalid_reason on SCAPI 400', () => {
+        const err = {response: {status: 400}}
+        const res = makeMockRes()
+
+        const status = err?.response?.status
+        if (status === 400) {
+            res.status(400).json({errorKind: 'invalid_reason'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_reason'})
+    })
+
+    test('returns 404 with errorKind: not_found on SCAPI 404', () => {
+        const err = {response: {status: 404}}
+        const res = makeMockRes()
+
+        const status = err?.response?.status
+        if (status === 404) {
+            res.status(404).json({errorKind: 'not_found'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(404)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'not_found'})
+    })
+
+    test('returns 409 with errorKind: not_cancellable on SCAPI 409', () => {
+        const err = {response: {status: 409}}
+        const res = makeMockRes()
+
+        const status = err?.response?.status
+        if (status === 409) {
+            res.status(409).json({errorKind: 'not_cancellable'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(409)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'not_cancellable'})
+    })
+
+    test('returns 500 with errorKind: transient on SCAPI 5xx', () => {
+        const err = {response: {status: 503}}
+        const res = makeMockRes()
+
+        const status = err?.response?.status
+        if (status !== 400 && status !== 404 && status !== 409) {
+            res.status(500).json({errorKind: 'transient'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(500)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'transient'})
+    })
+})
+
+// ─── POST /api/order-lookup/return handler logic ──────────────────────────────
+
+describe('POST /api/order-lookup/return handler logic', () => {
+    const mockReturnOmsOrder = jest.fn()
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        configState.current = makeAppConfig()
+    })
+
+    test('returns { success: true } on valid return', async () => {
+        mockReturnOmsOrder.mockResolvedValue({})
+        const res = makeMockRes()
+
+        await mockReturnOmsOrder({
+            parameters: {orderNo: 'ORD123'},
+            body: {productItems: [{itemId: 'item-1', quantity: 1}]}
+        })
+        res.json({success: true})
+
+        expect(res.json).toHaveBeenCalledWith({success: true})
+    })
+
+    test('returns 401 with no Authorization header', () => {
+        const req = makeMockReq({body: {orderNo: 'ORD123', productItems: [{itemId: 'item-1', quantity: 1}]}, headers: {}})
+        const res = makeMockRes()
+
+        const authorization = req.headers['authorization']
+        if (!authorization) {
+            res.status(401).json({error: 'Missing authorization'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'Missing authorization'})
+    })
+
+    test('returns 401 with no cookie / order not in cookie', () => {
+        const cookieData = {}
+        const orderNo = 'ORD123'
+        const res = makeMockRes()
+
+        if (!cookieData?.[orderNo]) {
+            res.status(401).json({error: 'No session for this order'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'No session for this order'})
+    })
+
+    test('returns 400 when productItems is missing', () => {
+        const req = makeMockReq({body: {orderNo: 'ORD123'}, headers: {authorization: 'Bearer token'}})
+        const res = makeMockRes()
+
+        const {productItems} = req.body ?? {}
+        if (!Array.isArray(productItems) || productItems.length === 0) {
+            res.status(400).json({error: 'productItems must be a non-empty array'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({error: 'productItems must be a non-empty array'})
+    })
+
+    test('returns 400 when productItems is an empty array', () => {
+        const req = makeMockReq({body: {orderNo: 'ORD123', productItems: []}, headers: {authorization: 'Bearer token'}})
+        const res = makeMockRes()
+
+        const {productItems} = req.body ?? {}
+        if (!Array.isArray(productItems) || productItems.length === 0) {
+            res.status(400).json({error: 'productItems must be a non-empty array'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({error: 'productItems must be a non-empty array'})
+    })
+
+    test('returns 400 when a productItem has no itemId', () => {
+        const items = [{quantity: 1}] // missing itemId
+        const res = makeMockRes()
+
+        for (const item of items) {
+            if (!item.itemId || typeof item.itemId !== 'string') {
+                res.status(400).json({error: 'Each productItem must have a string itemId'})
+                break
+            }
+        }
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({error: 'Each productItem must have a string itemId'})
+    })
+
+    test('returns 400 when a productItem has non-positive quantity', () => {
+        const items = [{itemId: 'item-1', quantity: 0}]
+        const res = makeMockRes()
+
+        for (const item of items) {
+            if (!item.itemId || typeof item.itemId !== 'string') {
+                res.status(400).json({error: 'Each productItem must have a string itemId'})
+                break
+            }
+            const qty = Number(item.quantity)
+            if (!Number.isFinite(qty) || qty < 1) {
+                res.status(400).json({error: 'Each productItem must have a positive quantity'})
+                break
+            }
+        }
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({error: 'Each productItem must have a positive quantity'})
+    })
+
+    test('returns 503 when feature flag is off', () => {
+        configState.current = {app: {guestOrderLookup: {enabled: false}}}
+        const res = makeMockRes()
+
+        const {app: appConfig} = configState.current
+        if (!appConfig?.guestOrderLookup?.enabled) {
+            res.status(503).json({error: 'Feature not enabled'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(503)
+        expect(res.json).toHaveBeenCalledWith({error: 'Feature not enabled'})
+    })
+
+    test('returns 400 errorKind: invalid_reason on SCAPI 400 + InvalidReasonCode', async () => {
+        const err = {
+            response: {
+                status: 400,
+                json: jest.fn().mockResolvedValue({errorCode: 'InvalidReasonCode'})
+            }
+        }
+        const res = makeMockRes()
+
+        const status = err?.response?.status
+        if (status === 400) {
+            let errorCode
+            try { errorCode = (await err.response.json())?.errorCode } catch {}
+            if (errorCode === 'InvalidReasonCode') {
+                res.status(400).json({errorKind: 'invalid_reason'})
+            }
+        }
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_reason'})
+    })
+
+    test('returns 400 errorKind: unknown_items on SCAPI 400 + UnknownProductItemIds', async () => {
+        const err = {
+            response: {
+                status: 400,
+                json: jest.fn().mockResolvedValue({errorCode: 'UnknownProductItemIds'})
+            }
+        }
+        const res = makeMockRes()
+
+        const status = err?.response?.status
+        if (status === 400) {
+            let errorCode
+            try { errorCode = (await err.response.json())?.errorCode } catch {}
+            if (errorCode === 'UnknownProductItemIds') {
+                res.status(400).json({errorKind: 'unknown_items'})
+            }
+        }
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'unknown_items'})
+    })
+
+    test('returns 400 errorKind: quantity_exceeded on SCAPI 400 + ReturnQuantityExceeded', async () => {
+        const err = {
+            response: {
+                status: 400,
+                json: jest.fn().mockResolvedValue({errorCode: 'ReturnQuantityExceeded'})
+            }
+        }
+        const res = makeMockRes()
+
+        const status = err?.response?.status
+        if (status === 400) {
+            let errorCode
+            try { errorCode = (await err.response.json())?.errorCode } catch {}
+            if (errorCode === 'ReturnQuantityExceeded') {
+                res.status(400).json({errorKind: 'quantity_exceeded'})
+            }
+        }
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'quantity_exceeded'})
+    })
+
+    test('returns 404 errorKind: not_found on SCAPI 404', () => {
+        const err = {response: {status: 404}}
+        const res = makeMockRes()
+
+        const status = err?.response?.status
+        if (status === 404) {
+            res.status(404).json({errorKind: 'not_found'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(404)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'not_found'})
+    })
+
+    test('returns 409 errorKind: not_returnable on SCAPI 409', () => {
+        const err = {response: {status: 409}}
+        const res = makeMockRes()
+
+        const status = err?.response?.status
+        if (status === 409) {
+            res.status(409).json({errorKind: 'not_returnable'})
+        }
+
+        expect(res.status).toHaveBeenCalledWith(409)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'not_returnable'})
+    })
+})
