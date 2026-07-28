@@ -84,7 +84,8 @@ const GuestOrderLookupOrder = () => {
             return res.json()
         },
         retry: false,
-        staleTime: 0
+        staleTime: 0,
+        cacheTime: 0
     })
 
     // Redirect on 404 (expired session) — useEffect so redirect happens after render
@@ -110,6 +111,9 @@ const GuestOrderLookupOrder = () => {
             </Container>
         )
     }
+
+    // Prevent TypeError flash while useEffect redirect fires for 404
+    if (isError && error?.status === 404) return null
 
     // Non-404 error state
     if (isError && error?.status !== 404) {
