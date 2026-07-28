@@ -195,16 +195,16 @@ describe('Routes', () => {
                     ...mockConfig,
                     app: {
                         ...mockConfig.app,
-                        guestOrderAccess: {
+                        guestOrderLookup: {
                             enabled: false
                         }
                     }
                 })
 
                 const allRoutes = routes()
-                expect(allRoutes.find((r) => r.path === '/order-access')).toBeUndefined()
-                expect(allRoutes.find((r) => r.path === '/order-access/verify')).toBeUndefined()
-                expect(allRoutes.find((r) => r.path === '/order-access/order')).toBeUndefined()
+                expect(allRoutes.find((r) => r.path === '/order-lookup')).toBeUndefined()
+                expect(allRoutes.find((r) => r.path === '/order-lookup/verify')).toBeUndefined()
+                expect(allRoutes.find((r) => r.path === '/order-lookup/order')).toBeUndefined()
             })
 
             test('does not add routes when flag is absent', () => {
@@ -216,9 +216,9 @@ describe('Routes', () => {
                 })
 
                 const allRoutes = routes()
-                expect(allRoutes.find((r) => r.path === '/order-access')).toBeUndefined()
-                expect(allRoutes.find((r) => r.path === '/order-access/verify')).toBeUndefined()
-                expect(allRoutes.find((r) => r.path === '/order-access/order')).toBeUndefined()
+                expect(allRoutes.find((r) => r.path === '/order-lookup')).toBeUndefined()
+                expect(allRoutes.find((r) => r.path === '/order-lookup/verify')).toBeUndefined()
+                expect(allRoutes.find((r) => r.path === '/order-lookup/order')).toBeUndefined()
             })
 
             test('adds all three routes when flag is enabled', () => {
@@ -226,16 +226,16 @@ describe('Routes', () => {
                     ...mockConfig,
                     app: {
                         ...mockConfig.app,
-                        guestOrderAccess: {
+                        guestOrderLookup: {
                             enabled: true
                         }
                     }
                 })
 
                 const allRoutes = routes()
-                const requestRoute = allRoutes.find((r) => r.path === '/order-access')
-                const verifyRoute = allRoutes.find((r) => r.path === '/order-access/verify')
-                const orderRoute = allRoutes.find((r) => r.path === '/order-access/order')
+                const requestRoute = allRoutes.find((r) => r.path === '/order-lookup')
+                const verifyRoute = allRoutes.find((r) => r.path === '/order-lookup/verify')
+                const orderRoute = allRoutes.find((r) => r.path === '/order-lookup/order')
 
                 expect(requestRoute).toBeDefined()
                 expect(requestRoute.exact).toBe(true)

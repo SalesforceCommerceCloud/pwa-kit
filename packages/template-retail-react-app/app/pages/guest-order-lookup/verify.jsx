@@ -28,7 +28,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {Redirect, useHistory, useLocation} from 'react-router-dom'
 
-const GuestOrderAccessVerify = () => {
+const GuestOrderLookupVerify = () => {
     const {formatMessage} = useIntl()
     const {isRegistered} = useCustomerType()
     const history = useHistory()
@@ -55,7 +55,7 @@ const GuestOrderAccessVerify = () => {
 
     const routeState = location.state
     if (!routeState?.orderNo || !routeState?.email) {
-        return <Redirect to="/order-access" />
+        return <Redirect to="/order-lookup" />
     }
 
     const {orderNo, email} = routeState
@@ -66,7 +66,7 @@ const GuestOrderAccessVerify = () => {
         setIsSubmitting(true)
         try {
             const token = await getTokenWhenReady()
-            const res = await fetch('/api/order-access/verify', {
+            const res = await fetch('/api/order-lookup/verify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -75,14 +75,14 @@ const GuestOrderAccessVerify = () => {
                 body: JSON.stringify({orderNo, email, accessCode})
             })
             if (res.ok) {
-                history.push('/order-access/order', {orderNo})
+                history.push('/order-lookup/order', {orderNo})
                 return
             }
             if (res.status === 404) {
                 setServerErrorType('invalidCode')
                 setServerError(
                     formatMessage({
-                        id: 'guestOrderAccess.verify.error.invalidCode',
+                        id: 'guestOrderLookup.verify.error.invalidCode',
                         defaultMessage:
                             'Code invalid or expired. Please try again or request a new code.'
                     })
@@ -91,7 +91,7 @@ const GuestOrderAccessVerify = () => {
                 setServerErrorType('throttle')
                 setServerError(
                     formatMessage({
-                        id: 'guestOrderAccess.verify.error.tooManyAttempts',
+                        id: 'guestOrderLookup.verify.error.tooManyAttempts',
                         defaultMessage: 'Too many attempts. Please wait a moment and try again.'
                     })
                 )
@@ -99,7 +99,7 @@ const GuestOrderAccessVerify = () => {
                 setServerErrorType('generic')
                 setServerError(
                     formatMessage({
-                        id: 'guestOrderAccess.verify.error.generic',
+                        id: 'guestOrderLookup.verify.error.generic',
                         defaultMessage: 'Something went wrong. Please try again.'
                     })
                 )
@@ -108,7 +108,7 @@ const GuestOrderAccessVerify = () => {
             setServerErrorType('generic')
             setServerError(
                 formatMessage({
-                    id: 'guestOrderAccess.verify.error.generic',
+                    id: 'guestOrderLookup.verify.error.generic',
                     defaultMessage: 'Something went wrong. Please try again.'
                 })
             )
@@ -131,7 +131,7 @@ const GuestOrderAccessVerify = () => {
         }
         toast({
             title: formatMessage({
-                id: 'guestOrderAccess.verify.toast.resent',
+                id: 'guestOrderLookup.verify.toast.resent',
                 defaultMessage: 'Check your inbox — it may take a moment.'
             }),
             status: 'info',
@@ -147,14 +147,14 @@ const GuestOrderAccessVerify = () => {
                 <Box>
                     <Heading as="h1" fontSize="2xl" mb={2}>
                         {formatMessage({
-                            id: 'guestOrderAccess.verify.heading',
+                            id: 'guestOrderLookup.verify.heading',
                             defaultMessage: 'Enter Your Access Code'
                         })}
                     </Heading>
                     <Text color="gray.600">
                         {formatMessage(
                             {
-                                id: 'guestOrderAccess.verify.subtext',
+                                id: 'guestOrderLookup.verify.subtext',
                                 defaultMessage:
                                     "We've sent a 6-digit code to {email}. It may take a moment to arrive."
                             },
@@ -167,7 +167,7 @@ const GuestOrderAccessVerify = () => {
                         <FormControl isInvalid={!!errors.accessCode || !!serverError}>
                             <FormLabel htmlFor="accessCode">
                                 {formatMessage({
-                                    id: 'guestOrderAccess.verify.label.code',
+                                    id: 'guestOrderLookup.verify.label.code',
                                     defaultMessage: 'Access Code'
                                 })}
                             </FormLabel>
@@ -187,13 +187,13 @@ const GuestOrderAccessVerify = () => {
                                 }
                                 {...register('accessCode', {
                                     required: formatMessage({
-                                        id: 'guestOrderAccess.verify.error.codeRequired',
+                                        id: 'guestOrderLookup.verify.error.codeRequired',
                                         defaultMessage: 'Access code is required'
                                     }),
                                     pattern: {
                                         value: /^[0-9]{6}$/,
                                         message: formatMessage({
-                                            id: 'guestOrderAccess.verify.error.codeInvalid',
+                                            id: 'guestOrderLookup.verify.error.codeInvalid',
                                             defaultMessage: 'Enter the 6-digit code from your email'
                                         })
                                     }
@@ -212,12 +212,12 @@ const GuestOrderAccessVerify = () => {
                                             {' '}
                                             <Link
                                                 as="a"
-                                                href="/order-access"
+                                                href="/order-lookup"
                                                 color="blue.600"
                                                 textDecoration="underline"
                                             >
                                                 {formatMessage({
-                                                    id: 'guestOrderAccess.verify.error.requestNewCode',
+                                                    id: 'guestOrderLookup.verify.error.requestNewCode',
                                                     defaultMessage: 'Request a new code'
                                                 })}
                                             </Link>
@@ -234,13 +234,13 @@ const GuestOrderAccessVerify = () => {
                             width="full"
                         >
                             {formatMessage({
-                                id: 'guestOrderAccess.verify.button.submit',
+                                id: 'guestOrderLookup.verify.button.submit',
                                 defaultMessage: 'Verify Code'
                             })}
                         </Button>
                         <Text fontSize="sm" textAlign="center">
                             {formatMessage({
-                                id: 'guestOrderAccess.verify.resend.prompt',
+                                id: 'guestOrderLookup.verify.resend.prompt',
                                 defaultMessage: "Didn't receive a code?"
                             })}{' '}
                             <Link
@@ -254,7 +254,7 @@ const GuestOrderAccessVerify = () => {
                                 pointerEvents={resendDisabled ? 'none' : 'auto'}
                             >
                                 {formatMessage({
-                                    id: 'guestOrderAccess.verify.resend.link',
+                                    id: 'guestOrderLookup.verify.resend.link',
                                     defaultMessage: 'Resend code'
                                 })}
                             </Link>
@@ -266,4 +266,4 @@ const GuestOrderAccessVerify = () => {
     )
 }
 
-export default GuestOrderAccessVerify
+export default GuestOrderLookupVerify

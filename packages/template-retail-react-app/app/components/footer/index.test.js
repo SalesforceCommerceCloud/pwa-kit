@@ -49,7 +49,7 @@ describe('Guest Order Access footer link', () => {
             ...mockConfig,
             app: {
                 ...mockConfig.app,
-                guestOrderAccess: {enabled: false}
+                guestOrderLookup: {enabled: false}
             }
         })
         renderWithProviders(<Footer />)
@@ -72,13 +72,13 @@ describe('Guest Order Access footer link', () => {
             ...mockConfig,
             app: {
                 ...mockConfig.app,
-                guestOrderAccess: {enabled: true}
+                guestOrderLookup: {enabled: true}
             }
         })
         renderWithProviders(<Footer />)
         const links = screen.getAllByRole('link', {name: 'Find Your Order', hidden: true})
         expect(links.length).toBeGreaterThanOrEqual(1)
-        // href includes locale prefix (e.g. /uk/en-GB/order-access) depending on multi-site config
-        expect(links[0].getAttribute('href')).toMatch(/\/order-access$/)
+        // href includes locale prefix (e.g. /uk/en-GB/order-lookup) depending on multi-site config
+        expect(links[0].getAttribute('href')).toMatch(/\/order-lookup$/)
     })
 })
