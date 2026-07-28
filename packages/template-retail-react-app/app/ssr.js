@@ -820,7 +820,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 headers: {authorization}
             })
             const order = await shopperOrders.guestOrderLookup({
-                parameters: {orderNo},
+                parameters: {orderNo, expand: 'oms,oms_shipments'},
                 body: {orderViewCode: accessCode, email}
             })
             const filtered = filterGuestOrderFields(order)
@@ -858,6 +858,166 @@ const {handler} = runtime.createHandler(options, (app) => {
                 return res.status(404).json({error: 'Session expired'})
             }
             res.status(502).json({error: 'Service error'})
+        }
+    })
+
+    app.get('/api/order-lookup/oms-meta', async (req, res) => {
+        const {app: appConfig} = getConfig()
+        if (!appConfig?.guestOrderLookup?.enabled)
+            return res.status(503).json({error: 'Feature not enabled'})
+
+        const authorization = req.headers['authorization']
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
+
+        const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const cookieName = `cc-goa_${siteId}`
+        const cookieData = parseGuestOrderCookie(req, cookieName)
+        if (!cookieData || Object.keys(cookieData).length === 0)
+            return res.status(401).json({error: 'No active session'})
+
+        try {
+            const {clientId, organizationId, shortCode, siteId: configSiteId} =
+                appConfig.commerceAPI.parameters
+            const shopperOrders = new ShopperOrders({
+                clientId,
+                organizationId,
+                shortCode,
+                siteId: configSiteId,
+                headers: {authorization}
+            })
+            const meta = await shopperOrders.getOmsMetaData({parameters: {}})
+            return res.json({
+                omsActive: meta.omsActive ?? false,
+                cancelReasonCodes: meta.cancelReasonCodes ?? [],
+                returnReasonCodes: meta.returnReasonCodes ?? []
+            })
+        } catch (err) {
+            if (err?.response?.status === 409) {
+                return res.json({omsActive: false, cancelReasonCodes: [], returnReasonCodes: []})
+            }
+            return res.status(502).json({error: 'Failed to fetch OMS metadata'})
+        }
+    })
+
+    app.post('/api/order-lookup/cancel', async (req, res) => {
+        const {app: appConfig} = getConfig()
+        if (!appConfig?.guestOrderLookup?.enabled)
+            return res.status(503).json({error: 'Feature not enabled'})
+
+        const authorization = req.headers['authorization']
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
+
+        const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const cookieName = `cc-goa_${siteId}`
+        const cookieData = parseGuestOrderCookie(req, cookieName)
+
+        const {orderNo, reason} = req.body ?? {}
+        // errorKind: 'invalid_input' for client input errors; SCAPI-classified kinds for downstream errors
+        if (!orderNo || typeof orderNo !== 'string')
+            return res.status(400).json({errorKind: 'invalid_input', message: 'orderNo is required'})
+        if (!cookieData?.[orderNo])
+            return res.status(401).json({error: 'No session for this order'})
+
+        let regex
+        try {
+            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[A-Za-z0-9]{6,20}$')
+        } catch {
+            regex = /^[A-Za-z0-9]{6,20}$/
+        }
+        if (!regex.test(orderNo))
+            return res.status(400).json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
+
+        try {
+            const {clientId, organizationId, shortCode, siteId: configSiteId} =
+                appConfig.commerceAPI.parameters
+            const shopperOrders = new ShopperOrders({
+                clientId,
+                organizationId,
+                shortCode,
+                siteId: configSiteId,
+                headers: {authorization}
+            })
+            await shopperOrders.cancelOmsOrder({
+                parameters: {orderNo},
+                body: reason && typeof reason === 'string' ? {reason} : {}
+            })
+            return res.json({success: true})
+        } catch (err) {
+            const status = err?.response?.status
+            if (status === 400) return res.status(400).json({errorKind: 'invalid_reason'})
+            if (status === 404) return res.status(404).json({errorKind: 'not_found'})
+            if (status === 409) return res.status(409).json({errorKind: 'not_cancellable'})
+            return res.status(500).json({errorKind: 'transient'})
+        }
+    })
+
+    app.post('/api/order-lookup/return', async (req, res) => {
+        const {app: appConfig} = getConfig()
+        if (!appConfig?.guestOrderLookup?.enabled)
+            return res.status(503).json({error: 'Feature not enabled'})
+
+        const authorization = req.headers['authorization']
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
+
+        const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const cookieName = `cc-goa_${siteId}`
+        const cookieData = parseGuestOrderCookie(req, cookieName)
+
+        const {orderNo, productItems} = req.body ?? {}
+        // errorKind: 'invalid_input' for client input errors; SCAPI-classified kinds for downstream errors
+        if (!orderNo || typeof orderNo !== 'string')
+            return res.status(400).json({errorKind: 'invalid_input', message: 'orderNo is required'})
+        if (!cookieData?.[orderNo])
+            return res.status(401).json({error: 'No session for this order'})
+
+        let regex
+        try {
+            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[A-Za-z0-9]{6,20}$')
+        } catch {
+            regex = /^[A-Za-z0-9]{6,20}$/
+        }
+        if (!regex.test(orderNo))
+            return res.status(400).json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
+
+        if (!Array.isArray(productItems) || productItems.length === 0)
+            return res.status(400).json({errorKind: 'invalid_input', message: 'productItems must be a non-empty array'})
+
+        for (const item of productItems) {
+            if (!item.itemId || typeof item.itemId !== 'string')
+                return res.status(400).json({errorKind: 'invalid_input', message: 'Each productItem must have a string itemId'})
+            const qty = Number(item.quantity)
+            if (!Number.isFinite(qty) || qty < 1)
+                return res.status(400).json({errorKind: 'invalid_input', message: 'Each productItem must have a positive quantity'})
+        }
+
+        try {
+            const {clientId, organizationId, shortCode, siteId: configSiteId} =
+                appConfig.commerceAPI.parameters
+            const shopperOrders = new ShopperOrders({
+                clientId,
+                organizationId,
+                shortCode,
+                siteId: configSiteId,
+                headers: {authorization}
+            })
+            await shopperOrders.returnOmsOrder({
+                parameters: {orderNo},
+                body: {productItems}
+            })
+            return res.json({success: true})
+        } catch (err) {
+            const status = err?.response?.status
+            if (status === 400) {
+                let errorCode
+                try { errorCode = (await err.response.clone().json())?.errorCode } catch {}
+                if (errorCode === 'InvalidReasonCode') return res.status(400).json({errorKind: 'invalid_reason'})
+                if (errorCode === 'UnknownProductItemIds') return res.status(400).json({errorKind: 'unknown_items'})
+                if (errorCode === 'ReturnQuantityExceeded') return res.status(400).json({errorKind: 'quantity_exceeded'})
+                return res.status(400).json({errorKind: 'transient'})
+            }
+            if (status === 404) return res.status(404).json({errorKind: 'not_found'})
+            if (status === 409) return res.status(409).json({errorKind: 'not_returnable'})
+            return res.status(500).json({errorKind: 'transient'})
         }
     })
 
