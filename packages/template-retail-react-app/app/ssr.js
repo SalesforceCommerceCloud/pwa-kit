@@ -426,12 +426,12 @@ export async function jwksCaching(req, res, options) {
     }
 }
 
-// Guest order access: warn if feature is enabled but cookies are not allowed
-const _goaConfig = getConfig()?.app?.guestOrderAccess
-if (_goaConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_COOKIES) {
+// Guest order lookup: warn if feature is enabled but cookies are not allowed
+const _golConfig = getConfig()?.app?.guestOrderLookup
+if (_golConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_COOKIES) {
     logger.warn(
-        'guestOrderAccess.enabled is true but neither localAllowCookies nor MRT_ALLOW_COOKIES is set. The cc-goa_* HttpOnly cookie will not be written. Set localAllowCookies: true for local dev or MRT_ALLOW_COOKIES=true for MRT.',
-        {namespace: 'guest-order-access'}
+        'guestOrderLookup.enabled is true but neither localAllowCookies nor MRT_ALLOW_COOKIES is set. The cc-goa_* HttpOnly cookie will not be written. Set localAllowCookies: true for local dev or MRT_ALLOW_COOKIES=true for MRT.',
+        {namespace: 'guest-order-lookup'}
     )
 }
 
@@ -660,9 +660,9 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
     })
 
-    app.post('/api/order-access/verify', async (req, res) => {
+    app.post('/api/order-lookup/verify', async (req, res) => {
         const {app: appConfig} = getConfig()
-        if (!appConfig?.guestOrderAccess?.enabled)
+        if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
 
         const {orderNo, email, accessCode} = req.body || {}
@@ -706,8 +706,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                 `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly; Secure; SameSite=Strict; Path=/`
             )
 
-            logger.info('guest-order-access verify success', {
-                namespace: 'guest-order-access',
+            logger.info('guest-order-lookup verify success', {
+                namespace: 'guest-order-lookup',
                 additionalProperties: {
                     correlationId,
                     orderNoPrefix: orderNo?.slice(0, 4),
@@ -719,8 +719,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         } catch (err) {
             const scapiStatus = err?.response?.status || 500
             const errorKind = scapiStatus === 404 ? 'invalid_code' : 'scapi_error'
-            logger.warn('guest-order-access verify error', {
-                namespace: 'guest-order-access',
+            logger.warn('guest-order-lookup verify error', {
+                namespace: 'guest-order-lookup',
                 additionalProperties: {
                     correlationId,
                     orderNoPrefix: orderNo?.slice(0, 4),
@@ -734,9 +734,9 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
     })
 
-    app.get('/api/order-access/order', async (req, res) => {
+    app.get('/api/order-lookup/order', async (req, res) => {
         const {app: appConfig} = getConfig()
-        if (!appConfig?.guestOrderAccess?.enabled)
+        if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
 
         const authorization = req.headers['authorization']
@@ -770,8 +770,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                 body: {orderViewCode: accessCode, email}
             })
             const filtered = filterGuestOrderFields(order)
-            logger.info('guest-order-access order fetch success', {
-                namespace: 'guest-order-access',
+            logger.info('guest-order-lookup order fetch success', {
+                namespace: 'guest-order-lookup',
                 additionalProperties: {
                     correlationId,
                     orderNoPrefix: orderNo?.slice(0, 4),
@@ -783,8 +783,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         } catch (err) {
             const scapiStatus = err?.response?.status || 500
             const errorKind = scapiStatus === 404 ? 'expired_code' : 'scapi_error'
-            logger.warn('guest-order-access order fetch error', {
-                namespace: 'guest-order-access',
+            logger.warn('guest-order-lookup order fetch error', {
+                namespace: 'guest-order-lookup',
                 additionalProperties: {
                     correlationId,
                     orderNoPrefix: orderNo?.slice(0, 4),
