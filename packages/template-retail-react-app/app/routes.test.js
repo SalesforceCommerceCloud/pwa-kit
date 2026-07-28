@@ -189,6 +189,63 @@ describe('Routes', () => {
             })
         })
 
+        describe('Guest order access routes', () => {
+            test('does not add routes when flag is disabled', () => {
+                getConfig.mockReturnValue({
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app,
+                        guestOrderLookup: {
+                            enabled: false
+                        }
+                    }
+                })
+
+                const allRoutes = routes()
+                expect(allRoutes.find((r) => r.path === '/order-lookup')).toBeUndefined()
+                expect(allRoutes.find((r) => r.path === '/order-lookup/verify')).toBeUndefined()
+                expect(allRoutes.find((r) => r.path === '/order-lookup/order')).toBeUndefined()
+            })
+
+            test('does not add routes when flag is absent', () => {
+                getConfig.mockReturnValue({
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app
+                    }
+                })
+
+                const allRoutes = routes()
+                expect(allRoutes.find((r) => r.path === '/order-lookup')).toBeUndefined()
+                expect(allRoutes.find((r) => r.path === '/order-lookup/verify')).toBeUndefined()
+                expect(allRoutes.find((r) => r.path === '/order-lookup/order')).toBeUndefined()
+            })
+
+            test('adds all three routes when flag is enabled', () => {
+                getConfig.mockReturnValue({
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app,
+                        guestOrderLookup: {
+                            enabled: true
+                        }
+                    }
+                })
+
+                const allRoutes = routes()
+                const requestRoute = allRoutes.find((r) => r.path === '/order-lookup')
+                const verifyRoute = allRoutes.find((r) => r.path === '/order-lookup/verify')
+                const orderRoute = allRoutes.find((r) => r.path === '/order-lookup/order')
+
+                expect(requestRoute).toBeDefined()
+                expect(requestRoute.exact).toBe(true)
+                expect(verifyRoute).toBeDefined()
+                expect(verifyRoute.exact).toBe(true)
+                expect(orderRoute).toBeDefined()
+                expect(orderRoute.exact).toBe(true)
+            })
+        })
+
         describe('Social login redirect route', () => {
             test('does not add route when disabled', () => {
                 getConfig.mockReturnValue({

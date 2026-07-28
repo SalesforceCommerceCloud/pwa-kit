@@ -642,6 +642,9 @@
   "footer.link.site_map": {
     "defaultMessage": "站点地图"
   },
+  "footer.link.find_your_order": {
+    "defaultMessage": "Find Your Order"
+  },
   "footer.link.store_locator": {
     "defaultMessage": "实体店地址搜索"
   },
