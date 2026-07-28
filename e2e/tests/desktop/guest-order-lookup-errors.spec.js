@@ -11,7 +11,7 @@
  * All tests use Playwright route interception to mock API responses.
  * No real SCAPI calls are made.
  *
- * Base URL is controlled by GUEST_ORDER_ACCESS_E2E_BASE_URL (feature must be on).
+ * Base URL is controlled by GUEST_ORDER_LOOKUP_E2E_BASE_URL (feature must be on).
  * See GROUP6_DECISIONS.md for CI wiring notes.
  */
 
@@ -21,7 +21,7 @@ const config = require('../../config.js')
 const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
 
 const FEATURE_ON_BASE_URL =
-    process.env.GUEST_ORDER_ACCESS_E2E_BASE_URL || config.RETAIL_APP_HOME
+    process.env.GUEST_ORDER_LOOKUP_E2E_BASE_URL || config.RETAIL_APP_HOME
 
 // ---------------------------------------------------------------------------
 // Shared mock helpers
@@ -60,14 +60,14 @@ const mockRequestCode = (page) => {
  * Prerequisite: mockRequestCode and mockSlasToken should already be set up.
  */
 const navigateToStep2 = async (page, {orderNo = 'ORD-001234', email = 'test@example.com'} = {}) => {
-    await page.goto(FEATURE_ON_BASE_URL + '/order-access')
+    await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
     await answerConsentTrackingForm(page)
 
     await page.getByLabel(/order number/i).fill(orderNo)
     await page.getByLabel(/email address/i).fill(email)
 
     await Promise.all([
-        page.waitForURL('**/order-access/verify'),
+        page.waitForURL('**/order-lookup/verify'),
         page.getByRole('button', {name: /send access code/i}).click()
     ])
 
@@ -87,7 +87,7 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
     test('Invalid/expired code: mock 404 → inline error and "Request a new code" link', async ({
         page
     }) => {
-        await page.route('**/api/order-access/verify', (route) => {
+        await page.route('**/api/order-lookup/verify', (route) => {
             route.fulfill({status: 404, contentType: 'application/json', body: '{}'})
         })
 
@@ -104,12 +104,12 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
         await expect(page.getByRole('link', {name: /request a new code/i})).toBeVisible()
 
         // Still on Step 2 — did NOT navigate to Step 3
-        expect(page.url()).toContain('/order-access/verify')
-        expect(page.url()).not.toContain('/order-access/order')
+        expect(page.url()).toContain('/order-lookup/verify')
+        expect(page.url()).not.toContain('/order-lookup/order')
     })
 
     test('Throttle: mock 429 → inline "Too many attempts" error', async ({page}) => {
-        await page.route('**/api/order-access/verify', (route) => {
+        await page.route('**/api/order-lookup/verify', (route) => {
             route.fulfill({status: 429, contentType: 'application/json', body: '{}'})
         })
 
@@ -121,7 +121,7 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
         await expect(page.getByRole('alert')).toBeVisible()
         await expect(page.getByText(/too many attempts/i)).toBeVisible()
 
-        expect(page.url()).toContain('/order-access/verify')
+        expect(page.url()).toContain('/order-lookup/verify')
     })
 
     test('Resend code: click "Resend code" → toast "Check your inbox" appears, link briefly disabled', async ({
@@ -145,16 +145,16 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
         await expect(resendLink).toHaveAttribute('aria-disabled', 'true')
     })
 
-    test('Mid-session expiry on Step 3: mock 404 from GET order → redirect to /order-access?expired=1 → expiry banner visible', async ({
+    test('Mid-session expiry on Step 3: mock 404 from GET order → redirect to /order-lookup?expired=1 → expiry banner visible', async ({
         page
     }) => {
         // First verify succeeds
-        await page.route('**/api/order-access/verify', (route) => {
+        await page.route('**/api/order-lookup/verify', (route) => {
             route.fulfill({status: 200, contentType: 'application/json', body: '{}'})
         })
 
         // Order endpoint returns 404 (session expired)
-        await page.route('**/api/order-access/order**', (route) => {
+        await page.route('**/api/order-lookup/order**', (route) => {
             route.fulfill({status: 404, contentType: 'application/json', body: '{}'})
         })
 
@@ -163,14 +163,14 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
         await page.getByLabel(/access code/i).fill('123456')
 
         await Promise.all([
-            page.waitForURL('**/order-access/order'),
+            page.waitForURL('**/order-lookup/order'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
-        // Step 3 fetches the order and gets 404 — component redirects to /order-access?expired=1
-        await page.waitForURL('**/order-access?expired=1', {timeout: 10000})
+        // Step 3 fetches the order and gets 404 — component redirects to /order-lookup?expired=1
+        await page.waitForURL('**/order-lookup?expired=1', {timeout: 10000})
 
-        expect(page.url()).toContain('/order-access')
+        expect(page.url()).toContain('/order-lookup')
         expect(page.url()).toContain('expired=1')
 
         // Expiry banner / alert should be visible on Step 1
@@ -178,16 +178,16 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
         await expect(page.getByText(/session has expired/i)).toBeVisible()
     })
 
-    test('Mid-session expiry: clicking "Refresh Status" on Step 3 with 404 → redirect to /order-access?expired=1', async ({
+    test('Mid-session expiry: clicking "Refresh Status" on Step 3 with 404 → redirect to /order-lookup?expired=1', async ({
         page
     }) => {
-        await page.route('**/api/order-access/verify', (route) => {
+        await page.route('**/api/order-lookup/verify', (route) => {
             route.fulfill({status: 200, contentType: 'application/json', body: '{}'})
         })
 
         // First load succeeds; second (refresh) returns 404
         let callCount = 0
-        await page.route('**/api/order-access/order**', (route) => {
+        await page.route('**/api/order-lookup/order**', (route) => {
             callCount++
             if (callCount === 1) {
                 route.fulfill({
@@ -218,7 +218,7 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
         await page.getByLabel(/access code/i).fill('123456')
 
         await Promise.all([
-            page.waitForURL('**/order-access/order'),
+            page.waitForURL('**/order-lookup/order'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
@@ -227,25 +227,25 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
         // Click "Refresh Status" — second call returns 404
         await page.getByRole('button', {name: /refresh status/i}).click()
 
-        await page.waitForURL('**/order-access?expired=1', {timeout: 10000})
+        await page.waitForURL('**/order-lookup?expired=1', {timeout: 10000})
 
         expect(page.url()).toContain('expired=1')
         await expect(page.getByRole('alert')).toBeVisible()
     })
 
-    test('Direct navigation to /order-access/verify without router state → redirect to /order-access', async ({
+    test('Direct navigation to /order-lookup/verify without router state → redirect to /order-lookup', async ({
         page
     }) => {
         // Navigate directly to Step 2 without router state (no orderNo/email)
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access/verify')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup/verify')
         await answerConsentTrackingForm(page)
 
-        // The verify page has a <Redirect to="/order-access" /> when routeState is missing
-        await page.waitForURL('**/order-access', {timeout: 5000})
+        // The verify page has a <Redirect to="/order-lookup" /> when routeState is missing
+        await page.waitForURL('**/order-lookup', {timeout: 5000})
 
-        expect(page.url()).toContain('/order-access')
-        expect(page.url()).not.toContain('/order-access/verify')
-        expect(page.url()).not.toContain('/order-access/order')
+        expect(page.url()).toContain('/order-lookup')
+        expect(page.url()).not.toContain('/order-lookup/verify')
+        expect(page.url()).not.toContain('/order-lookup/order')
     })
 })
 
@@ -262,7 +262,7 @@ test.describe('Guest Order Access — a11y critical violations check (S19)', () 
     })
 
     test('Step 1 with expiry banner has zero critical axe violations', async ({page}) => {
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access?expired=1')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup?expired=1')
         await answerConsentTrackingForm(page)
 
         await expect(page.getByRole('heading', {name: /find your order/i})).toBeVisible()
@@ -279,7 +279,7 @@ test.describe('Guest Order Access — a11y critical violations check (S19)', () 
     })
 
     test('Step 2 with 404 server error has zero critical axe violations', async ({page}) => {
-        await page.route('**/api/order-access/verify', (route) => {
+        await page.route('**/api/order-lookup/verify', (route) => {
             route.fulfill({status: 404, contentType: 'application/json', body: '{}'})
         })
 
@@ -303,10 +303,10 @@ test.describe('Guest Order Access — a11y critical violations check (S19)', () 
     })
 
     test('Step 3 order details page has zero critical axe violations', async ({page}) => {
-        await page.route('**/api/order-access/verify', (route) => {
+        await page.route('**/api/order-lookup/verify', (route) => {
             route.fulfill({status: 200, contentType: 'application/json', body: '{}'})
         })
-        await page.route('**/api/order-access/order**', (route) => {
+        await page.route('**/api/order-lookup/order**', (route) => {
             route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -346,7 +346,7 @@ test.describe('Guest Order Access — a11y critical violations check (S19)', () 
         await page.getByLabel(/access code/i).fill('123456')
 
         await Promise.all([
-            page.waitForURL('**/order-access/order'),
+            page.waitForURL('**/order-lookup/order'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 

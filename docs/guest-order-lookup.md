@@ -10,14 +10,14 @@ This feature ships in ECOM 26.8. It is disabled by default and requires explicit
 
 - **ECOM 26.8 or later** — required for the `requestOrderAccessCode` SCAPI endpoint. The feature cannot be enabled against earlier ECOM versions.
 - **`allowCookies` enabled** — the server writes a `Secure; HttpOnly; SameSite=Strict` session cookie after verification. This requires either `localAllowCookies: true` in `app/ssr.js` options (local dev) or the environment variable `MRT_ALLOW_COOKIES=true` (MRT deployments). Without this the `Set-Cookie` header is silently stripped by the MRT runtime.
-- **Feature flag** — `app.guestOrderAccess.enabled: true` in `config/default.js` or an environment-specific override.
+- **Feature flag** — `app.guestOrderLookup.enabled: true` in `config/default.js` or an environment-specific override.
 
 ## 3. Configuration
 
-All config keys live under `app.guestOrderAccess` in `config/default.js`:
+All config keys live under `app.guestOrderLookup` in `config/default.js`:
 
 ```js
-guestOrderAccess: {
+guestOrderLookup: {
   enabled: false,              // Master switch — off by default
   orderNumberRegex: '^[A-Za-z0-9]{6,20}$',  // Client-side format validation
   requestCodeThrottle: {
@@ -34,7 +34,7 @@ To enable the feature for a site:
 module.exports = {
   app: {
     // ...
-    guestOrderAccess: {
+    guestOrderLookup: {
       enabled: true,
       orderNumberRegex: '^[A-Za-z0-9]{6,20}$',
       requestCodeThrottle: {
@@ -50,20 +50,20 @@ module.exports = {
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `enabled` | boolean | `false` | Master switch. When `false`, all `/order-access` routes return 404 and the footer link is hidden. |
+| `enabled` | boolean | `false` | Master switch. When `false`, all `/order-lookup` routes return 404 and the footer link is hidden. |
 | `orderNumberRegex` | string | `'^[A-Za-z0-9]{6,20}$'` | Regex applied client-side to the Order Number field. Adjust to match your order ID format. |
-| `requestCodeThrottle.windowMs` | number | `60000` | Rolling window in milliseconds for the in-process throttle on `/api/order-access/verify`. |
+| `requestCodeThrottle.windowMs` | number | `60000` | Rolling window in milliseconds for the in-process throttle on `/api/order-lookup/verify`. |
 | `requestCodeThrottle.max` | number | `5` | Maximum verify attempts allowed per IP within `windowMs`. Requests over the limit receive HTTP 429. |
 
 ## 4. Security posture
 
 - **Time-limited credential** — the access code has a 15-minute TTL enforced by ECOM/Redis. After expiry, the shopper must restart the flow.
 - **Not single-use** — the code is reusable within its 15-minute window. Attempt limits are enforced server-side by ECOM/Redis, not by a "use once" constraint.
-- **Anti-enumeration** — Step 1 (`/order-access`) always routes the shopper to Step 2 regardless of whether the order number and email are valid. The server always returns 202. This prevents an attacker from inferring whether an order/email combination exists.
+- **Anti-enumeration** — Step 1 (`/order-lookup`) always routes the shopper to Step 2 regardless of whether the order number and email are valid. The server always returns 202. This prevents an attacker from inferring whether an order/email combination exists.
 - **Credentials never in URLs** — `orderNo`, `email`, and `accessCode` are passed between steps via React Router state, not as URL query parameters. They are never visible in the browser address bar or server access logs.
 - **HttpOnly session cookie** — after successful verification the server writes `cc-goa_{siteId}` with the flags `Secure; HttpOnly; SameSite=Strict`. The cookie is not readable from JavaScript (`document.cookie`).
-- **Field allowlist enforced server-side** — the `GET /api/order-access/order` endpoint strips `paymentCard`, `expirationMonth`, `expirationYear`, `phone`, `globalPartyId`, `orderToken`, `orderViewCode`, and all `c_*` custom attributes before returning the order to the client.
-- **In-process throttle** — the server applies an in-process rate limit on `POST /api/order-access/verify` (configurable via `requestCodeThrottle`). This is a defense-in-depth measure that operates before the request reaches ECOM.
+- **Field allowlist enforced server-side** — the `GET /api/order-lookup/order` endpoint strips `paymentCard`, `expirationMonth`, `expirationYear`, `phone`, `globalPartyId`, `orderToken`, `orderViewCode`, and all `c_*` custom attributes before returning the order to the client.
+- **In-process throttle** — the server applies an in-process rate limit on `POST /api/order-lookup/verify` (configurable via `requestCodeThrottle`). This is a defense-in-depth measure that operates before the request reaches ECOM.
 
 ## 5. Email customization
 
@@ -93,7 +93,7 @@ The cookie write is conditional on the MRT runtime allowing cookies:
 - **Local dev** (`localAllowCookies: true` in `app/ssr.js`) — set this in the SSR server options to allow the cookie to be written during local development.
 - **MRT deployments** (`MRT_ALLOW_COOKIES=true` environment variable) — set this in the MRT deployment environment.
 
-If neither is set, the runtime silently strips all `Set-Cookie` headers and the cookie is never written. The verification step will appear to succeed (the `/api/order-access/verify` endpoint returns 200) but the subsequent `GET /api/order-access/order` call will fail with 404 because the session cookie is missing.
+If neither is set, the runtime silently strips all `Set-Cookie` headers and the cookie is never written. The verification step will appear to succeed (the `/api/order-lookup/verify` endpoint returns 200) but the subsequent `GET /api/order-lookup/order` call will fail with 404 because the session cookie is missing.
 
 ## 8. Cancel/return coordination
 
@@ -108,7 +108,7 @@ without needing to re-enter their access code. The session cookie serves as the 
 ## 9. Troubleshooting
 
 **"I enabled the feature but the footer 'Find Your Order' link doesn't appear"**
-Check that `app.guestOrderAccess.enabled` is `true` in the config being loaded by the running server. Config changes require a server restart. Verify the correct config file is being used (check `NODE_ENV` and the active environment override).
+Check that `app.guestOrderLookup.enabled` is `true` in the config being loaded by the running server. Config changes require a server restart. Verify the correct config file is being used (check `NODE_ENV` and the active environment override).
 
 **"The cookie isn't being set after verification"**
 Check that `allowCookies` is enabled. For local dev set `localAllowCookies: true` in the SSR server options. For MRT set `MRT_ALLOW_COOKIES=true`. Without this the `Set-Cookie` header is silently dropped.

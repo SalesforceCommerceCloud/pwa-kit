@@ -1669,121 +1669,121 @@
       "value": "表示"
     }
   ],
-  "guestOrderAccess.request.button.submit": [
+  "guestOrderLookup.request.button.submit": [
     {
       "type": 0,
       "value": "Send Access Code"
     }
   ],
-  "guestOrderAccess.request.error.emailInvalid": [
+  "guestOrderLookup.request.error.emailInvalid": [
     {
       "type": 0,
       "value": "Enter a valid email address"
     }
   ],
-  "guestOrderAccess.request.error.emailRequired": [
+  "guestOrderLookup.request.error.emailRequired": [
     {
       "type": 0,
       "value": "Email address is required"
     }
   ],
-  "guestOrderAccess.request.error.orderNumberInvalid": [
+  "guestOrderLookup.request.error.orderNumberInvalid": [
     {
       "type": 0,
       "value": "Enter a valid order number"
     }
   ],
-  "guestOrderAccess.request.error.orderNumberRequired": [
+  "guestOrderLookup.request.error.orderNumberRequired": [
     {
       "type": 0,
       "value": "Order number is required"
     }
   ],
-  "guestOrderAccess.request.heading": [
+  "guestOrderLookup.request.heading": [
     {
       "type": 0,
       "value": "Find Your Order"
     }
   ],
-  "guestOrderAccess.request.label.email": [
+  "guestOrderLookup.request.label.email": [
     {
       "type": 0,
       "value": "Email Address"
     }
   ],
-  "guestOrderAccess.request.label.orderNumber": [
+  "guestOrderLookup.request.label.orderNumber": [
     {
       "type": 0,
       "value": "Order Number"
     }
   ],
-  "guestOrderAccess.request.subtext": [
+  "guestOrderLookup.request.subtext": [
     {
       "type": 0,
       "value": "Enter your order number and email address to receive a one-time access code."
     }
   ],
-  "guestOrderAccess.verify.button.submit": [
+  "guestOrderLookup.verify.button.submit": [
     {
       "type": 0,
       "value": "Verify Code"
     }
   ],
-  "guestOrderAccess.verify.error.codeInvalid": [
+  "guestOrderLookup.verify.error.codeInvalid": [
     {
       "type": 0,
       "value": "Enter the 6-digit code from your email"
     }
   ],
-  "guestOrderAccess.verify.error.codeRequired": [
+  "guestOrderLookup.verify.error.codeRequired": [
     {
       "type": 0,
       "value": "Access code is required"
     }
   ],
-  "guestOrderAccess.verify.error.generic": [
+  "guestOrderLookup.verify.error.generic": [
     {
       "type": 0,
       "value": "Something went wrong. Please try again."
     }
   ],
-  "guestOrderAccess.verify.error.invalidCode": [
+  "guestOrderLookup.verify.error.invalidCode": [
     {
       "type": 0,
       "value": "Code invalid or expired. Please try again or request a new code."
     }
   ],
-  "guestOrderAccess.verify.error.tooManyAttempts": [
+  "guestOrderLookup.verify.error.tooManyAttempts": [
     {
       "type": 0,
       "value": "Too many attempts. Please wait a moment and try again."
     }
   ],
-  "guestOrderAccess.verify.heading": [
+  "guestOrderLookup.verify.heading": [
     {
       "type": 0,
       "value": "Enter Your Access Code"
     }
   ],
-  "guestOrderAccess.verify.label.code": [
+  "guestOrderLookup.verify.label.code": [
     {
       "type": 0,
       "value": "Access Code"
     }
   ],
-  "guestOrderAccess.verify.resend.link": [
+  "guestOrderLookup.verify.resend.link": [
     {
       "type": 0,
       "value": "Resend code"
     }
   ],
-  "guestOrderAccess.verify.resend.prompt": [
+  "guestOrderLookup.verify.resend.prompt": [
     {
       "type": 0,
       "value": "Didn't receive a code?"
     }
   ],
-  "guestOrderAccess.verify.subtext": [
+  "guestOrderLookup.verify.subtext": [
     {
       "type": 0,
       "value": "We've sent a 6-digit code to "
@@ -1797,7 +1797,7 @@
       "value": ". It may take a moment to arrive."
     }
   ],
-  "guestOrderAccess.verify.toast.resent": [
+  "guestOrderLookup.verify.toast.resent": [
     {
       "type": 0,
       "value": "Check your inbox — it may take a moment."

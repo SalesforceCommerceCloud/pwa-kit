@@ -80,7 +80,7 @@ jest.mock(
 const configState = {
     current: {
         app: {
-            guestOrderAccess: {enabled: false},
+            guestOrderLookup: {enabled: false},
             commerceAPI: {
                 parameters: {
                     clientId: 'test-client',
@@ -128,7 +128,7 @@ const DEFAULT_COMMERCE_PARAMS = {
 function makeAppConfig(overrides = {}) {
     return {
         app: {
-            guestOrderAccess: {enabled: true, ...overrides.guestOrderAccess},
+            guestOrderLookup: {enabled: true, ...overrides.guestOrderLookup},
             commerceAPI: {parameters: {...DEFAULT_COMMERCE_PARAMS, ...overrides.parameters}},
             login: {
                 passwordless: {callbackURI: '/passwordless-login-callback'},
@@ -364,7 +364,7 @@ describe('evictIfNeeded', () => {
 
 // ─── Startup warning ─────────────────────────────────────────────────────────
 
-describe('guestOrderAccess startup warning', () => {
+describe('guestOrderLookup startup warning', () => {
     // The startup warning runs at module load time. We test the condition logic here.
     const warnFn = jest.fn()
 
@@ -379,14 +379,14 @@ describe('guestOrderAccess startup warning', () => {
 
         if (enabled && !localAllowCookies && !mrtAllowCookies) {
             warnFn(
-                'guestOrderAccess.enabled is true but neither localAllowCookies nor MRT_ALLOW_COOKIES is set. The cc-goa_* HttpOnly cookie will not be written. Set localAllowCookies: true for local dev or MRT_ALLOW_COOKIES=true for MRT.',
-                {namespace: 'guest-order-access'}
+                'guestOrderLookup.enabled is true but neither localAllowCookies nor MRT_ALLOW_COOKIES is set. The cc-goa_* HttpOnly cookie will not be written. Set localAllowCookies: true for local dev or MRT_ALLOW_COOKIES=true for MRT.',
+                {namespace: 'guest-order-lookup'}
             )
         }
 
         expect(warnFn).toHaveBeenCalledWith(
-            expect.stringContaining('guestOrderAccess.enabled is true'),
-            expect.objectContaining({namespace: 'guest-order-access'})
+            expect.stringContaining('guestOrderLookup.enabled is true'),
+            expect.objectContaining({namespace: 'guest-order-lookup'})
         )
     })
 
@@ -395,7 +395,7 @@ describe('guestOrderAccess startup warning', () => {
         const localAllowCookies = false
 
         if (enabled && !localAllowCookies) {
-            warnFn('should not be called', {namespace: 'guest-order-access'})
+            warnFn('should not be called', {namespace: 'guest-order-lookup'})
         }
 
         expect(warnFn).not.toHaveBeenCalled()
@@ -406,7 +406,7 @@ describe('guestOrderAccess startup warning', () => {
         const localAllowCookies = true
 
         if (enabled && !localAllowCookies) {
-            warnFn('should not be called', {namespace: 'guest-order-access'})
+            warnFn('should not be called', {namespace: 'guest-order-lookup'})
         }
 
         expect(warnFn).not.toHaveBeenCalled()
@@ -450,7 +450,7 @@ describe('structured logging: no full sensitive data in log output', () => {
 // These tests exercise the handler logic directly, replicating what the Express
 // route handlers do. We use the same helpers (filterGuestOrderFields, etc.)
 
-describe('POST /api/order-access/verify handler logic', () => {
+describe('POST /api/order-lookup/verify handler logic', () => {
     const MOCK_ORDER = {
         orderNo: 'ORD123',
         orderTotal: 100,
@@ -471,12 +471,12 @@ describe('POST /api/order-access/verify handler logic', () => {
     })
 
     test('returns 503 when feature flag is disabled', async () => {
-        configState.current = {app: {guestOrderAccess: {enabled: false}}}
+        configState.current = {app: {guestOrderLookup: {enabled: false}}}
 
         const res = makeMockRes()
 
         const {app: appConfig} = configState.current
-        if (!appConfig?.guestOrderAccess?.enabled) {
+        if (!appConfig?.guestOrderLookup?.enabled) {
             res.status(503).json({error: 'Feature not enabled'})
         }
 
@@ -602,7 +602,7 @@ describe('POST /api/order-access/verify handler logic', () => {
     })
 })
 
-describe('GET /api/order-access/order handler logic', () => {
+describe('GET /api/order-lookup/order handler logic', () => {
     const MOCK_ORDER = {
         orderNo: 'ORD456',
         orderTotal: 200,
@@ -621,10 +621,10 @@ describe('GET /api/order-access/order handler logic', () => {
     })
 
     test('returns 503 when feature flag is disabled', () => {
-        const appConfig = {guestOrderAccess: {enabled: false}}
+        const appConfig = {guestOrderLookup: {enabled: false}}
         const res = makeMockRes()
 
-        if (!appConfig?.guestOrderAccess?.enabled) {
+        if (!appConfig?.guestOrderLookup?.enabled) {
             res.status(503).json({error: 'Feature not enabled'})
         }
 
@@ -727,7 +727,7 @@ describe('cookie security flags', () => {
 
 // ─── Config block ─────────────────────────────────────────────────────────────
 
-describe('app.guestOrderAccess config block', () => {
+describe('app.guestOrderLookup config block', () => {
     test('defaults to enabled=false', () => {
         // Test that the shape of the default config is correct
         const defaultConfig = {
@@ -743,15 +743,15 @@ describe('app.guestOrderAccess config block', () => {
 
     test('feature flag optional-chain guard does not throw when config key is absent', () => {
         const config = {app: {}}
-        expect(() => config?.app?.guestOrderAccess?.enabled).not.toThrow()
-        expect(config?.app?.guestOrderAccess?.enabled).toBeUndefined()
+        expect(() => config?.app?.guestOrderLookup?.enabled).not.toThrow()
+        expect(config?.app?.guestOrderLookup?.enabled).toBeUndefined()
     })
 })
 
 // ─── S15: createVerifyThrottle ────────────────────────────────────────────────
 
 describe('S15: createVerifyThrottle', () => {
-    const makeThrottleReq = (ip = '1.2.3.4', path = '/api/order-access/verify') => ({
+    const makeThrottleReq = (ip = '1.2.3.4', path = '/api/order-lookup/verify') => ({
         path,
         ip,
         headers: {'x-forwarded-for': ip}
@@ -768,7 +768,7 @@ describe('S15: createVerifyThrottle', () => {
 
     beforeEach(() => {
         configState.current = makeAppConfig({
-            guestOrderAccess: {
+            guestOrderLookup: {
                 enabled: true,
                 requestCodeThrottle: {windowMs: 60000, max: 3}
             }
@@ -802,10 +802,10 @@ describe('S15: createVerifyThrottle', () => {
         expect(next).not.toHaveBeenCalled()
     })
 
-    test('is a no-op (passes through) when guestOrderAccess.enabled is false', () => {
+    test('is a no-op (passes through) when guestOrderLookup.enabled is false', () => {
         configState.current = {
             app: {
-                guestOrderAccess: {enabled: false},
+                guestOrderLookup: {enabled: false},
                 commerceAPI: {parameters: {...DEFAULT_COMMERCE_PARAMS}},
                 login: {
                     passwordless: {callbackURI: '/passwordless-login-callback'},
@@ -824,12 +824,12 @@ describe('S15: createVerifyThrottle', () => {
         }
     })
 
-    test('does not throttle requests outside /api/order-access/ prefix', () => {
+    test('does not throttle requests outside /api/order-lookup/ prefix', () => {
         const throttle = createVerifyThrottle()
         const ip = '5.5.5.5'
         // Exhaust the window for the IP first on the verify path
         for (let i = 0; i < 3; i++) {
-            throttle(makeThrottleReq(ip, '/api/order-access/verify'), makeThrottleRes(), makeNext())
+            throttle(makeThrottleReq(ip, '/api/order-lookup/verify'), makeThrottleRes(), makeNext())
         }
         // A request to a different path should not be throttled
         const next = makeNext()
@@ -842,7 +842,7 @@ describe('S15: createVerifyThrottle', () => {
     test('window resets after windowMs and allows requests again', () => {
         // Use a very short window
         configState.current = makeAppConfig({
-            guestOrderAccess: {
+            guestOrderLookup: {
                 enabled: true,
                 requestCodeThrottle: {windowMs: 1, max: 1}
             }
@@ -874,17 +874,17 @@ describe('S15: createVerifyThrottle', () => {
         const throttle = createVerifyThrottle()
         // IP 'a' exhausts its quota
         for (let i = 0; i < 3; i++) {
-            throttle({path: '/api/order-access/verify', ip: 'fallback', headers: {'x-forwarded-for': '1.1.1.1'}}, makeThrottleRes(), makeNext())
+            throttle({path: '/api/order-lookup/verify', ip: 'fallback', headers: {'x-forwarded-for': '1.1.1.1'}}, makeThrottleRes(), makeNext())
         }
         // IP 'a' is now throttled
         const resA = makeThrottleRes()
-        throttle({path: '/api/order-access/verify', ip: 'fallback', headers: {'x-forwarded-for': '1.1.1.1'}}, resA, makeNext())
+        throttle({path: '/api/order-lookup/verify', ip: 'fallback', headers: {'x-forwarded-for': '1.1.1.1'}}, resA, makeNext())
         expect(resA.status).toHaveBeenCalledWith(429)
 
         // IP 'b' (different x-forwarded-for) should still be allowed
         const resB = makeThrottleRes()
         const nextB = makeNext()
-        throttle({path: '/api/order-access/verify', ip: 'fallback', headers: {'x-forwarded-for': '2.2.2.2'}}, resB, nextB)
+        throttle({path: '/api/order-lookup/verify', ip: 'fallback', headers: {'x-forwarded-for': '2.2.2.2'}}, resB, nextB)
         expect(nextB).toHaveBeenCalled()
         expect(resB.status).not.toHaveBeenCalled()
     })

@@ -2,7 +2,7 @@
 
 ## S13 — Error UX
 
-**"Request a new code" link on 404 errors:** Implemented as an `<a href="/order-access">` inside the FormErrorMessage on the 404/invalidCode error state. Used a hard `<a>` tag rather than react-router `<Link>` because the user must restart the flow from scratch (no state to carry over). The href navigates to the root of the flow.
+**"Request a new code" link on 404 errors:** Implemented as an `<a href="/order-lookup">` inside the FormErrorMessage on the 404/invalidCode error state. Used a hard `<a>` tag rather than react-router `<Link>` because the user must restart the flow from scratch (no state to carry over). The href navigates to the root of the flow.
 
 **Submit button re-enables after error:** The submit button was already correctly using `isDisabled={isSubmitting}` (not `isDisabled={isSubmitting || !!serverError}`), so it re-enables naturally after the `finally` block sets `isSubmitting = false`. No change needed.
 
@@ -10,7 +10,7 @@
 
 ## S15 — Throttle middleware
 
-**In-process Map throttle, not per-endpoint:** The throttle middleware (`createVerifyThrottle()`) checks `req.path.startsWith('/api/order-access/')` to limit scope. It's registered via `app.use(createVerifyThrottle())` before the verify and order endpoints, which is correct — it applies to all order-access routes. This is defense-in-depth (SCAPI also throttles upstream).
+**In-process Map throttle, not per-endpoint:** The throttle middleware (`createVerifyThrottle()`) checks `req.path.startsWith('/api/order-lookup/')` to limit scope. It's registered via `app.use(createVerifyThrottle())` before the verify and order endpoints, which is correct — it applies to all order-access routes. This is defense-in-depth (SCAPI also throttles upstream).
 
 **No external library:** Implemented as a closure over a `Map<ip, {count, resetAt}>`. No `express-rate-limit` or other dependency added.
 
@@ -18,7 +18,7 @@
 
 ## S16 — i18n catalog
 
-**One new key added:** `guestOrderAccess.verify.error.requestNewCode` ("Request a new code") was added to en-GB.json and all 16 peer locales. Prior to S13 the error copy was inline prose ("...request a new code.") with no interactive element — now the link text needs its own message ID.
+**One new key added:** `guestOrderLookup.verify.error.requestNewCode` ("Request a new code") was added to en-GB.json and all 16 peer locales. Prior to S13 the error copy was inline prose ("...request a new code.") with no interactive element — now the link text needs its own message ID.
 
 **Audit result:** All 45 existing keys in en-GB matched the IDs used in the JSX files exactly (no orphaned keys, no missing keys). After S13 the total is 46 keys, all present in all 17 locale files.
 
@@ -38,6 +38,6 @@
 
 ## Test infrastructure
 
-**`commerce-sdk-isomorphic` mock:** The pre-existing `guest-order-access.test.js` suite failed to run because `commerce-sdk-isomorphic` is not installed in the test node_modules. Fixed by adding `jest.mock('commerce-sdk-isomorphic', ..., {virtual: true})` at the top of the test file. The mock provides a `ShopperOrders` class stub. The helper functions under test (filterGuestOrderFields, parseGuestOrderCookie, evictIfNeeded, createVerifyThrottle) don't use ShopperOrders, so this is a pure infrastructure fix.
+**`commerce-sdk-isomorphic` mock:** The pre-existing `guest-order-lookup.test.js` suite failed to run because `commerce-sdk-isomorphic` is not installed in the test node_modules. Fixed by adding `jest.mock('commerce-sdk-isomorphic', ..., {virtual: true})` at the top of the test file. The mock provides a `ShopperOrders` class stub. The helper functions under test (filterGuestOrderFields, parseGuestOrderCookie, evictIfNeeded, createVerifyThrottle) don't use ShopperOrders, so this is a pure infrastructure fix.
 
 **node_modules:** The glo-error-i18n-a11y worktree has no node_modules installed. Tests were run using the node_modules from the glo-routing worktree (symlinked for test execution). This is consistent with how other worktrees in this chain operate.

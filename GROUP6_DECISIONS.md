@@ -2,8 +2,8 @@
 
 ## S18 / S19 — Playwright test placement
 
-**Decision:** Test files placed at `e2e/tests/desktop/guest-order-access.spec.js` (S18) and
-`e2e/tests/desktop/guest-order-access-errors.spec.js` (S19), following the existing pattern of
+**Decision:** Test files placed at `e2e/tests/desktop/guest-order-lookup.spec.js` (S18) and
+`e2e/tests/desktop/guest-order-lookup-errors.spec.js` (S19), following the existing pattern of
 per-feature spec files under `e2e/tests/desktop/`.
 
 The root `playwright.config.js` already configures `testDir: './e2e'` with
@@ -15,16 +15,16 @@ The root `playwright.config.js` already configures `testDir: './e2e'` with
 **Decision:** The tests are written against two separate deployment targets:
 
 - **Feature-on tests** (happy path, error paths, a11y): require a deployment with
-  `guestOrderAccess.enabled: true` and `MRT_ALLOW_COOKIES=true`. Set
-  `GUEST_ORDER_ACCESS_E2E_BASE_URL` to point to this deployment. Until that environment
+  `guestOrderLookup.enabled: true` and `MRT_ALLOW_COOKIES=true`. Set
+  `GUEST_ORDER_LOOKUP_E2E_BASE_URL` to point to this deployment. Until that environment
   exists in CI, these tests will run against `config.RETAIL_APP_HOME` (feature-off), which
   means the feature-on test suites will fail at the "heading visible" assertions and be
   skipped implicitly by the CI timeout.
 
   **Action required (post ECOM 26.8):** Add a CI job that deploys the template with
-  `guestOrderAccess.enabled: true` and runs:
+  `guestOrderLookup.enabled: true` and runs:
   ```
-  GUEST_ORDER_ACCESS_E2E_BASE_URL=<url> npx playwright test e2e/tests/desktop/guest-order-access.spec.js e2e/tests/desktop/guest-order-access-errors.spec.js --project=chromium
+  GUEST_ORDER_LOOKUP_E2E_BASE_URL=<url> npx playwright test e2e/tests/desktop/guest-order-lookup.spec.js e2e/tests/desktop/guest-order-lookup-errors.spec.js --project=chromium
   ```
 
 - **Flag-off tests**: run against `config.RETAIL_APP_HOME` (default, feature-off). These
@@ -56,12 +56,12 @@ helper from `e2e/scripts/utils.js`. Rationale:
    violation will fail the test immediately without requiring a snapshot update cycle.
 
 If a snapshot baseline is desired post-launch, the tests can be updated to call
-`runAccessibilityTest(page, ['guest-order-access', 'step1-violations.json'])` after snapshots
+`runAccessibilityTest(page, ['guest-order-lookup', 'step1-violations.json'])` after snapshots
 are committed.
 
 ## S20 — Docs location
 
-**Decision:** `docs/guest-order-access.md` placed alongside existing docs files
+**Decision:** `docs/guest-order-lookup.md` placed alongside existing docs files
 (`docs/distributed-tracing.md`, `docs/httponly-cookies-architecture.md`, etc.).
 
 ## S18 / S19 — SLAS token mock

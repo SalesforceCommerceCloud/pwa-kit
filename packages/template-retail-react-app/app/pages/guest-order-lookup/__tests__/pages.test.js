@@ -44,28 +44,28 @@ jest.mock('@tanstack/react-query', () => {
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useQuery} from '@tanstack/react-query'
-import GuestOrderAccessRequest from '@salesforce/retail-react-app/app/pages/guest-order-access/request'
-import GuestOrderAccessVerify from '@salesforce/retail-react-app/app/pages/guest-order-access/verify'
-import GuestOrderAccessOrder, {
+import GuestOrderLookupRequest from '@salesforce/retail-react-app/app/pages/guest-order-lookup/request'
+import GuestOrderLookupVerify from '@salesforce/retail-react-app/app/pages/guest-order-lookup/verify'
+import GuestOrderLookupOrder, {
     GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS
-} from '@salesforce/retail-react-app/app/pages/guest-order-access/order'
+} from '@salesforce/retail-react-app/app/pages/guest-order-lookup/order'
 
 // Helper to render verify page with router state
 const renderVerifyWithState = (state = {orderNo: 'ABC123', email: 'test@example.com'}) => {
     return renderWithProviders(
-        <MemoryRouter initialEntries={[{pathname: '/order-access/verify', state}]}>
-            <Route path="/order-access/verify" component={GuestOrderAccessVerify} />
-            <Route path="/order-access" exact component={GuestOrderAccessRequest} />
-            <Route path="/order-access/order" render={() => <div>Order Details Page</div>} />
+        <MemoryRouter initialEntries={[{pathname: '/order-lookup/verify', state}]}>
+            <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
+            <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
+            <Route path="/order-lookup/order" render={() => <div>Order Details Page</div>} />
         </MemoryRouter>
     )
 }
 
-const guestOrderAccessConfig = {
+const guestOrderLookupConfig = {
     ...mockConfig,
     app: {
         ...mockConfig.app,
-        guestOrderAccess: {
+        guestOrderLookup: {
             enabled: true,
             orderNumberRegex: '^[A-Za-z0-9]{6,20}$'
         }
@@ -115,17 +115,17 @@ const defaultUseQueryMock = ({data = mockOrder, isLoading = false, isError = fal
     refetch: mockRefetch
 })
 
-describe('GuestOrderAccessRequest', () => {
+describe('GuestOrderLookupRequest', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockMutateAsync.mockResolvedValue({})
         useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
-        getConfig.mockReturnValue(guestOrderAccessConfig)
+        getConfig.mockReturnValue(guestOrderLookupConfig)
         useQuery.mockReturnValue(defaultUseQueryMock())
     })
 
     test('renders heading and form fields for guest users', () => {
-        renderWithProviders(<GuestOrderAccessRequest />)
+        renderWithProviders(<GuestOrderLookupRequest />)
         expect(screen.getByText('Find Your Order')).toBeInTheDocument()
         expect(screen.getByLabelText('Order Number')).toBeInTheDocument()
         expect(screen.getByLabelText('Email Address')).toBeInTheDocument()
@@ -135,8 +135,8 @@ describe('GuestOrderAccessRequest', () => {
     test('redirects to /account/orders when user is registered', () => {
         useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
         renderWithProviders(
-            <MemoryRouter initialEntries={['/order-access']}>
-                <Route path="/order-access" component={GuestOrderAccessRequest} />
+            <MemoryRouter initialEntries={['/order-lookup']}>
+                <Route path="/order-lookup" component={GuestOrderLookupRequest} />
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
@@ -146,7 +146,7 @@ describe('GuestOrderAccessRequest', () => {
 
     test('shows validation error when order number is empty', async () => {
         const user = userEvent.setup()
-        renderWithProviders(<GuestOrderAccessRequest />)
+        renderWithProviders(<GuestOrderLookupRequest />)
         await user.click(screen.getByRole('button', {name: /send access code/i}))
         await waitFor(() => {
             expect(screen.getByText('Order number is required')).toBeInTheDocument()
@@ -155,7 +155,7 @@ describe('GuestOrderAccessRequest', () => {
 
     test('shows validation error when email is empty', async () => {
         const user = userEvent.setup()
-        renderWithProviders(<GuestOrderAccessRequest />)
+        renderWithProviders(<GuestOrderLookupRequest />)
         const orderInput = screen.getByLabelText('Order Number')
         await user.type(orderInput, 'ABC123')
         await user.click(screen.getByRole('button', {name: /send access code/i}))
@@ -166,7 +166,7 @@ describe('GuestOrderAccessRequest', () => {
 
     test('shows validation error when order number does not match regex', async () => {
         const user = userEvent.setup()
-        renderWithProviders(<GuestOrderAccessRequest />)
+        renderWithProviders(<GuestOrderLookupRequest />)
         const orderInput = screen.getByLabelText('Order Number')
         await user.type(orderInput, '!!!')
         const emailInput = screen.getByLabelText('Email Address')
@@ -181,7 +181,7 @@ describe('GuestOrderAccessRequest', () => {
         const user = userEvent.setup()
         renderWithProviders(
             <MemoryRouter>
-                <GuestOrderAccessRequest />
+                <GuestOrderLookupRequest />
             </MemoryRouter>
         )
         await user.type(screen.getByLabelText('Order Number'), 'ABC123')
@@ -195,14 +195,14 @@ describe('GuestOrderAccessRequest', () => {
         })
     })
 
-    test('navigates to /order-access/verify on successful mutation (202)', async () => {
+    test('navigates to /order-lookup/verify on successful mutation (202)', async () => {
         mockMutateAsync.mockResolvedValue({})
         const user = userEvent.setup()
         renderWithProviders(
-            <MemoryRouter initialEntries={['/order-access']}>
-                <Route path="/order-access" exact component={GuestOrderAccessRequest} />
+            <MemoryRouter initialEntries={['/order-lookup']}>
+                <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
                 <Route
-                    path="/order-access/verify"
+                    path="/order-lookup/verify"
                     render={({location}) => (
                         <div data-testid="verify-page">
                             verify-{location.state?.orderNo}-{location.state?.email}
@@ -225,10 +225,10 @@ describe('GuestOrderAccessRequest', () => {
         mockMutateAsync.mockRejectedValue({response: {status: 500}})
         const user = userEvent.setup()
         renderWithProviders(
-            <MemoryRouter initialEntries={['/order-access']}>
-                <Route path="/order-access" exact component={GuestOrderAccessRequest} />
+            <MemoryRouter initialEntries={['/order-lookup']}>
+                <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
                 <Route
-                    path="/order-access/verify"
+                    path="/order-lookup/verify"
                     render={() => <div data-testid="verify-page">verify</div>}
                 />
             </MemoryRouter>
@@ -245,10 +245,10 @@ describe('GuestOrderAccessRequest', () => {
         mockMutateAsync.mockRejectedValue({response: {status: 400}})
         const user = userEvent.setup()
         renderWithProviders(
-            <MemoryRouter initialEntries={['/order-access']}>
-                <Route path="/order-access" exact component={GuestOrderAccessRequest} />
+            <MemoryRouter initialEntries={['/order-lookup']}>
+                <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
                 <Route
-                    path="/order-access/verify"
+                    path="/order-lookup/verify"
                     render={() => <div data-testid="verify-page">verify</div>}
                 />
             </MemoryRouter>
@@ -264,8 +264,8 @@ describe('GuestOrderAccessRequest', () => {
     // S11 — expired=1 banner
     test('shows session-expired alert when ?expired=1 is in the URL', () => {
         renderWithProviders(
-            <MemoryRouter initialEntries={['/order-access?expired=1']}>
-                <Route path="/order-access" component={GuestOrderAccessRequest} />
+            <MemoryRouter initialEntries={['/order-lookup?expired=1']}>
+                <Route path="/order-lookup" component={GuestOrderLookupRequest} />
             </MemoryRouter>
         )
         expect(
@@ -275,22 +275,22 @@ describe('GuestOrderAccessRequest', () => {
 
     test('does not show expired alert when ?expired=1 is absent', () => {
         renderWithProviders(
-            <MemoryRouter initialEntries={['/order-access']}>
-                <Route path="/order-access" component={GuestOrderAccessRequest} />
+            <MemoryRouter initialEntries={['/order-lookup']}>
+                <Route path="/order-lookup" component={GuestOrderLookupRequest} />
             </MemoryRouter>
         )
         expect(screen.queryByText(/your session has expired/i)).not.toBeInTheDocument()
     })
 })
 
-describe('GuestOrderAccessVerify', () => {
+describe('GuestOrderLookupVerify', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockMutateAsync.mockResolvedValue({})
         mockGetTokenWhenReady.mockResolvedValue('test-access-token')
         useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
         global.fetch = jest.fn().mockResolvedValue({ok: true, status: 200})
-        getConfig.mockReturnValue(guestOrderAccessConfig)
+        getConfig.mockReturnValue(guestOrderLookupConfig)
         useQuery.mockReturnValue(defaultUseQueryMock())
     })
 
@@ -306,23 +306,23 @@ describe('GuestOrderAccessVerify', () => {
         expect(screen.getByText(/user@test\.com/)).toBeInTheDocument()
     })
 
-    test('redirects to /order-access when router state is missing', () => {
+    test('redirects to /order-lookup when router state is missing', () => {
         renderWithProviders(
-            <MemoryRouter initialEntries={[{pathname: '/order-access/verify', state: null}]}>
-                <Route path="/order-access/verify" component={GuestOrderAccessVerify} />
-                <Route path="/order-access" exact render={() => <div>Request Page</div>} />
+            <MemoryRouter initialEntries={[{pathname: '/order-lookup/verify', state: null}]}>
+                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
+                <Route path="/order-lookup" exact render={() => <div>Request Page</div>} />
             </MemoryRouter>
         )
         expect(screen.getByText('Request Page')).toBeInTheDocument()
     })
 
-    test('redirects to /order-access when orderNo is missing from state', () => {
+    test('redirects to /order-lookup when orderNo is missing from state', () => {
         renderWithProviders(
             <MemoryRouter
-                initialEntries={[{pathname: '/order-access/verify', state: {email: 'a@b.com'}}]}
+                initialEntries={[{pathname: '/order-lookup/verify', state: {email: 'a@b.com'}}]}
             >
-                <Route path="/order-access/verify" component={GuestOrderAccessVerify} />
-                <Route path="/order-access" exact render={() => <div>Request Page</div>} />
+                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
+                <Route path="/order-lookup" exact render={() => <div>Request Page</div>} />
             </MemoryRouter>
         )
         expect(screen.getByText('Request Page')).toBeInTheDocument()
@@ -333,10 +333,10 @@ describe('GuestOrderAccessVerify', () => {
         renderWithProviders(
             <MemoryRouter
                 initialEntries={[
-                    {pathname: '/order-access/verify', state: {orderNo: 'ABC', email: 'a@b.com'}}
+                    {pathname: '/order-lookup/verify', state: {orderNo: 'ABC', email: 'a@b.com'}}
                 ]}
             >
-                <Route path="/order-access/verify" component={GuestOrderAccessVerify} />
+                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
@@ -371,7 +371,7 @@ describe('GuestOrderAccessVerify', () => {
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalledWith(
-                '/api/order-access/verify',
+                '/api/order-lookup/verify',
                 expect.objectContaining({
                     method: 'POST',
                     headers: expect.objectContaining({
@@ -388,20 +388,20 @@ describe('GuestOrderAccessVerify', () => {
         })
     })
 
-    test('navigates to /order-access/order on 200 response', async () => {
+    test('navigates to /order-lookup/order on 200 response', async () => {
         global.fetch.mockResolvedValue({ok: true, status: 200})
         const user = userEvent.setup()
         renderWithProviders(
             <MemoryRouter
                 initialEntries={[
                     {
-                        pathname: '/order-access/verify',
+                        pathname: '/order-lookup/verify',
                         state: {orderNo: 'ABC123', email: 'test@example.com'}
                     }
                 ]}
             >
-                <Route path="/order-access/verify" component={GuestOrderAccessVerify} />
-                <Route path="/order-access/order" render={() => <div>Order Page</div>} />
+                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
+                <Route path="/order-lookup/order" render={() => <div>Order Page</div>} />
             </MemoryRouter>
         )
         await user.type(screen.getByLabelText('Access Code'), '123456')
@@ -493,17 +493,17 @@ describe('GuestOrderAccessVerify', () => {
         })
     })
 
-    test('S13: "Request a new code" link routes to /order-access on 404 error', async () => {
+    test('S13: "Request a new code" link routes to /order-lookup on 404 error', async () => {
         global.fetch.mockResolvedValue({ok: false, status: 404})
         const user = userEvent.setup()
         renderWithProviders(
             <MemoryRouter
                 initialEntries={[
-                    {pathname: '/order-access/verify', state: {orderNo: 'ABC123', email: 'test@example.com'}}
+                    {pathname: '/order-lookup/verify', state: {orderNo: 'ABC123', email: 'test@example.com'}}
                 ]}
             >
-                <Route path="/order-access/verify" component={GuestOrderAccessVerify} />
-                <Route path="/order-access" exact render={() => <div data-testid="request-page">Request Page</div>} />
+                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
+                <Route path="/order-lookup" exact render={() => <div data-testid="request-page">Request Page</div>} />
             </MemoryRouter>
         )
         await user.type(screen.getByLabelText('Access Code'), '999999')
@@ -511,9 +511,9 @@ describe('GuestOrderAccessVerify', () => {
         await waitFor(() => {
             expect(screen.getByText('Request a new code')).toBeInTheDocument()
         })
-        // The link href points to /order-access
+        // The link href points to /order-lookup
         const link = screen.getByText('Request a new code')
-        expect(link).toHaveAttribute('href', '/order-access')
+        expect(link).toHaveAttribute('href', '/order-lookup')
     })
 
     test('S13: submit button re-enables after a server error', async () => {
@@ -595,10 +595,10 @@ describe('GuestOrderAccessVerify', () => {
     })
 })
 
-describe('GuestOrderAccessOrder', () => {
+describe('GuestOrderLookupOrder', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        getConfig.mockReturnValue(guestOrderAccessConfig)
+        getConfig.mockReturnValue(guestOrderLookupConfig)
         useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
         mockRefetch.mockResolvedValue({data: mockOrder, error: null})
         useQuery.mockReturnValue(defaultUseQueryMock())
@@ -606,11 +606,11 @@ describe('GuestOrderAccessOrder', () => {
 
     // Helper to render the order page with optional router state
     const renderOrderPage = (state = {orderNo: 'ABC123'}, search = '') => {
-        const path = `/order-access/order${search}`
+        const path = `/order-lookup/order${search}`
         return renderWithProviders(
-            <MemoryRouter initialEntries={[{pathname: '/order-access/order', state, search}]}>
-                <Route path="/order-access/order" component={GuestOrderAccessOrder} />
-                <Route path="/order-access" render={() => <div data-testid="request-page">Request Page</div>} />
+            <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state, search}]}>
+                <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
+                <Route path="/order-lookup" render={() => <div data-testid="request-page">Request Page</div>} />
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
@@ -670,7 +670,7 @@ describe('GuestOrderAccessOrder', () => {
         expect(screen.getByText('Account Orders')).toBeInTheDocument()
     })
 
-    test('redirects to /order-access?expired=1 on 404 error', async () => {
+    test('redirects to /order-lookup?expired=1 on 404 error', async () => {
         const expiredError = new Error('Session expired')
         expiredError.status = 404
         useQuery.mockReturnValue(
@@ -699,7 +699,7 @@ describe('GuestOrderAccessOrder', () => {
         expect(screen.getByText(/Refreshing/i)).toBeInTheDocument()
     })
 
-    test('mid-session expiry: redirect to /order-access?expired=1 when refetch returns 404', async () => {
+    test('mid-session expiry: redirect to /order-lookup?expired=1 when refetch returns 404', async () => {
         const expiredError = new Error('Session expired')
         expiredError.status = 404
         mockRefetch.mockResolvedValue({data: undefined, error: expiredError})
@@ -782,7 +782,7 @@ describe('GuestOrderAccessOrder', () => {
 // ─── S10 Security Backstop ─────────────────────────────────────────────────
 // These tests verify that suppressed field values NEVER appear in the rendered DOM,
 // even if somehow returned by the server. This is a non-negotiable security gate.
-describe('GuestOrderAccessOrder — S10 field suppression security backstop', () => {
+describe('GuestOrderLookupOrder — S10 field suppression security backstop', () => {
     const SUPPRESSED_FIELD_VALUES = [
         ['paymentCard', 'VISA-4111-SUPPRESSED'],
         ['expirationMonth', 'EXPIRY-MONTH-SUPPRESSED'],
@@ -797,7 +797,7 @@ describe('GuestOrderAccessOrder — S10 field suppression security backstop', ()
 
     beforeEach(() => {
         jest.clearAllMocks()
-        getConfig.mockReturnValue(guestOrderAccessConfig)
+        getConfig.mockReturnValue(guestOrderLookupConfig)
         useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
         mockRefetch.mockResolvedValue({data: mockOrder, error: null})
     })
@@ -842,9 +842,9 @@ describe('GuestOrderAccessOrder — S10 field suppression security backstop', ()
             )
 
             const {container} = renderWithProviders(
-                <MemoryRouter initialEntries={[{pathname: '/order-access/order', state: {orderNo: 'ABC123'}}]}>
-                    <Route path="/order-access/order" component={GuestOrderAccessOrder} />
-                    <Route path="/order-access" render={() => <div>Request Page</div>} />
+                <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state: {orderNo: 'ABC123'}}]}>
+                    <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
+                    <Route path="/order-lookup" render={() => <div>Request Page</div>} />
                 </MemoryRouter>
             )
 

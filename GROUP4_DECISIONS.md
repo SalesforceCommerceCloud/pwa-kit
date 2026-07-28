@@ -1,10 +1,10 @@
 # Group 4 Implementation Decisions
 
-## D1: orderNo query param required on GET /api/order-access/order
+## D1: orderNo query param required on GET /api/order-lookup/order
 
 **Decision:** The Express GET handler at `ssr.js:750` requires `orderNo` in `req.query` and returns 404 if it's absent — there is no "serve first cookie entry" fallback. The client therefore:
 - Passes `orderNo` from router state when navigating from Step 2 (the normal flow).
-- On refresh/SSR (no router state), sends the request **without** `orderNo`, which triggers a 404. The `useEffect` then redirects to `/order-access?expired=1`.
+- On refresh/SSR (no router state), sends the request **without** `orderNo`, which triggers a 404. The `useEffect` then redirects to `/order-lookup?expired=1`.
 
 This is intentionally conservative: a hard refresh after a session clears router state is treated as an expired session, prompting the user to re-authenticate. This is the safest behaviour and consistent with the HttpOnly cookie design.
 
@@ -18,11 +18,11 @@ This is intentionally conservative: a hard refresh after a session clears router
 
 ## D4: `?expired=1` redirect target includes the query string
 
-**Decision:** Redirects to `/order-access?expired=1` (with query string) so Step 1 (`request.jsx`) detects the expired flag and shows the alert banner. Both `history.replace('/order-access?expired=1')` and the `isExpired` check in `request.jsx` use the query string approach.
+**Decision:** Redirects to `/order-lookup?expired=1` (with query string) so Step 1 (`request.jsx`) detects the expired flag and shows the alert banner. Both `history.replace('/order-lookup?expired=1')` and the `isExpired` check in `request.jsx` use the query string approach.
 
 ## D5: Translation keys use English defaultMessage for all 16 peer locales
 
-**Decision:** All new `guestOrderAccess.order.*` and `guestOrderAccess.request.alert.*` keys use English `defaultMessage` values in the 16 non-en-GB locale files. Localisation is handled separately by the i18n team — the keys must exist so the app compiles and the react-intl fallback works.
+**Decision:** All new `guestOrderLookup.order.*` and `guestOrderLookup.request.alert.*` keys use English `defaultMessage` values in the 16 non-en-GB locale files. Localisation is handled separately by the i18n team — the keys must exist so the app compiles and the react-intl fallback works.
 
 ## D6: Suppressed field set exported for test access (S10)
 
