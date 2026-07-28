@@ -51,9 +51,9 @@ export function parseGuestOrderCookie(req, cookieName) {
 }
 
 export function evictIfNeeded(cookieMap) {
-    // FIFO eviction if JSON would exceed ~3KB
+    // FIFO eviction if raw JSON would exceed ~2500 bytes (leaves headroom for URL-encoding expansion)
     let entries = Object.entries(cookieMap)
-    while (JSON.stringify(Object.fromEntries(entries)).length > 3000 && entries.length > 1) {
+    while (JSON.stringify(Object.fromEntries(entries)).length > 2500 && entries.length > 0) {
         entries.shift()
     }
     return Object.fromEntries(entries)
@@ -661,7 +661,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     })
 
     app.post('/api/order-lookup/verify', async (req, res) => {
-        const {app: appConfig} = getConfig()
+        const appConfig = getConfig()?.app
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
 
@@ -735,7 +735,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     })
 
     app.get('/api/order-lookup/order', async (req, res) => {
-        const {app: appConfig} = getConfig()
+        const appConfig = getConfig()?.app
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
 
