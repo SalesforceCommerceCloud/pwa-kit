@@ -106,6 +106,16 @@ export function filterGuestOrderFields(order) {
         }
         filtered[key] = val
     }
+    // Strip c_* custom attributes from individual productItems (server-side security)
+    if (filtered.productItems) {
+        filtered.productItems = filtered.productItems.map((item) => {
+            const filteredItem = {...item}
+            Object.keys(filteredItem).forEach((key) => {
+                if (key.startsWith('c_')) delete filteredItem[key]
+            })
+            return filteredItem
+        })
+    }
     return filtered
 }
 
@@ -703,7 +713,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             const cookieVal = evictIfNeeded(existing)
             res.setHeader(
                 'Set-Cookie',
-                `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+                `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=3600`
             )
 
             logger.info('guest-order-lookup verify success', {
