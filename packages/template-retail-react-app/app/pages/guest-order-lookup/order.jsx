@@ -33,7 +33,7 @@ export const GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS = new Set([
     'orderViewCode'
 ])
 
-const GuestOrderAccessOrder = () => {
+const GuestOrderLookupOrder = () => {
     const {formatMessage, formatDate, formatTime, formatNumber} = useIntl()
     const {isRegistered} = useCustomerType()
     const history = useHistory()
@@ -47,8 +47,8 @@ const GuestOrderAccessOrder = () => {
     const orderNoFromState = location.state?.orderNo
 
     const queryKey = orderNoFromState
-        ? ['guestOrderAccess', 'order', orderNoFromState]
-        : ['guestOrderAccess', 'order', '__cookie__']
+        ? ['guestOrderLookup', 'order', orderNoFromState]
+        : ['guestOrderLookup', 'order', '__cookie__']
 
     const {
         data: order,
@@ -64,8 +64,8 @@ const GuestOrderAccessOrder = () => {
         queryFn: async () => {
             const token = await getTokenWhenReady()
             const url = orderNoFromState
-                ? `/api/order-access/order?orderNo=${encodeURIComponent(orderNoFromState)}`
-                : '/api/order-access/order'
+                ? `/api/order-lookup/order?orderNo=${encodeURIComponent(orderNoFromState)}`
+                : '/api/order-lookup/order'
             const res = await fetch(url, {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -90,7 +90,7 @@ const GuestOrderAccessOrder = () => {
     // Redirect on 404 (expired session) — useEffect so redirect happens after render
     useEffect(() => {
         if (isError && error?.status === 404) {
-            history.replace('/order-access?expired=1')
+            history.replace('/order-lookup?expired=1')
         }
     }, [isError, error, history])
 
@@ -118,14 +118,14 @@ const GuestOrderAccessOrder = () => {
                 <Box p={4} bg="red.50" borderRadius="md" role="alert">
                     <Text color="red.700">
                         {formatMessage({
-                            id: 'guestOrderAccess.order.error.generic',
+                            id: 'guestOrderLookup.order.error.generic',
                             defaultMessage:
                                 'Something went wrong loading your order. Please try again.'
                         })}
                     </Text>
                     <Button mt={4} onClick={() => refetch()} isLoading={isFetching}>
                         {formatMessage({
-                            id: 'guestOrderAccess.order.button.retry',
+                            id: 'guestOrderLookup.order.button.retry',
                             defaultMessage: 'Try Again'
                         })}
                     </Button>
@@ -156,7 +156,7 @@ const GuestOrderAccessOrder = () => {
     const handleRefresh = async () => {
         const result = await refetch()
         if (result.error?.status === 404) {
-            history.replace('/order-access?expired=1')
+            history.replace('/order-lookup?expired=1')
         }
     }
 
@@ -168,7 +168,7 @@ const GuestOrderAccessOrder = () => {
                     <Box>
                         <Heading as="h1" fontSize="2xl" mb={1}>
                             {formatMessage({
-                                id: 'guestOrderAccess.order.heading',
+                                id: 'guestOrderLookup.order.heading',
                                 defaultMessage: 'Order Details'
                             })}
                         </Heading>
@@ -176,7 +176,7 @@ const GuestOrderAccessOrder = () => {
                             <Text color="gray.600" fontSize="sm">
                                 {formatMessage(
                                     {
-                                        id: 'guestOrderAccess.order.orderNumber',
+                                        id: 'guestOrderLookup.order.orderNumber',
                                         defaultMessage: 'Order #{orderNo}'
                                     },
                                     {orderNo: order.orderNo}
@@ -187,7 +187,7 @@ const GuestOrderAccessOrder = () => {
                             <Text color="gray.600" fontSize="sm">
                                 {formatMessage(
                                     {
-                                        id: 'guestOrderAccess.order.placedOn',
+                                        id: 'guestOrderLookup.order.placedOn',
                                         defaultMessage: 'Placed on {date}'
                                     },
                                     {date: orderDate}
@@ -198,7 +198,7 @@ const GuestOrderAccessOrder = () => {
                             <Text fontWeight="semibold" mt={1}>
                                 {formatMessage(
                                     {
-                                        id: 'guestOrderAccess.order.status',
+                                        id: 'guestOrderLookup.order.status',
                                         defaultMessage: 'Status: {status}'
                                     },
                                     {status: order.status}
@@ -213,18 +213,18 @@ const GuestOrderAccessOrder = () => {
                             onClick={handleRefresh}
                             isLoading={isFetching}
                             loadingText={formatMessage({
-                                id: 'guestOrderAccess.order.button.refreshing',
+                                id: 'guestOrderLookup.order.button.refreshing',
                                 defaultMessage: 'Refreshing…'
                             })}
                             variant="outline"
                             size="sm"
                             aria-label={formatMessage({
-                                id: 'guestOrderAccess.order.button.refreshStatus.aria',
+                                id: 'guestOrderLookup.order.button.refreshStatus.aria',
                                 defaultMessage: 'Refresh order status'
                             })}
                         >
                             {formatMessage({
-                                id: 'guestOrderAccess.order.button.refreshStatus',
+                                id: 'guestOrderLookup.order.button.refreshStatus',
                                 defaultMessage: 'Refresh Status'
                             })}
                         </Button>
@@ -239,7 +239,7 @@ const GuestOrderAccessOrder = () => {
                             >
                                 {formatMessage(
                                     {
-                                        id: 'guestOrderAccess.order.lastUpdated',
+                                        id: 'guestOrderLookup.order.lastUpdated',
                                         defaultMessage: 'Last updated at {time}'
                                     },
                                     {time: lastUpdatedTime}
@@ -256,7 +256,7 @@ const GuestOrderAccessOrder = () => {
                     <Box>
                         <Heading as="h2" fontSize="lg" mb={4}>
                             {formatMessage({
-                                id: 'guestOrderAccess.order.section.items',
+                                id: 'guestOrderLookup.order.section.items',
                                 defaultMessage: 'Items'
                             })}
                         </Heading>
@@ -286,14 +286,14 @@ const GuestOrderAccessOrder = () => {
                                                 {item.productName ||
                                                     item.itemText ||
                                                     formatMessage({
-                                                        id: 'guestOrderAccess.order.item.unnamed',
+                                                        id: 'guestOrderLookup.order.item.unnamed',
                                                         defaultMessage: 'Product'
                                                     })}
                                             </Text>
                                             <Text fontSize="sm" color="gray.600">
                                                 {formatMessage(
                                                     {
-                                                        id: 'guestOrderAccess.order.item.qty',
+                                                        id: 'guestOrderLookup.order.item.qty',
                                                         defaultMessage: 'Qty: {qty}'
                                                     },
                                                     {qty: item.quantity ?? 1}
@@ -319,7 +319,7 @@ const GuestOrderAccessOrder = () => {
                     <Box>
                         <Heading as="h2" fontSize="lg" mb={3}>
                             {formatMessage({
-                                id: 'guestOrderAccess.order.section.shipping',
+                                id: 'guestOrderLookup.order.section.shipping',
                                 defaultMessage: 'Shipping'
                             })}
                         </Heading>
@@ -329,7 +329,7 @@ const GuestOrderAccessOrder = () => {
                                     <Text fontSize="sm">
                                         {formatMessage(
                                             {
-                                                id: 'guestOrderAccess.order.shipping.status',
+                                                id: 'guestOrderLookup.order.shipping.status',
                                                 defaultMessage: 'Shipping status: {status}'
                                             },
                                             {status: shipment.shippingStatus}
@@ -340,7 +340,7 @@ const GuestOrderAccessOrder = () => {
                                     <Text fontSize="sm" color="gray.600">
                                         {formatMessage(
                                             {
-                                                id: 'guestOrderAccess.order.shipping.postalCode',
+                                                id: 'guestOrderLookup.order.shipping.postalCode',
                                                 defaultMessage: 'Postal code: {postalCode}'
                                             },
                                             {postalCode: shipment.shippingAddress.postalCode}
@@ -351,7 +351,7 @@ const GuestOrderAccessOrder = () => {
                                     <Text fontSize="sm" color="gray.600">
                                         {formatMessage(
                                             {
-                                                id: 'guestOrderAccess.order.shipping.expectedDelivery',
+                                                id: 'guestOrderLookup.order.shipping.expectedDelivery',
                                                 defaultMessage: 'Expected delivery: {date}'
                                             },
                                             {
@@ -371,7 +371,7 @@ const GuestOrderAccessOrder = () => {
                                     <Text fontSize="sm" color="gray.600">
                                         {formatMessage(
                                             {
-                                                id: 'guestOrderAccess.order.shipping.tracking',
+                                                id: 'guestOrderLookup.order.shipping.tracking',
                                                 defaultMessage: 'Tracking: {trackingNumber}'
                                             },
                                             {trackingNumber: shipment.trackingNumber}
@@ -389,7 +389,7 @@ const GuestOrderAccessOrder = () => {
                 <Box>
                     <Heading as="h2" fontSize="lg" mb={3}>
                         {formatMessage({
-                            id: 'guestOrderAccess.order.section.totals',
+                            id: 'guestOrderLookup.order.section.totals',
                             defaultMessage: 'Order Summary'
                         })}
                     </Heading>
@@ -398,7 +398,7 @@ const GuestOrderAccessOrder = () => {
                             <Flex justify="space-between">
                                 <Text>
                                     {formatMessage({
-                                        id: 'guestOrderAccess.order.totals.subtotal',
+                                        id: 'guestOrderLookup.order.totals.subtotal',
                                         defaultMessage: 'Subtotal'
                                     })}
                                 </Text>
@@ -414,7 +414,7 @@ const GuestOrderAccessOrder = () => {
                             <Flex justify="space-between">
                                 <Text>
                                     {formatMessage({
-                                        id: 'guestOrderAccess.order.totals.shipping',
+                                        id: 'guestOrderLookup.order.totals.shipping',
                                         defaultMessage: 'Shipping'
                                     })}
                                 </Text>
@@ -430,7 +430,7 @@ const GuestOrderAccessOrder = () => {
                             <Flex justify="space-between">
                                 <Text>
                                     {formatMessage({
-                                        id: 'guestOrderAccess.order.totals.tax',
+                                        id: 'guestOrderLookup.order.totals.tax',
                                         defaultMessage: 'Tax'
                                     })}
                                 </Text>
@@ -451,7 +451,7 @@ const GuestOrderAccessOrder = () => {
                             >
                                 <Text>
                                     {formatMessage({
-                                        id: 'guestOrderAccess.order.totals.total',
+                                        id: 'guestOrderLookup.order.totals.total',
                                         defaultMessage: 'Total'
                                     })}
                                 </Text>
@@ -470,4 +470,4 @@ const GuestOrderAccessOrder = () => {
     )
 }
 
-export default GuestOrderAccessOrder
+export default GuestOrderLookupOrder

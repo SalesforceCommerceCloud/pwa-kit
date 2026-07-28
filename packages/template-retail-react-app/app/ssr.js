@@ -426,10 +426,10 @@ export async function jwksCaching(req, res, options) {
     }
 }
 
-// ─── S15: In-process throttle middleware for /api/order-access/verify ────────
+// ─── S15: In-process throttle middleware for /api/order-lookup/verify ────────
 // Keyed on the first IP from X-Forwarded-For (or req.ip). Uses a Map with
 // {count, resetAt} per key. No external library — zero new dependencies.
-// Reads windowMs/max from app.guestOrderAccess.requestCodeThrottle at request
+// Reads windowMs/max from app.guestOrderLookup.requestCodeThrottle at request
 // time so config hot-reload works without restarting the server.
 export function createVerifyThrottle() {
     /** @type {Map<string, {count: number, resetAt: number}>} */
@@ -438,11 +438,11 @@ export function createVerifyThrottle() {
     return function verifyThrottleMiddleware(req, res, next) {
         const {app: appConfig} = getConfig()
         // No-op when feature is disabled
-        if (!appConfig?.guestOrderAccess?.enabled) return next()
-        // Only throttle /api/order-access/ requests
-        if (!req.path?.startsWith('/api/order-access/')) return next()
+        if (!appConfig?.guestOrderLookup?.enabled) return next()
+        // Only throttle /api/order-lookup/ requests
+        if (!req.path?.startsWith('/api/order-lookup/')) return next()
 
-        const throttleCfg = appConfig.guestOrderAccess.requestCodeThrottle || {}
+        const throttleCfg = appConfig.guestOrderLookup.requestCodeThrottle || {}
         const windowMs = throttleCfg.windowMs ?? 60000
         const max = throttleCfg.max ?? 5
 
@@ -465,11 +465,11 @@ export function createVerifyThrottle() {
 }
 
 // Guest order access: warn if feature is enabled but cookies are not allowed
-const _goaConfig = getConfig()?.app?.guestOrderAccess
+const _goaConfig = getConfig()?.app?.guestOrderLookup
 if (_goaConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_COOKIES) {
     logger.warn(
-        'guestOrderAccess.enabled is true but neither localAllowCookies nor MRT_ALLOW_COOKIES is set. The cc-goa_* HttpOnly cookie will not be written. Set localAllowCookies: true for local dev or MRT_ALLOW_COOKIES=true for MRT.',
-        {namespace: 'guest-order-access'}
+        'guestOrderLookup.enabled is true but neither localAllowCookies nor MRT_ALLOW_COOKIES is set. The cc-goa_* HttpOnly cookie will not be written. Set localAllowCookies: true for local dev or MRT_ALLOW_COOKIES=true for MRT.',
+        {namespace: 'guest-order-lookup'}
     )
 }
 
@@ -698,12 +698,12 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
     })
 
-    // S15: defense-in-depth throttle on /api/order-access/* endpoints
+    // S15: defense-in-depth throttle on /api/order-lookup/* endpoints
     app.use(createVerifyThrottle())
 
-    app.post('/api/order-access/verify', async (req, res) => {
+    app.post('/api/order-lookup/verify', async (req, res) => {
         const {app: appConfig} = getConfig()
-        if (!appConfig?.guestOrderAccess?.enabled)
+        if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
 
         const {orderNo, email, accessCode} = req.body || {}
@@ -747,8 +747,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                 `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly; Secure; SameSite=Strict; Path=/`
             )
 
-            logger.info('guest-order-access verify success', {
-                namespace: 'guest-order-access',
+            logger.info('guest-order-lookup verify success', {
+                namespace: 'guest-order-lookup',
                 additionalProperties: {
                     correlationId,
                     orderNoPrefix: orderNo?.slice(0, 4),
@@ -760,8 +760,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         } catch (err) {
             const scapiStatus = err?.response?.status || 500
             const errorKind = scapiStatus === 404 ? 'invalid_code' : 'scapi_error'
-            logger.warn('guest-order-access verify error', {
-                namespace: 'guest-order-access',
+            logger.warn('guest-order-lookup verify error', {
+                namespace: 'guest-order-lookup',
                 additionalProperties: {
                     correlationId,
                     orderNoPrefix: orderNo?.slice(0, 4),
@@ -775,9 +775,9 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
     })
 
-    app.get('/api/order-access/order', async (req, res) => {
+    app.get('/api/order-lookup/order', async (req, res) => {
         const {app: appConfig} = getConfig()
-        if (!appConfig?.guestOrderAccess?.enabled)
+        if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
 
         const authorization = req.headers['authorization']
@@ -811,8 +811,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                 body: {orderViewCode: accessCode, email}
             })
             const filtered = filterGuestOrderFields(order)
-            logger.info('guest-order-access order fetch success', {
-                namespace: 'guest-order-access',
+            logger.info('guest-order-lookup order fetch success', {
+                namespace: 'guest-order-lookup',
                 additionalProperties: {
                     correlationId,
                     orderNoPrefix: orderNo?.slice(0, 4),
@@ -824,8 +824,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         } catch (err) {
             const scapiStatus = err?.response?.status || 500
             const errorKind = scapiStatus === 404 ? 'expired_code' : 'scapi_error'
-            logger.warn('guest-order-access order fetch error', {
-                namespace: 'guest-order-access',
+            logger.warn('guest-order-lookup order fetch error', {
+                namespace: 'guest-order-lookup',
                 additionalProperties: {
                     correlationId,
                     orderNoPrefix: orderNo?.slice(0, 4),

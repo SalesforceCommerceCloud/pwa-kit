@@ -12,9 +12,9 @@
  * and internal API responses. No real SCAPI calls are made. The tests assume
  * a dev server is running with the config applied via env vars:
  *
- *   GUEST_ORDER_ACCESS_E2E_BASE_URL  - base URL of the app under test
+ *   GUEST_ORDER_LOOKUP_E2E_BASE_URL  - base URL of the app under test
  *                                      (defaults to config.RETAIL_APP_HOME)
- *   GUEST_ORDER_ACCESS_ENABLED       - set to "true" for feature-on suites
+ *   GUEST_ORDER_LOOKUP_ENABLED       - set to "true" for feature-on suites
  *
  * For CI wiring see GROUP6_DECISIONS.md.
  */
@@ -30,11 +30,11 @@ const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
 
 /**
  * Base URL for the app under test.
- * Feature-on integration: deploy with guestOrderAccess.enabled=true and
- * set GUEST_ORDER_ACCESS_E2E_BASE_URL to point to that deployment.
+ * Feature-on integration: deploy with guestOrderLookup.enabled=true and
+ * set GUEST_ORDER_LOOKUP_E2E_BASE_URL to point to that deployment.
  */
 const FEATURE_ON_BASE_URL =
-    process.env.GUEST_ORDER_ACCESS_E2E_BASE_URL || config.RETAIL_APP_HOME
+    process.env.GUEST_ORDER_LOOKUP_E2E_BASE_URL || config.RETAIL_APP_HOME
 
 /**
  * Intercept the requestOrderAccessCode SCAPI call and return 202 Accepted.
@@ -53,7 +53,7 @@ const mockRequestCode = (page) => {
  * Intercept the internal verify endpoint and fulfill with a given status.
  */
 const mockVerifyEndpoint = (page, {status = 200, body = '{}'} = {}) => {
-    return page.route('**/api/order-access/verify', (route) => {
+    return page.route('**/api/order-lookup/verify', (route) => {
         route.fulfill({
             status,
             contentType: 'application/json',
@@ -66,7 +66,7 @@ const mockVerifyEndpoint = (page, {status = 200, body = '{}'} = {}) => {
  * Intercept the internal order endpoint and return a minimal order payload.
  */
 const mockOrderEndpoint = (page, {status = 200, orderNo = 'ORD-001'} = {}) => {
-    return page.route('**/api/order-access/order**', (route) => {
+    return page.route('**/api/order-lookup/order**', (route) => {
         if (status !== 200) {
             route.fulfill({status, body: '{}'})
             return
@@ -139,7 +139,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await mockSlasToken(page)
     })
 
-    test('Footer "Find Your Order" link is visible and navigates to /order-access', async ({
+    test('Footer "Find Your Order" link is visible and navigates to /order-lookup', async ({
         page
     }) => {
         await page.goto(FEATURE_ON_BASE_URL)
@@ -149,20 +149,20 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         const link = page.getByRole('link', {name: /find your order/i})
         await expect(link).toBeVisible()
 
-        await Promise.all([page.waitForURL('**/order-access'), link.click()])
+        await Promise.all([page.waitForURL('**/order-lookup'), link.click()])
 
-        expect(page.url()).toContain('/order-access')
+        expect(page.url()).toContain('/order-lookup')
         // Confirm Step 1 heading is visible
         await expect(page.getByRole('heading', {name: /find your order/i})).toBeVisible()
     })
 
-    test('Step 1: fill order number + email, submit → routed to /order-access/verify (anti-enumeration)', async ({
+    test('Step 1: fill order number + email, submit → routed to /order-lookup/verify (anti-enumeration)', async ({
         page
     }) => {
         // requestOrderAccessCode always returns 202 — the route to verify is unconditional
         await mockRequestCode(page)
 
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
         await expect(page.getByRole('heading', {name: /find your order/i})).toBeVisible()
@@ -171,23 +171,23 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-access/verify'),
+            page.waitForURL('**/order-lookup/verify'),
             page.getByRole('button', {name: /send access code/i}).click()
         ])
 
-        expect(page.url()).toContain('/order-access/verify')
+        expect(page.url()).toContain('/order-lookup/verify')
         expect(page.url()).not.toContain('orderNo')
         expect(page.url()).not.toContain('email')
     })
 
-    test('Step 2: fill 6-digit code, submit → routed to /order-access/order', async ({page}) => {
+    test('Step 2: fill 6-digit code, submit → routed to /order-lookup/order', async ({page}) => {
         await mockRequestCode(page)
         await mockVerifyEndpoint(page, {status: 200})
         await mockOrderEndpoint(page)
 
         // Navigate directly to verify with router state (simulating coming from Step 1)
         // We use page.evaluate to set history state after navigation
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
         // Fill Step 1 to establish router state properly
@@ -195,7 +195,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-access/verify'),
+            page.waitForURL('**/order-lookup/verify'),
             page.getByRole('button', {name: /send access code/i}).click()
         ])
 
@@ -204,16 +204,16 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await page.getByLabel(/access code/i).fill('123456')
 
         await Promise.all([
-            page.waitForURL('**/order-access/order'),
+            page.waitForURL('**/order-lookup/order'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
-        expect(page.url()).toContain('/order-access/order')
+        expect(page.url()).toContain('/order-lookup/order')
         expect(page.url()).not.toContain('accessCode')
         expect(page.url()).not.toContain('orderNo')
     })
 
-    test('Step 3: order details rendered from mock GET /api/order-access/order response', async ({
+    test('Step 3: order details rendered from mock GET /api/order-lookup/order response', async ({
         page
     }) => {
         await mockRequestCode(page)
@@ -221,21 +221,21 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await mockOrderEndpoint(page, {orderNo: 'ORD-001234'})
 
         // Traverse the full flow
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
         await page.getByLabel(/order number/i).fill('ORD-001234')
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-access/verify'),
+            page.waitForURL('**/order-lookup/verify'),
             page.getByRole('button', {name: /send access code/i}).click()
         ])
 
         await page.getByLabel(/access code/i).fill('123456')
 
         await Promise.all([
-            page.waitForURL('**/order-access/order'),
+            page.waitForURL('**/order-lookup/order'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
@@ -260,21 +260,21 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
             }
         })
 
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
         await page.getByLabel(/order number/i).fill('ORD-SENSITIVE')
         await page.getByLabel(/email address/i).fill('sensitive@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-access/verify'),
+            page.waitForURL('**/order-lookup/verify'),
             page.getByRole('button', {name: /send access code/i}).click()
         ])
 
         await page.getByLabel(/access code/i).fill('999888')
 
         await Promise.all([
-            page.waitForURL('**/order-access/order'),
+            page.waitForURL('**/order-lookup/order'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
@@ -296,21 +296,21 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await mockVerifyEndpoint(page, {status: 200})
         await mockOrderEndpoint(page)
 
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
         await page.getByLabel(/order number/i).fill('ORD-001234')
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-access/verify'),
+            page.waitForURL('**/order-lookup/verify'),
             page.getByRole('button', {name: /send access code/i}).click()
         ])
 
         await page.getByLabel(/access code/i).fill('123456')
 
         await Promise.all([
-            page.waitForURL('**/order-access/order'),
+            page.waitForURL('**/order-lookup/order'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
@@ -326,7 +326,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await mockVerifyEndpoint(page, {status: 200})
 
         // Mock order with suppressed field data that should NOT be rendered
-        await page.route('**/api/order-access/order**', (route) => {
+        await page.route('**/api/order-lookup/order**', (route) => {
             route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -353,21 +353,21 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
             })
         })
 
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
         await page.getByLabel(/order number/i).fill('ORD-001234')
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-access/verify'),
+            page.waitForURL('**/order-lookup/verify'),
             page.getByRole('button', {name: /send access code/i}).click()
         ])
 
         await page.getByLabel(/access code/i).fill('123456')
 
         await Promise.all([
-            page.waitForURL('**/order-access/order'),
+            page.waitForURL('**/order-lookup/order'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
@@ -379,7 +379,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         expect(bodyText).not.toContain('secret-value')
     })
 
-    test('Registered user visiting /order-access is redirected to /account/orders', async ({
+    test('Registered user visiting /order-lookup is redirected to /account/orders', async ({
         page
     }) => {
         // Mock a SLAS token with a registered customer (enc_user_id set)
@@ -407,7 +407,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         // state cannot be spoofed via route interception alone.
         //
         // The test navigates and waits up to 5s for the redirect.
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
         // Allow time for auth to initialize and potential redirect to trigger
@@ -433,13 +433,13 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
 test.describe('Guest Order Access — flag-off invisibility (feature-off)', () => {
     /**
      * These tests run against the default RETAIL_APP_HOME which has
-     * guestOrderAccess.enabled = false (the default config).
+     * guestOrderLookup.enabled = false (the default config).
      *
-     * If GUEST_ORDER_ACCESS_FLAG_OFF_BASE_URL is set, that URL is used instead.
+     * If GUEST_ORDER_LOOKUP_FLAG_OFF_BASE_URL is set, that URL is used instead.
      * It should point to a deployment with the feature disabled (i.e. default config).
      */
     const FLAG_OFF_BASE_URL =
-        process.env.GUEST_ORDER_ACCESS_FLAG_OFF_BASE_URL || config.RETAIL_APP_HOME
+        process.env.GUEST_ORDER_LOOKUP_FLAG_OFF_BASE_URL || config.RETAIL_APP_HOME
 
     test.beforeEach(async ({page}) => {
         await mockSlasToken(page)
@@ -456,17 +456,17 @@ test.describe('Guest Order Access — flag-off invisibility (feature-off)', () =
         await expect(link).not.toBeVisible()
     })
 
-    test('Direct navigation to /order-access renders PageNotFound when feature is off', async ({
+    test('Direct navigation to /order-lookup renders PageNotFound when feature is off', async ({
         page
     }) => {
         // Capture any network calls to order-access endpoints
         const orderAccessCalls = []
-        await page.route('**/api/order-access/**', (route) => {
+        await page.route('**/api/order-lookup/**', (route) => {
             orderAccessCalls.push(route.request().url())
             route.continue()
         })
 
-        await page.goto(FLAG_OFF_BASE_URL + '/order-access')
+        await page.goto(FLAG_OFF_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
         // The route is not registered when feature is off — should show 404/not-found page
@@ -475,16 +475,16 @@ test.describe('Guest Order Access — flag-off invisibility (feature-off)', () =
         await expect(notFound).toBeVisible({timeout: 10000})
     })
 
-    test('Direct navigation to /order-access/verify renders PageNotFound when feature is off', async ({
+    test('Direct navigation to /order-lookup/verify renders PageNotFound when feature is off', async ({
         page
     }) => {
         const orderAccessCalls = []
-        await page.route('**/api/order-access/**', (route) => {
+        await page.route('**/api/order-lookup/**', (route) => {
             orderAccessCalls.push(route.request().url())
             route.continue()
         })
 
-        await page.goto(FLAG_OFF_BASE_URL + '/order-access/verify')
+        await page.goto(FLAG_OFF_BASE_URL + '/order-lookup/verify')
         await answerConsentTrackingForm(page)
 
         const notFound = page.getByText(/page not found/i)
@@ -494,16 +494,16 @@ test.describe('Guest Order Access — flag-off invisibility (feature-off)', () =
         expect(orderAccessCalls).toHaveLength(0)
     })
 
-    test('Direct navigation to /order-access/order renders PageNotFound when feature is off', async ({
+    test('Direct navigation to /order-lookup/order renders PageNotFound when feature is off', async ({
         page
     }) => {
         const orderAccessCalls = []
-        await page.route('**/api/order-access/**', (route) => {
+        await page.route('**/api/order-lookup/**', (route) => {
             orderAccessCalls.push(route.request().url())
             route.continue()
         })
 
-        await page.goto(FLAG_OFF_BASE_URL + '/order-access/order')
+        await page.goto(FLAG_OFF_BASE_URL + '/order-lookup/order')
         await answerConsentTrackingForm(page)
 
         const notFound = page.getByText(/page not found/i)
@@ -521,15 +521,15 @@ test.describe('Guest Order Access — flag-off invisibility (feature-off)', () =
                 route.continue()
             }
         )
-        await page.route('**/api/order-access/**', (route) => {
+        await page.route('**/api/order-lookup/**', (route) => {
             requestCodeCalls.push(route.request().url())
             route.continue()
         })
 
         // Visit all three order-access paths
-        await page.goto(FLAG_OFF_BASE_URL + '/order-access')
-        await page.goto(FLAG_OFF_BASE_URL + '/order-access/verify')
-        await page.goto(FLAG_OFF_BASE_URL + '/order-access/order')
+        await page.goto(FLAG_OFF_BASE_URL + '/order-lookup')
+        await page.goto(FLAG_OFF_BASE_URL + '/order-lookup/verify')
+        await page.goto(FLAG_OFF_BASE_URL + '/order-lookup/order')
 
         expect(requestCodeCalls).toHaveLength(0)
     })
@@ -550,7 +550,7 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
     test('Step 1 (request) has zero critical axe violations', async ({page}) => {
         await mockRequestCode(page)
 
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
         await expect(page.getByRole('heading', {name: /find your order/i})).toBeVisible()
 
@@ -569,14 +569,14 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
         await mockRequestCode(page)
 
         // Navigate through Step 1 to reach Step 2 with router state
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
         await page.getByLabel(/order number/i).fill('ORD-001234')
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-access/verify'),
+            page.waitForURL('**/order-lookup/verify'),
             page.getByRole('button', {name: /send access code/i}).click()
         ])
 
@@ -598,21 +598,21 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
         await mockVerifyEndpoint(page, {status: 200})
         await mockOrderEndpoint(page)
 
-        await page.goto(FEATURE_ON_BASE_URL + '/order-access')
+        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
         await page.getByLabel(/order number/i).fill('ORD-001234')
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-access/verify'),
+            page.waitForURL('**/order-lookup/verify'),
             page.getByRole('button', {name: /send access code/i}).click()
         ])
 
         await page.getByLabel(/access code/i).fill('123456')
 
         await Promise.all([
-            page.waitForURL('**/order-access/order'),
+            page.waitForURL('**/order-lookup/order'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
