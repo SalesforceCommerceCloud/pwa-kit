@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import {useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
@@ -37,8 +37,14 @@ const GuestOrderLookupVerify = () => {
     const {getTokenWhenReady} = useAccessToken()
 
     const [serverError, setServerError] = useState(null)
-    const [isSubmitting, setIsSubmitting] = useState(false)
     const [resendDisabled, setResendDisabled] = useState(false)
+    const resendTimerRef = useRef(null)
+
+    useEffect(() => {
+        return () => {
+            if (resendTimerRef.current) clearTimeout(resendTimerRef.current)
+        }
+    }, [])
 
     // @ts-expect-error SDK 26.8 pending — requestOrderAccessCode is not yet in commerce-sdk-isomorphic 5.4.0
     const {mutateAsync: requestOrderAccessCode} = useShopperOrdersMutation('requestOrderAccessCode')
@@ -46,7 +52,7 @@ const GuestOrderLookupVerify = () => {
     const {
         register,
         handleSubmit,
-        formState: {errors}
+        formState: {errors, isSubmitting}
     } = useForm({defaultValues: {accessCode: ''}})
 
     if (isRegistered) return <Redirect to="/account/orders" />
@@ -60,7 +66,6 @@ const GuestOrderLookupVerify = () => {
 
     const onSubmit = async ({accessCode}) => {
         setServerError(null)
-        setIsSubmitting(true)
         try {
             const token = await getTokenWhenReady()
             const res = await fetch('/api/order-lookup/verify', {
@@ -72,7 +77,7 @@ const GuestOrderLookupVerify = () => {
                 body: JSON.stringify({orderNo, email, accessCode})
             })
             if (res.ok) {
-                history.push('/order-lookup/order')
+                history.push('/order-lookup/order', {orderNo})
                 return
             }
             if (res.status === 404) {
@@ -105,8 +110,6 @@ const GuestOrderLookupVerify = () => {
                     defaultMessage: 'Something went wrong. Please try again.'
                 })
             )
-        } finally {
-            setIsSubmitting(false)
         }
     }
 
@@ -129,7 +132,7 @@ const GuestOrderLookupVerify = () => {
             duration: 5000,
             isClosable: true
         })
-        setTimeout(() => setResendDisabled(false), 2000)
+        resendTimerRef.current = setTimeout(() => setResendDisabled(false), 2000)
     }
 
     return (
