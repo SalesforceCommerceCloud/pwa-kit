@@ -219,6 +219,24 @@ describe('createTrustedAgentPopup — COOP-severed popup', () => {
         channel.close()
     })
 
+    test('rejects immediately and starts no poll timer when the popup is blocked', async () => {
+        // A popup blocker makes window.open return null.
+        window.open = jest.fn().mockReturnValue(null)
+        const setIntervalSpy = jest.spyOn(global, 'setInterval')
+
+        const promise = createTrustedAgentPopup(AUTHORIZE_URL)
+        let rejectionReason: unknown = null
+        const captured = promise.catch((reason) => {
+            rejectionReason = reason
+        })
+
+        await captured
+        expect(rejectionReason).toMatch(/popup blocker/i)
+        // The synchronous check already rejected, so no lingering 1 Hz no-op timer
+        // should have been scheduled.
+        expect(setIntervalSpy).not.toHaveBeenCalled()
+    })
+
     test('rejects the prior promise when a new login supersedes it (no indefinite hang)', async () => {
         window.open = jest.fn().mockReturnValue(makeCoopSeveredPopup())
 

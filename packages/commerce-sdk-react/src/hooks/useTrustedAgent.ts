@@ -226,7 +226,12 @@ export const createTrustedAgentPopup = async (
         }
 
         checkPopupState()
-        intervalId = setInterval(checkPopupState, 1000)
+        // The synchronous check above can already settle (for example when the popup
+        // was blocked). Only start the poll timer if we are still waiting, otherwise
+        // it would spin as a no-op until the next flow clears it.
+        if (!settled) {
+            intervalId = setInterval(checkPopupState, 1000)
+        }
     })
 }
 
