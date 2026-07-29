@@ -31,7 +31,11 @@
  * These tests assert the FIXED behavior, so they are red against the current
  * implementation and green once the fix lands.
  */
-import {createTrustedAgentPopup, TRUSTED_AGENT_POPUP_MESSAGE_TYPE} from './useTrustedAgent'
+import {
+    createTrustedAgentPopup,
+    TRUSTED_AGENT_POPUP_MESSAGE_TYPE,
+    TRUSTED_AGENT_POPUP_CHANNEL
+} from './useTrustedAgent'
 
 // jsdom is reconfigured to this origin in setup-jest.js. The callback page is a
 // same-origin storefront route, so postMessage/BroadcastChannel are same-origin.
@@ -72,17 +76,48 @@ const postCallbackResult = (code: string, state: string, origin: string = STOREF
     )
 }
 
+// jsdom does not implement BroadcastChannel. Real browsers do, and the source
+// guards its use behind `typeof BroadcastChannel !== 'undefined'`, so production is
+// unaffected. Install a minimal same-origin, same-process polyfill so both the
+// source's fallback path and these tests can exercise the channel.
+class TestBroadcastChannel {
+    static channels: Record<string, TestBroadcastChannel[]> = {}
+    name: string
+    onmessage: ((event: {data: unknown}) => void) | null = null
+    constructor(name: string) {
+        this.name = name
+        ;(TestBroadcastChannel.channels[name] ||= []).push(this)
+    }
+    postMessage(data: unknown) {
+        for (const channel of TestBroadcastChannel.channels[this.name] || []) {
+            if (channel !== this) {
+                channel.onmessage?.({data})
+            }
+        }
+    }
+    close() {
+        const list = TestBroadcastChannel.channels[this.name]
+        if (list) {
+            TestBroadcastChannel.channels[this.name] = list.filter((c) => c !== this)
+        }
+    }
+}
+
 describe('createTrustedAgentPopup — COOP-severed popup', () => {
     const originalOpen = window.open
+    const originalBroadcastChannel = (global as {BroadcastChannel?: unknown}).BroadcastChannel
 
     beforeEach(() => {
         jest.useFakeTimers()
+        ;(global as {BroadcastChannel?: unknown}).BroadcastChannel = TestBroadcastChannel
+        TestBroadcastChannel.channels = {}
     })
 
     afterEach(() => {
         jest.clearAllTimers()
         jest.useRealTimers()
         window.open = originalOpen
+        ;(global as {BroadcastChannel?: unknown}).BroadcastChannel = originalBroadcastChannel
         jest.restoreAllMocks()
     })
 
@@ -160,5 +195,54 @@ describe('createTrustedAgentPopup — COOP-severed popup', () => {
 
         await captured
         expect(rejectionReason).toMatch(/timed out/i)
+    })
+
+    test('resolves with {code, state} delivered via BroadcastChannel', async () => {
+        window.open = jest.fn().mockReturnValue(makeCoopSeveredPopup())
+
+        const promise = createTrustedAgentPopup(AUTHORIZE_URL)
+
+        // Simulate the same-origin callback page broadcasting on the shared channel
+        // (the fallback path when the opener reference is unusable).
+        const channel = new BroadcastChannel(TRUSTED_AGENT_POPUP_CHANNEL)
+        channel.postMessage({
+            type: TRUSTED_AGENT_POPUP_MESSAGE_TYPE,
+            code: 'bc_code_123',
+            state: 'bc_state_abc'
+        })
+        // BroadcastChannel delivery is async (a microtask/macrotask), so let it flush.
+        jest.advanceTimersByTime(1000)
+        await Promise.resolve()
+        await Promise.resolve()
+
+        await expect(promise).resolves.toEqual({code: 'bc_code_123', state: 'bc_state_abc'})
+        channel.close()
+    })
+
+    test('rejects the prior promise when a new login supersedes it (no indefinite hang)', async () => {
+        window.open = jest.fn().mockReturnValue(makeCoopSeveredPopup())
+
+        // First flow: the caller is awaiting. This mirrors a manual popup that is
+        // still open when a background refresh fires and starts a new flow.
+        const first = createTrustedAgentPopup(AUTHORIZE_URL)
+        let firstRejection: unknown = null
+        const firstSettled = first.catch((reason) => {
+            firstRejection = reason
+        })
+        // createTrustedAgentPopup is an async function, so its returned promise adopts
+        // the inner Promise on a microtask. Yield once so the catch above is registered
+        // on that inner promise before the superseding call rejects it synchronously.
+        await Promise.resolve()
+
+        // A second call supersedes the first. The prior promise MUST settle rather
+        // than hang forever once its listener/timer are torn down.
+        const second = createTrustedAgentPopup(AUTHORIZE_URL)
+
+        await firstSettled
+        expect(firstRejection).toMatch(/superseded/i)
+
+        // The superseding flow still completes normally.
+        postCallbackResult('second_code', 'second_state')
+        await expect(second).resolves.toEqual({code: 'second_code', state: 'second_state'})
     })
 })

@@ -21,10 +21,11 @@ type UseTrustedAgent = {
 
 let popup: Window | null
 let intervalId: NodeJS.Timer
-// Teardown for the currently-active popup flow (message listener + broadcast
-// channel + poll timer). Tracked at module scope so a new login() call — or the
-// re-entrant guard below — can tear down a prior flow before starting another.
-let teardownActivePopup: (() => void) | null = null
+// Cancels the currently-active popup flow: tears down its listener, broadcast
+// channel, and poll timer, and rejects its pending promise so a superseding
+// login() call never leaves the prior caller awaiting forever. Tracked at module
+// scope because only one trusted-agent popup flow can be active at a time.
+let cancelActivePopup: (() => void) | null = null
 
 /**
  * `type` discriminator for the message the same-origin OAuth callback page posts
@@ -71,9 +72,10 @@ export const createTrustedAgentPopup = async (
     timeoutMinutes = 5,
     refreshTimeoutFocusMinutes = 1
 ): Promise<{code: string; state: string}> => {
-    // if a prior popup flow is still active, tear it down (listeners, channel, timer)
-    if (teardownActivePopup) {
-        teardownActivePopup()
+    // if a prior popup flow is still active, cancel it: reject its pending promise
+    // (so the prior caller doesn't hang) and tear down its listener/channel/timer
+    if (cancelActivePopup) {
+        cancelActivePopup()
     }
 
     // if a popup already exists, close it
@@ -83,7 +85,7 @@ export const createTrustedAgentPopup = async (
 
     // if a timer already exists, clear it
     if (intervalId) {
-        clearTimeout(intervalId)
+        clearInterval(intervalId)
     }
 
     // create our popup
@@ -117,7 +119,7 @@ export const createTrustedAgentPopup = async (
 
         const teardown = () => {
             if (intervalId) {
-                clearTimeout(intervalId)
+                clearInterval(intervalId)
             }
             if (messageListener) {
                 window?.removeEventListener?.('message', messageListener)
@@ -127,11 +129,10 @@ export const createTrustedAgentPopup = async (
                 broadcastChannel.close()
                 broadcastChannel = null
             }
-            if (teardownActivePopup === teardown) {
-                teardownActivePopup = null
+            if (cancelActivePopup === cancel) {
+                cancelActivePopup = null
             }
         }
-        teardownActivePopup = teardown
 
         const settleResolve = (result: {code: string; state: string}) => {
             if (settled) return
@@ -147,6 +148,12 @@ export const createTrustedAgentPopup = async (
             teardown()
             reject(reason)
         }
+
+        // Cancel path used when a new flow supersedes this one. Reject the pending
+        // promise so the superseded caller settles instead of awaiting forever; the
+        // new flow closes/reopens the shared popup window itself.
+        const cancel = () => settleReject('Popup superseded by a new authentication request.')
+        cancelActivePopup = cancel
 
         // Handle a callback delivered via postMessage or BroadcastChannel. Only
         // same-origin messages carrying our discriminator are honored; a payload
