@@ -32,15 +32,11 @@ const GuestOrderLookupRequest = () => {
     const orderNumberRegex =
         getConfig()?.app?.guestOrderLookup?.orderNumberRegex ?? '^[A-Za-z0-9]{6,20}$'
 
-    const form = useForm({
-        defaultValues: {orderNo: '', email: ''}
-    })
-
     const {
         control,
         handleSubmit,
         formState: {errors}
-    } = form
+    } = useForm({defaultValues: {orderNo: '', email: ''}})
 
     if (isRegistered) return <Redirect to="/account/orders" />
 
@@ -51,9 +47,7 @@ const GuestOrderLookupRequest = () => {
                 body: {email}
             })
         } catch (err) {
-            // Non-400 errors: route to verify anyway (anti-enumeration).
-            // 400 errors are also routed to verify — the server rejects
-            // malformed payloads, but the UI must never leak order existence.
+            // Route to verify regardless (anti-enumeration — never leak order existence).
             if (err?.response?.status === 400) {
                 history.push('/order-lookup/verify', {orderNo, email})
                 return
@@ -63,30 +57,38 @@ const GuestOrderLookupRequest = () => {
     }
 
     return (
-        <Container maxW="md" py={12}>
+        <Container maxW="lg" py={12}>
             <Stack spacing={8}>
-                <Box>
-                    <Heading as="h1" fontSize="2xl" mb={2}>
+                <Box textAlign="center">
+                    <Heading as="h1" fontSize="3xl" fontWeight="bold" mb={2}>
                         {formatMessage({
                             id: 'guestOrderLookup.request.heading',
-                            defaultMessage: 'Find Your Order'
+                            defaultMessage: 'Look Up Your Order'
                         })}
                     </Heading>
                     <Text color="gray.600">
                         {formatMessage({
                             id: 'guestOrderLookup.request.subtext',
                             defaultMessage:
-                                'Enter your order number and email address to receive a one-time access code.'
+                                'Enter your order details to track your order or view your receipt.'
                         })}
                     </Text>
                 </Box>
-                <Box as="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-                    <Stack spacing={5}>
+
+                <Box
+                    as="form"
+                    onSubmit={handleSubmit(onSubmit)}
+                    noValidate
+                    borderWidth="1px"
+                    borderRadius="lg"
+                    p={8}
+                >
+                    <Stack spacing={6}>
                         <Field
                             name="orderNo"
                             label={formatMessage({
                                 id: 'guestOrderLookup.request.label.orderNumber',
-                                defaultMessage: 'Order Number'
+                                defaultMessage: 'Order number'
                             })}
                             type="text"
                             control={control}
@@ -111,7 +113,7 @@ const GuestOrderLookupRequest = () => {
                             name="email"
                             label={formatMessage({
                                 id: 'guestOrderLookup.request.label.email',
-                                defaultMessage: 'Email Address'
+                                defaultMessage: 'Email address'
                             })}
                             type="email"
                             control={control}
@@ -138,10 +140,11 @@ const GuestOrderLookupRequest = () => {
                             isLoading={isLoading}
                             isDisabled={isLoading}
                             width="full"
+                            size="lg"
                         >
                             {formatMessage({
                                 id: 'guestOrderLookup.request.button.submit',
-                                defaultMessage: 'Send Access Code'
+                                defaultMessage: 'Find My Order'
                             })}
                         </Button>
                     </Stack>
