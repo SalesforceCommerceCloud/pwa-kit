@@ -30,7 +30,7 @@ const GuestOrderLookupRequest = () => {
         useShopperOrdersMutation('requestOrderAccessCode')
 
     const orderNumberRegex =
-        getConfig()?.app?.guestOrderLookup?.orderNumberRegex ?? '^[A-Za-z0-9]{6,20}$'
+        getConfig()?.app?.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$'
 
     const {
         control,
