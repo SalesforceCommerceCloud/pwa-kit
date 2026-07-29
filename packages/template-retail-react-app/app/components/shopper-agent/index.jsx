@@ -590,7 +590,7 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {string} [props.commerceAgentConfiguration.cc_esDeveloperName] - Embedded Service developer name
  * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `cc_esDeveloperName`
  * @param {string} [props.commerceAgentConfiguration.cc_capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
- * @param {string} [props.commerceAgentConfiguration.cc_enableEscalationToAgent] - 'true' (default) lets shoppers escalate to a human agent; forwarded as `messagingConfig.enableEscalationToAgent`
+ * @param {string} [props.commerceAgentConfiguration.cc_enableEscalationToAgent] - When 'true', lets shoppers escalate to a human agent; forwarded as `messagingConfig.enableEscalationToAgent`. Defaults to 'false'
  * @param {string} [props.commerceAgentConfiguration.cc_enableDownloadTranscript] - 'true' (default) lets shoppers download the chat transcript; forwarded as `messagingConfig.enableDownloadTranscript`
  * @param {string} [props.commerceAgentConfiguration.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0'); resolved into the full messaging bundle URL
  * @param {string} [props.commerceAgentConfiguration.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting); wins over cc_cdnVersion
@@ -626,7 +626,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         cc_widgetPosition = 'bottom-right',
         cc_isOpen = 'false',
         cc_isDevelopment = 'false',
-        cc_enableEscalationToAgent = 'true',
+        cc_enableEscalationToAgent = 'false',
         cc_enableDownloadTranscript = 'true',
         cc_theme,
         cc_searchConfig,

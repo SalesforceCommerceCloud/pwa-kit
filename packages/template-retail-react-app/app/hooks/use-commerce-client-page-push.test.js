@@ -23,11 +23,14 @@ afterEach(() => {
     jest.clearAllMocks()
 })
 
-// Base config that satisfies every gate: Commerce Client provider, page-push on,
-// full-height side panel. Individual tests override fields to exercise the gates.
+// Base config that satisfies every gate: agent on, Commerce Client provider,
+// page-push on, full-height dialog. Individual tests override fields to exercise
+// the gates.
 const enabledConfig = {
+    enabled: 'true',
     provider: 'commerce-client',
     cc_pagePush: 'true',
+    cc_displayType: 'dialog',
     cc_dialogFullHeight: 'true',
     cc_widgetPosition: 'bottom-right',
     cc_dialogWidth: '420px',
@@ -68,6 +71,48 @@ describe('useCommerceClientPagePush', () => {
             const {result} = renderHook(() =>
                 useCommerceClientPagePush({...enabledConfig, cc_dialogFullHeight: 'false'})
             )
+            expect(result.current).toEqual({})
+        })
+
+        test('returns no props when the shopper agent is disabled', () => {
+            const {result} = renderHook(() =>
+                useCommerceClientPagePush({...enabledConfig, enabled: 'false'})
+            )
+            expect(result.current).toEqual({})
+        })
+
+        test('returns no props for a modal widget', () => {
+            const {result} = renderHook(() =>
+                useCommerceClientPagePush({...enabledConfig, cc_displayType: 'modal'})
+            )
+            expect(result.current).toEqual({})
+        })
+
+        test('returns no props for an inline chat widget', () => {
+            const {result} = renderHook(() =>
+                useCommerceClientPagePush({...enabledConfig, cc_displayType: 'chat'})
+            )
+            expect(result.current).toEqual({})
+        })
+
+        test('applies the shift when cc_displayType is left at its dialog default', () => {
+            const configWithoutDisplayType = {...enabledConfig}
+            delete configWithoutDisplayType.cc_displayType
+
+            const {result} = renderHook(() => useCommerceClientPagePush(configWithoutDisplayType))
+
+            dispatchUiState('isOpen', true)
+
+            expect(result.current.paddingRight).toEqual({base: 0, lg: '420px'})
+        })
+
+        test('ignores widget events while page-push is gated off', () => {
+            const {result} = renderHook(() =>
+                useCommerceClientPagePush({...enabledConfig, cc_displayType: 'modal'})
+            )
+
+            dispatchUiState('isOpen', true)
+
             expect(result.current).toEqual({})
         })
     })
@@ -140,6 +185,67 @@ describe('useCommerceClientPagePush', () => {
                 transition: 'padding 0.3s ease-in-out'
             })
             expect(result.current).not.toHaveProperty('paddingRight')
+        })
+
+        test('follows the panel when the shopper moves it to the other side', () => {
+            const {result} = renderHook(() => useCommerceClientPagePush(enabledConfig))
+
+            dispatchUiState('isOpen', true)
+            expect(result.current.paddingRight).toEqual({base: 0, lg: '420px'})
+
+            dispatchUiState('position', 'bottom-left')
+
+            expect(result.current).toEqual({
+                paddingLeft: {base: 0, lg: '420px'},
+                transition: 'padding 0.3s ease-in-out'
+            })
+            expect(result.current).not.toHaveProperty('paddingRight')
+        })
+
+        test('moves the shift back when the panel returns to the configured corner', () => {
+            const {result} = renderHook(() =>
+                useCommerceClientPagePush({...enabledConfig, cc_widgetPosition: 'bottom-left'})
+            )
+
+            dispatchUiState('isOpen', true)
+            dispatchUiState('position', 'bottom-right')
+
+            expect(result.current.paddingRight).toEqual({base: 0, lg: '420px'})
+            expect(result.current).not.toHaveProperty('paddingLeft')
+        })
+
+        test('keeps the panel side across an open/close cycle', () => {
+            const {result} = renderHook(() => useCommerceClientPagePush(enabledConfig))
+
+            dispatchUiState('position', 'bottom-left')
+            dispatchUiState('isOpen', true)
+            dispatchUiState('isOpen', false)
+            dispatchUiState('isOpen', true)
+
+            expect(result.current.paddingLeft).toEqual({base: 0, lg: '420px'})
+        })
+
+        test('falls back to the right-hand shift for positions we do not push against', () => {
+            const {result} = renderHook(() =>
+                useCommerceClientPagePush({...enabledConfig, cc_widgetPosition: 'bottom-left'})
+            )
+
+            dispatchUiState('isOpen', true)
+            dispatchUiState('position', 'center')
+
+            expect(result.current.paddingRight).toEqual({base: 0, lg: '420px'})
+            expect(result.current).not.toHaveProperty('paddingLeft')
+        })
+
+        test('ignores a non-string position value', () => {
+            const {result} = renderHook(() =>
+                useCommerceClientPagePush({...enabledConfig, cc_widgetPosition: 'bottom-left'})
+            )
+
+            dispatchUiState('isOpen', true)
+            dispatchUiState('position', undefined)
+
+            expect(result.current.paddingLeft).toEqual({base: 0, lg: '420px'})
         })
 
         test('honors a custom cc_dialogWidth for the shift amount', () => {

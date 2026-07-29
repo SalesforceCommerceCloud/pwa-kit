@@ -298,9 +298,10 @@ export const COMMERCE_CLIENT_CDN_BASE_URL = 'https://cdn.search.cimulate.ai/copi
 
 /**
  * Window event the Commerce Client widget dispatches on every UI state change,
- * with `detail` of `{property, value}` (e.g. `{property: 'isOpen', value: true}`).
- * It fires regardless of source — our `toggleWidgetOpen` calls and the panel's own
- * close/minimize buttons alike — so it is the reliable signal for panel open-state.
+ * with `detail` of `{property, value}` (e.g. `{property: 'isOpen', value: true}` or
+ * `{property: 'position', value: 'bottom-left'}`). It fires regardless of source —
+ * our `toggleWidgetOpen` calls, the panel's own close/minimize buttons, and the
+ * header's Move left/right control alike.
  */
 export const COMMERCE_CLIENT_UI_STATE_EVENT = 'cimulate:ui-state-update'
 

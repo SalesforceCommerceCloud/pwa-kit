@@ -1677,15 +1677,24 @@ describe('ShopperAgent Component', () => {
             )
         })
 
-        test('defaults escalation and transcript toggles to true in the widget options', () => {
+        test('defaults escalation to false and transcript to true in the widget options', () => {
             renderCommerceClient()
 
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
                 expect.anything(),
                 expect.objectContaining({
-                    enableEscalationToAgent: true,
+                    enableEscalationToAgent: false,
                     enableDownloadTranscript: true
                 })
+            )
+        })
+
+        test('forwards cc_enableEscalationToAgent as true when explicitly set', () => {
+            renderCommerceClient({cc_enableEscalationToAgent: 'true'})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({enableEscalationToAgent: true})
             )
         })
 

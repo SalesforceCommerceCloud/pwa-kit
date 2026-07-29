@@ -63,7 +63,8 @@ module.exports = {
             cc_widgetPosition: 'bottom-right',
             // When 'true', storefront content shifts aside for the open side panel
             // instead of being overlaid by it. Handled template-side by
-            // useCommerceClientPagePush; needs cc_dialogFullHeight 'true' and `lg`+ width.
+            // useCommerceClientPagePush; needs an enabled agent on a full-height
+            // dialog widget (cc_dialogFullHeight 'true') and `lg`+ width.
             cc_pagePush: 'false',
             // Optional URL of a logo shown in the widget, forwarded as `logoUrl`.
             cc_logoUrl: '',
@@ -73,9 +74,9 @@ module.exports = {
             // When 'true', the widget logs its events to the console. Forwarded to the
             // widget as `isDevelopment`. Defaults to 'false'.
             cc_isDevelopment: 'false',
-            // When 'true' (default), shoppers can escalate the conversation to a human
-            // agent. Forwarded as `messagingConfig.enableEscalationToAgent`.
-            cc_enableEscalationToAgent: 'true',
+            // When 'true', shoppers can escalate the conversation to a human agent.
+            // Forwarded as `messagingConfig.enableEscalationToAgent`. Defaults to 'false'.
+            cc_enableEscalationToAgent: 'false',
             // When 'true' (default), shoppers can download the chat transcript.
             // Forwarded as `messagingConfig.enableDownloadTranscript`.
             cc_enableDownloadTranscript: 'true'

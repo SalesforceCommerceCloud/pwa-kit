@@ -39,7 +39,7 @@ export const getCommerceAgentConfig = () => {
         cc_logoUrl: '',
         cc_isOpen: 'false',
         cc_isDevelopment: 'false',
-        cc_enableEscalationToAgent: 'true',
+        cc_enableEscalationToAgent: 'false',
         cc_enableDownloadTranscript: 'true'
     }
     return getConfig().app.commerceAgent ?? defaults
