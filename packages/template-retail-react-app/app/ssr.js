@@ -907,9 +907,9 @@ const {handler} = runtime.createHandler(options, (app) => {
 
         let regex
         try {
-            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[A-Za-z0-9]{6,20}$')
+            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$')
         } catch {
-            regex = /^[A-Za-z0-9]{6,20}$/
+            regex = /^[a-zA-Z0-9-]{6,32}$/
         }
         if (!regex.test(orderNo))
             return res.status(400).json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
@@ -959,9 +959,9 @@ const {handler} = runtime.createHandler(options, (app) => {
 
         let regex
         try {
-            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[A-Za-z0-9]{6,20}$')
+            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$')
         } catch {
-            regex = /^[A-Za-z0-9]{6,20}$/
+            regex = /^[a-zA-Z0-9-]{6,32}$/
         }
         if (!regex.test(orderNo))
             return res.status(400).json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
