@@ -9,21 +9,35 @@ import {renderWithReactIntl} from '@salesforce/retail-react-app/app/utils/test-u
 import LoginRedirect from '@salesforce/retail-react-app/app/pages/login-redirect/index'
 import {TRUSTED_AGENT_POPUP_MESSAGE_TYPE} from '@salesforce/commerce-sdk-react'
 
+// Replace the whole `window.location` object rather than routing through
+// `history.replaceState`. Older jsdom versions (as bundled with some Node runtimes
+// used in CI) do not reliably reflect a `replaceState` URL back into
+// `window.location.search`, which made the component read an empty search and skip
+// the post. `location.search` is also non-configurable in some jsdom versions, so
+// swapping the whole object is the version-stable approach. We keep `origin` intact
+// so the post target assertion stays meaningful.
 const setSearch = (search) => {
-    const url = new URL(window.location.href)
-    url.search = search
-    window.history.replaceState({}, '', url.toString())
+    Object.defineProperty(window, 'location', {
+        value: {origin: 'https://www.domain.com', search},
+        configurable: true,
+        writable: true
+    })
 }
 
 describe('Login Redirect', () => {
     let originalOpener
+    const originalLocation = window.location
 
     beforeEach(() => {
         originalOpener = window.opener
     })
 
     afterEach(() => {
-        setSearch('')
+        Object.defineProperty(window, 'location', {
+            value: originalLocation,
+            configurable: true,
+            writable: true
+        })
         Object.defineProperty(window, 'opener', {value: originalOpener, configurable: true})
         jest.restoreAllMocks()
     })
