@@ -2588,16 +2588,16 @@
     "defaultMessage": "Please sign in to continue!"
   },
   "guestOrderLookup.request.heading": {
-    "defaultMessage": "Find Your Order"
+    "defaultMessage": "Look Up Your Order"
   },
   "guestOrderLookup.request.subtext": {
-    "defaultMessage": "Enter your order number and email address to receive a one-time access code."
+    "defaultMessage": "Enter your order details to track your order or view your receipt."
   },
   "guestOrderLookup.request.label.orderNumber": {
-    "defaultMessage": "Order Number"
+    "defaultMessage": "Order number"
   },
   "guestOrderLookup.request.label.email": {
-    "defaultMessage": "Email Address"
+    "defaultMessage": "Email address"
   },
   "guestOrderLookup.request.error.orderNumberRequired": {
     "defaultMessage": "Order number is required"
@@ -2612,16 +2612,16 @@
     "defaultMessage": "Enter a valid email address"
   },
   "guestOrderLookup.request.button.submit": {
-    "defaultMessage": "Send Access Code"
+    "defaultMessage": "Find My Order"
   },
   "guestOrderLookup.verify.heading": {
-    "defaultMessage": "Enter Your Access Code"
+    "defaultMessage": "Verify Your Email"
   },
   "guestOrderLookup.verify.subtext": {
-    "defaultMessage": "We've sent a 6-digit code to {email}. It may take a moment to arrive."
+    "defaultMessage": "We've sent a verification code to {email}. Please enter it below."
   },
   "guestOrderLookup.verify.label.code": {
-    "defaultMessage": "Access Code"
+    "defaultMessage": "Verification code"
   },
   "guestOrderLookup.verify.error.codeRequired": {
     "defaultMessage": "Access code is required"
@@ -2630,7 +2630,7 @@
     "defaultMessage": "Enter the 6-digit code from your email"
   },
   "guestOrderLookup.verify.error.invalidCode": {
-    "defaultMessage": "Code invalid or expired. Please try again or request a new code."
+    "defaultMessage": "The code you entered is invalid or has expired. Please try again."
   },
   "guestOrderLookup.verify.error.requestNewCode": {
     "defaultMessage": "Request a new code"
@@ -2643,15 +2643,6 @@
   },
   "guestOrderLookup.verify.button.submit": {
     "defaultMessage": "Verify Code"
-  },
-  "guestOrderLookup.verify.resend.prompt": {
-    "defaultMessage": "Didn't receive a code?"
-  },
-  "guestOrderLookup.verify.resend.link": {
-    "defaultMessage": "Resend code"
-  },
-  "guestOrderLookup.verify.toast.resent": {
-    "defaultMessage": "Check your inbox — it may take a moment."
   },
   "guestOrderLookup.request.alert.sessionExpired": {
     "defaultMessage": "Your session has expired. Please request a new access code."
@@ -2736,5 +2727,8 @@
   },
   "guestOrderLookup.order.return.success": {
     "defaultMessage": "Your return has been submitted."
+  },
+  "guestOrderLookup.verify.label.digitN": {
+    "defaultMessage": "Digit {n} of {total}"
   }
 }
