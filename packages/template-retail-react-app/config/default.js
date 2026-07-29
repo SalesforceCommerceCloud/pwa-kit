@@ -142,7 +142,7 @@ module.exports = {
         storeLocatorEnabled: true,
         guestOrderLookup: {
             enabled: false,
-            orderNumberRegex: '^[A-Za-z0-9]{6,20}$',
+            orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$',
             requestCodeThrottle: {
                 windowMs: 60000,
                 max: 5

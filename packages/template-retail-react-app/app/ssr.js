@@ -82,25 +82,37 @@ export function filterGuestOrderFields(order) {
             continue
         }
         if (key === 'paymentInstruments') {
-            // Keep maskedNumber + cardType only
+            // Keep card type, last digits, masked number, method id — matches sf-next allowedFields
             filtered.paymentInstruments = (val || []).map((pi) => ({
-                maskedNumber: pi.maskedNumber,
+                paymentInstrumentId: pi.paymentInstrumentId,
+                paymentMethodId: pi.paymentMethodId,
                 cardType: pi.cardType,
-                paymentMethodId: pi.paymentMethodId
+                numberLastDigits: pi.numberLastDigits,
+                maskedNumber: pi.maskedNumber
             }))
             continue
         }
         if (key === 'shipments') {
-            // Keep shippingAddress (postalCode only), trackingNumber, trackingUrl, expectedDeliveryDate
+            // Full shippingAddress matches sf-next allowedFields; tracking fields are additive
             filtered.shipments = (val || []).map((s) => ({
+                shipmentId: s.shipmentId,
+                shippingStatus: s.shippingStatus,
                 trackingNumber: s.trackingNumber,
                 trackingUrl: s.trackingUrl,
                 expectedDeliveryDate: s.expectedDeliveryDate,
-                shippingStatus: s.shippingStatus,
+                shippingMethod: s.shippingMethod,
                 shippingAddress: s.shippingAddress
-                    ? {postalCode: s.shippingAddress.postalCode}
-                    : undefined,
-                shippingMethod: s.shippingMethod
+                    ? {
+                          firstName: s.shippingAddress.firstName,
+                          lastName: s.shippingAddress.lastName,
+                          address1: s.shippingAddress.address1,
+                          address2: s.shippingAddress.address2,
+                          city: s.shippingAddress.city,
+                          stateCode: s.shippingAddress.stateCode,
+                          countryCode: s.shippingAddress.countryCode,
+                          postalCode: s.shippingAddress.postalCode
+                      }
+                    : undefined
             }))
             continue
         }
