@@ -79,10 +79,22 @@ export const processRequest = ({
     // On client side, browser always follow the redirect
     // to /callback but the response is always the same.
     // We strip out the unique query parameters so this
-    // endpoint is cached at the CDN level
+    // endpoint is cached at the CDN level.
+    //
+    // The Trusted Agent (Order on Behalf) redirect is the exception: it lands on
+    // /callback carrying both code and state, and the rendered page needs those
+    // values to hand the result back to the opener. When state is present we keep
+    // code (and the handler skips caching that variant) so the trusted agent flow
+    // still works. The standard SLAS login redirect has no state, so its code and
+    // usid are still stripped and the endpoint stays cacheable at the CDN.
     if (path === '/callback') {
+        const isTrustedAgentCallback = new QueryParameters(querystring).parameters.some(
+            (parameter) => parameter.key === 'state'
+        )
         exclusions.push('usid')
-        exclusions.push('code')
+        if (!isTrustedAgentCallback) {
+            exclusions.push('code')
+        }
     }
 
     // Build a first QueryParameters object from the given querystring
