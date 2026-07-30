@@ -13,6 +13,7 @@ import {
     openShopperAgentWidget,
     persistCommerceClientOpenState,
     getPersistedCommerceClientOpenState,
+    resolveCommerceClientOverrideOptions,
     resolveCommerceClientScriptUrl,
     validateCommerceClientDomain,
     validateCommerceClientAgentSettings
@@ -664,6 +665,129 @@ describe('shopper-agent-utils', () => {
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 'Commerce Client script URL must be served from a trusted cimulate.ai or sfcc-store-internal.net domain.'
             )
+        })
+
+        describe('component overrides', () => {
+            let consoleWarnSpy
+
+            beforeEach(() => {
+                consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+            })
+
+            afterEach(() => {
+                consoleWarnSpy.mockRestore()
+            })
+
+            test('warns but stays valid when cc_overrides and cc_overridesUrl are both set', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overridesUrl: 'https://example.com/overrides.js',
+                    cc_overrides: {ProductTile: 'my-product-tile'}
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).toHaveBeenCalledWith(
+                    'Commerce Client cc_overrides and cc_overridesUrl are mutually exclusive. Using cc_overrides and ignoring cc_overridesUrl.'
+                )
+            })
+
+            test('does not warn when only cc_overrides is set', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overrides: {ProductTile: 'my-product-tile'}
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).not.toHaveBeenCalled()
+            })
+
+            test('does not warn when only an HTTPS cc_overridesUrl is set', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overridesUrl: 'https://example.com/overrides.js'
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).not.toHaveBeenCalled()
+            })
+
+            test('warns when a lone cc_overridesUrl does not use HTTPS', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overridesUrl: 'http://example.com/overrides.js'
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).toHaveBeenCalledWith(
+                    'Commerce Client overrides URL must use HTTPS. Overrides will not be loaded.'
+                )
+            })
+
+            test('skips the HTTPS check on a cc_overridesUrl that an inline map already displaced', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overridesUrl: 'http://example.com/overrides.js',
+                    cc_overrides: {ProductTile: 'my-product-tile'}
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).not.toHaveBeenCalledWith(
+                    'Commerce Client overrides URL must use HTTPS. Overrides will not be loaded.'
+                )
+            })
+
+            test('treats an empty cc_overrides map as absent', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overridesUrl: 'https://example.com/overrides.js',
+                    cc_overrides: {}
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).not.toHaveBeenCalled()
+            })
+        })
+    })
+
+    describe('resolveCommerceClientOverrideOptions', () => {
+        test('returns the inline map as overrides', () => {
+            expect(
+                resolveCommerceClientOverrideOptions({cc_overrides: {ProductTile: 'my-tile'}})
+            ).toEqual({overrides: {ProductTile: 'my-tile'}})
+        })
+
+        test('returns the hosted script as overridesUrl', () => {
+            expect(
+                resolveCommerceClientOverrideOptions({
+                    cc_overridesUrl: 'https://example.com/overrides.js'
+                })
+            ).toEqual({overridesUrl: 'https://example.com/overrides.js'})
+        })
+
+        test('prefers the inline map and drops the URL when both are set', () => {
+            expect(
+                resolveCommerceClientOverrideOptions({
+                    cc_overrides: {ProductTile: 'my-tile'},
+                    cc_overridesUrl: 'https://example.com/overrides.js'
+                })
+            ).toEqual({overrides: {ProductTile: 'my-tile'}})
+        })
+
+        test('falls back to the URL when the inline map is empty', () => {
+            expect(
+                resolveCommerceClientOverrideOptions({
+                    cc_overrides: {},
+                    cc_overridesUrl: 'https://example.com/overrides.js'
+                })
+            ).toEqual({overridesUrl: 'https://example.com/overrides.js'})
+        })
+
+        test('returns an empty object when neither is set', () => {
+            expect(resolveCommerceClientOverrideOptions({})).toEqual({})
+        })
+
+        test('returns an empty object when called with no config', () => {
+            expect(resolveCommerceClientOverrideOptions()).toEqual({})
         })
     })
 

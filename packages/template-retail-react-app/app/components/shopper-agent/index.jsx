@@ -31,14 +31,11 @@ import {
     getPersistedCommerceClientOpenState,
     persistCommerceClientOpenState,
     resetEmbeddedMessagingForCommerceSessionChange,
+    resolveCommerceClientOverrideOptions,
     resolveCommerceClientScriptUrl,
     validateCommerceClientAgentSettings
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
-import {
-    COMMERCE_CLIENT_OVERRIDES,
-    registerCommerceClientOverrides
-} from '@salesforce/retail-react-app/app/components/shopper-agent/overrides'
 
 const onClient = typeof window !== 'undefined'
 
@@ -612,6 +609,7 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {Object} [props.commerceAgentConfiguration.cc_theme] - Partial theme overrides for the widget
  * @param {Object} [props.commerceAgentConfiguration.cc_routingAttributes] - Optional Agentforce routing attributes forwarded to the widget as `routingAttributes`
  * @param {string} [props.commerceAgentConfiguration.cc_overridesUrl] - Optional HTTPS URL of a component override script, forwarded as `overridesUrl`
+ * @param {Object} [props.commerceAgentConfiguration.cc_overrides] - Optional inline map of widget override keys (e.g. `ProductTile`) to already-registered custom element tag names, forwarded as `overrides`. Mutually exclusive with `cc_overridesUrl`, which it takes precedence over
  * @returns {JSX.Element} A container element the Commerce Client widget is rendered into
  */
 const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
@@ -636,7 +634,8 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         cc_theme,
         cc_searchConfig,
         cc_routingAttributes,
-        cc_overridesUrl
+        cc_overridesUrl,
+        cc_overrides
     } = commerceAgentConfiguration
 
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
@@ -667,12 +666,6 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         }
     }, [])
 
-    // Define the override custom elements before the widget is injected. Declared
-    // ahead of useCommerceClientMessaging so this effect runs first on mount.
-    useEffect(() => {
-        registerCommerceClientOverrides()
-    }, [])
-
     const widgetOptions = useMemo(
         () => ({
             elementId: commerceClientElementId,
@@ -701,8 +694,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
                 }
             },
             theme: cc_theme,
-            overrides: COMMERCE_CLIENT_OVERRIDES,
-            ...(cc_overridesUrl ? {overridesUrl: cc_overridesUrl} : {})
+            ...resolveCommerceClientOverrideOptions({cc_overrides, cc_overridesUrl})
         }),
         [
             commerceClientElementId,
@@ -725,7 +717,8 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             cc_widgetPosition,
             cc_dialogWidth,
             cc_theme,
-            cc_overridesUrl
+            cc_overridesUrl,
+            cc_overrides
         ]
     )
 
