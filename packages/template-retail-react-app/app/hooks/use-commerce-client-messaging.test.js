@@ -237,6 +237,25 @@ describe('injectCommerceClientWidget', () => {
         )
     })
 
+    test('forwards overrides when provided', () => {
+        injectCommerceClientWidget({
+            ...messagingFields,
+            overrides: {ProductTile: 'commerce-client-product-tile'}
+        })
+
+        expect(mockInject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                overrides: {ProductTile: 'commerce-client-product-tile'}
+            })
+        )
+    })
+
+    test('omits overrides when it is not an object', () => {
+        injectCommerceClientWidget({...messagingFields, overrides: 'not-an-object'})
+
+        expect(mockInject.mock.calls[0][0]).not.toHaveProperty('overrides')
+    })
+
     test('omits optional presentation fields when not provided', () => {
         injectCommerceClientWidget(messagingFields)
 
@@ -247,6 +266,7 @@ describe('injectCommerceClientWidget', () => {
         expect(config).not.toHaveProperty('searchConfig')
         expect(config).not.toHaveProperty('globalClassName')
         expect(config).not.toHaveProperty('overridesUrl')
+        expect(config).not.toHaveProperty('overrides')
     })
 
     test('always forwards mode as "messaging"', () => {
