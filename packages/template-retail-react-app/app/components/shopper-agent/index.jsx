@@ -35,6 +35,10 @@ import {
     validateCommerceClientAgentSettings
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
+import {
+    COMMERCE_CLIENT_OVERRIDES,
+    registerCommerceClientOverrides
+} from '@salesforce/retail-react-app/app/components/shopper-agent/overrides'
 
 const onClient = typeof window !== 'undefined'
 
@@ -663,6 +667,12 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         }
     }, [])
 
+    // Define the override custom elements before the widget is injected. Declared
+    // ahead of useCommerceClientMessaging so this effect runs first on mount.
+    useEffect(() => {
+        registerCommerceClientOverrides()
+    }, [])
+
     const widgetOptions = useMemo(
         () => ({
             elementId: commerceClientElementId,
@@ -691,6 +701,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
                 }
             },
             theme: cc_theme,
+            overrides: COMMERCE_CLIENT_OVERRIDES,
             ...(cc_overridesUrl ? {overridesUrl: cc_overridesUrl} : {})
         }),
         [
