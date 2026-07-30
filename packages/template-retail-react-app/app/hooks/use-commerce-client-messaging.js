@@ -45,6 +45,7 @@ const onClient = typeof window !== 'undefined'
  * @param {boolean} [options.isDevelopment] - When true, logs widget events to the console
  * @param {Object} [options.componentConfig] - Partial component config merged over the defaults
  * @param {Object} [options.theme] - Partial theme merged over the defaults
+ * @param {string} [options.overridesUrl] - URL to customer's component override script (sets window.CimulateOverrides)
  * @returns {boolean} True when the widget injection was invoked, false otherwise
  */
 const injectCommerceClientWidget = ({
@@ -63,7 +64,8 @@ const injectCommerceClientWidget = ({
     globalClassName,
     isDevelopment = false,
     componentConfig,
-    theme
+    theme,
+    overridesUrl
 } = {}) => {
     if (!onClient) return false
 
@@ -106,7 +108,8 @@ const injectCommerceClientWidget = ({
                     ...componentConfig?.options
                 }
             },
-            theme: {...DEFAULT_COMMERCE_CLIENT_THEME, ...theme}
+            theme: {...DEFAULT_COMMERCE_CLIENT_THEME, ...theme},
+            ...(overridesUrl ? {overridesUrl} : {})
         })
         return true
     } catch (err) {

@@ -607,6 +607,7 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {string} [props.commerceAgentConfiguration.cc_isDevelopment] - When 'true', logs widget events to the console (forwarded as `isDevelopment`)
  * @param {Object} [props.commerceAgentConfiguration.cc_theme] - Partial theme overrides for the widget
  * @param {Object} [props.commerceAgentConfiguration.cc_routingAttributes] - Optional Agentforce routing attributes forwarded to the widget as `routingAttributes`
+ * @param {string} [props.commerceAgentConfiguration.cc_overridesUrl] - Optional HTTPS URL of a component override script, forwarded as `overridesUrl`
  * @returns {JSX.Element} A container element the Commerce Client widget is rendered into
  */
 const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
@@ -630,7 +631,8 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         cc_enableDownloadTranscript = 'true',
         cc_theme,
         cc_searchConfig,
-        cc_routingAttributes
+        cc_routingAttributes,
+        cc_overridesUrl
     } = commerceAgentConfiguration
 
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
@@ -688,7 +690,8 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
                     })
                 }
             },
-            theme: cc_theme
+            theme: cc_theme,
+            ...(cc_overridesUrl ? {overridesUrl: cc_overridesUrl} : {})
         }),
         [
             commerceClientElementId,
@@ -710,7 +713,8 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             cc_displayType,
             cc_widgetPosition,
             cc_dialogWidth,
-            cc_theme
+            cc_theme,
+            cc_overridesUrl
         ]
     )
 

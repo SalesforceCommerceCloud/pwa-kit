@@ -224,6 +224,19 @@ describe('injectCommerceClientWidget', () => {
         )
     })
 
+    test('forwards overridesUrl when provided', () => {
+        injectCommerceClientWidget({
+            ...messagingFields,
+            overridesUrl: 'https://example.com/widget-overrides.js'
+        })
+
+        expect(mockInject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                overridesUrl: 'https://example.com/widget-overrides.js'
+            })
+        )
+    })
+
     test('omits optional presentation fields when not provided', () => {
         injectCommerceClientWidget(messagingFields)
 
@@ -233,6 +246,7 @@ describe('injectCommerceClientWidget', () => {
         expect(config).not.toHaveProperty('disclaimerMarkdown')
         expect(config).not.toHaveProperty('searchConfig')
         expect(config).not.toHaveProperty('globalClassName')
+        expect(config).not.toHaveProperty('overridesUrl')
     })
 
     test('always forwards mode as "messaging"', () => {
