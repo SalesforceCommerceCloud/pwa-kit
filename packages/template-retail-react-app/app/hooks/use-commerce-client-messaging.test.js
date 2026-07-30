@@ -22,11 +22,14 @@ const messagingFields = {
     esDeveloperName: 'My_Embedded_Service'
 }
 
-// The widget always receives a capabilitiesVersion; it defaults to '65' when the
-// caller does not provide one, so the expected messagingConfig includes it.
+// The widget always receives capabilitiesVersion (defaults to '65') plus the
+// escalation/transcript toggles (default true) when the caller omits them, so the
+// expected messagingConfig includes them.
 const expectedMessagingConfig = {
     ...messagingFields,
-    capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION
+    capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
+    enableEscalationToAgent: true,
+    enableDownloadTranscript: true
 }
 
 describe('injectCommerceClientWidget', () => {
@@ -167,7 +170,33 @@ describe('injectCommerceClientWidget', () => {
 
         expect(mockInject).toHaveBeenCalledWith(
             expect.objectContaining({
-                messagingConfig: {...messagingFields, capabilitiesVersion: '70'}
+                messagingConfig: {...expectedMessagingConfig, capabilitiesVersion: '70'}
+            })
+        )
+    })
+
+    test('defaults escalation and transcript toggles to true in messagingConfig', () => {
+        injectCommerceClientWidget(messagingFields)
+
+        const {messagingConfig} = mockInject.mock.calls[0][0]
+        expect(messagingConfig.enableEscalationToAgent).toBe(true)
+        expect(messagingConfig.enableDownloadTranscript).toBe(true)
+    })
+
+    test('forwards escalation and transcript toggles when disabled', () => {
+        injectCommerceClientWidget({
+            ...messagingFields,
+            enableEscalationToAgent: false,
+            enableDownloadTranscript: false
+        })
+
+        expect(mockInject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                messagingConfig: {
+                    ...expectedMessagingConfig,
+                    enableEscalationToAgent: false,
+                    enableDownloadTranscript: false
+                }
             })
         )
     })
@@ -175,7 +204,6 @@ describe('injectCommerceClientWidget', () => {
     test('forwards optional presentation fields only when provided', () => {
         injectCommerceClientWidget({
             ...messagingFields,
-            mode: 'custom-mode',
             logoUrl: 'https://cdn.example.com/logo.png',
             headerText: 'Need help?',
             disclaimerMarkdown: 'This is AI. See [details](https://example.com).',
@@ -186,7 +214,6 @@ describe('injectCommerceClientWidget', () => {
 
         expect(mockInject).toHaveBeenCalledWith(
             expect.objectContaining({
-                mode: 'custom-mode',
                 logoUrl: 'https://cdn.example.com/logo.png',
                 headerText: 'Need help?',
                 disclaimerMarkdown: 'This is AI. See [details](https://example.com).',
@@ -208,10 +235,10 @@ describe('injectCommerceClientWidget', () => {
         expect(config).not.toHaveProperty('globalClassName')
     })
 
-    test('omits mode when an empty mode is provided', () => {
-        injectCommerceClientWidget({...messagingFields, mode: ''})
+    test('always forwards mode as "messaging"', () => {
+        injectCommerceClientWidget(messagingFields)
 
-        expect(mockInject.mock.calls[0][0]).not.toHaveProperty('mode')
+        expect(mockInject.mock.calls[0][0].mode).toBe('messaging')
     })
 
     test('returns false and logs when injectMessagingWidget throws', () => {
