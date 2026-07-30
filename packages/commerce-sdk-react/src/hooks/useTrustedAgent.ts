@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+// Trusted Agent (Order on Behalf) login. For the callback contract, the COOP
+// same-origin behaviour, upgrade steps, and how to reproduce and verify the flow,
+// see ../../TRUSTED_AGENT_RUNBOOK.md.
 import {useState, useEffect, useCallback} from 'react'
 import {useMutation} from '@tanstack/react-query'
 import useAuthContext from './useAuthContext'
