@@ -92,6 +92,12 @@ module.exports = {
             // borderColor, fontFamily).
             // Optional: pass `cc_routingAttributes` (object) via COMMERCE_AGENT_SETTINGS to
             // forward Agentforce routing attributes to the widget as `routingAttributes`.
+            // Optional: pass `cc_overrides` (object) via COMMERCE_AGENT_SETTINGS to map widget
+            // override keys (e.g. `ProductTile`) to custom element tag names, such as
+            // {"ProductTile": "my-product-tile"}. Forwarded to the widget as `overrides`. The
+            // elements must already be registered with customElements.define() before the widget
+            // injects. Mutually exclusive with `cc_overridesUrl` — set one or the other, not
+            // both; when both are set `cc_overrides` wins and the URL is ignored.
         },
         url: {
             site: 'path',

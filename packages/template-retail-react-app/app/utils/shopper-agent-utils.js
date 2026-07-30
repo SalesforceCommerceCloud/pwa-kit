@@ -253,6 +253,28 @@ export const validateOverridesUrl = (url) => {
 }
 
 /**
+ * Resolves the widget's component-override option from config. The widget accepts a
+ * single override source, so `cc_overrides` and `cc_overridesUrl` are mutually
+ * exclusive: an inline map wins and the hosted script URL is dropped when both are set.
+ *
+ * @param {Object} [commerceAgent] - Commerce agent configuration object
+ * @param {Object} [commerceAgent.cc_overrides] - Inline map of override keys (e.g. `ProductTile`) to registered custom element tag names
+ * @param {string} [commerceAgent.cc_overridesUrl] - HTTPS URL of a hosted override script
+ * @returns {Object} `{overrides}`, `{overridesUrl}`, or an empty object when neither is configured
+ */
+export const resolveCommerceClientOverrideOptions = ({cc_overrides, cc_overridesUrl} = {}) => {
+    if (cc_overrides && Object.keys(cc_overrides).length) {
+        return {overrides: cc_overrides}
+    }
+
+    if (cc_overridesUrl) {
+        return {overridesUrl: cc_overridesUrl}
+    }
+
+    return {}
+}
+
+/**
  * Validates the commerce agent configuration for the Commerce Client widget.
  * The Commerce Client widget requires a different (smaller) set of fields than MIAW:
  * the SCRT2 URL, Salesforce org id, embedded service developer name, and the
@@ -266,6 +288,7 @@ export const validateOverridesUrl = (url) => {
  * @param {string} [commerceAgent.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0')
  * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting)
  * @param {string} [commerceAgent.cc_overridesUrl] - Optional URL to customer's component override script
+ * @param {Object} [commerceAgent.cc_overrides] - Optional inline override map, mutually exclusive with `cc_overridesUrl`
  * @returns {boolean} True if configuration is valid, false otherwise
  */
 export const validateCommerceClientAgentSettings = (commerceAgent) => {
@@ -300,8 +323,19 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
         return false
     }
 
-    // Validate optional overrides URL (must be HTTPS, any domain allowed)
-    if (commerceAgent.cc_overridesUrl) {
+    const hasInlineOverrides =
+        Boolean(commerceAgent.cc_overrides) && Object.keys(commerceAgent.cc_overrides).length > 0
+
+    // Non-fatal: resolveCommerceClientOverrideOptions drops the URL and keeps the inline map.
+    if (hasInlineOverrides && commerceAgent.cc_overridesUrl) {
+        console.warn(
+            'Commerce Client cc_overrides and cc_overridesUrl are mutually exclusive. Using cc_overrides and ignoring cc_overridesUrl.'
+        )
+    }
+
+    // Validate optional overrides URL (must be HTTPS, any domain allowed). Skipped when an
+    // inline map wins, so we do not warn about a URL that is already being dropped.
+    if (!hasInlineOverrides && commerceAgent.cc_overridesUrl) {
         if (!validateOverridesUrl(commerceAgent.cc_overridesUrl)) {
             console.warn(
                 'Commerce Client overrides URL must use HTTPS. Overrides will not be loaded.'
