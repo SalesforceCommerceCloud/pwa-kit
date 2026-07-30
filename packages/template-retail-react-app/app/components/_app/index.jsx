@@ -40,6 +40,8 @@ import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
 
 // Local Project Components
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
+// Trusted Agent (Order on Behalf) demo banner. See app/pages/trusted-agent.
+import TrustedAgentBanner from '@salesforce/retail-react-app/app/components/trusted-agent-banner'
 import {DrawerMenu} from '@salesforce/retail-react-app/app/components/drawer-menu'
 import Footer from '@salesforce/retail-react-app/app/components/footer'
 import Header from '@salesforce/retail-react-app/app/components/header'
@@ -407,6 +409,8 @@ const App = (props) => {
                                     onClose={onCloseStoreLocator}
                                 />
                             )}
+                            {/* Trusted Agent (Order on Behalf) demo banner. */}
+                            <TrustedAgentBanner />
                             <Island hydrateOn={'visible'}>
                                 <Box {...styles.headerWrapper}>
                                     {!isCheckout ? (

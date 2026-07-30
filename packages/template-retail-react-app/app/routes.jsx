@@ -40,6 +40,7 @@ const CheckoutOneClick = loadable(() => import('./pages/checkout-one-click'), {
 const CheckoutConfirmation = loadable(() => import('./pages/confirmation'), {fallback})
 const SocialLoginRedirect = loadable(() => import('./pages/social-login-redirect'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
+const TrustedAgent = loadable(() => import('./pages/trusted-agent'), {fallback})
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
 const ProductList = loadable(() => import('./pages/product-list'), {
     fallback
@@ -99,6 +100,11 @@ export const routes = [
     {
         path: '/callback',
         component: LoginRedirect,
+        exact: true
+    },
+    {
+        path: '/trusted-agent',
+        component: TrustedAgent,
         exact: true
     },
     {
