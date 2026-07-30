@@ -236,6 +236,23 @@ export const validateCommerceClientDomain = (url) => {
 }
 
 /**
+ * Validates that a URL uses HTTPS (required for override scripts).
+ * Unlike the widget script, override scripts can be hosted on any domain
+ * (customer's own CDN).
+ *
+ * @param {string} url - The URL to validate
+ * @returns {boolean} True if the URL uses HTTPS
+ */
+export const validateOverridesUrl = (url) => {
+    try {
+        const parsed = new URL(url)
+        return parsed.protocol === 'https:'
+    } catch {
+        return false
+    }
+}
+
+/**
  * Validates the commerce agent configuration for the Commerce Client widget.
  * The Commerce Client widget requires a different (smaller) set of fields than MIAW:
  * the SCRT2 URL, Salesforce org id, embedded service developer name, and the
@@ -248,6 +265,7 @@ export const validateCommerceClientDomain = (url) => {
  * @param {string} [commerceAgent.embeddedServiceName] - Fallback for `cc_esDeveloperName`
  * @param {string} [commerceAgent.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0')
  * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting)
+ * @param {string} [commerceAgent.cc_overridesUrl] - Optional URL to customer's component override script
  * @returns {boolean} True if configuration is valid, false otherwise
  */
 export const validateCommerceClientAgentSettings = (commerceAgent) => {
@@ -280,6 +298,16 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
             'Commerce Client script URL must be served from a trusted cimulate.ai or sfcc-store-internal.net domain.'
         )
         return false
+    }
+
+    // Validate optional overrides URL (must be HTTPS, any domain allowed)
+    if (commerceAgent.cc_overridesUrl) {
+        if (!validateOverridesUrl(commerceAgent.cc_overridesUrl)) {
+            console.warn(
+                'Commerce Client overrides URL must use HTTPS. Overrides will not be loaded.'
+            )
+            // Non-fatal: widget still works without overrides
+        }
     }
 
     return true

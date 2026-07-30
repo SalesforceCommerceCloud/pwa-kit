@@ -79,7 +79,11 @@ module.exports = {
             cc_enableEscalationToAgent: 'false',
             // When 'true' (default), shoppers can download the chat transcript.
             // Forwarded as `messagingConfig.enableDownloadTranscript`.
-            cc_enableDownloadTranscript: 'true'
+            cc_enableDownloadTranscript: 'true',
+            // Optional URL to customer's component override script. Must use HTTPS.
+            // The script defines Web Components that replace default product cards, carousels,
+            // and custom action payloads. See Commerce Client override documentation.
+            cc_overridesUrl: ''
             // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
