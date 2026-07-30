@@ -38,7 +38,12 @@ describe('Login Redirect', () => {
             configurable: true,
             writable: true
         })
-        Object.defineProperty(window, 'opener', {value: originalOpener, configurable: true})
+        // Assign rather than `Object.defineProperty`. `window.opener` is spec-writable
+        // (it has a setter). On the older jsdom bundled with Node 18, defining it as a
+        // data property leaves it non-writable, so a later re-definition silently keeps
+        // the stale value and the next test reads `opener` as unset. Plain assignment
+        // routes through the setter and stays writable across runtimes.
+        window.opener = originalOpener
         jest.restoreAllMocks()
     })
 
@@ -51,7 +56,7 @@ describe('Login Redirect', () => {
 
     test('posts trusted-agent {code, state} to the opener when present in the URL', () => {
         const postMessage = jest.fn()
-        Object.defineProperty(window, 'opener', {value: {postMessage}, configurable: true})
+        window.opener = {postMessage}
         setSearch('?code=auth_code_123&state=state_abc')
 
         renderWithReactIntl(<LoginRedirect />)
@@ -68,7 +73,7 @@ describe('Login Redirect', () => {
 
     test('does not post to the opener when code/state are absent', () => {
         const postMessage = jest.fn()
-        Object.defineProperty(window, 'opener', {value: {postMessage}, configurable: true})
+        window.opener = {postMessage}
         setSearch('')
 
         renderWithReactIntl(<LoginRedirect />)
