@@ -89,7 +89,7 @@ export const processRequest = ({
     // usid are still stripped and the endpoint stays cacheable at the CDN.
     if (path === '/callback') {
         const isTrustedAgentCallback = new QueryParameters(querystring).parameters.some(
-            (parameter) => parameter.key === 'state'
+            (parameter) => parameter.key === 'state' && parameter.value
         )
         exclusions.push('usid')
         if (!isTrustedAgentCallback) {

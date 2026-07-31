@@ -310,6 +310,7 @@ describe('deliverTrustedAgentResult', () => {
     const originalUrl = window.location.href
     let broadcastPosts: Array<unknown>
     let broadcastClosed: boolean
+    let closeSpy: jest.SpyInstance
 
     // jsdom's window.location is read-only, and redefining it with
     // Object.defineProperty does not reliably reset between tests on older
@@ -320,11 +321,15 @@ describe('deliverTrustedAgentResult', () => {
     }
 
     beforeEach(() => {
+        jest.useFakeTimers()
         broadcastPosts = []
         broadcastClosed = false
         // Route through the spec setter so the property stays writable across
         // Node versions (a plain Object.defineProperty data prop breaks Node 18).
         window.opener = undefined
+        // jsdom does not implement window.close; spy on it so the callback page's
+        // deferred self-close is observable rather than throwing "Not implemented".
+        closeSpy = jest.spyOn(window, 'close').mockImplementation(() => undefined)
         ;(global as any).BroadcastChannel = jest.fn().mockImplementation(() => ({
             postMessage: (msg: unknown) => broadcastPosts.push(msg),
             close: () => {
@@ -337,6 +342,9 @@ describe('deliverTrustedAgentResult', () => {
         window.opener = originalOpener
         jsdom.reconfigure({url: originalUrl})
         delete (global as any).BroadcastChannel
+        closeSpy.mockRestore()
+        jest.clearAllTimers()
+        jest.useRealTimers()
     })
 
     test('posts {type, code, state} to window.opener scoped to origin', () => {
@@ -396,5 +404,28 @@ describe('deliverTrustedAgentResult', () => {
         expect(() => useTrustedAgentModule.deliverTrustedAgentResult()).not.toThrow()
         // The broadcast fallback still delivers the result.
         expect(broadcastPosts).toHaveLength(1)
+    })
+
+    test('closes its own window after delivering the result', () => {
+        const postMessage = jest.fn()
+        window.opener = {postMessage}
+        setLocation('?code=abc&state=xyz')
+
+        useTrustedAgentModule.deliverTrustedAgentResult()
+
+        // Deferred so the queued postMessage/broadcast flushes first; it must not
+        // rely on the opener's COOP-severed `popup.close()` to shut the popup.
+        expect(closeSpy).not.toHaveBeenCalled()
+        jest.runOnlyPendingTimers()
+        expect(closeSpy).toHaveBeenCalledTimes(1)
+    })
+
+    test('does not close the window when there is nothing to deliver', () => {
+        setLocation('?code=abc')
+
+        useTrustedAgentModule.deliverTrustedAgentResult()
+        jest.runOnlyPendingTimers()
+
+        expect(closeSpy).not.toHaveBeenCalled()
     })
 })

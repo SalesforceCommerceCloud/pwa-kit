@@ -40,4 +40,15 @@ describe('processRequest', () => {
         expect(result.path).toBe('/callback')
         expect(result.querystring).toBe('')
     })
+
+    test('empty state is treated as a standard callback and strips code', () => {
+        // An empty `state=` is not a real trusted agent callback. Match on a truthy
+        // value so this stays aligned with handleCallback's `code && state` guard: the
+        // one-time code must be stripped so a code-bearing URL is never year-cacheable.
+        // The empty `state=` itself is harmless and left as-is.
+        const result = processRequest({path: '/callback', querystring: 'usid=1&code=2&state='})
+
+        expect(result.path).toBe('/callback')
+        expect(result.querystring).toBe('state=')
+    })
 })

@@ -81,3 +81,5 @@ Since customers may upgrade for this feature as soon as it ships, test across en
 
 - The public API of `useTrustedAgent` is unchanged.
 - The message is posted to the opener scoped to the storefront origin, so it is not exposed to any other document. The listener checks the message origin as well.
+- After delivering the result the `/callback` page closes itself. The opener also calls `popup.close()`, but that is unreliable through the COOP-severed window reference, so the callback page closing itself is what reliably shuts the popup.
+- The `BroadcastChannel` fallback is origin-wide, and the callback is not yet tied to the specific flow that opened it. Running two Trusted Agent logins at once on the same origin (for example in two tabs) is therefore not supported: one flow's callback can settle the other. The `code_verifier` and `state` validation on the token request turns that into a failed login rather than a wrong session, but treat one Trusted Agent login per origin at a time as the supported path until per-flow correlation lands.

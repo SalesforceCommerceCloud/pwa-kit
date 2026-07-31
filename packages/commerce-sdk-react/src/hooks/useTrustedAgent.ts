@@ -115,6 +115,24 @@ export const deliverTrustedAgentResult = (): void => {
     // why here rather than leaving the login silently hanging.
     if (!deliveredToOpener && !broadcast) {
         console.warn('Trusted agent callback could not deliver the OAuth result to the opener.')
+        return
+    }
+
+    // Close the popup from its own context. The opener also calls `popup.close()`,
+    // but under COOP `same-origin` its reference to us is a severed WindowProxy where
+    // `close()` is unreliable, so the popup could otherwise linger after a successful
+    // login. A window may only close a window opened by script, which the trusted
+    // agent popup is. Deferred so the queued postMessage/broadcast flushes first.
+    try {
+        setTimeout(() => {
+            try {
+                window.close()
+            } catch (e) {
+                /* closing may be blocked in some environments; the opener still settles */
+            }
+        }, 0)
+    } catch (e) {
+        /* here to catch environments without setTimeout */
     }
 }
 
