@@ -41,8 +41,6 @@ export {default as useUsid} from './useUsid'
 export {default as useCustomerId} from './useCustomerId'
 export {default as useCustomerType} from './useCustomerType'
 export {default as useTrustedAgent} from './useTrustedAgent'
-// The callback route only needs the hook. `deliverTrustedAgentResult` and the
-// message/channel constants stay module-internal (the hook owns the contract).
 export {useTrustedAgentPopupCallback} from './useTrustedAgent'
 export {default as useConfig} from './useConfig'
 export {default as useDNT} from './useDNT'
