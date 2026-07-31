@@ -428,4 +428,23 @@ describe('deliverTrustedAgentResult', () => {
 
         expect(closeSpy).not.toHaveBeenCalled()
     })
+
+    test('warns and does not close when neither delivery path is available', () => {
+        // Valid code+state, but no opener and no BroadcastChannel: both delivery
+        // paths fail, so the opener is left to fall back to its timeout. The page
+        // must surface why and must NOT close itself (nothing was delivered).
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+        window.opener = undefined
+        delete (global as any).BroadcastChannel
+        setLocation('?code=abc&state=xyz')
+
+        useTrustedAgentModule.deliverTrustedAgentResult()
+        jest.runOnlyPendingTimers()
+
+        expect(warn).toHaveBeenCalledWith(
+            'Trusted agent callback could not deliver the OAuth result to the opener.'
+        )
+        expect(closeSpy).not.toHaveBeenCalled()
+        warn.mockRestore()
+    })
 })
