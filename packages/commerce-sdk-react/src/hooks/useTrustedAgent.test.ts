@@ -5,12 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import type {JSDOM} from 'jsdom'
 import nock from 'nock'
 import {act, waitFor} from '@testing-library/react'
 import {mockMutationEndpoints, renderHookWithProviders} from '../test-utils'
 import * as useTrustedAgentModule from './useTrustedAgent'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
+
+declare global {
+    // Provided by the jest jsdom environment.
+    const jsdom: JSDOM
+}
 
 jest.mock('./useAuthContext')
 
@@ -304,16 +310,16 @@ describe('useTrustedAgent', () => {
 
 describe('deliverTrustedAgentResult', () => {
     const originalOpener = window.opener
-    const originalLocation = window.location
+    const originalUrl = window.location.href
     let broadcastPosts: Array<unknown>
     let broadcastClosed: boolean
 
+    // jsdom's window.location is read-only, and redefining it with
+    // Object.defineProperty does not reliably reset between tests on older
+    // jsdom (Node 18). Reconfigure the whole document URL instead so both
+    // `search` and `origin` are driven from a single source of truth.
     const setLocation = (search: string, origin = 'http://localhost') => {
-        // jsdom's window.location is read-only; redefine it for the test.
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: {search, origin}
-        })
+        jsdom.reconfigure({url: `${origin}/${search}`})
     }
 
     beforeEach(() => {
@@ -332,10 +338,7 @@ describe('deliverTrustedAgentResult', () => {
 
     afterEach(() => {
         window.opener = originalOpener
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: originalLocation
-        })
+        jsdom.reconfigure({url: originalUrl})
         delete (global as any).BroadcastChannel
     })
 
