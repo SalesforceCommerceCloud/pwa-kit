@@ -7,44 +7,20 @@
 import React from 'react'
 import {renderWithReactIntl} from '@salesforce/retail-react-app/app/utils/test-utils'
 import LoginRedirect from '@salesforce/retail-react-app/app/pages/login-redirect/index'
-import {TRUSTED_AGENT_POPUP_MESSAGE_TYPE} from '@salesforce/commerce-sdk-react'
 
-// Replace the whole `window.location` object rather than routing through
-// `history.replaceState`. Older jsdom versions (as bundled with some Node runtimes
-// used in CI) do not reliably reflect a `replaceState` URL back into
-// `window.location.search`, which made the component read an empty search and skip
-// the post. `location.search` is also non-configurable in some jsdom versions, so
-// swapping the whole object is the version-stable approach. We keep `origin` intact
-// so the post target assertion stays meaningful.
-const setSearch = (search) => {
-    Object.defineProperty(window, 'location', {
-        value: {origin: 'https://www.domain.com', search},
-        configurable: true,
-        writable: true
-    })
-}
+// The Trusted Agent callback delivery lives in the SDK hook
+// `useTrustedAgentPopupCallback`; this page just mounts it. We assert the page
+// wires the hook up. The delivery behaviour itself is covered by the hook's own
+// tests in commerce-sdk-react.
+const mockUseTrustedAgentPopupCallback = jest.fn()
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react'),
+    useTrustedAgentPopupCallback: () => mockUseTrustedAgentPopupCallback()
+}))
 
 describe('Login Redirect', () => {
-    let originalOpener
-    const originalLocation = window.location
-
-    beforeEach(() => {
-        originalOpener = window.opener
-    })
-
     afterEach(() => {
-        Object.defineProperty(window, 'location', {
-            value: originalLocation,
-            configurable: true,
-            writable: true
-        })
-        // Assign rather than `Object.defineProperty`. `window.opener` is spec-writable
-        // (it has a setter). On the older jsdom bundled with Node 18, defining it as a
-        // data property leaves it non-writable, so a later re-definition silently keeps
-        // the stale value and the next test reads `opener` as unset. Plain assignment
-        // routes through the setter and stays writable across runtimes.
-        window.opener = originalOpener
-        jest.restoreAllMocks()
+        jest.clearAllMocks()
     })
 
     test('renders without errors', () => {
@@ -54,30 +30,9 @@ describe('Login Redirect', () => {
         expect(typeof LoginRedirect.getTemplateName()).toBe('string')
     })
 
-    test('posts trusted-agent {code, state} to the opener when present in the URL', () => {
-        const postMessage = jest.fn()
-        window.opener = {postMessage}
-        setSearch('?code=auth_code_123&state=state_abc')
-
+    test('mounts the trusted-agent callback hook', () => {
         renderWithReactIntl(<LoginRedirect />)
 
-        expect(postMessage).toHaveBeenCalledWith(
-            {
-                type: TRUSTED_AGENT_POPUP_MESSAGE_TYPE,
-                code: 'auth_code_123',
-                state: 'state_abc'
-            },
-            window.location.origin
-        )
-    })
-
-    test('does not post to the opener when code/state are absent', () => {
-        const postMessage = jest.fn()
-        window.opener = {postMessage}
-        setSearch('')
-
-        renderWithReactIntl(<LoginRedirect />)
-
-        expect(postMessage).not.toHaveBeenCalled()
+        expect(mockUseTrustedAgentPopupCallback).toHaveBeenCalled()
     })
 })

@@ -52,6 +52,75 @@ type TrustedAgentPopupMessage = {
     state?: string | null
 }
 
+/**
+ * Delivers the Trusted Agent OAuth result from the same-origin `/callback` page back
+ * to the opener that started the flow via {@link createTrustedAgentPopup}.
+ *
+ * Under `Cross-Origin-Opener-Policy: same-origin` the opener can no longer read the
+ * popup's location, so the popup must hand the result back out-of-band. This reads
+ * the popup's own same-origin URL (always readable) and posts `{type, code, state}`
+ * to `window.opener` scoped to our origin (primary), plus a same-origin
+ * `BroadcastChannel` broadcast (fallback for when the opener reference is unusable
+ * after a COOP-induced browsing-context-group switch).
+ *
+ * No-op on the server, and when the URL carries no `code`/`state` (for example the
+ * standard SLAS login redirect), so it is safe to call unconditionally on `/callback`.
+ */
+export const deliverTrustedAgentResult = (): void => {
+    if (!onClient()) {
+        return
+    }
+
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get('code')
+    const state = params.get('state')
+
+    // Not a trusted-agent callback (no OAuth result present) — nothing to deliver.
+    if (!code || !state) {
+        return
+    }
+
+    const message: TrustedAgentPopupMessage = {type: TRUSTED_AGENT_POPUP_MESSAGE_TYPE, code, state}
+
+    // Primary: post to the opener, scoped to our own origin so the message is not
+    // exposed to any other document.
+    if (window.opener) {
+        try {
+            window.opener.postMessage(message, window.location.origin)
+        } catch (e) {
+            /* opener may be unavailable/severed; the broadcast fallback covers this */
+        }
+    }
+
+    // Fallback: a same-origin BroadcastChannel survives a COOP context-group switch.
+    try {
+        if (typeof BroadcastChannel !== 'undefined') {
+            const channel = new BroadcastChannel(TRUSTED_AGENT_POPUP_CHANNEL)
+            channel.postMessage(message)
+            channel.close()
+        }
+    } catch (e) {
+        /* here to catch environments without BroadcastChannel support */
+    }
+}
+
+/**
+ * Hook for the same-origin `/callback` route to hand a Trusted Agent (Order on
+ * Behalf) OAuth result back to the opener. Mount it on the callback page; it runs
+ * {@link deliverTrustedAgentResult} once on mount. It is a no-op unless the URL
+ * carries both `code` and `state`, so it is safe to mount on a shared `/callback`
+ * page that also handles the standard SLAS login redirect.
+ *
+ * @group Helpers
+ * @category Shopper Authentication
+ * @experimental
+ */
+export const useTrustedAgentPopupCallback = (): void => {
+    useEffect(() => {
+        deliverTrustedAgentResult()
+    }, [])
+}
+
 const getCodeAndStateValueFromPopup = (
     popup: Window | null
 ): {code: string | null; state: string | null} => {
