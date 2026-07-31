@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import type {JSDOM} from 'jsdom'
 import nock from 'nock'
 import {act, waitFor} from '@testing-library/react'
 import {mockMutationEndpoints, renderHookWithProviders} from '../test-utils'
@@ -13,10 +12,8 @@ import * as useTrustedAgentModule from './useTrustedAgent'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
 
-declare global {
-    // Provided by the jest jsdom environment.
-    const jsdom: JSDOM
-}
+// `jsdom` is a global provided by the jest jsdom environment; its type is
+// declared once in the test suite (see StorefrontPreview/utils.test.ts).
 
 jest.mock('./useAuthContext')
 
