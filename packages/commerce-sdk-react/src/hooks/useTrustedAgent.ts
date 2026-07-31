@@ -114,9 +114,7 @@ export const deliverTrustedAgentResult = (): void => {
     // Neither path delivered: the opener will fall back to its timeout, so surface
     // why here rather than leaving the login silently hanging.
     if (!deliveredToOpener && !broadcast) {
-        console.warn(
-            'Trusted agent callback could not deliver the OAuth result to the opener.'
-        )
+        console.warn('Trusted agent callback could not deliver the OAuth result to the opener.')
     }
 }
 
