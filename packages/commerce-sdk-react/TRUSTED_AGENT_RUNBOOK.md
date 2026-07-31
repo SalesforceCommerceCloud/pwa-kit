@@ -12,14 +12,13 @@ The fix delivers the result out of band. The same origin `/callback` page reads 
 
 Three pieces work together. A project that uses Trusted Agent needs all three.
 
-1. `commerce-sdk-react` hook `useTrustedAgent`
-   - Listens for the OAuth result via `postMessage` with a `BroadcastChannel` fallback.
-   - No longer rejects when `popup.closed` is `true`, since a severed popup reports that falsely.
-   - Exports the message contract as `TRUSTED_AGENT_POPUP_MESSAGE_TYPE` and `TRUSTED_AGENT_POPUP_CHANNEL`.
+1. `commerce-sdk-react` hooks `useTrustedAgent` and `useTrustedAgentPopupCallback`
+   - `useTrustedAgent` listens for the OAuth result via `postMessage` with a `BroadcastChannel` fallback, and no longer rejects when `popup.closed` is `true`, since a severed popup reports that falsely.
+   - `useTrustedAgentPopupCallback` delivers the OAuth result from the same origin `/callback` page back to the opener. The SDK owns the message contract and the delivery.
 
 2. `/callback` page in the app (`app/pages/login-redirect/index.jsx`)
-   - When `code` and `state` are both present in the URL, it posts them to the opener using the exported contract.
-   - When they are absent it does nothing, so the standard SLAS redirect is unaffected.
+   - Mounts `useTrustedAgentPopupCallback`. The hook posts `code` and `state` to the opener when both are present in the URL.
+   - When they are absent the hook does nothing, so the standard SLAS redirect is unaffected.
 
 3. Server request handling
    - `request-processor.js` keeps `code` on a `/callback` request when `state` is also present, instead of stripping it.
@@ -30,7 +29,7 @@ Three pieces work together. A project that uses Trusted Agent needs all three.
 If you generated your project before this fix, apply the matching changes to your own copies of these files.
 
 1. Update `@salesforce/commerce-sdk-react` to the version that includes this fix.
-2. In `app/pages/login-redirect/index.jsx`, add the callback delivery that reads `code` and `state` from the URL and posts them to the opener using `TRUSTED_AGENT_POPUP_MESSAGE_TYPE` and `TRUSTED_AGENT_POPUP_CHANNEL` from `@salesforce/commerce-sdk-react`.
+2. In `app/pages/login-redirect/index.jsx`, mount `useTrustedAgentPopupCallback` from `@salesforce/commerce-sdk-react`. The hook reads `code` and `state` from the URL and posts them to the opener when both are present, and does nothing otherwise.
 3. In `app/request-processor.js`, keep `code` on `/callback` when `state` is present. Continue to strip `code` and `usid` when `state` is absent so the standard redirect stays cacheable.
 4. In `app/ssr.js`, add or update `handleCallback` so the `code` plus `state` variant is served with `Cache-Control: no-store`, and register it with `app.get('/callback', handleCallback)`.
 

@@ -81,14 +81,20 @@ export const deliverTrustedAgentResult = (): void => {
     }
 
     const message: TrustedAgentPopupMessage = {type: TRUSTED_AGENT_POPUP_MESSAGE_TYPE, code, state}
+    let deliveredToOpener = false
+    let broadcast = false
 
     // Primary: post to the opener, scoped to our own origin so the message is not
     // exposed to any other document.
     if (window.opener) {
         try {
             window.opener.postMessage(message, window.location.origin)
+            deliveredToOpener = true
         } catch (e) {
-            /* opener may be unavailable/severed; the broadcast fallback covers this */
+            // Opener may be unavailable/severed after a COOP context-group switch;
+            // the broadcast fallback covers this. Logged so a rolled-out failure is
+            // diagnosable from the console.
+            console.warn('Trusted agent callback could not post to the opener.', e)
         }
     }
 
@@ -98,9 +104,19 @@ export const deliverTrustedAgentResult = (): void => {
             const channel = new BroadcastChannel(TRUSTED_AGENT_POPUP_CHANNEL)
             channel.postMessage(message)
             channel.close()
+            broadcast = true
         }
     } catch (e) {
-        /* here to catch environments without BroadcastChannel support */
+        // Here to catch environments without BroadcastChannel support.
+        console.warn('Trusted agent callback could not broadcast the result.', e)
+    }
+
+    // Neither path delivered: the opener will fall back to its timeout, so surface
+    // why here rather than leaving the login silently hanging.
+    if (!deliveredToOpener && !broadcast) {
+        console.warn(
+            'Trusted agent callback could not deliver the OAuth result to the opener.'
+        )
     }
 }
 
