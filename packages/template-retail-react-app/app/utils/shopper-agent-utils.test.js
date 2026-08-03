@@ -13,6 +13,7 @@ import {
     openShopperAgentWidget,
     persistCommerceClientOpenState,
     getPersistedCommerceClientOpenState,
+    getCommerceClientOverridesCspSources,
     resolveCommerceClientOverrideOptions,
     resolveCommerceClientScriptUrl,
     validateCommerceClientDomain,
@@ -788,6 +789,71 @@ describe('shopper-agent-utils', () => {
 
         test('returns an empty object when called with no config', () => {
             expect(resolveCommerceClientOverrideOptions()).toEqual({})
+        })
+
+        test('drops a non-HTTPS URL instead of forwarding it', () => {
+            expect(
+                resolveCommerceClientOverrideOptions({
+                    cc_overridesUrl: 'http://example.com/overrides.js'
+                })
+            ).toEqual({})
+        })
+
+        test('drops a malformed URL instead of forwarding it', () => {
+            expect(resolveCommerceClientOverrideOptions({cc_overridesUrl: 'not-a-url'})).toEqual({})
+        })
+
+        test('still returns the inline map when the URL is invalid', () => {
+            expect(
+                resolveCommerceClientOverrideOptions({
+                    cc_overrides: {ProductTile: 'my-tile'},
+                    cc_overridesUrl: 'http://example.com/overrides.js'
+                })
+            ).toEqual({overrides: {ProductTile: 'my-tile'}})
+        })
+    })
+
+    describe('getCommerceClientOverridesCspSources', () => {
+        test('returns the origin of a valid HTTPS override URL', () => {
+            expect(
+                getCommerceClientOverridesCspSources({
+                    cc_overridesUrl: 'https://cdn.example.com/path/overrides.js?v=2'
+                })
+            ).toEqual(['https://cdn.example.com'])
+        })
+
+        test('preserves a non-default port in the origin', () => {
+            expect(
+                getCommerceClientOverridesCspSources({
+                    cc_overridesUrl: 'https://cdn.example.com:8443/overrides.js'
+                })
+            ).toEqual(['https://cdn.example.com:8443'])
+        })
+
+        test('returns no sources for a non-HTTPS URL', () => {
+            expect(
+                getCommerceClientOverridesCspSources({
+                    cc_overridesUrl: 'http://cdn.example.com/overrides.js'
+                })
+            ).toEqual([])
+        })
+
+        test('returns no sources for a malformed URL', () => {
+            expect(getCommerceClientOverridesCspSources({cc_overridesUrl: 'not-a-url'})).toEqual([])
+        })
+
+        test('returns no sources when an inline map wins over the URL', () => {
+            expect(
+                getCommerceClientOverridesCspSources({
+                    cc_overrides: {ProductTile: 'my-tile'},
+                    cc_overridesUrl: 'https://cdn.example.com/overrides.js'
+                })
+            ).toEqual([])
+        })
+
+        test('returns no sources when nothing is configured', () => {
+            expect(getCommerceClientOverridesCspSources({})).toEqual([])
+            expect(getCommerceClientOverridesCspSources()).toEqual([])
         })
     })
 

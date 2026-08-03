@@ -257,6 +257,9 @@ export const validateOverridesUrl = (url) => {
  * single override source, so `cc_overrides` and `cc_overridesUrl` are mutually
  * exclusive: an inline map wins and the hosted script URL is dropped when both are set.
  *
+ * A hosted script URL is only returned when it passes `validateOverridesUrl`, so a
+ * non-HTTPS or malformed value is dropped rather than forwarded to the widget.
+ *
  * @param {Object} [commerceAgent] - Commerce agent configuration object
  * @param {Object} [commerceAgent.cc_overrides] - Inline map of override keys (e.g. `ProductTile`) to registered custom element tag names
  * @param {string} [commerceAgent.cc_overridesUrl] - HTTPS URL of a hosted override script
@@ -267,11 +270,31 @@ export const resolveCommerceClientOverrideOptions = ({cc_overrides, cc_overrides
         return {overrides: cc_overrides}
     }
 
-    if (cc_overridesUrl) {
+    if (cc_overridesUrl && validateOverridesUrl(cc_overridesUrl)) {
         return {overridesUrl: cc_overridesUrl}
     }
 
     return {}
+}
+
+/**
+ * Resolves the Content-Security-Policy `script-src` sources needed for a merchant-hosted
+ * component-override script. The widget loads that script in the browser, so its origin
+ * must be allowed by the policy or it is blocked before it can register
+ * `window.CimulateOverrides`.
+ *
+ * Returns an origin rather than the configured URL because CSP source expressions cannot
+ * carry a query string or fragment. Empty whenever no hosted script is in effect — an
+ * inline `cc_overrides` map wins, the URL fails validation, or nothing is configured —
+ * so the policy is never widened beyond what the widget actually loads.
+ *
+ * @param {Object} [commerceAgent] - Commerce agent configuration object
+ * @returns {string[]} `[origin]` for a valid hosted override script, otherwise an empty array
+ */
+export const getCommerceClientOverridesCspSources = (commerceAgent) => {
+    const {overridesUrl} = resolveCommerceClientOverrideOptions(commerceAgent)
+
+    return overridesUrl ? [new URL(overridesUrl).origin] : []
 }
 
 /**
