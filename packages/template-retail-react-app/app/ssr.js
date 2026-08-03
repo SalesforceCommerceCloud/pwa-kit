@@ -29,7 +29,7 @@ import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
-import {getCommerceClientOverridesCspSources} from './utils/shopper-agent-utils.js'
+import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
 
 const config = getConfig()
 

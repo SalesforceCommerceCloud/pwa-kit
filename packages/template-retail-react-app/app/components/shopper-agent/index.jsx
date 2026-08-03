@@ -31,10 +31,10 @@ import {
     getPersistedCommerceClientOpenState,
     persistCommerceClientOpenState,
     resetEmbeddedMessagingForCommerceSessionChange,
-    resolveCommerceClientOverrideOptions,
     resolveCommerceClientScriptUrl,
     validateCommerceClientAgentSettings
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+import {resolveCommerceClientOverrideOptions} from '@salesforce/retail-react-app/app/utils/commerce-client-overrides'
 import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
 
 const onClient = typeof window !== 'undefined'
