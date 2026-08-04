@@ -82,7 +82,17 @@ module.exports = {
             cc_enableEscalationToAgent: 'false',
             // When 'true' (default), shoppers can download the chat transcript.
             // Forwarded as `messagingConfig.enableDownloadTranscript`.
-            cc_enableDownloadTranscript: 'true'
+            cc_enableDownloadTranscript: 'true',
+            // Optional URL to customer's component override script. Must use HTTPS;
+            // a non-HTTPS or malformed URL is dropped and the widget keeps its defaults.
+            // The script defines Web Components that replace default product cards, carousels,
+            // and custom action payloads. See Commerce Client override documentation.
+            // This origin is added to the `script-src` CSP directive in app/ssr.js, otherwise
+            // the browser blocks the script before it can register window.CimulateOverrides.
+            // Serving the script from a host other than the one configured here (for example
+            // when the URL varies per environment) means adding that hostname to `script-src`
+            // in app/ssr.js yourself.
+            cc_overridesUrl: ''
             // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
@@ -91,6 +101,12 @@ module.exports = {
             // borderColor, fontFamily).
             // Optional: pass `cc_routingAttributes` (object) via COMMERCE_AGENT_SETTINGS to
             // forward Agentforce routing attributes to the widget as `routingAttributes`.
+            // Optional: pass `cc_overrides` (object) via COMMERCE_AGENT_SETTINGS to map widget
+            // override keys (e.g. `ProductTile`) to custom element tag names, such as
+            // {"ProductTile": "my-product-tile"}. Forwarded to the widget as `overrides`. The
+            // elements must already be registered with customElements.define() before the widget
+            // injects. Mutually exclusive with `cc_overridesUrl` — set one or the other, not
+            // both; when both are set `cc_overrides` wins and the URL is ignored.
         },
         url: {
             site: 'path',
