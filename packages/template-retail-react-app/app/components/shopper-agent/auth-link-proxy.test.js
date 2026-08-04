@@ -14,11 +14,6 @@ import {
     AUTH_LINK_PROXY_PATH
 } from '@salesforce/retail-react-app/app/components/shopper-agent/auth-link-proxy'
 
-// The module only consumes getSiteId from the runtime cookie-config helper.
-jest.mock('@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config', () => ({
-    getSiteId: jest.fn((req) => req.headers['x-site-id'])
-}))
-
 // --- Test helpers -----------------------------------------------------------
 // Commerce Client JWTs are `header.payload.signature`, each segment base64url.
 // The proxy never verifies the signature (SCRT does) — it only base64url-decodes
@@ -29,8 +24,9 @@ const makeJWT = (payload, header = {alg: 'RS256', typ: 'JWT'}) =>
 
 // A JWT minted for v2 (the version Commerce Client currently issues).
 const V2_JWT = makeJWT({apiVersion: 'v2', sub: 'v2/iamessage/abc', iss: 'orgJwt'})
-// A JWT minted for v1 (proves the path version is derived, not hardcoded).
-const V1_JWT = makeJWT({apiVersion: 'v1', sub: 'v1/iamessage/abc', iss: 'orgJwt'})
+// A JWT minted for a non-v2 version (proves the diagnostic version check reads
+// the token claim rather than assuming v2, and drives the mismatch warning).
+const NON_V2_JWT = makeJWT({apiVersion: 'v9', sub: 'v9/iamessage/abc', iss: 'orgJwt'})
 
 const TRUSTED_SCRT2_URL = 'https://orgfarm-123.test1.my.pc-rnd.salesforce-scrt.com'
 
@@ -55,8 +51,8 @@ describe('auth-link-proxy', () => {
             expect(extractApiVersionFromJWT(V2_JWT)).toBe('v2')
         })
 
-        it('returns the apiVersion claim (v1)', () => {
-            expect(extractApiVersionFromJWT(V1_JWT)).toBe('v1')
+        it('returns the apiVersion claim for a non-v2 token', () => {
+            expect(extractApiVersionFromJWT(NON_V2_JWT)).toBe('v9')
         })
 
         it('supports multi-digit versions (v10)', () => {
@@ -211,7 +207,6 @@ describe('auth-link-proxy', () => {
 
             req = {
                 headers: {
-                    'x-site-id': 'RefArch',
                     origin: 'https://localhost:3000',
                     host: 'localhost:3000'
                 },
@@ -239,7 +234,12 @@ describe('auth-link-proxy', () => {
                 `${TRUSTED_SCRT2_URL}/iamessage/api/v2/authorization/authlink`,
                 {
                     method: 'GET',
-                    headers: {Authorization: `Bearer ${V2_JWT}`}
+                    headers: {Authorization: `Bearer ${V2_JWT}`},
+                    // The request is bounded by an AbortController timeout (#7),
+                    // so an AbortSignal is always attached. Coverage for the
+                    // signal/timeout behavior itself lives in the dedicated
+                    // "passes an AbortSignal" / "returns 504 SCRT_TIMEOUT" tests.
+                    signal: expect.anything()
                 }
             )
             expect(res.status).toHaveBeenCalledWith(200)
@@ -288,8 +288,8 @@ describe('auth-link-proxy', () => {
 
         it('warns when the presented JWT version will not match the v2 authlink endpoint', async () => {
             const consoleSpy = jest.spyOn(console, 'warn').mockImplementation()
-            // Present a v1 JWT — authlink requires v2, so this should warn.
-            req.body = {commerce_client_jwt: V1_JWT}
+            // Present a non-v2 JWT — authlink requires v2, so this should warn.
+            req.body = {commerce_client_jwt: NON_V2_JWT}
             mockFetch.mockResolvedValue({
                 ok: false,
                 status: 401,
@@ -300,7 +300,7 @@ describe('auth-link-proxy', () => {
 
             expect(consoleSpy).toHaveBeenCalledWith(
                 expect.stringContaining('does not match the authlink'),
-                expect.objectContaining({jwtApiVersion: 'v1', requiredApiVersion: 'v2'})
+                expect.objectContaining({jwtApiVersion: 'v9', requiredApiVersion: 'v2'})
             )
             consoleSpy.mockRestore()
         })
@@ -447,7 +447,7 @@ describe('auth-link-proxy', () => {
                 })
             })
 
-            it('forwards the version-mismatch 401 (regression for the v1/v2 bug), adding scrt_url', async () => {
+            it('forwards the version-mismatch 401 (regression for the version-mismatch bug), adding scrt_url', async () => {
                 // If a caller ever hits the wrong version, SCRT returns this exact
                 // body (error 900020). We must surface it unchanged, not swallow it.
                 const versionMismatchBody = {
@@ -525,6 +525,34 @@ describe('auth-link-proxy', () => {
                 expect(res.json).toHaveBeenCalledWith({error: 'INTERNAL_ERROR'})
             })
 
+            it('returns 504 SCRT_TIMEOUT when the SCRT request aborts on timeout', async () => {
+                // Simulate the AbortController firing: undici fetch rejects with an
+                // AbortError when the request is aborted past the timeout deadline.
+                const abortError = new Error('The operation was aborted')
+                abortError.name = 'AbortError'
+                mockFetch.mockRejectedValue(abortError)
+
+                await handleAuthLinkProxy(req, res)
+
+                expect(res.status).toHaveBeenCalledWith(504)
+                expect(res.json).toHaveBeenCalledWith({error: 'SCRT_TIMEOUT'})
+            })
+
+            it('passes an AbortSignal to the SCRT fetch (bounded by a timeout)', async () => {
+                mockFetch.mockResolvedValue({
+                    ok: true,
+                    status: 200,
+                    json: async () => ({auth_link_key: 'k'})
+                })
+
+                await handleAuthLinkProxy(req, res)
+
+                const opts = mockFetch.mock.calls[0][1]
+                expect(opts.signal).toBeDefined()
+                // AbortController.signal is an AbortSignal instance.
+                expect(typeof opts.signal.aborted).toBe('boolean')
+            })
+
             it('logs unexpected errors', async () => {
                 const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
                 mockFetch.mockRejectedValue(new Error('Network error'))
@@ -553,18 +581,27 @@ describe('auth-link-proxy', () => {
                 json: async () => ({auth_link_key: 'k', scrt_url: 'https://x/authlink'})
             })
 
-            const result = await callAuthLinkProxy({
-                commerceClientJWT: V2_JWT,
-                siteId: 'RefArch'
-            })
+            const result = await callAuthLinkProxy({commerceClientJWT: V2_JWT})
 
             expect(result).toEqual({auth_link_key: 'k', scrt_url: 'https://x/authlink'})
             expect(mockFetch).toHaveBeenCalledTimes(1)
             const [path, opts] = mockFetch.mock.calls[0]
             expect(path).toBe(AUTH_LINK_PROXY_PATH)
             expect(opts.method).toBe('POST')
-            expect(opts.headers['x-site-id']).toBe('RefArch')
             expect(JSON.parse(opts.body)).toEqual({commerce_client_jwt: V2_JWT})
+        })
+
+        it('does not send an x-site-id header (authlink authenticates with the JWT alone)', async () => {
+            mockFetch.mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: async () => ({auth_link_key: 'k'})
+            })
+
+            await callAuthLinkProxy({commerceClientJWT: V2_JWT})
+
+            const opts = mockFetch.mock.calls[0][1]
+            expect(opts.headers).not.toHaveProperty('x-site-id')
         })
 
         it('never includes conversation_id in the POST body', async () => {
@@ -574,7 +611,7 @@ describe('auth-link-proxy', () => {
                 json: async () => ({auth_link_key: 'k'})
             })
 
-            await callAuthLinkProxy({commerceClientJWT: V2_JWT, siteId: 'RefArch'})
+            await callAuthLinkProxy({commerceClientJWT: V2_JWT})
 
             const sentBody = JSON.parse(mockFetch.mock.calls[0][1].body)
             expect(sentBody).toEqual({commerce_client_jwt: V2_JWT})

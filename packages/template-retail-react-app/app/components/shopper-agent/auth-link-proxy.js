@@ -22,14 +22,16 @@
  *   1. Browser: Commerce Client widget is ready (onCimulateWidgetReady event)
  *      - Extract Commerce Client JWT from the cim_af_ct_* storage key
  *      - Send commerce_client_jwt in request body to /api/agent/authlink
- *      - Send siteId as x-site-id header
  *   2. Server route (registerAuthLinkRoute, mounted in app/ssr.js):
- *      - Reads siteId from x-site-id header (standard PWA Kit pattern)
  *      - Reads commerce_client_jwt from request body
  *      - Validates JWT is present
  *      - Reads scrt2Url from the COMMERCE_AGENT_SETTINGS environment variable
  *      - Validates scrt2Url against Salesforce domain allowlist (SSRF prevention)
  *      - Forwards to SCRT with `Authorization: Bearer <commerce_client_jwt>`
+ *
+ * NOTE: unlike the Token Bridge, this route does NOT use a siteId — the SCRT
+ * authlink endpoint authenticates with the Commerce Client JWT (Bearer) alone,
+ * so there is no x-site-id header on this request.
  *   3. SCRT's response (auth_link_key) is forwarded to the browser
  *   4. Browser then calls the existing Token Bridge proxy with auth_link_key
  *
@@ -45,6 +47,13 @@
  * ------------------------------------------------------------------------- */
 
 export const AUTH_LINK_PROXY_PATH = '/api/agent/authlink'
+
+/**
+ * Upstream timeout (ms) for the SCRT authlink call. Without a bound, a hung SCRT
+ * connection would tie up the request until the platform's socket timeout, so
+ * we abort well before that and return a 504 the caller can act on.
+ */
+const SCRT_FETCH_TIMEOUT_MS = 10000
 
 /**
  * SCRT auth link endpoint path.
@@ -70,7 +79,7 @@ const SCRT_AUTHLINK_PATH = '/iamessage/api/v2/authorization/authlink'
 const REQUIRED_JWT_API_VERSION = 'v2'
 
 /**
- * Extract the SCRT API version (e.g. "v1"/"v2") from a Commerce Client JWT's
+ * Extract the SCRT API version (e.g. "v2") from a Commerce Client JWT's
  * `apiVersion` claim, WITHOUT verifying the signature (SCRT verifies it).
  *
  * This is used purely for DIAGNOSTICS: authlink requires a v2 token, so logging
@@ -181,8 +190,6 @@ export function isTrustedSalesforceDomain(myDomain) {
  * authorization.
  *
  * Request:
- *   Headers:
- *     x-site-id: <siteId> (optional)
  *   Body:
  *     {
  *       "commerce_client_jwt": "<jwt_from_cim_af_ct_storage>"
@@ -283,14 +290,24 @@ export async function handleAuthLinkProxy(req, res) {
         }
 
         // Call SCRT's auth link endpoint with the Commerce Client JWT.
-        // The path is fixed at v2 (see SCRT_AUTHLINK_PATH).
+        // The path is fixed at v2 (see SCRT_AUTHLINK_PATH). The request is bounded
+        // by SCRT_FETCH_TIMEOUT_MS via an AbortController so a hung upstream does
+        // not tie up the connection indefinitely.
         const scrtRequestUrl = `${scrt2Url}${SCRT_AUTHLINK_PATH}`
-        const scrtResponse = await fetch(scrtRequestUrl, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${commerceClientJWT}`
-            }
-        })
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), SCRT_FETCH_TIMEOUT_MS)
+        let scrtResponse
+        try {
+            scrtResponse = await fetch(scrtRequestUrl, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${commerceClientJWT}`
+                },
+                signal: controller.signal
+            })
+        } finally {
+            clearTimeout(timeoutId)
+        }
 
         let body = null
         try {
@@ -321,6 +338,14 @@ export async function handleAuthLinkProxy(req, res) {
 
         return res.status(scrtResponse.status).json(responseBody)
     } catch (err) {
+        // AbortError => the SCRT_FETCH_TIMEOUT_MS deadline fired. Surface it as a
+        // distinct 504 so the caller can tell a slow upstream from a real 500.
+        if (err?.name === 'AbortError') {
+            console.error('[auth-link-proxy] SCRT auth link request timed out', {
+                timeoutMs: SCRT_FETCH_TIMEOUT_MS
+            })
+            return res.status(504).json({error: 'SCRT_TIMEOUT'})
+        }
         console.error('[auth-link-proxy] Unexpected error:', err)
         return res.status(500).json({error: 'INTERNAL_ERROR'})
     }
@@ -346,26 +371,22 @@ export function registerAuthLinkRoute(app) {
  *
  * @param {Object} options - Request options
  * @param {string} options.commerceClientJWT - Commerce Client JWT from the cim_af_ct_* storage key (required)
- * @param {string} [options.siteId] - Site ID sent as x-site-id header
  * @returns {Promise<Object>} Promise that resolves to { auth_link_key: "..." }
  */
-export const callAuthLinkProxy = async ({commerceClientJWT, siteId}) => {
+export const callAuthLinkProxy = async ({commerceClientJWT}) => {
     const requestBody = {
         commerce_client_jwt: commerceClientJWT
     }
 
-    const headers = {
-        'Content-Type': 'application/json'
-    }
-
-    // Send siteId as x-site-id header (same pattern as other PWA Kit routes)
-    if (siteId) {
-        headers['x-site-id'] = siteId
-    }
-
+    // No x-site-id header: the SCRT authlink endpoint authenticates with the
+    // Commerce Client JWT (Bearer) alone. Unlike the Token Bridge — which needs
+    // the siteId to resolve HttpOnly cookie names (cc-at_{siteId}) — authlink has
+    // nothing to key off the siteId, so sending it would be dead weight.
     const res = await fetch(AUTH_LINK_PROXY_PATH, {
         method: 'POST',
-        headers,
+        headers: {
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify(requestBody)
     })
 
