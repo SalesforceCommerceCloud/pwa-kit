@@ -8,7 +8,6 @@
 import {
     handleAuthLinkProxy,
     extractScrt2UrlFromEnv,
-    extractApiVersionFromJWT,
     isTrustedSalesforceDomain,
     callAuthLinkProxy,
     AUTH_LINK_PROXY_PATH
@@ -16,17 +15,14 @@ import {
 
 // --- Test helpers -----------------------------------------------------------
 // Commerce Client JWTs are `header.payload.signature`, each segment base64url.
-// The proxy never verifies the signature (SCRT does) — it only base64url-decodes
-// the payload to read the `apiVersion` claim, so a dummy signature is fine here.
+// The proxy forwards the JWT to SCRT verbatim as a Bearer token and never
+// verifies the signature (SCRT does), so a dummy signature is fine here.
 const encode = (obj) => Buffer.from(JSON.stringify(obj)).toString('base64url')
 const makeJWT = (payload, header = {alg: 'RS256', typ: 'JWT'}) =>
     `${encode(header)}.${encode(payload)}.signature`
 
-// A JWT minted for v2 (the version Commerce Client currently issues).
+// A representative Commerce Client JWT (minted for the v2 API the widget issues).
 const V2_JWT = makeJWT({apiVersion: 'v2', sub: 'v2/iamessage/abc', iss: 'orgJwt'})
-// A JWT minted for a non-v2 version (proves the diagnostic version check reads
-// the token claim rather than assuming v2, and drives the mismatch warning).
-const NON_V2_JWT = makeJWT({apiVersion: 'v9', sub: 'v9/iamessage/abc', iss: 'orgJwt'})
 
 const TRUSTED_SCRT2_URL = 'https://orgfarm-123.test1.my.pc-rnd.salesforce-scrt.com'
 
@@ -43,54 +39,6 @@ describe('auth-link-proxy', () => {
     afterEach(() => {
         process.env = originalEnv
         jest.clearAllMocks()
-    })
-
-    // ------------------------------------------------------------------------
-    describe('extractApiVersionFromJWT', () => {
-        it('returns the apiVersion claim (v2)', () => {
-            expect(extractApiVersionFromJWT(V2_JWT)).toBe('v2')
-        })
-
-        it('returns the apiVersion claim for a non-v2 token', () => {
-            expect(extractApiVersionFromJWT(NON_V2_JWT)).toBe('v9')
-        })
-
-        it('supports multi-digit versions (v10)', () => {
-            expect(extractApiVersionFromJWT(makeJWT({apiVersion: 'v10'}))).toBe('v10')
-        })
-
-        it('returns null when the apiVersion claim is absent', () => {
-            expect(extractApiVersionFromJWT(makeJWT({iss: 'orgJwt'}))).toBeNull()
-        })
-
-        it('returns null (rejects) a path-traversal apiVersion claim', () => {
-            expect(extractApiVersionFromJWT(makeJWT({apiVersion: '../../evil'}))).toBeNull()
-        })
-
-        it('returns null for an apiVersion missing the v prefix', () => {
-            expect(extractApiVersionFromJWT(makeJWT({apiVersion: '2'}))).toBeNull()
-        })
-
-        it('is case-sensitive (rejects uppercase V2)', () => {
-            expect(extractApiVersionFromJWT(makeJWT({apiVersion: 'V2'}))).toBeNull()
-        })
-
-        it('returns null for null / undefined / non-string input', () => {
-            expect(extractApiVersionFromJWT(null)).toBeNull()
-            expect(extractApiVersionFromJWT(undefined)).toBeNull()
-            expect(extractApiVersionFromJWT(12345)).toBeNull()
-        })
-
-        it('returns null for a malformed JWT (fewer than 2 segments)', () => {
-            expect(extractApiVersionFromJWT('only-one-segment')).toBeNull()
-        })
-
-        it('returns null when the payload segment is not valid JSON', () => {
-            const badPayload = Buffer.from('not-json').toString('base64url')
-            expect(
-                extractApiVersionFromJWT(`${encode({alg: 'none'})}.${badPayload}.sig`)
-            ).toBeNull()
-        })
     })
 
     // ------------------------------------------------------------------------
@@ -284,40 +232,6 @@ describe('auth-link-proxy', () => {
             const calledUrl = mockFetch.mock.calls[0][0]
             expect(calledUrl).toBe(`${TRUSTED_SCRT2_URL}/iamessage/api/v2/authorization/authlink`)
             expect(calledUrl).not.toContain('conversationId')
-        })
-
-        it('warns when the presented JWT version will not match the v2 authlink endpoint', async () => {
-            const consoleSpy = jest.spyOn(console, 'warn').mockImplementation()
-            // Present a non-v2 JWT — authlink requires v2, so this should warn.
-            req.body = {commerce_client_jwt: NON_V2_JWT}
-            mockFetch.mockResolvedValue({
-                ok: false,
-                status: 401,
-                json: async () => ({message: 'version mismatch'})
-            })
-
-            await handleAuthLinkProxy(req, res)
-
-            expect(consoleSpy).toHaveBeenCalledWith(
-                expect.stringContaining('does not match the authlink'),
-                expect.objectContaining({jwtApiVersion: 'v9', requiredApiVersion: 'v2'})
-            )
-            consoleSpy.mockRestore()
-        })
-
-        it('does not warn when the presented JWT is already v2', async () => {
-            const consoleSpy = jest.spyOn(console, 'warn').mockImplementation()
-            // beforeEach already sets a v2 JWT in req.body.
-            mockFetch.mockResolvedValue({
-                ok: true,
-                status: 200,
-                json: async () => ({auth_link_key: 'k'})
-            })
-
-            await handleAuthLinkProxy(req, res)
-
-            expect(consoleSpy).not.toHaveBeenCalled()
-            consoleSpy.mockRestore()
         })
 
         it('returns 401 MISSING_COMMERCE_CLIENT_JWT when the JWT is absent', async () => {

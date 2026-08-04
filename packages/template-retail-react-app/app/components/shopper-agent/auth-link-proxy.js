@@ -41,7 +41,7 @@
  *
  * SCRT2 host resolution: the auth link endpoint (/iamessage/*) is served by
  * SCRT2 (*.salesforce-scrt.com), which is a DIFFERENT host from Core's My Domain
- * (AGENT_MYDOMAIN, used by the Token Bridge). The SCRT2 origin is read from the
+ * (ANC_MYDOMAIN, used by the Token Bridge). The SCRT2 origin is read from the
  * scrt2Url field of the COMMERCE_AGENT_SETTINGS environment variable, then
  * validated against a Salesforce domain allowlist (prevents SSRF).
  * ------------------------------------------------------------------------- */
@@ -56,68 +56,21 @@ export const AUTH_LINK_PROXY_PATH = '/api/agent/authlink'
 const SCRT_FETCH_TIMEOUT_MS = 10000
 
 /**
- * SCRT auth link endpoint path.
+ * SCRT auth link endpoint path — fixed at the **v2** IA-message API.
  *
- * AuthLink is served by the **v2** IA-message API. The presented JWT must be
- * minted for the same version: the Commerce Client (Cimulate) widget stores a
- * v2 public continuation token, which is what this endpoint expects.
- *
- * If a JWT minted for a different version is presented, SCRT rejects it with
- * HTTP 401 `JWT_VALID_NOT_AUTHORIZED_TO_API` (error 900020):
- *   "JWT is valid, but not issued with correct version of the end point.
- *    Please use the correct version of the end point."
- *
- * The fix for that 401 is to present a token minted for this endpoint's
- * version (v2), NOT to change this path.
+ * The presented JWT must be minted for the same version; the Commerce Client
+ * (Cimulate) widget stores a v2 continuation token, which is what this endpoint
+ * expects. A version mismatch is rejected by SCRT with HTTP 401 error 900020
+ * (`JWT_VALID_NOT_AUTHORIZED_TO_API`) — the fix is to present a v2 token, NOT
+ * to change this path.
  */
 const SCRT_AUTHLINK_PATH = '/iamessage/api/v2/authorization/authlink'
-
-/**
- * The `apiVersion` the authlink endpoint requires the presented JWT to carry.
- * Used only for a diagnostic warning — see handleAuthLinkProxy.
- */
-const REQUIRED_JWT_API_VERSION = 'v2'
-
-/**
- * Extract the SCRT API version (e.g. "v2") from a Commerce Client JWT's
- * `apiVersion` claim, WITHOUT verifying the signature (SCRT verifies it).
- *
- * This is used purely for DIAGNOSTICS: authlink requires a v2 token, so logging
- * the token's version turns an otherwise-cryptic upstream 401 into an
- * actionable message. The value is NOT interpolated into the request URL.
- *
- * Only the payload segment is base64url-decoded and parsed. The value is
- * strictly validated against /^v\d+$/ before use.
- *
- * @param {string} jwt - The Commerce Client JWT (header.payload.signature)
- * @returns {string|null} - A validated version like "v2", or null if unavailable/invalid
- */
-export function extractApiVersionFromJWT(jwt) {
-    if (!jwt || typeof jwt !== 'string') return null
-
-    const parts = jwt.split('.')
-    if (parts.length < 2) return null
-
-    let payload
-    try {
-        payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'))
-    } catch {
-        return null
-    }
-
-    const apiVersion = payload?.apiVersion
-    if (typeof apiVersion !== 'string' || !/^v\d+$/.test(apiVersion)) {
-        return null
-    }
-
-    return apiVersion
-}
 
 /**
  * Extract the SCRT2 origin from the COMMERCE_AGENT_SETTINGS environment variable.
  *
  * The auth link endpoint (`/iamessage/*`) is served by SCRT2, whose host
- * (`*.salesforce-scrt.com`) is different from Core's My Domain (AGENT_MYDOMAIN).
+ * (`*.salesforce-scrt.com`) is different from Core's My Domain (ANC_MYDOMAIN).
  * SCRT2's base URL is already provisioned to the storefront as the `scrt2Url`
  * field of COMMERCE_AGENT_SETTINGS, so we read it from the same server-side
  * source rather than introducing a new env var.
@@ -156,15 +109,16 @@ export function extractScrt2UrlFromEnv() {
 }
 
 /**
- * Validate that the myDomain hostname is a trusted Salesforce domain.
- * SSRF prevention: only allow requests to known Salesforce infrastructure.
+ * Validate that a URL's hostname is a trusted Salesforce domain.
+ * SSRF/CSRF prevention: only allow requests to (and origins from) known
+ * Salesforce infrastructure — used for both the SCRT2 URL and the request Origin.
  *
- * @param {string} myDomain - The full myDomain URL (e.g., https://org.my.salesforce.com)
- * @returns {boolean} - True if the domain is trusted, false otherwise
+ * @param {string} candidateUrl - The full URL to check (e.g., https://org.my.salesforce-scrt.com)
+ * @returns {boolean} - True if the host is a trusted Salesforce domain, false otherwise
  */
-export function isTrustedSalesforceDomain(myDomain) {
+export function isTrustedSalesforceDomain(candidateUrl) {
     try {
-        const url = new URL(myDomain)
+        const url = new URL(candidateUrl)
         const host = url.hostname.toLowerCase()
 
         // Allowlist: Salesforce production, sandbox, and developer domains
@@ -253,9 +207,9 @@ export async function handleAuthLinkProxy(req, res) {
         // If no Origin/Referer header, allow (same-origin POSTs from some browsers/tools)
 
         // Resolve the SCRT2 origin from COMMERCE_AGENT_SETTINGS.scrt2Url.
-        // NOTE: this is intentionally NOT AGENT_MYDOMAIN — the auth link endpoint
+        // NOTE: this is intentionally NOT ANC_MYDOMAIN — the auth link endpoint
         // (/iamessage/*) lives on SCRT2 (*.salesforce-scrt.com), a different host
-        // from Core's My Domain. Pointing at AGENT_MYDOMAIN returns a 404 from Core.
+        // from Core's My Domain. Pointing at ANC_MYDOMAIN returns a 404 from Core.
         const scrt2Url = extractScrt2UrlFromEnv()
 
         if (!scrt2Url) {
@@ -273,20 +227,6 @@ export async function handleAuthLinkProxy(req, res) {
                 {scrt2Url}
             )
             return res.status(400).json({error: 'UNTRUSTED_SCRT2_URL'})
-        }
-
-        // Diagnostic only: authlink is served by the v2 API. If the presented
-        // JWT was minted for a different version, SCRT will reject it with a 401
-        // version-mismatch (error 900020). Surface that as an actionable log
-        // line rather than letting the upstream 401 look like a bad token.
-        const jwtApiVersion = extractApiVersionFromJWT(commerceClientJWT)
-        if (jwtApiVersion && jwtApiVersion !== REQUIRED_JWT_API_VERSION) {
-            console.warn(
-                '[auth-link-proxy] Presented JWT apiVersion does not match the authlink ' +
-                    'endpoint version — SCRT will likely return a 401 version-mismatch (900020). ' +
-                    'AuthLink requires a v2 token.',
-                {jwtApiVersion, requiredApiVersion: REQUIRED_JWT_API_VERSION}
-            )
         }
 
         // Call SCRT's auth link endpoint with the Commerce Client JWT.

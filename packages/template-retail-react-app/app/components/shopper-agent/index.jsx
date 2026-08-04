@@ -597,18 +597,17 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {Object} props.commerceAgentConfiguration - Commerce agent configuration object
  * @param {string} props.commerceAgentConfiguration.scrt2Url - SCRT2 URL (passed to `messagingConfig.scrt2Url`)
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID (passed to `messagingConfig.orgId`)
- * @param {string} [props.commerceAgentConfiguration.esDeveloperName] - Embedded Service developer name
- * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `esDeveloperName`
- * @param {string} [props.commerceAgentConfiguration.capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
- * @param {string} props.commerceAgentConfiguration.commerceClientScriptSourceUrl - Commerce Client messaging bundle URL
- * @param {string} [props.commerceAgentConfiguration.commerceClientLoadingMode] - Asset loading mode: 'cdn' (default, external Cimulate CDN) or 'static' (this app's bundled static assets)
- * @param {string} [props.commerceAgentConfiguration.commerceClientScriptSourceUrl] - Commerce Client messaging bundle URL (used when loading mode is 'cdn')
- * @param {string} [props.commerceAgentConfiguration.commerceClientStaticAssetPath] - Bundle path relative to the build dir (used when loading mode is 'static'; defaults to 'static/commerce-client/messaging.umd.js')
- * @param {string} [props.commerceAgentConfiguration.commerceClientMode] - Widget mode forwarded to the bundle as `mode` (defaults to 'messaging')
- * @param {string} [props.commerceAgentConfiguration.commerceClientLogoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
- * @param {string} [props.commerceAgentConfiguration.headerText] - Header text shown at the top of the widget
- * @param {string} [props.commerceAgentConfiguration.disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
- * @param {Object} [props.commerceAgentConfiguration.commerceClientSearchConfig] - Search input config forwarded to the widget as `searchConfig` (e.g. `placeholder`, `buttonLabel`, `buttonType`, `buttonIconUrl`)
+ * @param {string} [props.commerceAgentConfiguration.cc_esDeveloperName] - Embedded Service developer name
+ * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `cc_esDeveloperName`
+ * @param {string} [props.commerceAgentConfiguration.cc_capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
+ * @param {string} [props.commerceAgentConfiguration.cc_enableEscalationToAgent] - When 'true', lets shoppers escalate to a human agent; forwarded as `messagingConfig.enableEscalationToAgent`. Defaults to 'false'
+ * @param {string} [props.commerceAgentConfiguration.cc_enableDownloadTranscript] - 'true' (default) lets shoppers download the chat transcript; forwarded as `messagingConfig.enableDownloadTranscript`
+ * @param {string} [props.commerceAgentConfiguration.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0'); resolved into the full messaging bundle URL
+ * @param {string} [props.commerceAgentConfiguration.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting); wins over cc_cdnVersion
+ * @param {string} [props.commerceAgentConfiguration.cc_logoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
+ * @param {string} [props.commerceAgentConfiguration.cc_headerText] - Header text shown at the top of the widget
+ * @param {string} [props.commerceAgentConfiguration.cc_disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
+ * @param {Object} [props.commerceAgentConfiguration.cc_searchConfig] - Search input config forwarded to the widget as `searchConfig` (e.g. `placeholder`, `buttonLabel`, `buttonType`, `buttonIconUrl`)
  * @param {string} [props.commerceAgentConfiguration.commerceClientElementId] - Container element id (defaults to 'commerce-client-messaging-widget')
  * @param {string} [props.commerceAgentConfiguration.cc_dialogFullHeight] - 'true' (default) renders a full-height side panel; 'false' renders a standard corner dialog
  * @param {string} [props.commerceAgentConfiguration.cc_dialogWidth] - Width of the side panel when cc_dialogFullHeight is 'true' (e.g. '420px')
@@ -696,32 +695,11 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
     // re-links.
     const lastAuthLinkKeyRef = useRef(null)
 
-    // Resolve the bundle URL from the configured loading mode: the external
-    // Cimulate CDN ('cdn', default) or this app's own bundled static assets
-    // ('static'). Mirrors the SFCC cartridge's `cc_loadingMode` preference.
-    const commerceClientScriptUrl = resolveCommerceClientScriptUrl(commerceAgentConfiguration)
+    // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
+    const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
 
-    // Load the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging
-    const scriptLoadStatus = useScript(commerceClientScriptUrl)
-
-    // =====================================================================
-    // NEW auth-link flow (identity-change driven).
-    //
-    // Auth-linking binds the Commerce Client CONVERSATION (identified by the
-    // Commerce Client JWT in *_WEB_STORAGE / cim_af_ct_*) to the SLAS SHOPPER
-    // (access/refresh token forwarded by the Token Bridge). The link is stale
-    // whenever EITHER endpoint changes, so we (re)link on two signals:
-    //
-    //   1. `onCimulateWidgetReady` — the widget fires this ONLY when it creates
-    //      a NEW conversation (never on resume). New conversation => new
-    //      Commerce Client JWT that has never been linked to anyone.
-    //   2. SLAS identity transition — guest <-> registered, or usid/account
-    //      switch. Same conversation, but now the wrong (or anonymous) shopper.
-    //
-    // Both converge on a single idempotent performAuthLink(), deduped by the
-    // composite key `${conversationId}:${slasIdentity}` so redundant opens do
-    // not re-link while a genuine identity change on either side still does.
-    // =====================================================================
+    // The helpers below feed the two re-link triggers (new conversation, SLAS
+    // identity change), which both route through the idempotent performAuthLink().
 
     /**
      * Resolve a stable identifier for the current SLAS shopper. Guests share
@@ -822,20 +800,14 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             return
         }
 
-        // Auth-linking reaches Core through the Token Bridge, which needs the
-        // org's my_domain to have resolved. Defensive guard mirroring the MIAW
-        // conversation-started flow: <ShopperAgent> already gates this component's
-        // mount on !isConfigurationsLoading, so my_domain is normally present by
-        // the time any trigger fires — but skip rather than call the bridge with
-        // an unresolved domain if that ever changes.
+        // The Token Bridge reaches Core, which needs my_domain resolved. The mount
+        // is already gated on !isConfigurationsLoading, so this is a defensive skip
+        // rather than a call to the bridge with an unresolved domain.
         if (!domain) {
             console.warn(`[Commerce Client] performAuthLink(${reason}): my_domain not resolved yet`)
             return
         }
 
-        // Dedup: skip if this exact (conversation, shopper) pair is already linked.
-        // conversationId may be null here (conversation still creating) — the JWT
-        // poll below gives it time to appear, and we re-read it before the key check.
         const slasIdentity = getSlasIdentity()
 
         try {
@@ -845,12 +817,12 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
                 return
             }
 
+            // Dedup on (conversation, shopper). conversationId is read here — after
+            // the JWT poll — so a still-creating conversation has time to appear.
             const conversationId = readConversationId()
             const linkKey = `${conversationId || 'unknown'}:${slasIdentity}`
             if (lastAuthLinkKeyRef.current === linkKey) {
-                console.debug(
-                    `[Commerce Client] performAuthLink(${reason}): already linked (${linkKey})`
-                )
+                // Already linked this exact (conversation, shopper) pair.
                 return
             }
 
@@ -890,7 +862,6 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             }
 
             lastAuthLinkKeyRef.current = linkKey
-            console.debug(`[Commerce Client] performAuthLink(${reason}): linked (${linkKey})`)
         } catch (error) {
             console.error(`[Commerce Client] performAuthLink(${reason}) threw`, error)
             toastRef.current({
@@ -919,7 +890,6 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             return
         }
         const handleWidgetReady = () => {
-            console.debug('[Commerce Client] onCimulateWidgetReady -> auth link (new conversation)')
             performAuthLinkRef.current({reason: 'widget-ready'})
         }
         window.addEventListener('onCimulateWidgetReady', handleWidgetReady)
@@ -950,9 +920,6 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             return
         }
         if (prev !== identity) {
-            console.debug(
-                `[Commerce Client] SLAS identity change (${prev} -> ${identity}) -> auth link`
-            )
             performAuthLinkRef.current({reason: 'slas-identity-change'})
         }
     }, [customerType, usid, scriptLoadStatus])
