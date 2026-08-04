@@ -1772,5 +1772,23 @@ describe('ShopperAgent Component', () => {
             expect(widgetOptions.componentConfig.type).toBe('modal')
             expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'bottom-left'})
         })
+
+        test('sends dialogFullHeight false explicitly so the widget default cannot win', () => {
+            renderCommerceClient({cc_dialogFullHeight: 'false', cc_displayType: 'dialog'})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.options.dialogFullHeight).toBe(false)
+        })
+
+        test('omits dialog layout options for a modal widget', () => {
+            renderCommerceClient({cc_dialogFullHeight: 'true', cc_displayType: 'modal'})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'bottom-right'})
+        })
     })
 })
