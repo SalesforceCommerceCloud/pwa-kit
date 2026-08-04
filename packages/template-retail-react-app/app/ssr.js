@@ -28,6 +28,8 @@ import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
 
 const config = getConfig()
 
@@ -397,6 +399,11 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.cimulate.ai',
                         // Commerce Client bundle served from the SFCC static CDN
                         '*.sfcc-store-internal.net',
+                        // Origin of the merchant-hosted Commerce Client component-override
+                        // script, added only when cc_overridesUrl holds a valid HTTPS URL.
+                        // Serving that script from a different host than the configured one
+                        // requires adding the host here.
+                        ...getCommerceClientOverridesCspSources(config.app.commerceAgent),
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
                         // Payment gateways
