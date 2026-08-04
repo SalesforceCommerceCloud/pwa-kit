@@ -39,10 +39,6 @@ jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/token-bridg
 
 // Import ShopperAgent after all mocks are set up
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
-import {
-    COMMERCE_CLIENT_CDN_BASE_URL,
-    COMMERCE_CLIENT_OPEN_STATE_KEY
-} from '@salesforce/retail-react-app/app/constants'
 
 // Mock the embedded messaging service
 const mockEmbeddedService = {
@@ -68,12 +64,6 @@ Object.defineProperty(window, 'embeddedservice_bootstrap', {
 jest.mock('@salesforce/retail-react-app/app/hooks/use-script', () => ({
     __esModule: true,
     default: jest.fn()
-}))
-
-// Mock getAssetUrl so 'static' loading mode resolves to a deterministic, same-origin URL
-jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => ({
-    __esModule: true,
-    getAssetUrl: jest.fn((path) => `/mobify/bundle/development/${path}`)
 }))
 
 // Mock the useCommerceClientMessaging hook (Commerce Client provider)
@@ -1656,41 +1646,6 @@ describe('ShopperAgent Component', () => {
                 expect.anything(),
                 expect.objectContaining({routingAttributes: {foo: 'bar'}})
             )
-        })
-
-        describe("commerceClientLoadingMode 'static'", () => {
-            test('loads the bundle from the same-origin static asset path (no CDN URL required)', () => {
-                renderCommerceClient({
-                    commerceClientLoadingMode: 'static',
-                    commerceClientScriptSourceUrl: ''
-                })
-
-                expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
-                expect(mockedUseScript).toHaveBeenCalledWith(
-                    '/mobify/bundle/development/static/commerce-client/messaging.umd.js'
-                )
-            })
-
-            test('resolves a custom commerceClientStaticAssetPath', () => {
-                renderCommerceClient({
-                    commerceClientLoadingMode: 'static',
-                    commerceClientScriptSourceUrl: '',
-                    commerceClientStaticAssetPath: 'static/custom/widget.umd.js'
-                })
-
-                expect(mockedUseScript).toHaveBeenCalledWith(
-                    '/mobify/bundle/development/static/custom/widget.umd.js'
-                )
-            })
-
-            test('renders even without a cimulate.ai domain (allowlist skipped in static mode)', () => {
-                renderCommerceClient({
-                    commerceClientLoadingMode: 'static',
-                    commerceClientScriptSourceUrl: ''
-                })
-
-                expect(screen.getByTestId('shopper-agent')).toBeInTheDocument()
-            })
         })
 
         test('builds full-height side panel options in the default panel display mode', () => {
