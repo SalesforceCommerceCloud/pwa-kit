@@ -333,6 +333,28 @@ export async function jwksCaching(req, res, options) {
     }
 }
 
+/**
+ * Handle the SLAS `/callback` redirect.
+ *
+ * The Trusted Agent (Order on Behalf) popup redirects here with both a `code` and
+ * a `state`. That flow needs the React app to mount so the callback page can hand
+ * the result back to the opener, so let it fall through to the renderer via
+ * `next()`. This URL carries OAuth material, so that variant must never be cached.
+ *
+ * For every other request (including the standard SLAS login redirect, which does
+ * not navigate the top window here and carries no `state`) this endpoint does
+ * nothing and is safe to cache for a long time.
+ */
+export function handleCallback(req, res, next) {
+    if (req.query.code && req.query.state) {
+        res.set('Cache-Control', 'no-store')
+        return next()
+    }
+
+    res.set('Cache-Control', `max-age=31536000`)
+    res.send()
+}
+
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
     app.use(express.urlencoded({extended: true}))
@@ -423,12 +445,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     )
 
     // Handle the redirect from SLAS as to avoid error
-    app.get('/callback', (req, res) => {
-        // This endpoint does nothing and is not expected to change
-        // Thus we cache it for a year to maximize performance
-        res.set('Cache-Control', `max-age=31536000`)
-        res.send()
-    })
+    app.get('/callback', handleCallback)
 
     app.get('/:shortCode/:tenantId/oauth2/jwks', (req, res) => {
         jwksCaching(req, res, {shortCode: req.params.shortCode, tenantId: req.params.tenantId})
