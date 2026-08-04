@@ -297,14 +297,6 @@ export const DEFAULT_COMMERCE_CLIENT_ELEMENT_ID = 'commerce-client-messaging-wid
 export const COMMERCE_CLIENT_CDN_BASE_URL = 'https://cdn.search.cimulate.ai/copilot-widget'
 
 /**
- * Default bundle path (relative to the build directory) served same-origin when
- * `commerceClientLoadingMode` is `'static'`. Resolved to a full URL at runtime
- * via `getAssetUrl`. Matches where `scripts/copy-commerce-client-assets.js`
- * writes the copied Commerce Client messaging UMD bundle.
- */
-export const COMMERCE_CLIENT_STATIC_ASSET_PATH = 'static/commerce-client/messaging.umd.js'
-
-/**
  * Window event the Commerce Client widget dispatches on every UI state change,
  * with `detail` of `{property, value}` (e.g. `{property: 'isOpen', value: true}` or
  * `{property: 'position', value: 'bottom-left'}`). It fires regardless of source —

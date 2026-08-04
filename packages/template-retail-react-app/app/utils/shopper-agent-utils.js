@@ -4,11 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {
     COMMERCE_CLIENT_CDN_BASE_URL,
-    COMMERCE_CLIENT_OPEN_STATE_KEY,
-    COMMERCE_CLIENT_STATIC_ASSET_PATH
+    COMMERCE_CLIENT_OPEN_STATE_KEY
 } from '@salesforce/retail-react-app/app/constants'
 import {validateOverridesUrl} from '@salesforce/retail-react-app/app/utils/commerce-client-overrides'
 
@@ -196,33 +194,16 @@ export function openShopperAgentWidget() {
 /**
  * Resolves the Commerce Client messaging bundle URL from the agent configuration.
  *
- * Two loading modes, selected by `commerceClientLoadingMode`:
- *   - `'static'` — serve the bundle SAME-ORIGIN from this app's build output.
- *     `getAssetUrl` resolves the configured (or default) build-relative path to a
- *     full URL at runtime. The CDN/override fields are ignored in this mode.
- *   - `'cdn'` (default) — `cc_cdnVersion` (e.g. '1.18.0') is interpolated into the
- *     Cimulate CDN URL. An explicit `commerceClientScriptSourceUrl` takes precedence
- *     when set, which supports local dev (localhost) and SFCC self-hosted bundles.
+ * `cc_cdnVersion` (e.g. '1.18.0') is the common path: it is interpolated into the
+ * Cimulate CDN URL. An explicit `commerceClientScriptSourceUrl` takes precedence
+ * when set, which supports local dev (localhost) and SFCC self-hosted bundles.
  *
  * @param {Object} commerceAgent - Commerce agent configuration object
- * @param {string} [commerceAgent.commerceClientLoadingMode] - 'cdn' (default) or 'static'
- * @param {string} [commerceAgent.commerceClientStaticAssetPath] - Build-relative bundle path for static mode (defaults to COMMERCE_CLIENT_STATIC_ASSET_PATH)
  * @param {string} [commerceAgent.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0')
- * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override (cdn mode)
- * @returns {string} The resolved bundle URL, or '' when nothing is configured
+ * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override
+ * @returns {string} The resolved bundle URL, or '' when neither field is set
  */
 export const resolveCommerceClientScriptUrl = (commerceAgent) => {
-    // Static mode is checked FIRST: it serves the app's own bundled asset and
-    // intentionally ignores cc_cdnVersion / commerceClientScriptSourceUrl.
-    if (commerceAgent?.commerceClientLoadingMode === 'static') {
-        const configuredPath = commerceAgent.commerceClientStaticAssetPath
-        const staticPath =
-            typeof configuredPath === 'string' && configuredPath.trim() !== ''
-                ? configuredPath.trim()
-                : COMMERCE_CLIENT_STATIC_ASSET_PATH
-        return getAssetUrl(staticPath)
-    }
-
     const override = commerceAgent?.commerceClientScriptSourceUrl
     if (typeof override === 'string' && override.trim() !== '') {
         return override.trim()
@@ -295,13 +276,6 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
             'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, cc_esDeveloperName (or embeddedServiceName), and cc_cdnVersion (or commerceClientScriptSourceUrl).'
         )
         return false
-    }
-
-    // In static mode the bundle is served same-origin from this app's own build
-    // output (resolved via getAssetUrl), so the external cimulate.ai / SFCC
-    // allowlist does not apply — it exists to constrain third-party CDN origins.
-    if (commerceAgent.commerceClientLoadingMode === 'static') {
-        return true
     }
 
     if (!validateCommerceClientDomain(scriptSourceUrl)) {

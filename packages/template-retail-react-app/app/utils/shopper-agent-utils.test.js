@@ -22,13 +22,6 @@ import {
     COMMERCE_CLIENT_OPEN_STATE_KEY
 } from '@salesforce/retail-react-app/app/constants'
 
-// Mock getAssetUrl so 'static' loading mode resolves to a deterministic,
-// same-origin build URL (matches the mock used in the component's index.test.js).
-jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => ({
-    __esModule: true,
-    getAssetUrl: jest.fn((path) => `/mobify/bundle/development/${path}`)
-}))
-
 describe('shopper-agent-utils', () => {
     let originalWindow
     let consoleErrorSpy
@@ -673,16 +666,85 @@ describe('shopper-agent-utils', () => {
             )
         })
 
-        test('returns true in static mode without requiring a cimulate.ai domain', () => {
-            // The static bundle is same-origin (getAssetUrl -> /mobify/bundle/...),
-            // so the external CDN allowlist must be skipped rather than rejecting it.
-            const result = validateCommerceClientAgentSettings({
-                ...validConfig,
-                cc_cdnVersion: undefined,
-                commerceClientLoadingMode: 'static'
+        describe('component overrides', () => {
+            let consoleWarnSpy
+
+            beforeEach(() => {
+                consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
             })
 
-            expect(result).toBe(true)
+            afterEach(() => {
+                consoleWarnSpy.mockRestore()
+            })
+
+            test('warns but stays valid when cc_overrides and cc_overridesUrl are both set', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overridesUrl: 'https://example.com/overrides.js',
+                    cc_overrides: {ProductTile: 'my-product-tile'}
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).toHaveBeenCalledWith(
+                    'Commerce Client cc_overrides and cc_overridesUrl are mutually exclusive. Using cc_overrides and ignoring cc_overridesUrl.'
+                )
+            })
+
+            test('does not warn when only cc_overrides is set', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overrides: {ProductTile: 'my-product-tile'}
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).not.toHaveBeenCalled()
+            })
+
+            test('does not warn when only an HTTPS cc_overridesUrl is set', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overridesUrl: 'https://example.com/overrides.js'
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).not.toHaveBeenCalled()
+            })
+
+            test('warns when a lone cc_overridesUrl does not use HTTPS', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overridesUrl: 'http://example.com/overrides.js'
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).toHaveBeenCalledWith(
+                    'Commerce Client overrides URL must use HTTPS. Overrides will not be loaded.'
+                )
+            })
+
+            test('skips the HTTPS check on a cc_overridesUrl that an inline map already displaced', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overridesUrl: 'http://example.com/overrides.js',
+                    cc_overrides: {ProductTile: 'my-product-tile'}
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).not.toHaveBeenCalledWith(
+                    'Commerce Client overrides URL must use HTTPS. Overrides will not be loaded.'
+                )
+            })
+
+            test('treats an empty cc_overrides map as absent', () => {
+                const result = validateCommerceClientAgentSettings({
+                    ...validConfig,
+                    cc_overridesUrl: 'https://example.com/overrides.js',
+                    cc_overrides: {}
+                })
+
+                expect(result).toBe(true)
+                expect(consoleWarnSpy).not.toHaveBeenCalled()
+            })
         })
     })
 
@@ -724,42 +786,6 @@ describe('shopper-agent-utils', () => {
         test('returns an empty string for a null/undefined config', () => {
             expect(resolveCommerceClientScriptUrl(null)).toBe('')
             expect(resolveCommerceClientScriptUrl(undefined)).toBe('')
-        })
-
-        describe("commerceClientLoadingMode 'static'", () => {
-            test('resolves the default same-origin static asset path via getAssetUrl', () => {
-                expect(
-                    resolveCommerceClientScriptUrl({commerceClientLoadingMode: 'static'})
-                ).toBe('/mobify/bundle/development/static/commerce-client/messaging.umd.js')
-            })
-
-            test('resolves a custom commerceClientStaticAssetPath', () => {
-                expect(
-                    resolveCommerceClientScriptUrl({
-                        commerceClientLoadingMode: 'static',
-                        commerceClientStaticAssetPath: 'static/custom/widget.umd.js'
-                    })
-                ).toBe('/mobify/bundle/development/static/custom/widget.umd.js')
-            })
-
-            test('ignores cc_cdnVersion and commerceClientScriptSourceUrl in static mode', () => {
-                expect(
-                    resolveCommerceClientScriptUrl({
-                        commerceClientLoadingMode: 'static',
-                        cc_cdnVersion: '1.18.0',
-                        commerceClientScriptSourceUrl: 'http://localhost:5050/messaging.umd.js'
-                    })
-                ).toBe('/mobify/bundle/development/static/commerce-client/messaging.umd.js')
-            })
-
-            test('falls back to the default path when commerceClientStaticAssetPath is blank', () => {
-                expect(
-                    resolveCommerceClientScriptUrl({
-                        commerceClientLoadingMode: 'static',
-                        commerceClientStaticAssetPath: '   '
-                    })
-                ).toBe('/mobify/bundle/development/static/commerce-client/messaging.umd.js')
-            })
         })
     })
 })
