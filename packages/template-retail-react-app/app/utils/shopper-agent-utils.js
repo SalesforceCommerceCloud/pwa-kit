@@ -8,6 +8,7 @@ import {
     COMMERCE_CLIENT_CDN_BASE_URL,
     COMMERCE_CLIENT_OPEN_STATE_KEY
 } from '@salesforce/retail-react-app/app/constants'
+import {validateOverridesUrl} from '@salesforce/retail-react-app/app/utils/commerce-client-overrides'
 
 const onClient = typeof window !== 'undefined'
 
@@ -248,6 +249,8 @@ export const validateCommerceClientDomain = (url) => {
  * @param {string} [commerceAgent.embeddedServiceName] - Fallback for `cc_esDeveloperName`
  * @param {string} [commerceAgent.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0')
  * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting)
+ * @param {string} [commerceAgent.cc_overridesUrl] - Optional URL to customer's component override script
+ * @param {Object} [commerceAgent.cc_overrides] - Optional inline override map, mutually exclusive with `cc_overridesUrl`
  * @returns {boolean} True if configuration is valid, false otherwise
  */
 export const validateCommerceClientAgentSettings = (commerceAgent) => {
@@ -280,6 +283,27 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
             'Commerce Client script URL must be served from a trusted cimulate.ai or sfcc-store-internal.net domain.'
         )
         return false
+    }
+
+    const hasInlineOverrides =
+        Boolean(commerceAgent.cc_overrides) && Object.keys(commerceAgent.cc_overrides).length > 0
+
+    // Non-fatal: resolveCommerceClientOverrideOptions drops the URL and keeps the inline map.
+    if (hasInlineOverrides && commerceAgent.cc_overridesUrl) {
+        console.warn(
+            'Commerce Client cc_overrides and cc_overridesUrl are mutually exclusive. Using cc_overrides and ignoring cc_overridesUrl.'
+        )
+    }
+
+    // Validate optional overrides URL (must be HTTPS, any domain allowed). Skipped when an
+    // inline map wins, so we do not warn about a URL that is already being dropped.
+    if (!hasInlineOverrides && commerceAgent.cc_overridesUrl) {
+        if (!validateOverridesUrl(commerceAgent.cc_overridesUrl)) {
+            console.warn(
+                'Commerce Client overrides URL must use HTTPS. Overrides will not be loaded.'
+            )
+            // Non-fatal: widget still works without overrides
+        }
     }
 
     return true

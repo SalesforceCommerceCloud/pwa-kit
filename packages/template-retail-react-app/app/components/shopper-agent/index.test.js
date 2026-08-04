@@ -1601,6 +1601,69 @@ describe('ShopperAgent Component', () => {
             )
         })
 
+        test('forwards cc_overridesUrl to the widget options as overridesUrl', () => {
+            renderCommerceClient({cc_overridesUrl: 'https://example.com/overrides.js'})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({overridesUrl: 'https://example.com/overrides.js'})
+            )
+        })
+
+        test('forwards cc_overrides to the widget options as overrides', () => {
+            renderCommerceClient({cc_overrides: {ProductTile: 'my-product-tile'}})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({overrides: {ProductTile: 'my-product-tile'}})
+            )
+        })
+
+        test('prefers cc_overrides and drops cc_overridesUrl when both are set', () => {
+            renderCommerceClient({
+                cc_overridesUrl: 'https://example.com/overrides.js',
+                cc_overrides: {ProductTile: 'my-product-tile'}
+            })
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.overrides).toEqual({ProductTile: 'my-product-tile'})
+            expect(widgetOptions).not.toHaveProperty('overridesUrl')
+        })
+
+        test('falls back to cc_overridesUrl when cc_overrides is an empty map', () => {
+            renderCommerceClient({
+                cc_overridesUrl: 'https://example.com/overrides.js',
+                cc_overrides: {}
+            })
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.overridesUrl).toBe('https://example.com/overrides.js')
+            expect(widgetOptions).not.toHaveProperty('overrides')
+        })
+
+        test('omits both override options when neither is configured', () => {
+            renderCommerceClient()
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions).not.toHaveProperty('overridesUrl')
+            expect(widgetOptions).not.toHaveProperty('overrides')
+        })
+
+        test('omits overrides when cc_overrides is an empty object', () => {
+            renderCommerceClient({cc_overrides: {}})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions).not.toHaveProperty('overrides')
+        })
+
         test('opens the widget automatically when cc_isOpen is true', () => {
             renderCommerceClient({cc_isOpen: 'true'})
 
