@@ -41,7 +41,7 @@
  *
  * SCRT2 host resolution: the auth link endpoint (/iamessage/*) is served by
  * SCRT2 (*.salesforce-scrt.com), which is a DIFFERENT host from Core's My Domain
- * (ANC_MYDOMAIN, used by the Token Bridge). The SCRT2 origin is read from the
+ * (AGENT_MYDOMAIN, used by the Token Bridge). The SCRT2 origin is read from the
  * scrt2Url field of the COMMERCE_AGENT_SETTINGS environment variable, then
  * validated against a Salesforce domain allowlist (prevents SSRF).
  * ------------------------------------------------------------------------- */
@@ -70,7 +70,7 @@ const SCRT_AUTHLINK_PATH = '/iamessage/api/v2/authorization/authlink'
  * Extract the SCRT2 origin from the COMMERCE_AGENT_SETTINGS environment variable.
  *
  * The auth link endpoint (`/iamessage/*`) is served by SCRT2, whose host
- * (`*.salesforce-scrt.com`) is different from Core's My Domain (ANC_MYDOMAIN).
+ * (`*.salesforce-scrt.com`) is different from Core's My Domain (AGENT_MYDOMAIN).
  * SCRT2's base URL is already provisioned to the storefront as the `scrt2Url`
  * field of COMMERCE_AGENT_SETTINGS, so we read it from the same server-side
  * source rather than introducing a new env var.
@@ -207,9 +207,9 @@ export async function handleAuthLinkProxy(req, res) {
         // If no Origin/Referer header, allow (same-origin POSTs from some browsers/tools)
 
         // Resolve the SCRT2 origin from COMMERCE_AGENT_SETTINGS.scrt2Url.
-        // NOTE: this is intentionally NOT ANC_MYDOMAIN — the auth link endpoint
+        // NOTE: this is intentionally NOT AGENT_MYDOMAIN — the auth link endpoint
         // (/iamessage/*) lives on SCRT2 (*.salesforce-scrt.com), a different host
-        // from Core's My Domain. Pointing at ANC_MYDOMAIN returns a 404 from Core.
+        // from Core's My Domain. Pointing at AGENT_MYDOMAIN returns a 404 from Core.
         const scrt2Url = extractScrt2UrlFromEnv()
 
         if (!scrt2Url) {
