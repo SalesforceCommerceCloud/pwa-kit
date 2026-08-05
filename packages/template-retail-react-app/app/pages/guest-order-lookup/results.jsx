@@ -24,6 +24,7 @@ import {
     HStack,
     Heading,
     Input,
+    SimpleGrid,
     Skeleton,
     Stack,
     Text
@@ -674,199 +675,40 @@ const GuestOrderLookupResults = () => {
                 </Box>
             )}
 
-            {/* Main card: Items Ordered (left) + Order Summary (right) */}
+            {/* Top card: Billing Address (left) + Order Summary (right) — matches account order detail */}
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
-                    {/* Items Ordered */}
-                    <Stack spacing={4} py={{xl: 6}} px={{base: 6, xl: 0}} pt={{base: 6}}>
-                        <Heading as="h2" fontSize="md" fontWeight="semibold">
-                            <FormattedMessage
-                                id="guestOrderLookup.order.section.items"
-                                defaultMessage="Items Ordered"
-                            />
-                        </Heading>
-                        <Stack spacing={4}>
-                            {shipments.length === 0 ? (
-                                <OrderProducts
-                                    productItems={order.productItems}
-                                    currency={order.currency}
-                                />
-                            ) : (
-                                (() => {
-                                    const renderedBucketIds = new Set()
-                                    const boxes = shipments.map((shipment, index) => {
-                                        const sid = shipment.shipmentId ?? `ship-${index}`
-                                        const items = isSingleShipment
-                                            ? order.productItems
-                                            : itemsByShipmentId[sid] ?? []
-                                        if (isSingleShipment) {
-                                            Object.keys(itemsByShipmentId).forEach((k) =>
-                                                renderedBucketIds.add(k)
-                                            )
-                                        } else if (itemsByShipmentId[sid]) {
-                                            renderedBucketIds.add(sid)
-                                        }
-                                        const address = shipment.shippingAddress
-                                        return (
-                                            <Box
-                                                key={sid}
-                                                border="1px solid"
-                                                borderColor="gray.100"
-                                                borderRadius="base"
-                                                overflow="hidden"
-                                            >
-                                                <Flex
-                                                    bg="gray.50"
-                                                    px={4}
-                                                    py={3}
-                                                    justify="space-between"
-                                                    align="center"
-                                                    gap={2}
-                                                >
-                                                    <Heading
-                                                        as="h3"
-                                                        fontSize="sm"
-                                                        fontWeight="semibold"
-                                                    >
-                                                        {shipments.length > 1 ? (
-                                                            <FormattedMessage
-                                                                id="guestOrderLookup.order.shipment.number"
-                                                                defaultMessage="Shipment {number}"
-                                                                values={{number: index + 1}}
-                                                            />
-                                                        ) : (
-                                                            <FormattedMessage
-                                                                id="guestOrderLookup.order.shipment"
-                                                                defaultMessage="Shipment"
-                                                            />
-                                                        )}
-                                                    </Heading>
-                                                    {shipment.shippingStatus && (
-                                                        <Text
-                                                            as="span"
-                                                            px={2}
-                                                            py={1}
-                                                            bg="gray.200"
-                                                            color="gray.800"
-                                                            fontSize="xs"
-                                                            fontWeight="semibold"
-                                                            borderRadius="sm"
-                                                            textTransform="capitalize"
-                                                            whiteSpace="nowrap"
-                                                        >
-                                                            <ShipmentStatusLabel
-                                                                status={shipment.shippingStatus}
-                                                            />
-                                                        </Text>
-                                                    )}
-                                                </Flex>
-                                                <Stack spacing={4} p={[4, 6]}>
-                                                    <OrderProducts
-                                                        productItems={items}
-                                                        currency={order.currency}
-                                                    />
-                                                    {address && (
-                                                        <Stack
-                                                            spacing={1}
-                                                            borderTop="1px solid"
-                                                            borderColor="gray.100"
-                                                            pt={4}
-                                                        >
-                                                            <Heading as="h4" fontSize="sm">
-                                                                <FormattedMessage
-                                                                    id="guestOrderLookup.order.shippingAddress"
-                                                                    defaultMessage="Shipping Address"
-                                                                />
-                                                            </Heading>
-                                                            <Box>
-                                                                {(address.firstName ||
-                                                                    address.lastName) && (
-                                                                    <Text fontSize="sm">
-                                                                        {address.firstName}{' '}
-                                                                        {address.lastName}
-                                                                    </Text>
-                                                                )}
-                                                                {address.address1 && (
-                                                                    <Text fontSize="sm">
-                                                                        {address.address1}
-                                                                    </Text>
-                                                                )}
-                                                                {(address.city ||
-                                                                    address.stateCode ||
-                                                                    address.postalCode) && (
-                                                                    <Text fontSize="sm">
-                                                                        {[
-                                                                            address.postalCode,
-                                                                            address.city,
-                                                                            address.stateCode
-                                                                        ]
-                                                                            .filter(Boolean)
-                                                                            .join(', ')}
-                                                                    </Text>
-                                                                )}
-                                                                {shipment.shippingMethod
-                                                                    ?.name && (
-                                                                    <Text
-                                                                        fontSize="sm"
-                                                                        color="gray.600"
-                                                                    >
-                                                                        {
-                                                                            shipment.shippingMethod
-                                                                                .name
-                                                                        }
-                                                                    </Text>
-                                                                )}
-                                                            </Box>
-                                                        </Stack>
-                                                    )}
-                                                </Stack>
-                                            </Box>
-                                        )
-                                    })
-                                    // Items not covered by any delivery shipment box
-                                    const leftoverItems = Object.entries(itemsByShipmentId)
-                                        .filter(([k]) => !renderedBucketIds.has(k))
-                                        .flatMap(([, items]) => items)
-                                    if (leftoverItems.length > 0) {
-                                        boxes.push(
-                                            <Box
-                                                key="other-items"
-                                                border="1px solid"
-                                                borderColor="gray.100"
-                                                borderRadius="base"
-                                                overflow="hidden"
-                                            >
-                                                <Flex
-                                                    bg="gray.50"
-                                                    px={4}
-                                                    py={3}
-                                                    align="center"
-                                                >
-                                                    <Heading
-                                                        as="h3"
-                                                        fontSize="sm"
-                                                        fontWeight="semibold"
-                                                    >
-                                                        <FormattedMessage
-                                                            id="guestOrderLookup.order.otherItems"
-                                                            defaultMessage="Other items"
-                                                        />
-                                                    </Heading>
-                                                </Flex>
-                                                <Stack spacing={4} p={[4, 6]}>
-                                                    <OrderProducts
-                                                        productItems={leftoverItems}
-                                                        currency={order.currency}
-                                                    />
-                                                </Stack>
-                                            </Box>
-                                        )
-                                    }
-                                    return boxes
-                                })()
-                            )}
-                        </Stack>
-                    </Stack>
+                    <SimpleGrid columns={{base: 1, sm: 2}} columnGap={4} rowGap={5} py={{xl: 6}}>
+                        {/* Billing Address */}
+                        {order.billingAddress && (
+                            <Stack spacing={1}>
+                                <Heading as="h2" fontSize="sm" pt={1}>
+                                    <FormattedMessage
+                                        id="guestOrderLookup.order.heading.billingAddress"
+                                        defaultMessage="Billing Address"
+                                    />
+                                </Heading>
+                                <Box>
+                                    {(order.billingAddress.firstName || order.billingAddress.lastName) && (
+                                        <Text fontSize="sm">
+                                            {order.billingAddress.firstName}{' '}
+                                            {order.billingAddress.lastName}
+                                        </Text>
+                                    )}
+                                    {order.billingAddress.address1 && (
+                                        <Text fontSize="sm">{order.billingAddress.address1}</Text>
+                                    )}
+                                    {(order.billingAddress.city || order.billingAddress.stateCode || order.billingAddress.postalCode) && (
+                                        <Text fontSize="sm">
+                                            {order.billingAddress.city},{' '}
+                                            {order.billingAddress.stateCode}{' '}
+                                            {order.billingAddress.postalCode}
+                                        </Text>
+                                    )}
+                                </Box>
+                            </Stack>
+                        )}
+                    </SimpleGrid>
 
                     {/* Order Summary (right column on xl) */}
                     <Box
@@ -888,6 +730,158 @@ const GuestOrderLookupResults = () => {
                     values={{count: itemCount}}
                 />
             </Text>
+
+            {/* Per-shipment boxes */}
+            <Stack spacing={4}>
+                {shipments.length === 0 ? (
+                    <OrderProducts
+                        productItems={order.productItems}
+                        currency={order.currency}
+                    />
+                ) : (
+                    (() => {
+                        const renderedBucketIds = new Set()
+                        const boxes = shipments.map((shipment, index) => {
+                            const sid = shipment.shipmentId ?? `ship-${index}`
+                            const items = isSingleShipment
+                                ? order.productItems
+                                : itemsByShipmentId[sid] ?? []
+                            if (isSingleShipment) {
+                                Object.keys(itemsByShipmentId).forEach((k) =>
+                                    renderedBucketIds.add(k)
+                                )
+                            } else if (itemsByShipmentId[sid]) {
+                                renderedBucketIds.add(sid)
+                            }
+                            const address = shipment.shippingAddress
+                            return (
+                                <Box
+                                    key={sid}
+                                    border="1px solid"
+                                    borderColor="gray.100"
+                                    borderRadius="base"
+                                    overflow="hidden"
+                                >
+                                    <Flex
+                                        bg="gray.50"
+                                        px={4}
+                                        py={3}
+                                        justify="space-between"
+                                        align="center"
+                                        gap={2}
+                                    >
+                                        <Heading as="h2" fontSize="sm" fontWeight="semibold">
+                                            {shipments.length > 1 ? (
+                                                <FormattedMessage
+                                                    id="guestOrderLookup.order.shipment.number"
+                                                    defaultMessage="Shipment {number}"
+                                                    values={{number: index + 1}}
+                                                />
+                                            ) : (
+                                                <FormattedMessage
+                                                    id="guestOrderLookup.order.shipment"
+                                                    defaultMessage="Shipment"
+                                                />
+                                            )}
+                                        </Heading>
+                                        {shipment.shippingStatus && (
+                                            <Text
+                                                as="span"
+                                                px={2}
+                                                py={1}
+                                                bg="gray.200"
+                                                color="gray.800"
+                                                fontSize="xs"
+                                                fontWeight="semibold"
+                                                borderRadius="sm"
+                                                textTransform="capitalize"
+                                                whiteSpace="nowrap"
+                                            >
+                                                <ShipmentStatusLabel
+                                                    status={shipment.shippingStatus}
+                                                />
+                                            </Text>
+                                        )}
+                                    </Flex>
+                                    <Stack spacing={4} p={[4, 6]}>
+                                        <OrderProducts
+                                            productItems={items}
+                                            currency={order.currency}
+                                        />
+                                        {address && (
+                                            <Stack
+                                                spacing={1}
+                                                borderTop="1px solid"
+                                                borderColor="gray.100"
+                                                pt={4}
+                                            >
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        id="guestOrderLookup.order.shippingAddress"
+                                                        defaultMessage="Shipping Address"
+                                                    />
+                                                </Heading>
+                                                <Box>
+                                                    {(address.firstName || address.lastName) && (
+                                                        <Text fontSize="sm">
+                                                            {address.firstName} {address.lastName}
+                                                        </Text>
+                                                    )}
+                                                    {address.address1 && (
+                                                        <Text fontSize="sm">{address.address1}</Text>
+                                                    )}
+                                                    {(address.city || address.stateCode || address.postalCode) && (
+                                                        <Text fontSize="sm">
+                                                            {address.city},{' '}
+                                                            {address.stateCode}{' '}
+                                                            {address.postalCode}
+                                                        </Text>
+                                                    )}
+                                                    {shipment.shippingMethod?.name && (
+                                                        <Text fontSize="sm" color="gray.600">
+                                                            {shipment.shippingMethod.name}
+                                                        </Text>
+                                                    )}
+                                                </Box>
+                                            </Stack>
+                                        )}
+                                    </Stack>
+                                </Box>
+                            )
+                        })
+                        const leftoverItems = Object.entries(itemsByShipmentId)
+                            .filter(([k]) => !renderedBucketIds.has(k))
+                            .flatMap(([, items]) => items)
+                        if (leftoverItems.length > 0) {
+                            boxes.push(
+                                <Box
+                                    key="other-items"
+                                    border="1px solid"
+                                    borderColor="gray.100"
+                                    borderRadius="base"
+                                    overflow="hidden"
+                                >
+                                    <Flex bg="gray.50" px={4} py={3} align="center">
+                                        <Heading as="h2" fontSize="sm" fontWeight="semibold">
+                                            <FormattedMessage
+                                                id="guestOrderLookup.order.otherItems"
+                                                defaultMessage="Other items"
+                                            />
+                                        </Heading>
+                                    </Flex>
+                                    <Stack spacing={4} p={[4, 6]}>
+                                        <OrderProducts
+                                            productItems={leftoverItems}
+                                            currency={order.currency}
+                                        />
+                                    </Stack>
+                                </Box>
+                            )
+                        }
+                        return boxes
+                    })()
+                )}
+            </Stack>
 
             {/* Tracking section */}
             {trackingEntries.length > 0 && (
