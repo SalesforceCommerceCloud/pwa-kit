@@ -400,7 +400,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
             // Show error message to user - order was failed and basket reopened
             const message = formatMessage({
                 defaultMessage:
-                    'Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
+                    'Payment processing failed. Your order has been canceled and your basket has been restored. Please try again or select a different payment method.',
                 id: 'checkout.message.payment_processing_failed'
             })
             onError(message)
@@ -490,7 +490,7 @@ const SFPaymentsSheet = forwardRef((props, ref) => {
                     // Show error message to user - order was failed and basket reopened
                     const message = formatMessage({
                         defaultMessage:
-                            'Payment confirmation failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
+                            'Payment confirmation failed. Your order has been canceled and your basket has been restored. Please try again or select a different payment method.',
                         id: 'checkout.message.payment_confirm_failure'
                     })
                     onError(message)

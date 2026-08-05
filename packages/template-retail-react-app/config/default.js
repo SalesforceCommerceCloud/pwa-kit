@@ -36,31 +36,74 @@ module.exports = {
             // 'commerce-client' (Commerce Client widget). Selecting 'commerce-client' uses the
             // fields below instead of the MIAW embedded-service fields above.
             provider: 'miaw',
-            // URL of the Commerce Client messaging UMD bundle (e.g.
-            // https://cdn.search.cimulate.ai/copilot-widget/<version>/messaging.umd.js).
+            // Cimulate CDN version of the Commerce Client messaging UMD bundle (e.g.
+            // '1.18.0'). Resolved into
+            // https://cdn.search.cimulate.ai/copilot-widget/<version>/messaging.umd.js.
             // Only used when provider === 'commerce-client'.
+            cc_cdnVersion: '',
+            // Optional explicit bundle URL. Overrides cc_cdnVersion when set; use for local
+            // dev (http://localhost:...) or an SFCC self-hosted bundle.
             commerceClientScriptSourceUrl: '',
             // Embedded Service developer name for the Commerce Client widget. Falls back
             // to embeddedServiceName when not set.
-            esDeveloperName: '',
+            cc_esDeveloperName: '',
             // Header text shown at the top of the Commerce Client widget.
-            headerText: '',
+            cc_headerText: '',
             // Markdown disclaimer shown in the Commerce Client widget. Supports links and
             // basic markdown (e.g. 'This is AI. See [details](https://example.com).').
-            disclaimerMarkdown: '',
-            // Commerce Client widget layout: 'panel' (default) renders a full-height side
-            // panel docked to the right that slides in/out; 'dialog' renders the
-            // default floating corner dialog; 'modal' renders a centered modal.
-            commerceClientDisplayMode: 'panel',
-            // Width of the side panel when commerceClientDisplayMode is 'panel'.
-            commerceClientPanelWidth: '420px',
-            // Widget mode forwarded to the Commerce Client bundle as `mode` ('messaging').
-            commerceClientMode: 'messaging',
+            cc_disclaimerMarkdown: '',
+            // When 'true' (default) the widget renders as a full-height side panel
+            // docked to the configured corner; when 'false' it renders as a standard
+            // floating corner dialog. Forwarded to the widget as `dialogFullHeight`.
+            cc_dialogFullHeight: 'true',
+            // Width of the side panel when cc_dialogFullHeight is 'true'.
+            cc_dialogWidth: '420px',
+            // Corner the widget docks to: 'bottom-left' or 'bottom-right' (default).
+            // Forwarded to the widget as `dialogPosition`.
+            cc_widgetPosition: 'bottom-right',
+            // When 'true', storefront content shifts aside for the open side panel
+            // instead of being overlaid by it. Handled template-side by
+            // useCommerceClientPagePush; needs an enabled agent on a full-height
+            // dialog widget (cc_dialogFullHeight 'true') and `lg`+ width.
+            cc_pagePush: 'false',
             // Optional URL of a logo shown in the widget, forwarded as `logoUrl`.
-            commerceClientLogoUrl: ''
-            // Optional: pass `commerceClientSearchConfig` (object) via COMMERCE_AGENT_SETTINGS
+            cc_logoUrl: '',
+            // When 'true', the widget opens automatically as the page loads. Forwarded
+            // to the widget as `componentConfig.isOpen`. Defaults to 'false'.
+            cc_isOpen: 'false',
+            // When 'true', the widget logs its events to the console. Forwarded to the
+            // widget as `isDevelopment`. Defaults to 'false'.
+            cc_isDevelopment: 'false',
+            // When 'true', shoppers can escalate the conversation to a human agent.
+            // Forwarded as `messagingConfig.enableEscalationToAgent`. Defaults to 'false'.
+            cc_enableEscalationToAgent: 'false',
+            // When 'true' (default), shoppers can download the chat transcript.
+            // Forwarded as `messagingConfig.enableDownloadTranscript`.
+            cc_enableDownloadTranscript: 'true',
+            // Optional URL to customer's component override script. Must use HTTPS;
+            // a non-HTTPS or malformed URL is dropped and the widget keeps its defaults.
+            // The script defines Web Components that replace default product cards, carousels,
+            // and custom action payloads. See Commerce Client override documentation.
+            // This origin is added to the `script-src` CSP directive in app/ssr.js, otherwise
+            // the browser blocks the script before it can register window.CimulateOverrides.
+            // Serving the script from a host other than the one configured here (for example
+            // when the URL varies per environment) means adding that hostname to `script-src`
+            // in app/ssr.js yourself.
+            cc_overridesUrl: ''
+            // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
+            // Optional: pass `cc_theme` (object) via COMMERCE_AGENT_SETTINGS to override
+            // the widget theme (primaryColor, secondaryColor, backgroundColor, fontColor,
+            // borderColor, fontFamily).
+            // Optional: pass `cc_routingAttributes` (object) via COMMERCE_AGENT_SETTINGS to
+            // forward Agentforce routing attributes to the widget as `routingAttributes`.
+            // Optional: pass `cc_overrides` (object) via COMMERCE_AGENT_SETTINGS to map widget
+            // override keys (e.g. `ProductTile`) to custom element tag names, such as
+            // {"ProductTile": "my-product-tile"}. Forwarded to the widget as `overrides`. The
+            // elements must already be registered with customElements.define() before the widget
+            // injects. Mutually exclusive with `cc_overridesUrl` — set one or the other, not
+            // both; when both are set `cc_overrides` wins and the URL is ignored.
         },
         url: {
             site: 'path',
