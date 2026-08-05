@@ -36,8 +36,13 @@ const GuestOrderLookupRequest = () => {
     const orderNumberRegex =
         getConfig()?.app?.guestOrderLookup?.orderNumberRegex ?? '^[A-Za-z0-9]{6,20}$'
 
+    // Prefill from query params — matches sf-next /order-lookup?order=<n>&email=<e> pattern
+    const searchParams = new URLSearchParams(location.search)
+    const prefillOrderNo = searchParams.get('order') || ''
+    const prefillEmail = searchParams.get('email') || ''
+
     const form = useForm({
-        defaultValues: {orderNo: '', email: ''}
+        defaultValues: {orderNo: prefillOrderNo, email: prefillEmail}
     })
 
     const {
@@ -55,15 +60,15 @@ const GuestOrderLookupRequest = () => {
                 body: {email}
             })
         } catch (err) {
-            // Non-400 errors: route to verify anyway (anti-enumeration).
-            // 400 errors are also routed to verify — the server rejects
+            // Non-400 errors: route to results anyway (anti-enumeration).
+            // 400 errors are also routed to results — the server rejects
             // malformed payloads, but the UI must never leak order existence.
             if (err?.response?.status === 400) {
-                history.push('/order-lookup/verify', {orderNo, email})
+                history.push(`/order-lookup/results?order=${encodeURIComponent(orderNo)}&email=${encodeURIComponent(email)}`)
                 return
             }
         }
-        history.push('/order-lookup/verify', {orderNo, email})
+        history.push(`/order-lookup/results?order=${encodeURIComponent(orderNo)}&email=${encodeURIComponent(email)}`)
     }
 
     return (
