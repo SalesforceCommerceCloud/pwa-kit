@@ -793,7 +793,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
      * @param {Object} opts
      * @param {string} opts.reason - Diagnostic label for the triggering signal.
      */
-    const performAuthLink = async ({reason}) => {
+    const performAuthLink = async ({reason, force = false}) => {
         const {organizationId: orgId, configSiteId: sid, myDomain: domain} = configRef.current
         if (!orgId || !sid) {
             console.error('[Commerce Client] performAuthLink: missing organizationId or siteId')
@@ -819,10 +819,16 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
 
             // Dedup on (conversation, shopper). conversationId is read here — after
             // the JWT poll — so a still-creating conversation has time to appear.
+            // `force` (set by the new-conversation trigger) bypasses the guard: a
+            // brand-new conversation must always re-link, even when the freshly
+            // read conversationId still matches the previous link key.
             const conversationId = readConversationId()
             const linkKey = `${conversationId || 'unknown'}:${slasIdentity}`
-            if (lastAuthLinkKeyRef.current === linkKey) {
+            if (!force && lastAuthLinkKeyRef.current === linkKey) {
                 // Already linked this exact (conversation, shopper) pair.
+                console.warn(
+                    `[Commerce Client] performAuthLink(${reason}): already linked, skipping`
+                )
                 return
             }
 
@@ -890,7 +896,11 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             return
         }
         const handleWidgetReady = () => {
-            performAuthLinkRef.current({reason: 'widget-ready'})
+            // A new conversation (including after the shopper clears the chat)
+            // must always (re)link to the current shopper. Force past the dedup
+            // guard: the previous conversation's link key would otherwise make
+            // performAuthLink treat this as already-linked and silently no-op.
+            performAuthLinkRef.current({reason: 'widget-ready', force: true})
         }
         window.addEventListener('onCimulateWidgetReady', handleWidgetReady)
         return () => {
