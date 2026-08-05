@@ -152,9 +152,7 @@ const GuestOrderLookupOrder = () => {
         isError,
         error,
         isFetching,
-        dataUpdatedAt,
-        refetch,
-        isSuccess
+        refetch
     } = useQuery({
         queryKey: ['guestOrderLookup', 'order', orderNo],
         queryFn: async () => {
@@ -317,31 +315,24 @@ const GuestOrderLookupOrder = () => {
         }
     }, [])
 
-    const handleRefresh = async () => {
-        const result = await refetch()
-        if (result.error?.status === 404) {
-            history.replace('/order-lookup?expired=1')
-        }
-    }
-
     if (isRegistered) return <Redirect to="/account/orders" />
 
     if (isLoading) {
         return (
-            <Stack spacing={6} py={[6, 8]} px={[4, 6, null, 8]}>
+            <Box layerStyle="page"><Stack spacing={6}>
                 <Skeleton height="20px" width="200px" />
                 <Stack spacing={2}>
                     <Skeleton height="32px" width="200px" />
                     <Skeleton height="20px" width="150px" />
                 </Stack>
                 <Skeleton height="300px" />
-            </Stack>
+            </Stack></Box>
         )
     }
 
     if (isError && error?.status !== 404) {
         return (
-            <Stack spacing={4} py={[6, 8]} px={[4, 6, null, 8]}>
+            <Box layerStyle="page"><Stack spacing={4}>
                 <Box p={4} bg="red.50" borderRadius="md" role="alert">
                     <Text color="red.700">
                         <FormattedMessage
@@ -356,20 +347,11 @@ const GuestOrderLookupOrder = () => {
                         />
                     </Button>
                 </Box>
-            </Stack>
+            </Stack></Box>
         )
     }
 
     if (!order) return null
-
-    const lastUpdatedTime =
-        isSuccess && dataUpdatedAt
-            ? new Intl.DateTimeFormat(undefined, {
-                  hour: 'numeric',
-                  minute: '2-digit',
-                  second: '2-digit'
-              }).format(new Date(dataUpdatedAt))
-            : null
 
     const itemCount = order.productItems?.reduce((n, item) => n + item.quantity, 0) || 0
     const canCancel = !cancelSuccess && isCancellable(order)
@@ -381,7 +363,7 @@ const GuestOrderLookupOrder = () => {
     const itemsByShipmentId = groupProductItemsByShipmentId(order.productItems)
 
     return (
-        <Stack spacing={6} py={[6, 8]} px={[4, 6, null, 8]} data-testid="guest-order-details-page">
+        <Box layerStyle="page" data-testid="guest-order-details-page"><Stack spacing={6}>
             {/* Breadcrumb: Home > Order Lookup > #orderNo */}
             <Breadcrumb
                 separator={<ChevronRightIcon color="gray.500" boxSize="12px" />}
@@ -456,44 +438,6 @@ const GuestOrderLookupOrder = () => {
                     </Text>
                 </Stack>
             </Stack>
-
-            {/* Refresh Status + last-updated timestamp */}
-            <Flex align="center" gap={3}>
-                <Button
-                    onClick={handleRefresh}
-                    isLoading={isFetching}
-                    loadingText={formatMessage({
-                        id: 'guestOrderLookup.order.button.refreshing',
-                        defaultMessage: 'Refreshing…'
-                    })}
-                    variant="outline"
-                    size="sm"
-                    aria-label={formatMessage({
-                        id: 'guestOrderLookup.order.button.refreshStatus.aria',
-                        defaultMessage: 'Refresh order status'
-                    })}
-                >
-                    <FormattedMessage
-                        id="guestOrderLookup.order.button.refreshStatus"
-                        defaultMessage="Refresh Status"
-                    />
-                </Button>
-                {lastUpdatedTime && (
-                    <Text
-                        fontSize="xs"
-                        color="gray.500"
-                        data-testid="last-updated"
-                        aria-live="polite"
-                        aria-atomic="true"
-                    >
-                        <FormattedMessage
-                            id="guestOrderLookup.order.lastUpdated"
-                            defaultMessage="Last updated at {time}"
-                            values={{time: lastUpdatedTime}}
-                        />
-                    </Text>
-                )}
-            </Flex>
 
             {/* Cancel / Return buttons — only when OMS is active */}
             {showActions && (
@@ -814,7 +758,7 @@ const GuestOrderLookupOrder = () => {
                 onClearSubmitError={() => setReturnError(null)}
                 onRefetchReasons={handleRefetchReasons}
             />
-        </Stack>
+        </Stack></Box>
     )
 }
 
