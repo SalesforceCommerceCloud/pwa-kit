@@ -171,7 +171,7 @@ export default () => {
             exact: true
         },
         guestOrderLookupEnabled && {
-            path: '/order-lookup/order',
+            path: '/order-lookup/order/:orderNo',
             component: GuestOrderLookupOrder,
             exact: true
         }
