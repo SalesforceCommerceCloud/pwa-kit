@@ -791,7 +791,7 @@ const {handler} = runtime.createHandler(options, (app) => {
 
         const orderNo = req.params.orderNo
         if (!orderNo || !cookieData[orderNo])
-            return res.status(404).json({error: 'No session for this order'})
+            return res.status(403).json({error: 'No verified session for this order'})
 
         const {email, verifiedCode} = cookieData[orderNo]
         const correlationId = req.headers['x-correlation-id']
