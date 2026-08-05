@@ -749,7 +749,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         // orderNo passed as query param (never in path — security constraint)
         const orderNo = req.query?.orderNo
         if (!orderNo || !cookieData[orderNo])
-            return res.status(404).json({error: 'No session for this order'})
+            return res.status(403).json({error: 'No verified session for this order'})
 
         const {email, accessCode} = cookieData[orderNo]
         const correlationId = req.headers['x-correlation-id']
