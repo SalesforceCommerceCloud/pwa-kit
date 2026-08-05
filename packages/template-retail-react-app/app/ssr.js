@@ -37,6 +37,19 @@ function getSiteIdFromRequest(req) {
     return req.headers['x-site-id'] || null
 }
 
+// Route server-side SCAPI calls through the MRT proxy so they work in Lambda.
+// MRT Lambdas have no direct outbound internet; all external API traffic must
+// go via /mobify/proxy/api (same path the client SDK uses).
+function makeShopperOrders(apiParams, authorization) {
+    const {clientId, organizationId, shortCode, siteId} = apiParams
+    const proxy = `${getAppOrigin()}${getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
+    return new ShopperOrders({
+        parameters: {clientId, organizationId, shortCode, siteId},
+        headers: {authorization},
+        proxy
+    })
+}
+
 function parseCookieValue(req, cookieName) {
     const raw = req.headers?.cookie
         ?.split(';')
@@ -757,20 +770,12 @@ const {handler} = runtime.createHandler(options, (app) => {
         const start = Date.now()
 
         try {
-            const {clientId, organizationId, shortCode, siteId: configSiteId} =
-                appConfig.commerceAPI.parameters
-            const shopperOrders = new ShopperOrders({
-                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
-                headers: {authorization}
-            })
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
 
             const order = await shopperOrders.guestOrderLookup({
                 parameters: {orderNo},
                 body: {orderViewCode: accessCode, email}
             })
-            console.log('[GOL verify] guestOrderLookup response keys:', Object.keys(order || {}))
-            if (!order?.orderNo) console.log('[GOL verify] SCAPI error body:', JSON.stringify(order))
-
             // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
             if (!order?.orderNo) {
                 const title = order?.title || ''
@@ -785,7 +790,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             // Apply guest field allowlist
             const filtered = filterGuestOrderFields(order)
 
-            const siteId = getSiteIdFromRequest(req) || configSiteId
+            const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
             const cookieName = `cc-goa_${siteId}`
             const existing = parseGuestOrderCookie(req, cookieName)
             existing[orderNo] = {email, verifiedCode: accessCode}
@@ -847,12 +852,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         const start = Date.now()
 
         try {
-            const {clientId, organizationId, shortCode, siteId: configSiteId} =
-                appConfig.commerceAPI.parameters
-            const shopperOrders = new ShopperOrders({
-                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
-                headers: {authorization}
-            })
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             const order = await shopperOrders.guestOrderLookup({
                 parameters: {orderNo},
                 body: {orderViewCode: verifiedCode, email}
@@ -922,12 +922,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             return res.status(401).json({error: 'No active session'})
 
         try {
-            const {clientId, organizationId, shortCode, siteId: configSiteId} =
-                appConfig.commerceAPI.parameters
-            const shopperOrders = new ShopperOrders({
-                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
-                headers: {authorization}
-            })
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             const meta = await shopperOrders.getOmsMetaData({parameters: {}})
             return res.json({
                 omsActive: meta.omsActive ?? false,
@@ -971,12 +966,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             return res.status(400).json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
 
         try {
-            const {clientId, organizationId, shortCode, siteId: configSiteId} =
-                appConfig.commerceAPI.parameters
-            const shopperOrders = new ShopperOrders({
-                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
-                headers: {authorization}
-            })
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             await shopperOrders.cancelOmsOrder({
                 parameters: {orderNo},
                 body: reason && typeof reason === 'string' ? {reason} : {}
@@ -1031,12 +1021,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
 
         try {
-            const {clientId, organizationId, shortCode, siteId: configSiteId} =
-                appConfig.commerceAPI.parameters
-            const shopperOrders = new ShopperOrders({
-                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
-                headers: {authorization}
-            })
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             await shopperOrders.returnOmsOrder({
                 parameters: {orderNo},
                 body: {productItems}
