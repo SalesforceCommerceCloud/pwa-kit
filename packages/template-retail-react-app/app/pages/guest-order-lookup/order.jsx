@@ -21,25 +21,17 @@ import {
     Stack,
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useCustomerType, useAccessToken, useProducts} from '@salesforce/commerce-sdk-react'
+import {useCustomerType, useAccessToken} from '@salesforce/commerce-sdk-react'
 import {Redirect, useHistory, useParams, Link as RouterLink} from 'react-router-dom'
 import {ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
-import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
-import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
-import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
-import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
+import OrderProducts, {groupProductItemsByShipmentId} from '@salesforce/retail-react-app/app/components/order-products'
 import OrderStatusBadge from '@salesforce/retail-react-app/app/components/order-status-badge'
 import ShipmentStatusLabel from '@salesforce/retail-react-app/app/components/order-tracking/shipment-status-label'
 import OrderTracking from '@salesforce/retail-react-app/app/components/order-tracking'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
 import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
-import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
-import PropTypes from 'prop-types'
-
-const onClient = typeof window !== 'undefined'
 
 // Fields suppressed by the server — asserted here as a client-side security backstop (S10).
 // Any value from this set must never appear rendered in the DOM.
@@ -52,74 +44,6 @@ export const GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS = new Set([
     'orderToken',
     'orderViewCode'
 ])
-
-const groupProductItemsByShipmentId = (productItems) =>
-    (productItems || []).reduce((acc, item) => {
-        const sid = item.shipmentId ?? 'default'
-        if (!acc[sid]) acc[sid] = []
-        acc[sid].push(item)
-        return acc
-    }, {})
-
-const OrderProducts = ({productItems, currency}) => {
-    const productIds = (productItems || []).map((item) => item.productId)
-    const {data: products, isLoading} = useProducts(
-        {parameters: {ids: productIds}},
-        {
-            enabled: productIds.length > 0 && onClient,
-            select: (result) =>
-                result?.data?.reduce((acc, item) => {
-                    acc[item.id] = item
-                    return acc
-                }, {})
-        }
-    )
-    const consolidated = consolidateDuplicateBonusProducts(productItems || [])
-    const variants = consolidated.map((item) => {
-        const product = products?.[item.productId]
-        return {...(product || {}), isProductUnavailable: !product, ...item}
-    })
-
-    return (
-        <>
-            {!isLoading &&
-                variants.map((variant, index) => (
-                    <Box
-                        key={index}
-                        p={[4, 6]}
-                        border="1px solid"
-                        borderColor="gray.100"
-                        borderRadius="base"
-                    >
-                        <ItemVariantProvider variant={variant} currency={currency}>
-                            <Flex width="full" alignItems="flex-start">
-                                <CartItemVariantImage width={['88px', 36]} mr={4} />
-                                <Stack spacing={1} marginTop="-3px" flex={1}>
-                                    <CartItemVariantName />
-                                    <Flex
-                                        width="full"
-                                        justifyContent="space-between"
-                                        alignItems="flex-end"
-                                    >
-                                        <CartItemVariantAttributes
-                                            includeQuantity
-                                            currency={currency}
-                                        />
-                                        <CartItemVariantPrice currency={currency} />
-                                    </Flex>
-                                </Stack>
-                            </Flex>
-                        </ItemVariantProvider>
-                    </Box>
-                ))}
-        </>
-    )
-}
-
-OrderProducts.propTypes = {
-    productItems: PropTypes.array.isRequired,
-    currency: PropTypes.string
-}
 
 /**
  * All-or-nothing cancel eligibility: every product item must have its full
