@@ -16,7 +16,7 @@ import {
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCustomerType, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
-import {Redirect, useHistory} from 'react-router-dom'
+import {Redirect, useHistory, useLocation} from 'react-router-dom'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import Field from '@salesforce/retail-react-app/app/components/field'
 
@@ -24,6 +24,7 @@ const GuestOrderLookupRequest = () => {
     const {formatMessage} = useIntl()
     const {isRegistered} = useCustomerType()
     const history = useHistory()
+    const location = useLocation()
 
     const {mutateAsync: requestOrderAccessCode, isLoading} =
         useShopperOrdersMutation('requestOrderAccessCode')
@@ -31,11 +32,16 @@ const GuestOrderLookupRequest = () => {
     const orderNumberRegex =
         getConfig()?.app?.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$'
 
+    // Prefill from query params — matches sf-next /order-lookup?order=<n>&email=<e> pattern
+    const searchParams = new URLSearchParams(location.search)
+    const prefillOrderNo = searchParams.get('order') || ''
+    const prefillEmail = searchParams.get('email') || ''
+
     const {
         control,
         handleSubmit,
         formState: {errors}
-    } = useForm({defaultValues: {orderNo: '', email: ''}})
+    } = useForm({defaultValues: {orderNo: prefillOrderNo, email: prefillEmail}})
 
     if (isRegistered) return <Redirect to="/account/orders" />
 
@@ -46,13 +52,13 @@ const GuestOrderLookupRequest = () => {
                 body: {email}
             })
         } catch (err) {
-            // Route to verify regardless (anti-enumeration — never leak order existence).
+            // Route to results regardless (anti-enumeration — never leak order existence).
             if (err?.response?.status === 400) {
-                history.push('/order-lookup/verify', {orderNo, email})
+                history.push(`/order-lookup/results?order=${encodeURIComponent(orderNo)}&email=${encodeURIComponent(email)}`)
                 return
             }
         }
-        history.push('/order-lookup/verify', {orderNo, email})
+        history.push(`/order-lookup/results?order=${encodeURIComponent(orderNo)}&email=${encodeURIComponent(email)}`)
     }
 
     return (

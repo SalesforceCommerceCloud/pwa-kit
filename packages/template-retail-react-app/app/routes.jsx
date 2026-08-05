@@ -53,8 +53,7 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
 const PaymentProcessing = loadable(() => import('./pages/checkout/payment-processing'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 const GuestOrderLookupRequest = loadable(() => import('./pages/guest-order-lookup/request'), {fallback})
-const GuestOrderLookupVerify = loadable(() => import('./pages/guest-order-lookup/verify'), {fallback})
-const GuestOrderLookupOrder = loadable(() => import('./pages/guest-order-lookup/order'), {fallback})
+const GuestOrderLookupResults = loadable(() => import('./pages/guest-order-lookup/results'), {fallback})
 
 export const routes = [
     {
@@ -166,13 +165,8 @@ export default () => {
             exact: true
         },
         guestOrderLookupEnabled && {
-            path: '/order-lookup/verify',
-            component: GuestOrderLookupVerify,
-            exact: true
-        },
-        guestOrderLookupEnabled && {
-            path: '/order-lookup/order/:orderNo',
-            component: GuestOrderLookupOrder,
+            path: '/order-lookup/results',
+            component: GuestOrderLookupResults,
             exact: true
         }
     ].filter(Boolean)
