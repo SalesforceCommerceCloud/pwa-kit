@@ -6,7 +6,7 @@
  */
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useQuery, useQueryClient} from '@tanstack/react-query'
+import {useQuery} from '@tanstack/react-query'
 import {
     Alert,
     AlertIcon,
@@ -78,7 +78,6 @@ const GuestOrderLookupResults = () => {
     const history = useHistory()
     const location = useLocation()
     const {getTokenWhenReady} = useAccessToken()
-    const queryClient = useQueryClient()
 
     // Read order number and email from query params — matches sf-next /order-lookup/results?order=<n>&email=<e>
     const searchParams = new URLSearchParams(location.search)
@@ -257,9 +256,9 @@ const GuestOrderLookupResults = () => {
                 body: JSON.stringify({orderNo, email, accessCode: enteredCode})
             })
             if (res.ok) {
-                const orderData = await res.json()
-                // Seed the cache so the order details render immediately without a server round-trip.
-                queryClient.setQueryData(['guestOrderLookup', 'order', orderNo], orderData)
+                // Cookie is now written server-side. Refetch so the query transitions
+                // out of error state and renders order details.
+                await refetch()
                 return
             }
             if (res.status === 404) {
