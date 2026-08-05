@@ -243,7 +243,7 @@ describe('filterGuestOrderFields', () => {
         expect(result.paymentInstruments[0].expirationYear).toBeUndefined()
     })
 
-    test('shipments: keeps trackingNumber, postalCode, shippingStatus; suppresses full address', () => {
+    test('shipments: keeps trackingNumber, shippingStatus, and full shippingAddress', () => {
         const order = {
             shipments: [
                 {
@@ -264,9 +264,9 @@ describe('filterGuestOrderFields', () => {
         const result = filterGuestOrderFields(order)
         expect(result.shipments[0].trackingNumber).toBe('TRACK123')
         expect(result.shipments[0].shippingAddress.postalCode).toBe('90210')
-        expect(result.shipments[0].shippingAddress.address1).toBeUndefined()
-        expect(result.shipments[0].shippingAddress.city).toBeUndefined()
-        expect(result.shipments[0].shippingAddress.stateCode).toBeUndefined()
+        expect(result.shipments[0].shippingAddress.address1).toBe('123 Secret St')
+        expect(result.shipments[0].shippingAddress.city).toBe('Springfield')
+        expect(result.shipments[0].shippingAddress.stateCode).toBe('CA')
     })
 
     test('returns the input unchanged for null/non-object inputs', () => {
@@ -758,11 +758,6 @@ describe('app.guestOrderLookup config block', () => {
         const config = {app: {}}
         expect(() => config?.app?.guestOrderLookup?.enabled).not.toThrow()
         expect(config?.app?.guestOrderLookup?.enabled).toBeUndefined()
-<<<<<<<< HEAD:packages/template-retail-react-app/app/__tests__/guest-order-lookup/guest-order-access.test.js
-<<<<<<<< HEAD:packages/template-retail-react-app/app/__tests__/guest-order-lookup/guest-order-access.test.js
-========
-========
->>>>>>>> origin/glo/tests-docs:packages/template-retail-react-app/app/__tests__/guest-order-lookup/guest-order-lookup.test.js
     })
 })
 
@@ -905,6 +900,5 @@ describe('S15: createVerifyThrottle', () => {
         throttle({path: '/api/order-lookup/verify', ip: 'fallback', headers: {'x-forwarded-for': '2.2.2.2'}}, resB, nextB)
         expect(nextB).toHaveBeenCalled()
         expect(resB.status).not.toHaveBeenCalled()
->>>>>>>> origin/glo/error-i18n-a11y:packages/template-retail-react-app/app/__tests__/guest-order-lookup/guest-order-lookup.test.js
     })
 })

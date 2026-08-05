@@ -2788,7 +2788,7 @@
   "guestOrderLookup.request.button.submit": [
     {
       "type": 0,
-      "value": "Send Access Code"
+      "value": "Find My Order"
     }
   ],
   "guestOrderLookup.request.error.emailInvalid": [
@@ -2818,25 +2818,25 @@
   "guestOrderLookup.request.heading": [
     {
       "type": 0,
-      "value": "Find Your Order"
+      "value": "Look Up Your Order"
     }
   ],
   "guestOrderLookup.request.label.email": [
     {
       "type": 0,
-      "value": "Email Address"
+      "value": "Email address"
     }
   ],
   "guestOrderLookup.request.label.orderNumber": [
     {
       "type": 0,
-      "value": "Order Number"
+      "value": "Order number"
     }
   ],
   "guestOrderLookup.request.subtext": [
     {
       "type": 0,
-      "value": "Enter your order number and email address to receive a one-time access code."
+      "value": "Enter your order details to track your order or view your receipt."
     }
   ],
   "guestOrderLookup.verify.button.submit": [
@@ -2866,7 +2866,7 @@
   "guestOrderLookup.verify.error.invalidCode": [
     {
       "type": 0,
-      "value": "Code invalid or expired. Please try again or request a new code."
+      "value": "The code you entered is invalid or has expired. Please try again."
     }
   ],
   "guestOrderLookup.verify.error.requestNewCode": [
@@ -2884,31 +2884,37 @@
   "guestOrderLookup.verify.heading": [
     {
       "type": 0,
-      "value": "Enter Your Access Code"
+      "value": "Verify Your Email"
     }
   ],
   "guestOrderLookup.verify.label.code": [
     {
       "type": 0,
-      "value": "Access Code"
+      "value": "Verification code"
     }
   ],
-  "guestOrderLookup.verify.resend.link": [
+  "guestOrderLookup.verify.label.digitN": [
     {
       "type": 0,
-      "value": "Resend code"
-    }
-  ],
-  "guestOrderLookup.verify.resend.prompt": [
+      "value": "Digit "
+    },
+    {
+      "type": 1,
+      "value": "n"
+    },
     {
       "type": 0,
-      "value": "Didn't receive a code?"
+      "value": " of "
+    },
+    {
+      "type": 1,
+      "value": "total"
     }
   ],
   "guestOrderLookup.verify.subtext": [
     {
       "type": 0,
-      "value": "We've sent a 6-digit code to "
+      "value": "We've sent a verification code to "
     },
     {
       "type": 1,
@@ -2916,13 +2922,7 @@
     },
     {
       "type": 0,
-      "value": ". It may take a moment to arrive."
-    }
-  ],
-  "guestOrderLookup.verify.toast.resent": [
-    {
-      "type": 0,
-      "value": "Check your inbox — it may take a moment."
+      "value": ". Please enter it below."
     }
   ],
   "header.button.assistive_msg.ask_shopping_agent": [

@@ -85,6 +85,5 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         }
         return {invalidate}
     },
-    // @ts-expect-error SDK 26.8 pending — requestOrderAccessCode is not yet in commerce-sdk-isomorphic 5.4.0
     requestOrderAccessCode: () => ({})
 }

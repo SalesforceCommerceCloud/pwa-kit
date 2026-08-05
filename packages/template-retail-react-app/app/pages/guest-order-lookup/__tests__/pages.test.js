@@ -67,7 +67,7 @@ const guestOrderLookupConfig = {
         ...mockConfig.app,
         guestOrderLookup: {
             enabled: true,
-            orderNumberRegex: '^[A-Za-z0-9]{6,20}$'
+            orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$'
         }
     }
 }
@@ -126,10 +126,10 @@ describe('GuestOrderLookupRequest', () => {
 
     test('renders heading and form fields for guest users', () => {
         renderWithProviders(<GuestOrderLookupRequest />)
-        expect(screen.getByText('Find Your Order')).toBeInTheDocument()
-        expect(screen.getByLabelText('Order Number')).toBeInTheDocument()
-        expect(screen.getByLabelText('Email Address')).toBeInTheDocument()
-        expect(screen.getByRole('button', {name: /send access code/i})).toBeInTheDocument()
+        expect(screen.getByText('Look Up Your Order')).toBeInTheDocument()
+        expect(screen.getByLabelText('Order number')).toBeInTheDocument()
+        expect(screen.getByLabelText('Email address')).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /find my order/i})).toBeInTheDocument()
     })
 
     test('redirects to /account/orders when user is registered', () => {
@@ -140,14 +140,14 @@ describe('GuestOrderLookupRequest', () => {
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
-        expect(screen.queryByText('Find Your Order')).not.toBeInTheDocument()
+        expect(screen.queryByText('Look Up Your Order')).not.toBeInTheDocument()
         expect(screen.getByText('Account Orders')).toBeInTheDocument()
     })
 
     test('shows validation error when order number is empty', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByText('Order number is required')).toBeInTheDocument()
         })
@@ -156,9 +156,9 @@ describe('GuestOrderLookupRequest', () => {
     test('shows validation error when email is empty', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        const orderInput = screen.getByLabelText('Order Number')
+        const orderInput = screen.getByLabelText('Order number')
         await user.type(orderInput, 'ABC123')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByText('Email address is required')).toBeInTheDocument()
         })
@@ -167,11 +167,11 @@ describe('GuestOrderLookupRequest', () => {
     test('shows validation error when order number does not match regex', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        const orderInput = screen.getByLabelText('Order Number')
+        const orderInput = screen.getByLabelText('Order number')
         await user.type(orderInput, '!!!')
-        const emailInput = screen.getByLabelText('Email Address')
+        const emailInput = screen.getByLabelText('Email address')
         await user.type(emailInput, 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByText('Enter a valid order number')).toBeInTheDocument()
         })
@@ -184,9 +184,9 @@ describe('GuestOrderLookupRequest', () => {
                 <GuestOrderLookupRequest />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {orderNo: 'ABC123'},
@@ -211,9 +211,9 @@ describe('GuestOrderLookupRequest', () => {
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
             expect(screen.getByTestId('verify-page').textContent).toContain('ABC123')
@@ -233,9 +233,9 @@ describe('GuestOrderLookupRequest', () => {
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
         })
@@ -253,24 +253,22 @@ describe('GuestOrderLookupRequest', () => {
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
         })
     })
 
-    // S11 — expired=1 banner
-    test('shows session-expired alert when ?expired=1 is in the URL', () => {
+    // S11 — expired=1 banner was removed in the redesign (no server session concept in this flow)
+    test('does not show expired alert on any URL', () => {
         renderWithProviders(
             <MemoryRouter initialEntries={['/order-lookup?expired=1']}>
                 <Route path="/order-lookup" component={GuestOrderLookupRequest} />
             </MemoryRouter>
         )
-        expect(
-            screen.getByText(/your session has expired/i)
-        ).toBeInTheDocument()
+        expect(screen.queryByText(/your session has expired/i)).not.toBeInTheDocument()
     })
 
     test('does not show expired alert when ?expired=1 is absent', () => {
@@ -294,10 +292,12 @@ describe('GuestOrderLookupVerify', () => {
         useQuery.mockReturnValue(defaultUseQueryMock())
     })
 
-    test('renders heading and code input for guest users with valid router state', () => {
+    test('renders heading and code inputs for guest users with valid router state', () => {
         renderVerifyWithState()
-        expect(screen.getByText('Enter Your Access Code')).toBeInTheDocument()
-        expect(screen.getByLabelText('Access Code')).toBeInTheDocument()
+        expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
+        // 6 individual digit inputs
+        expect(screen.getByLabelText('Digit 1 of 6')).toBeInTheDocument()
+        expect(screen.getByLabelText('Digit 6 of 6')).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /verify code/i})).toBeInTheDocument()
     })
 
@@ -340,34 +340,33 @@ describe('GuestOrderLookupVerify', () => {
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
-        expect(screen.queryByText('Enter Your Access Code')).not.toBeInTheDocument()
+        expect(screen.queryByText('Verify Your Email')).not.toBeInTheDocument()
         expect(screen.getByText('Account Orders')).toBeInTheDocument()
     })
 
-    test('shows validation error when code is empty', async () => {
-        const user = userEvent.setup()
-        renderVerifyWithState()
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(screen.getByText('Access code is required')).toBeInTheDocument()
-        })
-    })
+    // Helper: type a 6-digit code into individual digit inputs
+    const typeOtpCode = async (user, code) => {
+        for (let i = 0; i < code.length; i++) {
+            await user.type(screen.getByLabelText(`Digit ${i + 1} of 6`), code[i])
+        }
+    }
 
-    test('shows validation error when code is not 6 digits', async () => {
+    test('verify button is disabled until all 6 digits are entered', async () => {
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '123')
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(screen.getByText('Enter the 6-digit code from your email')).toBeInTheDocument()
-        })
+        const btn = screen.getByRole('button', {name: /verify code/i})
+        expect(btn).toBeDisabled()
+        await typeOtpCode(user, '12345')
+        expect(btn).toBeDisabled()
+        await user.type(screen.getByLabelText('Digit 6 of 6'), '6')
+        expect(btn).not.toBeDisabled()
     })
 
     test('calls verify endpoint with correct body and Authorization header on submit', async () => {
         global.fetch.mockResolvedValue({ok: true, status: 200})
         const user = userEvent.setup()
         renderVerifyWithState({orderNo: 'ABC123', email: 'test@example.com'})
-        await user.type(screen.getByLabelText('Access Code'), '123456')
+        await typeOtpCode(user, '123456')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalledWith(
@@ -404,7 +403,7 @@ describe('GuestOrderLookupVerify', () => {
                 <Route path="/order-lookup/order" render={() => <div>Order Page</div>} />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Access Code'), '123456')
+        await typeOtpCode(user, '123456')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Order Page')).toBeInTheDocument()
@@ -415,11 +414,13 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 404})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(
-                screen.getByText('Code invalid or expired. Please try again or request a new code.')
+                screen.getByText(
+                    'The code you entered is invalid or has expired. Please try again.'
+                )
             ).toBeInTheDocument()
         })
     })
@@ -428,7 +429,7 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 429})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(
@@ -441,7 +442,7 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
@@ -452,116 +453,51 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockRejectedValue(new Error('network error'))
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
         })
     })
 
-    test('resend code fires mutation with correct args', async () => {
-        const user = userEvent.setup()
-        renderVerifyWithState({orderNo: 'ABC123', email: 'test@example.com'})
-        await user.click(screen.getByText('Resend code'))
-        await waitFor(() => {
-            expect(mockMutateAsync).toHaveBeenCalledWith({
-                parameters: {orderNo: 'ABC123'},
-                body: {email: 'test@example.com'}
-            })
-        })
-    })
-
-    test('resend code briefly disables the link to prevent rapid-fire clicks', async () => {
-        const user = userEvent.setup()
-        renderVerifyWithState()
-        const resendLink = screen.getByText('Resend code')
-        await user.click(resendLink)
-        await waitFor(() => {
-            expect(resendLink).toHaveAttribute('aria-disabled', 'true')
-        })
-    })
-
-    // ── S13: "Request a new code" link on 404 error ────────────────────────────
-    test('S13: shows "Request a new code" link when 404 error occurs', async () => {
-        global.fetch.mockResolvedValue({ok: false, status: 404})
-        const user = userEvent.setup()
-        renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(screen.getByText('Request a new code')).toBeInTheDocument()
-        })
-    })
-
-    test('S13: "Request a new code" link routes to /order-lookup on 404 error', async () => {
-        global.fetch.mockResolvedValue({ok: false, status: 404})
-        const user = userEvent.setup()
-        renderWithProviders(
-            <MemoryRouter
-                initialEntries={[
-                    {pathname: '/order-lookup/verify', state: {orderNo: 'ABC123', email: 'test@example.com'}}
-                ]}
-            >
-                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
-                <Route path="/order-lookup" exact render={() => <div data-testid="request-page">Request Page</div>} />
-            </MemoryRouter>
-        )
-        await user.type(screen.getByLabelText('Access Code'), '999999')
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(screen.getByText('Request a new code')).toBeInTheDocument()
-        })
-        // The link href points to /order-lookup
-        const link = screen.getByText('Request a new code')
-        expect(link).toHaveAttribute('href', '/order-lookup')
-    })
-
+    // ── S13: error UX ──────────────────────────────────────────────────────────
     test('S13: submit button re-enables after a server error', async () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
         })
-        // Button should be re-enabled (not disabled) after error
+        // Button re-enables (all 6 digits still present, isSubmitting=false)
         expect(screen.getByRole('button', {name: /verify code/i})).not.toBeDisabled()
     })
 
-    test('S13: "Request a new code" link does NOT appear on 429 or 500 errors', async () => {
-        global.fetch.mockResolvedValue({ok: false, status: 429})
-        const user = userEvent.setup()
+    test('S13: no resend link is shown (API enforces 15-min cooldown)', () => {
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(
-                screen.getByText('Too many attempts. Please wait a moment and try again.')
-            ).toBeInTheDocument()
-        })
-        expect(screen.queryByText('Request a new code')).not.toBeInTheDocument()
+        expect(screen.queryByText(/resend/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/request a new code/i)).not.toBeInTheDocument()
     })
 
     // ── S17: A11y attributes ────────────────────────────────────────────────────
-    test('S17: OTP input does not have aria-invalid=true when no error', () => {
+    test('S17: digit inputs do not have aria-invalid when no error', () => {
         renderVerifyWithState()
-        const input = screen.getByLabelText('Access Code')
-        // When no error, aria-invalid is either absent or 'false' — either is correct
+        const input = screen.getByLabelText('Digit 1 of 6')
         const ariaInvalid = input.getAttribute('aria-invalid')
         expect(ariaInvalid === null || ariaInvalid === 'false').toBe(true)
     })
 
-    test('S17: OTP input has aria-invalid=true when server error is present', async () => {
+    test('S17: digit inputs have aria-invalid=true when server error is present', async () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
         })
-        const input = screen.getByLabelText('Access Code')
+        const input = screen.getByLabelText('Digit 1 of 6')
         expect(input).toHaveAttribute('aria-invalid', 'true')
     })
 
@@ -569,29 +505,27 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
         })
-        // The error message container has role="alert"
-        const alert = screen.getByRole('alert')
-        expect(alert).toBeInTheDocument()
+        // Chakra Alert renders with role="alert"
+        expect(screen.getByRole('alert')).toBeInTheDocument()
     })
 
-    test('S17: OTP input aria-describedby includes server error element id when error is present', async () => {
+    test('S17: digit input has aria-describedby pointing to error when error is present', async () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
         })
-        const input = screen.getByLabelText('Access Code')
-        // Chakra FormControl may append additional ids; verify ours is included
+        const input = screen.getByLabelText('Digit 1 of 6')
         const describedBy = input.getAttribute('aria-describedby') || ''
-        expect(describedBy).toContain('accessCode-server-error')
+        expect(describedBy).toContain('otp-error')
     })
 })
 

@@ -262,11 +262,13 @@ describe('filterGuestOrderFields', () => {
         expect(result.customerInfo.globalPartyId).toBeUndefined()
     })
 
-    test('paymentInstruments: keeps only maskedNumber, cardType, paymentMethodId', () => {
+    test('paymentInstruments: keeps paymentInstrumentId, paymentMethodId, cardType, numberLastDigits, maskedNumber', () => {
         const order = {
             paymentInstruments: [
                 {
+                    paymentInstrumentId: 'pi-abc',
                     maskedNumber: '****4242',
+                    numberLastDigits: '4242',
                     cardType: 'Visa',
                     paymentMethodId: 'CREDIT_CARD',
                     paymentCard: {holder: 'John Doe'},
@@ -277,38 +279,50 @@ describe('filterGuestOrderFields', () => {
         }
         const result = filterGuestOrderFields(order)
         expect(result.paymentInstruments).toHaveLength(1)
-        expect(result.paymentInstruments[0].maskedNumber).toBe('****4242')
-        expect(result.paymentInstruments[0].cardType).toBe('Visa')
+        expect(result.paymentInstruments[0].paymentInstrumentId).toBe('pi-abc')
         expect(result.paymentInstruments[0].paymentMethodId).toBe('CREDIT_CARD')
+        expect(result.paymentInstruments[0].cardType).toBe('Visa')
+        expect(result.paymentInstruments[0].numberLastDigits).toBe('4242')
+        expect(result.paymentInstruments[0].maskedNumber).toBe('****4242')
         expect(result.paymentInstruments[0].paymentCard).toBeUndefined()
         expect(result.paymentInstruments[0].expirationMonth).toBeUndefined()
         expect(result.paymentInstruments[0].expirationYear).toBeUndefined()
     })
 
-    test('shipments: keeps trackingNumber, postalCode, shippingStatus; suppresses full address', () => {
+    test('shipments: keeps full shippingAddress, tracking fields, shipmentId, shippingStatus', () => {
         const order = {
             shipments: [
                 {
+                    shipmentId: 'ship-1',
                     trackingNumber: 'TRACK123',
                     trackingUrl: 'https://carrier.com/track',
                     expectedDeliveryDate: '2026-02-01',
                     shippingStatus: 'shipped',
                     shippingAddress: {
-                        address1: '123 Secret St',
+                        firstName: 'Jane',
+                        lastName: 'Doe',
+                        address1: '123 Main St',
+                        address2: 'Apt 4',
                         city: 'Springfield',
-                        postalCode: '90210',
-                        stateCode: 'CA'
+                        stateCode: 'CA',
+                        countryCode: 'US',
+                        postalCode: '90210'
                     },
                     shippingMethod: {name: 'Standard'}
                 }
             ]
         }
         const result = filterGuestOrderFields(order)
+        expect(result.shipments[0].shipmentId).toBe('ship-1')
         expect(result.shipments[0].trackingNumber).toBe('TRACK123')
+        expect(result.shipments[0].shippingStatus).toBe('shipped')
         expect(result.shipments[0].shippingAddress.postalCode).toBe('90210')
-        expect(result.shipments[0].shippingAddress.address1).toBeUndefined()
-        expect(result.shipments[0].shippingAddress.city).toBeUndefined()
-        expect(result.shipments[0].shippingAddress.stateCode).toBeUndefined()
+        expect(result.shipments[0].shippingAddress.address1).toBe('123 Main St')
+        expect(result.shipments[0].shippingAddress.city).toBe('Springfield')
+        expect(result.shipments[0].shippingAddress.stateCode).toBe('CA')
+        expect(result.shipments[0].shippingAddress.firstName).toBe('Jane')
+        expect(result.shipments[0].shippingAddress.lastName).toBe('Doe')
+        expect(result.shipments[0].shippingAddress.countryCode).toBe('US')
     })
 
     test('returns the input unchanged for null/non-object inputs', () => {
@@ -764,7 +778,7 @@ describe('app.guestOrderLookup config block', () => {
         // Test that the shape of the default config is correct
         const defaultConfig = {
             enabled: false,
-            orderNumberRegex: '^[A-Za-z0-9]{6,20}$',
+            orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$',
             requestCodeThrottle: {windowMs: 60000, max: 5}
         }
         expect(defaultConfig.enabled).toBe(false)
@@ -1258,7 +1272,7 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({error: 'orderNo is required'})
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'orderNo is required'})
     })
 
     test('400: orderNo fails regex', async () => {
@@ -1274,7 +1288,7 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({error: 'Invalid orderNo format'})
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
     })
 
     test('503: feature flag off', async () => {
@@ -1368,12 +1382,16 @@ describe('POST /api/order-lookup/return — real handler', () => {
 
     // Helper for SCAPI 400 errors with a cloneable response body (RFC 7807).
     // ssr.js catch block does: (await err.response.json())?.errorCode
-    const makeApiError = (status, errorCode) => ({
-        response: {
-            status,
-            json: async () => ({errorCode})
+    const makeApiError = (status, errorCode) => {
+        const jsonFn = async () => ({errorCode})
+        return {
+            response: {
+                status,
+                json: jsonFn,
+                clone: () => ({json: jsonFn})
+            }
         }
-    })
+    }
 
     beforeEach(() => {
         jest.clearAllMocks()
@@ -1481,7 +1499,7 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({error: 'productItems must be a non-empty array'})
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'productItems must be a non-empty array'})
     })
 
     test('400: empty productItems array', async () => {
@@ -1495,7 +1513,7 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({error: 'productItems must be a non-empty array'})
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'productItems must be a non-empty array'})
     })
 
     test('400: productItem with no itemId', async () => {
@@ -1509,7 +1527,7 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({error: 'Each productItem must have a string itemId'})
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'Each productItem must have a string itemId'})
     })
 
     test('400: productItem with non-positive quantity', async () => {
@@ -1523,7 +1541,7 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({error: 'Each productItem must have a positive quantity'})
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'Each productItem must have a positive quantity'})
     })
 
     test('503: feature flag off', async () => {

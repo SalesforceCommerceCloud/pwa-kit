@@ -6,6 +6,7 @@
  */
 import React, {useState, useRef, useEffect, useCallback} from 'react'
 import {useIntl} from 'react-intl'
+import {useQueryClient} from '@tanstack/react-query'
 import {
     Alert,
     AlertIcon,
@@ -13,7 +14,6 @@ import {
     Button,
     Container,
     FormControl,
-    FormErrorMessage,
     FormLabel,
     HStack,
     Heading,
@@ -32,6 +32,7 @@ const GuestOrderLookupVerify = () => {
     const history = useHistory()
     const location = useLocation()
     const {getTokenWhenReady} = useAccessToken()
+    const queryClient = useQueryClient()
     const getTokenWhenReadyRef = useRef(getTokenWhenReady)
     useEffect(() => {
         getTokenWhenReadyRef.current = getTokenWhenReady
@@ -105,7 +106,9 @@ const GuestOrderLookupVerify = () => {
                 body: JSON.stringify({orderNo, email, accessCode: enteredCode})
             })
             if (res.ok) {
-                history.push('/order-lookup/order', {orderNo})
+                const orderData = await res.json()
+                queryClient.setQueryData(['guestOrderLookup', 'order', orderNo], orderData)
+                history.push(`/order-lookup/order/${encodeURIComponent(orderNo)}`)
                 return
             }
             if (res.status === 404) {
@@ -176,7 +179,7 @@ const GuestOrderLookupVerify = () => {
                 >
                     <Stack spacing={6}>
                         {serverError && (
-                            <Alert status="error" borderRadius="md">
+                            <Alert id="otp-error" status="error" borderRadius="md">
                                 <AlertIcon />
                                 {serverError}
                             </Alert>
@@ -224,11 +227,6 @@ const GuestOrderLookupVerify = () => {
                                     />
                                 ))}
                             </HStack>
-                            {serverError && (
-                                <FormErrorMessage id="otp-error" justifyContent="center" mt={3}>
-                                    {serverError}
-                                </FormErrorMessage>
-                            )}
                         </FormControl>
 
                         <Button
