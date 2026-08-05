@@ -27,7 +27,8 @@ import {
     SimpleGrid,
     Skeleton,
     Stack,
-    Text
+    Text,
+    useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCustomerType, useAccessToken} from '@salesforce/commerce-sdk-react'
 import {Redirect, useHistory, useLocation, Link as RouterLink} from 'react-router-dom'
@@ -75,6 +76,7 @@ const isCancellable = (order) => {
 
 const GuestOrderLookupResults = () => {
     const {formatMessage, formatDate} = useIntl()
+    const breadcrumbStyles = useStyleConfig('Breadcrumb')
     const {isRegistered} = useCustomerType()
     const history = useHistory()
     const location = useLocation()
@@ -543,14 +545,14 @@ const GuestOrderLookupResults = () => {
 
     return (
         <Box layerStyle="page" data-testid="guest-order-details-page"><Stack spacing={6}>
-            {/* Breadcrumb: Home > Order Lookup > #orderNo */}
+            {/* Breadcrumb — styled to match PLP via Breadcrumb theme */}
             <Breadcrumb
-                separator={<ChevronRightIcon color="gray.500" boxSize="12px" />}
-                fontSize="sm"
-                color="gray.600"
+                className="sf-breadcrumb"
+                sx={breadcrumbStyles.container}
+                separator={<ChevronRightIcon {...breadcrumbStyles.icon} aria-hidden="true" />}
             >
                 <BreadcrumbItem>
-                    <BreadcrumbLink as={RouterLink} to="/">
+                    <BreadcrumbLink as={RouterLink} to="/" sx={breadcrumbStyles.link}>
                         <FormattedMessage
                             id="guestOrderLookup.order.breadcrumb.home"
                             defaultMessage="Home"
@@ -558,7 +560,7 @@ const GuestOrderLookupResults = () => {
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbItem>
-                    <BreadcrumbLink as={RouterLink} to="/order-lookup">
+                    <BreadcrumbLink as={RouterLink} to="/order-lookup" sx={breadcrumbStyles.link}>
                         <FormattedMessage
                             id="guestOrderLookup.order.breadcrumb.orderLookup"
                             defaultMessage="Order Lookup"
@@ -566,7 +568,7 @@ const GuestOrderLookupResults = () => {
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbItem isCurrentPage>
-                    <BreadcrumbLink>#{order.orderNo}</BreadcrumbLink>
+                    <BreadcrumbLink sx={breadcrumbStyles.link}>#{order.orderNo}</BreadcrumbLink>
                 </BreadcrumbItem>
             </Breadcrumb>
 
