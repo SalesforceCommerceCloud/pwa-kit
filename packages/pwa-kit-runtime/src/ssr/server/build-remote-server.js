@@ -1056,7 +1056,6 @@ export const RemoteServerFactory = {
 
         const ssrRequestProcessorMiddleware = (req, res, next) => {
             const locals = res.locals
-            locals.requestStart = Date.now()
             locals.afterResponseCalled = false
             locals.responseCaching = {}
 

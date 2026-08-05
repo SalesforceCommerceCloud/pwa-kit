@@ -421,8 +421,8 @@ describe('SSRServer Lambda integration', () => {
                 expect(collectGarbage.mock.calls).toHaveLength(0)
                 expect(route.mock.calls).toHaveLength(1)
                 // sendMetric is now a backwards-compatible no-op (W-22715301);
-                // no LambdaCreated/LambdaReused metrics are emitted.
-                expect(sendMetric).not.toHaveBeenCalledWith('LambdaReused')
+                // no metrics are emitted at all.
+                expect(sendMetric).not.toHaveBeenCalled()
             })
             .then(() => call(event))
             .then((response) => {
@@ -450,8 +450,8 @@ describe('SSRServer Lambda integration', () => {
                 expect(collectGarbage.mock.calls).toHaveLength(0)
                 expect(route.mock.calls).toHaveLength(1)
                 // sendMetric is now a backwards-compatible no-op (W-22715301);
-                // no LambdaCreated/LambdaReused metrics are emitted.
-                expect(sendMetric).not.toHaveBeenCalledWith('LambdaReused')
+                // no metrics are emitted at all.
+                expect(sendMetric).not.toHaveBeenCalled()
             })
             .then(() => call(event))
             .then((response) => {
