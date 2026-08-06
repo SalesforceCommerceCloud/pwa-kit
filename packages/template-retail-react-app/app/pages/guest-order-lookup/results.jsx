@@ -372,6 +372,21 @@ const GuestOrderLookupResults = () => {
     // ─── Loading ───────────────────────────────────────────────────────────────
 
     if (isLoading) {
+        // If there's no cached order yet, this is a first visit — the fetch will almost
+        // certainly return 403 (no cookie). Show a minimal spinner inside the verify
+        // form container rather than the order-details skeleton, which would be misleading.
+        if (!order) {
+            return (
+                <Container maxW="lg" py={12}>
+                    <Stack spacing={8} align="center">
+                        <Skeleton height="32px" width="220px" />
+                        <Skeleton height="20px" width="300px" />
+                        <Skeleton height="200px" width="100%" />
+                    </Stack>
+                </Container>
+            )
+        }
+        // Re-fetching an already-verified session — show the order-details skeleton.
         return (
             <Box layerStyle="page"><Stack spacing={6}>
                 <Skeleton height="20px" width="200px" />
