@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Salesforce, Inc.
+ * Copyright (c) 2026, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -10,6 +10,8 @@ import {
     getSiteId,
     SESSION_COOKIE_CONFIG
 } from '@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {isTrustedSalesforceDomain} from './salesforce-domain-allowlist.js'
 
 /* -------------------------------------------------------------------------
  * Token Bridge PoC — calls Core's `/agent/identity/bridge` from PWA Kit.
@@ -83,29 +85,10 @@ export function resolveAgentforceMyDomain(myDomain) {
     return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
 }
 
-/**
- * Validate that the myDomain hostname is a trusted Salesforce domain.
- * SSRF prevention: only allow requests to known Salesforce infrastructure.
- *
- * @param {string} myDomain - The full myDomain URL (e.g., https://org.my.salesforce.com)
- * @returns {boolean} - True if the domain is trusted, false otherwise
- */
-export function isTrustedSalesforceDomain(myDomain) {
-    try {
-        const url = new URL(myDomain)
-        const host = url.hostname.toLowerCase()
-
-        // Allowlist: Salesforce production, sandbox, and developer domains
-        return (
-            host.endsWith('.salesforce.com') ||
-            host.endsWith('.my.salesforce.com') ||
-            host.endsWith('.pc-rnd.salesforce.com')
-        )
-    } catch {
-        // Invalid URL
-        return false
-    }
-}
+// isTrustedSalesforceDomain (Core `*.salesforce.com` allowlist) is shared with
+// auth-link-proxy.js via ./salesforce-domain-allowlist.js — the Token Bridge only
+// ever talks to Core's My Domain (AGENT_MYDOMAIN), so it uses the Core list for both
+// its upstream SSRF check and the CSRF Origin check.
 
 /** Express handler for POST /api/agent/identity/bridge. */
 export async function handleTokenBridge(req, res) {

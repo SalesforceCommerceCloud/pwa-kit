@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Salesforce, Inc.
+ * Copyright (c) 2026, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -45,6 +45,9 @@
  * scrt2Url field of the COMMERCE_AGENT_SETTINGS environment variable, then
  * validated against a Salesforce domain allowlist (prevents SSRF).
  * ------------------------------------------------------------------------- */
+
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {isTrustedSalesforceDomain, isTrustedSCRTDomain} from './salesforce-domain-allowlist.js'
 
 export const AUTH_LINK_PROXY_PATH = '/api/agent/authlink'
 
@@ -108,33 +111,10 @@ export function extractScrt2UrlFromEnv() {
     return scrt2Url.trim().replace(/\/+$/, '')
 }
 
-/**
- * Validate that a URL's hostname is a trusted Salesforce domain.
- * SSRF/CSRF prevention: only allow requests to (and origins from) known
- * Salesforce infrastructure — used for both the SCRT2 URL and the request Origin.
- *
- * @param {string} candidateUrl - The full URL to check (e.g., https://org.my.salesforce-scrt.com)
- * @returns {boolean} - True if the host is a trusted Salesforce domain, false otherwise
- */
-export function isTrustedSalesforceDomain(candidateUrl) {
-    try {
-        const url = new URL(candidateUrl)
-        const host = url.hostname.toLowerCase()
-
-        // Allowlist: Salesforce production, sandbox, and developer domains
-        return (
-            host.endsWith('.salesforce.com') ||
-            host.endsWith('.my.salesforce.com') ||
-            host.endsWith('.pc-rnd.salesforce.com') ||
-            host.endsWith('.salesforce-scrt.com') ||
-            host.endsWith('.my.salesforce-scrt.com') ||
-            host.endsWith('.pc-rnd.salesforce-scrt.com')
-        )
-    } catch {
-        // Invalid URL
-        return false
-    }
-}
+// isTrustedSalesforceDomain (Core) and isTrustedSCRTDomain (SCRT2) are shared with
+// token-bridge.js via ./salesforce-domain-allowlist.js. This proxy uses the Core list
+// for the CSRF Origin check (Storefront Preview iframe is served from Core) and the
+// SCRT2 list for the upstream SSRF check on scrt2Url.
 
 /**
  * Express handler for POST /api/agent/authlink.
@@ -150,11 +130,9 @@ export function isTrustedSalesforceDomain(candidateUrl) {
  *     }
  *
  * Response:
- *   The SCRT status code is forwarded verbatim, and the SCRT URL that was
- *   actually called is echoed back as `scrt_url` for debugging.
- *   Success: { "auth_link_key": "...", "scrt_url": "https://<scrt2>/iamessage/api/v2/authorization/authlink" }
- *   SCRT error (object body): { <scrt error fields>, "scrt_url": "..." }
- *   SCRT error (non-object body): { "scrt_url": "...", "upstream_body": <body|null> }
+ *   The SCRT status code and body are forwarded verbatim.
+ *   Success: { "auth_link_key": "..." }
+ *   SCRT error: <scrt error body, forwarded unchanged>
  *   Pre-flight error (no SCRT call): { "error": "ERROR_CODE" }
  *
  * @param {Object} req - Express request object
@@ -220,8 +198,8 @@ export async function handleAuthLinkProxy(req, res) {
             return res.status(500).json({error: 'SCRT2_URL_NOT_CONFIGURED'})
         }
 
-        // SSRF prevention: validate scrt2Url against Salesforce allowlist
-        if (!isTrustedSalesforceDomain(scrt2Url)) {
+        // SSRF prevention: validate scrt2Url against the SCRT2 allowlist
+        if (!isTrustedSCRTDomain(scrt2Url)) {
             console.error(
                 '[auth-link-proxy] SSRF attempt blocked: scrt2Url is not a trusted Salesforce domain',
                 {scrt2Url}
@@ -265,18 +243,10 @@ export async function handleAuthLinkProxy(req, res) {
             })
         }
 
-        // Echo the SCRT URL that was actually called back to the caller as
-        // `scrt_url`, so it is visible in the browser Network tab for debugging
-        // (which upstream host/path the proxy hit). SCRT's body is preserved:
-        // when it is a plain object we attach `scrt_url` alongside it; otherwise
-        // (null on invalid JSON, or an array) we nest it under `upstream_body`
-        // so `scrt_url` can always be included.
-        const responseBody =
-            body && typeof body === 'object' && !Array.isArray(body)
-                ? {...body, scrt_url: scrtRequestUrl}
-                : {scrt_url: scrtRequestUrl, upstream_body: body}
-
-        return res.status(scrtResponse.status).json(responseBody)
+        // Forward SCRT's status and body to the caller unchanged. The SCRT2 URL
+        // that was called is intentionally NOT put in the response — it is only
+        // logged server-side (above) for diagnostics, never exposed to the browser.
+        return res.status(scrtResponse.status).json(body)
     } catch (err) {
         // AbortError => the SCRT_FETCH_TIMEOUT_MS deadline fired. Surface it as a
         // distinct 504 so the caller can tell a slow upstream from a real 500.

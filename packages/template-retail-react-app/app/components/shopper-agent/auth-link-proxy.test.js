@@ -8,7 +8,6 @@
 import {
     handleAuthLinkProxy,
     extractScrt2UrlFromEnv,
-    isTrustedSalesforceDomain,
     callAuthLinkProxy,
     AUTH_LINK_PROXY_PATH
 } from '@salesforce/retail-react-app/app/components/shopper-agent/auth-link-proxy'
@@ -99,52 +98,10 @@ describe('auth-link-proxy', () => {
         })
     })
 
-    // ------------------------------------------------------------------------
-    describe('isTrustedSalesforceDomain', () => {
-        it('accepts .salesforce.com domains', () => {
-            expect(isTrustedSalesforceDomain('https://org.salesforce.com')).toBe(true)
-        })
-
-        it('accepts .my.salesforce.com domains', () => {
-            expect(isTrustedSalesforceDomain('https://org.my.salesforce.com')).toBe(true)
-        })
-
-        it('accepts .pc-rnd.salesforce.com domains', () => {
-            expect(
-                isTrustedSalesforceDomain('https://orgfarm-123.test1.my.pc-rnd.salesforce.com')
-            ).toBe(true)
-        })
-
-        it('accepts .salesforce-scrt.com domains', () => {
-            expect(isTrustedSalesforceDomain('https://org.salesforce-scrt.com')).toBe(true)
-        })
-
-        it('accepts .my.salesforce-scrt.com domains', () => {
-            expect(
-                isTrustedSalesforceDomain('https://orgfarm-123.test1.my.salesforce-scrt.com')
-            ).toBe(true)
-        })
-
-        it('accepts .pc-rnd.salesforce-scrt.com domains', () => {
-            expect(isTrustedSalesforceDomain(TRUSTED_SCRT2_URL)).toBe(true)
-        })
-
-        it('rejects non-Salesforce domains', () => {
-            expect(isTrustedSalesforceDomain('https://evil.com')).toBe(false)
-        })
-
-        it('rejects domains that only contain salesforce in a subdomain', () => {
-            expect(isTrustedSalesforceDomain('https://salesforce.evil.com')).toBe(false)
-        })
-
-        it('rejects invalid URLs', () => {
-            expect(isTrustedSalesforceDomain('not-a-url')).toBe(false)
-        })
-
-        it('is case-insensitive', () => {
-            expect(isTrustedSalesforceDomain('https://ORG.SALESFORCE.COM')).toBe(true)
-        })
-    })
+    // NOTE: The domain allowlist validators (isTrustedSalesforceDomain,
+    // isTrustedSCRTDomain) now live in ./salesforce-domain-allowlist.js and are
+    // unit-tested there. Their behavior in this proxy's handler is exercised by
+    // the CSRF and SSRF cases in the handleAuthLinkProxy describe block below.
 
     // ------------------------------------------------------------------------
     describe('handleAuthLinkProxy', () => {
@@ -191,11 +148,9 @@ describe('auth-link-proxy', () => {
                 }
             )
             expect(res.status).toHaveBeenCalledWith(200)
-            // The response echoes the SCRT URL that was called as `scrt_url`,
-            // alongside SCRT's own body.
+            // SCRT's body is forwarded to the caller unchanged.
             expect(res.json).toHaveBeenCalledWith({
-                auth_link_key: 'test-auth-link-key',
-                scrt_url: `${TRUSTED_SCRT2_URL}/iamessage/api/v2/authorization/authlink`
+                auth_link_key: 'test-auth-link-key'
             })
         })
 
@@ -342,10 +297,8 @@ describe('auth-link-proxy', () => {
             })
         })
 
-        describe('SCRT endpoint errors are forwarded verbatim (with scrt_url echoed)', () => {
-            const SCRT_URL = `${TRUSTED_SCRT2_URL}/iamessage/api/v2/authorization/authlink`
-
-            it('forwards a 401 Unauthorized from SCRT, adding scrt_url', async () => {
+        describe('SCRT endpoint errors are forwarded verbatim', () => {
+            it('forwards a 401 Unauthorized from SCRT unchanged', async () => {
                 mockFetch.mockResolvedValue({
                     ok: false,
                     status: 401,
@@ -355,13 +308,10 @@ describe('auth-link-proxy', () => {
                 await handleAuthLinkProxy(req, res)
 
                 expect(res.status).toHaveBeenCalledWith(401)
-                expect(res.json).toHaveBeenCalledWith({
-                    message: 'INVALID_TOKEN',
-                    scrt_url: SCRT_URL
-                })
+                expect(res.json).toHaveBeenCalledWith({message: 'INVALID_TOKEN'})
             })
 
-            it('forwards the version-mismatch 401 (regression for the version-mismatch bug), adding scrt_url', async () => {
+            it('forwards the version-mismatch 401 unchanged (regression for the version-mismatch bug)', async () => {
                 // If a caller ever hits the wrong version, SCRT returns this exact
                 // body (error 900020). We must surface it unchanged, not swallow it.
                 const versionMismatchBody = {
@@ -378,13 +328,10 @@ describe('auth-link-proxy', () => {
                 await handleAuthLinkProxy(req, res)
 
                 expect(res.status).toHaveBeenCalledWith(401)
-                expect(res.json).toHaveBeenCalledWith({
-                    ...versionMismatchBody,
-                    scrt_url: SCRT_URL
-                })
+                expect(res.json).toHaveBeenCalledWith(versionMismatchBody)
             })
 
-            it('forwards a 403 Forbidden from SCRT, adding scrt_url', async () => {
+            it('forwards a 403 Forbidden from SCRT unchanged', async () => {
                 mockFetch.mockResolvedValue({
                     ok: false,
                     status: 403,
@@ -394,10 +341,10 @@ describe('auth-link-proxy', () => {
                 await handleAuthLinkProxy(req, res)
 
                 expect(res.status).toHaveBeenCalledWith(403)
-                expect(res.json).toHaveBeenCalledWith({error: 'FORBIDDEN', scrt_url: SCRT_URL})
+                expect(res.json).toHaveBeenCalledWith({error: 'FORBIDDEN'})
             })
 
-            it('forwards a 500 from SCRT, adding scrt_url', async () => {
+            it('forwards a 500 from SCRT unchanged', async () => {
                 mockFetch.mockResolvedValue({
                     ok: false,
                     status: 500,
@@ -407,13 +354,10 @@ describe('auth-link-proxy', () => {
                 await handleAuthLinkProxy(req, res)
 
                 expect(res.status).toHaveBeenCalledWith(500)
-                expect(res.json).toHaveBeenCalledWith({
-                    error: 'INTERNAL_ERROR',
-                    scrt_url: SCRT_URL
-                })
+                expect(res.json).toHaveBeenCalledWith({error: 'INTERNAL_ERROR'})
             })
 
-            it('forwards the status and nests a null body under upstream_body when SCRT returns invalid JSON', async () => {
+            it('forwards the status with a null body when SCRT returns invalid JSON', async () => {
                 mockFetch.mockResolvedValue({
                     ok: false,
                     status: 500,
@@ -425,7 +369,7 @@ describe('auth-link-proxy', () => {
                 await handleAuthLinkProxy(req, res)
 
                 expect(res.status).toHaveBeenCalledWith(500)
-                expect(res.json).toHaveBeenCalledWith({scrt_url: SCRT_URL, upstream_body: null})
+                expect(res.json).toHaveBeenCalledWith(null)
             })
         })
 
@@ -492,12 +436,12 @@ describe('auth-link-proxy', () => {
             mockFetch.mockResolvedValue({
                 ok: true,
                 status: 200,
-                json: async () => ({auth_link_key: 'k', scrt_url: 'https://x/authlink'})
+                json: async () => ({auth_link_key: 'k'})
             })
 
             const result = await callAuthLinkProxy({commerceClientJWT: V2_JWT})
 
-            expect(result).toEqual({auth_link_key: 'k', scrt_url: 'https://x/authlink'})
+            expect(result).toEqual({auth_link_key: 'k'})
             expect(mockFetch).toHaveBeenCalledTimes(1)
             const [path, opts] = mockFetch.mock.calls[0]
             expect(path).toBe(AUTH_LINK_PROXY_PATH)
