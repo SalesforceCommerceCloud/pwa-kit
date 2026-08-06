@@ -128,7 +128,9 @@ const GuestOrderLookupResults = () => {
             return res.json()
         },
         enabled: !!orderNo,
-        retry: false,
+        // Never retry auth errors — those mean the cookie is missing/expired and the
+        // verify form should show immediately. Retry once on transient 5xx/502.
+        retry: (failureCount, err) => failureCount < 1 && err?.status >= 500,
         // Access code is valid for 15 min — never serve data older than that from cache.
         staleTime: 15 * 60 * 1000,
         // Kick the query out of cache after 15 min of inactivity so a returning
@@ -419,21 +421,31 @@ const GuestOrderLookupResults = () => {
     // ─── Generic fetch error (order already verified but fetch failed) ─────────
 
     if (isError && error?.status !== 401 && error?.status !== 403) {
+        const is429 = error?.status === 429
         return (
             <Box layerStyle="page"><Stack spacing={4}>
                 <Box p={4} bg="red.50" borderRadius="md" role="alert">
                     <Text color="red.700">
-                        <FormattedMessage
-                            id="guestOrderLookup.order.error.generic"
-                            defaultMessage="Something went wrong loading your order. Please try again."
-                        />
+                        {is429 ? (
+                            <FormattedMessage
+                                id="guestOrderLookup.order.error.tooManyRequests"
+                                defaultMessage="You've refreshed too many times. Please wait a moment before trying again."
+                            />
+                        ) : (
+                            <FormattedMessage
+                                id="guestOrderLookup.order.error.generic"
+                                defaultMessage="Something went wrong loading your order. Please try again."
+                            />
+                        )}
                     </Text>
-                    <Button mt={4} onClick={() => refetch()} isLoading={isFetching}>
-                        <FormattedMessage
-                            id="guestOrderLookup.order.button.retry"
-                            defaultMessage="Try Again"
-                        />
-                    </Button>
+                    {!is429 && (
+                        <Button mt={4} onClick={() => refetch()} isLoading={isFetching}>
+                            <FormattedMessage
+                                id="guestOrderLookup.order.button.retry"
+                                defaultMessage="Try Again"
+                            />
+                        </Button>
+                    )}
                 </Box>
             </Stack></Box>
         )
