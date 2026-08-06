@@ -1,3 +1,4 @@
+## v3.20.0-nightly-20260806085320 (Aug 06, 2026)
 ## v3.20.0-dev (Jul 13, 2026)
 ## v3.19.0 (Jul 13, 2026)
 - **Security**: Upgrade `@salesforce/mrt-utilities` from `^0.1.6` to `^0.2.2` to eliminate fast-xml-parser dependency and resolve CVE-2026-26278 (Critical), CVE-2025-23333, CVE-2024-55565, CVE-2024-41818, CVE-2024-41810, CVE-2023-52426, and CVE-2023-34104. The mrt-utilities 0.2.2 uses AWS SDK 3.1049.0 which no longer depends on fast-xml-parser. [#3911](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3911)
