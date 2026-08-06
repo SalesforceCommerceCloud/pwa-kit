@@ -426,14 +426,58 @@ export async function jwksCaching(req, res, options) {
     }
 }
 
-// Guest order access: warn if feature is enabled but cookies are not allowed
-const _goaConfig = getConfig()?.app?.guestOrderLookup
-if (_goaConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_COOKIES) {
+// ─── S15: In-process throttle middleware for /api/order-lookup/verify ────────
+// Keyed on the first IP from X-Forwarded-For (or req.ip). Uses a Map with
+// {count, resetAt} per key. No external library — zero new dependencies.
+// Reads windowMs/max from app.guestOrderLookup.requestCodeThrottle at request
+// time so config hot-reload works without restarting the server.
+export function createVerifyThrottle() {
+    /** @type {Map<string, {count: number, resetAt: number}>} */
+    const store = new Map()
+
+    return function verifyThrottleMiddleware(req, res, next) {
+        const appConfig = getConfig()?.app
+        // No-op when feature is disabled
+        if (!appConfig?.guestOrderLookup?.enabled) return next()
+        // Only throttle the verify endpoint — order fetch and oms-meta must not be throttled
+        // because normal usage (hard refresh, cancel/return polling) would exhaust the budget.
+        if (req.path !== '/api/order-lookup/verify') return next()
+
+        const throttleConfig = appConfig?.guestOrderLookup?.requestCodeThrottle
+        const windowMs = throttleConfig?.windowMs ?? 60000
+        const max = throttleConfig?.max ?? 5
+
+        // Throttle keyed on x-forwarded-for. In MRT deployments this header is set
+        // by the trusted CDN edge. In non-MRT environments (local dev, custom hosting)
+        // it may be spoofable — SCAPI rate limiting is the authoritative backstop.
+        const ip =
+            (req.headers['x-forwarded-for']?.split(',')[0]?.trim()) || req.ip || 'unknown'
+        const now = Date.now()
+        const entry = store.get(ip)
+
+        if (!entry || now >= entry.resetAt) {
+            store.set(ip, {count: 1, resetAt: now + windowMs})
+            return next()
+        }
+
+        entry.count += 1
+        if (entry.count > max) {
+            return res.status(429).json({error: 'Too many requests'})
+        }
+        return next()
+    }
+}
+
+// Guest order lookup: warn if feature is enabled but cookies are not allowed
+const _golConfig = getConfig()?.app?.guestOrderLookup
+if (_golConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_COOKIES) {
     logger.warn(
         'guestOrderLookup.enabled is true but neither localAllowCookies nor MRT_ALLOW_COOKIES is set. The cc-goa_* HttpOnly cookie will not be written. Set localAllowCookies: true for local dev or MRT_ALLOW_COOKIES=true for MRT.',
         {namespace: 'guest-order-lookup'}
     )
 }
+
+const cookieSecureFlag = options.localAllowCookies ? '' : ' Secure;'
 
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
@@ -703,7 +747,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             const cookieVal = evictIfNeeded(existing)
             res.setHeader(
                 'Set-Cookie',
-                `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+                `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
             )
 
             logger.info('guest-order-lookup verify success', {
@@ -799,7 +843,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 delete cookieData2[orderNo]
                 res.setHeader(
                     'Set-Cookie',
-                    `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=3600`
+                    `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
                 )
                 return res.status(404).json({error: 'Session expired'})
             }
