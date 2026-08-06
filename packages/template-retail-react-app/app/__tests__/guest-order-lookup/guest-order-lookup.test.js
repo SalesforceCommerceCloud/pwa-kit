@@ -15,17 +15,40 @@
 
 // ─── Mock ssr.js module-level side effects ────────────────────────────────────
 
-jest.mock('@salesforce/pwa-kit-runtime/ssr/server/express', () => ({
-    getRuntime: jest.fn(() => ({
-        createHandler: jest.fn((opts, cb) => {
-            // Capture the callback but don't call it — endpoints are tested directly
-            return {handler: jest.fn()}
-        }),
-        serveStaticFile: jest.fn(),
-        serveServiceWorker: jest.fn(),
-        render: jest.fn()
-    }))
-}))
+// Capture handlers registered by ssr.js so tests can invoke them directly.
+// The mock factory initialises global._routeHandlers to a plain object and populates
+// it when ssr.js calls runtime.createHandler(options, appFn) at module-load time.
+// Using global ensures the reference is stable across the jest.mock hoisting boundary.
+jest.mock('@salesforce/pwa-kit-runtime/ssr/server/express', () => {
+    // eslint-disable-next-line no-undef
+    global._routeHandlers = {}
+    return {
+        getRuntime: jest.fn(() => ({
+            createHandler: jest.fn((opts, cb) => {
+                // Build a minimal fake express app that captures route handlers
+                // eslint-disable-next-line no-undef
+                const captured = global._routeHandlers
+                const fakeApp = {
+                    use: jest.fn(),
+                    get: jest.fn((path, ...fns) => {
+                        // Store the last handler (the async route handler, not middleware)
+                        const handler = fns[fns.length - 1]
+                        if (typeof path === 'string') captured[`GET ${path}`] = handler
+                    }),
+                    post: jest.fn((path, ...fns) => {
+                        const handler = fns[fns.length - 1]
+                        if (typeof path === 'string') captured[`POST ${path}`] = handler
+                    })
+                }
+                cb(fakeApp)
+                return {handler: jest.fn()}
+            }),
+            serveStaticFile: jest.fn(() => jest.fn()),
+            serveServiceWorker: jest.fn(),
+            render: jest.fn()
+        }))
+    }
+})
 
 jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => ({
     getAppOrigin: jest.fn(() => 'https://test-app.com')
@@ -58,6 +81,25 @@ jest.mock('jose', () => ({
 jest.mock(
     '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge.js',
     () => ({registerTokenBridgeRoute: jest.fn()}),
+    {virtual: true}
+)
+
+// ─── ShopperOrders mock ───────────────────────────────────────────────────────
+// Must include all methods called by ssr.js endpoints under test.
+// The factory returns a fresh set of jest.fn()s each time; tests can configure
+// return values via mockShopperOrdersInstance.
+const mockShopperOrdersInstance = {
+    guestOrderLookup: jest.fn(),
+    getOmsMetaData: jest.fn(),
+    cancelOmsOrder: jest.fn(),
+    returnOmsOrder: jest.fn()
+}
+
+jest.mock(
+    'commerce-sdk-isomorphic',
+    () => ({
+        ShopperOrders: jest.fn().mockImplementation(() => mockShopperOrdersInstance)
+    }),
     {virtual: true}
 )
 
@@ -99,7 +141,8 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/logger-instance', () => ({
 import {
     filterGuestOrderFields,
     parseGuestOrderCookie,
-    evictIfNeeded
+    evictIfNeeded,
+    createVerifyThrottle
 } from '@salesforce/retail-react-app/app/ssr.js'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -110,6 +153,8 @@ const DEFAULT_COMMERCE_PARAMS = {
     shortCode: 'abc12345',
     siteId: 'TestSite'
 }
+
+const COOKIE_NAME = 'cc-goa_TestSite'
 
 function makeAppConfig(overrides = {}) {
     return {
@@ -122,6 +167,14 @@ function makeAppConfig(overrides = {}) {
             }
         }
     }
+}
+
+/**
+ * Build a cookie header string for cc-goa_TestSite containing the given order map.
+ * orderMap e.g. { ORD123: { email: 'a@b.com', accessCode: 'code' } }
+ */
+function makeCookieHeader(orderMap) {
+    return `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(orderMap))}`
 }
 
 function makeMockReq(overrides = {}) {
