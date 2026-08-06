@@ -31,6 +31,8 @@ import {
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCustomerType, useAccessToken} from '@salesforce/commerce-sdk-react'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {Redirect, useHistory, useLocation, Link as RouterLink} from 'react-router-dom'
 import {ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
@@ -81,6 +83,8 @@ const GuestOrderLookupResults = () => {
     const history = useHistory()
     const location = useLocation()
     const {getTokenWhenReady} = useAccessToken()
+    const appOrigin = useAppOrigin()
+    const {req} = useServerContext()
 
     // Read order number and email from query params — matches sf-next /order-lookup/results?order=<n>&email=<e>
     const searchParams = new URLSearchParams(location.search)
@@ -106,8 +110,14 @@ const GuestOrderLookupResults = () => {
         queryKey: ['guestOrderLookup', 'order', orderNo],
         queryFn: async () => {
             const token = await getTokenWhenReadyRef.current()
-            const res = await fetch(`/api/order-lookup/order/${encodeURIComponent(orderNo)}`, {
-                headers: {Authorization: `Bearer ${token}`}
+            // On SSR, forward the incoming request cookies so the Express endpoint
+            // can read cc-at_{siteId} (SLAS token) and cc-goa_{siteId} (verified session).
+            const cookieHeader = typeof window === 'undefined' ? req?.headers?.cookie : undefined
+            const res = await fetch(`${appOrigin}/api/order-lookup/order/${encodeURIComponent(orderNo)}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    ...(cookieHeader && {Cookie: cookieHeader})
+                }
             })
             if (res.status === 401 || res.status === 403) {
                 // Not verified yet — expected on first visit before OTP entry.
