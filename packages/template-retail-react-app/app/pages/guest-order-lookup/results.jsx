@@ -565,21 +565,7 @@ const GuestOrderLookupResults = () => {
                                 })}
                             </Button>
 
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                width="full"
-                                onClick={() =>
-                                    history.push(
-                                        `/order-lookup?order=${encodeURIComponent(orderNo)}&email=${encodeURIComponent(email)}`
-                                    )
-                                }
-                            >
-                                {formatMessage({
-                                    id: 'guestOrderLookup.verify.button.requestNewCode',
-                                    defaultMessage: 'Request a new code'
-                                })}
-                            </Button>
+
                         </Stack>
                     </Box>
                 </Stack>
