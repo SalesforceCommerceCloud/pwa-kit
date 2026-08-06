@@ -424,136 +424,35 @@ test('escapeJSText', () => {
 })
 
 describe('MetricsSender', () => {
-    const sandbox = sinon.createSandbox()
-
-    afterEach(() => {
-        sandbox.restore()
-    })
-
-    test('MetricsSender.send', () => {
+    // Custom per-request CloudWatch metric emission was removed (W-22715301).
+    // MetricsSender is retained as an inert no-op for backwards compatibility:
+    // send() never queues anything and flush() never sends anything.
+    test('MetricsSender.send is a no-op that never queues metrics', () => {
         const sender = MetricsSender.getSender()
         const now = new Date()
-        const nowISO = now.toISOString()
-        const metrics1 = [
-            {
-                name: 'abc',
-                value: 123,
-                timestamp: now
-            },
+        const metrics = [
+            {name: 'abc', value: 123, timestamp: now},
             {
                 name: 'def',
-                dimensions: {
-                    project: 'whatever',
-                    xyzzy: 'plugh'
-                },
+                dimensions: {project: 'whatever', xyzzy: 'plugh'},
                 timestamp: now
             }
         ]
-        const metrics2 = [
-            {
-                name: 'xyz',
-                value: 1.23,
-                timestamp: now
-            }
-        ]
-        const metrics3 = []
 
-        // Add metrics until we get enough to cause multiple batches to
-        // be sent.
-        while (metrics1.length + metrics2.length + metrics3.length < 30) {
-            metrics3.push({
-                name: 'whatever',
-                value: Date.now(),
-                timestamp: now
-            })
-        }
-
-        // Set up a fake CloudWatch client
-        const calledParams = []
-        let callCount = 0
-        sender._CW = {
-            putMetricData: (params) => {
-                callCount += 1
-                params.MetricData.forEach((metric) => calledParams.push(metric))
-                // This returns a fake promise that resolves immediately
-                if (callCount === 1) {
-                    return Promise.reject(new Error('Some error'))
-                }
-                return Promise.resolve()
-            }
-        }
-
-        // Send the params.
-        sender.send(metrics1)
-        sender.send(metrics2)
-        sender.send(metrics3)
-        expect(sender.queueLength).toEqual(metrics1.length + metrics2.length + metrics3.length)
-        return sender.flush().then(() => {
-            // Expect that the MetricsSender is now empty
-            expect(sender.queueLength).toBe(0)
-
-            // Expect that there was a console warning
-            expect(consoleWarn.called).toBe(true)
-
-            // Expect that two batches were sent
-            expect(callCount).toBe(2)
-
-            // Expect that the correct values were sent
-            const expected = metrics1.concat(metrics2).concat(metrics3)
-            expect(calledParams).toHaveLength(expected.length)
-            expected.forEach((metric, index) => {
-                const actual = calledParams[index]
-                expect(actual).toBeDefined()
-                expect(actual.MetricName).toEqual(metric.name)
-                expect(actual.Value).toEqual(metric.value || 0)
-                expect(actual.Timestamp.toISOString()).toEqual(nowISO)
-
-                if (metric.dimensions) {
-                    expect(actual.Dimensions).toBeDefined()
-                    actual.Dimensions.forEach((dimension) => {
-                        expect(dimension.Value).toEqual(metric.dimensions[dimension.Name])
-                    })
-                }
-            })
-        })
+        expect(sender.queueLength).toBe(0)
+        expect(sender.send(metrics)).toBeUndefined()
+        // Nothing is queued, so no metric is ever emitted.
+        expect(sender.queueLength).toBe(0)
     })
 
-    test('MetricsSender.throttling', () => {
+    test('MetricsSender.flush is a no-op that resolves without sending', () => {
         const sender = MetricsSender.getSender()
-        const now = new Date()
-        const metrics1 = [
-            {
-                name: 'abc',
-                value: 123,
-                timestamp: now
-            },
-            {
-                name: 'def',
-                dimensions: {
-                    project: 'whatever',
-                    xyzzy: 'plugh'
-                },
-                timestamp: now
-            }
-        ]
 
-        // Set up a fake CloudWatch client that will return a Throttling
-        // error every time it's called.
-        sender._CW = {
-            putMetricData: (params) => {
-                return Promise.reject(new Error('Throttled'))
-            }
-        }
-
-        // Allow spying on the putMetricData calls
-        sender._CW.putMetricData = sandbox.spy(sender._CW, 'putMetricData')
-
-        // Send the params.
-        sender.send(metrics1)
-        expect(sender.queueLength).toEqual(metrics1.length)
-        return sender.flush().then(() => {
-            // Expect that we retried the correct number of times
-            expect(sender._CW.putMetricData.callCount).toBe(1)
+        sender.send([{name: 'abc', value: 123}])
+        const result = sender.flush()
+        expect(result).toBeInstanceOf(Promise)
+        return result.then((value) => {
+            expect(value).toBeUndefined()
             expect(sender.queueLength).toBe(0)
         })
     })
