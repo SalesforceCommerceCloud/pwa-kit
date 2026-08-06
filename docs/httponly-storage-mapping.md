@@ -16,11 +16,11 @@ For configuring a shared cookie domain across PWA Kit and SFRA in a hybrid deplo
 
 ## How storage is selected
 
-In **non-HttpOnly mode** (the default), `commerce-sdk-react` writes most SLAS response fields to `localStorage`. A few values (refresh tokens, `usid`) are already cookies because they're shared with SFRA in hybrid setups.
+In **non-HttpOnly mode** (the default), `commerce-sdk-react` writes most SLAS response fields to `localStorage`. PWA Kit already stores a few values (refresh tokens, `usid`) as cookies because they're shared with SFRA in hybrid setups.
 
 In **HttpOnly mode**, the SLAS proxy in `pwa-kit-runtime` sets cookies on every token response and strips the same fields from the JSON body. `commerce-sdk-react` then reads those values back from cookies. The cookie is the single source of truth—no `localStorage` mirror is kept.
 
-All cookie names are suffixed with `_{siteId}` (for example `cc-at_RefArch`). The `{siteId}` suffix is omitted from the table below for readability.
+All cookie names include a `_{siteId}` suffix (for example `cc-at_RefArch`). The `{siteId}` suffix is omitted from the table below for readability.
 
 ## Reference table
 

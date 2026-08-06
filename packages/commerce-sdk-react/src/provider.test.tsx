@@ -9,6 +9,7 @@ import {screen} from '@testing-library/react'
 import useCommerceApi from './hooks/useCommerceApi'
 import {renderWithProviders} from './test-utils'
 import Auth from './auth'
+import {DWSID_COOKIE_NAME, SERVER_AFFINITY_HEADER_KEY} from './constant'
 
 jest.mock('./auth/index.ts')
 
@@ -159,5 +160,64 @@ describe('provider', () => {
                 fetchOptions: expect.objectContaining({credentials: 'omit'})
             })
         )
+    })
+
+    // Regression test for W-23089490: the server-affinity header (sfdc_dwsid) must not go
+    // stale. Previously the `updatedClients` useMemo omitted `dwsid` from its dependency
+    // array, so when only the dwsid cookie changed (e.g. guest-to-logged-in, session bridge,
+    // re-auth) the memoized SCAPI clients kept sending the OLD sfdc_dwsid header.
+    describe('server-affinity header (sfdc_dwsid) stays in sync with the dwsid cookie', () => {
+        const readAffinityHeader = () => screen.getByTestId('affinity-header').textContent
+
+        const AffinityProbe = () => {
+            const api = useCommerceApi()
+            return (
+                <div data-testid="affinity-header">
+                    {api?.shopperSearch?.clientConfig?.headers?.[SERVER_AFFINITY_HEADER_KEY] ?? ''}
+                </div>
+            )
+        }
+
+        test('default client path rebuilds clients with the new sfdc_dwsid when dwsid changes', () => {
+            const authGet = jest.spyOn(Auth.prototype, 'get').mockImplementation((name) => {
+                if (name === DWSID_COOKIE_NAME) return 'OLD_DWSID'
+                return undefined as never
+            })
+
+            const {rerender} = renderWithProviders(<AffinityProbe />)
+            expect(readAffinityHeader()).toBe('OLD_DWSID')
+
+            // Only the dwsid changes; every provider prop stays identical.
+            authGet.mockImplementation((name) => {
+                if (name === DWSID_COOKIE_NAME) return 'NEW_DWSID'
+                return undefined as never
+            })
+            rerender(<AffinityProbe />)
+
+            expect(readAffinityHeader()).toBe('NEW_DWSID')
+        })
+
+        test('does not rebuild the SCAPI clients when dwsid is unchanged across renders', () => {
+            jest.spyOn(Auth.prototype, 'get').mockImplementation((name) => {
+                if (name === DWSID_COOKIE_NAME) return 'STABLE_DWSID'
+                return undefined as never
+            })
+
+            let capturedClient: unknown
+            const IdentityProbe = () => {
+                const api = useCommerceApi()
+                capturedClient = api?.shopperSearch
+                return <div>identity probe</div>
+            }
+
+            const {rerender} = renderWithProviders(<IdentityProbe />)
+            const firstClient = capturedClient
+
+            // Re-render with everything identical — the memo must return the same client instance
+            // so request deduplication and auth init are not disturbed (W-23089490 AC).
+            rerender(<IdentityProbe />)
+
+            expect(capturedClient).toBe(firstClient)
+        })
     })
 })

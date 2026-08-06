@@ -34,8 +34,14 @@ const runGeneratorWithResponses = (cmd, cliResponses = []) => {
             reject(`Child process exited with code ${code}.`)
         })
 
-        child.on('close', (code) => {
-            resolve(`Child process exited with code ${code}.`)
+        child.on('close', (code, signal) => {
+            if (code === 0) {
+                resolve(`Child process exited with code ${code}.`)
+            } else if (signal) {
+                reject(new Error(`Child process killed by signal ${signal} (code=${code}).`))
+            } else {
+                reject(new Error(`Child process exited with non-zero code ${code}.`))
+            }
         })
     })
 }

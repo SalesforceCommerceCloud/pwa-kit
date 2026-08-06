@@ -31,7 +31,8 @@ type TestMap = {[K in keyof Queries]: NonNullable<ReturnType<Queries[K]>['data']
 const testMap: TestMap = {
     useOrder: {orderNo: 'orderNo'},
     usePaymentMethodsForOrder: {applicablePaymentMethods: []},
-    useTaxesFromOrder: {taxes: {}}
+    useTaxesFromOrder: {taxes: {}},
+    useOmsMetaData: {cancelReasonCodes: [], returnReasonCodes: []}
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof TestMap]]>

@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
 import {renderHook} from '@testing-library/react'
 import useMiaw, {
     normalizeLocaleToSalesforce,
@@ -120,8 +119,7 @@ describe('useMiaw hook', () => {
         embeddedServiceDeploymentName: 'test-deployment',
         embeddedServiceDeploymentUrl: 'https://test.com',
         scrt2Url: 'https://scrt2.test.com',
-        locale: 'fr-FR',
-        refreshToken: 'test-refresh-token'
+        locale: 'fr-FR'
     }
 
     beforeEach(() => {

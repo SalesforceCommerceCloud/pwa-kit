@@ -95,11 +95,68 @@
   "account_detail.title.account_details": {
     "defaultMessage": "Account Details"
   },
+  "account_order_detail.alert.cancellation_error_conflict": {
+    "defaultMessage": "This order is already being processed and cannot be canceled. Please reach out to the merchant."
+  },
+  "account_order_detail.alert.cancellation_error_generic": {
+    "defaultMessage": "We couldn't process your cancellation right now. Please wait a moment and try again."
+  },
+  "account_order_detail.alert.cancellation_error_not_found": {
+    "defaultMessage": "We could not find this order. Please refresh and try again."
+  },
+  "account_order_detail.alert.cancellation_error_title": {
+    "defaultMessage": "Unable to cancel order"
+  },
+  "account_order_detail.alert.cancellation_error_title_generic": {
+    "defaultMessage": "Something went wrong"
+  },
+  "account_order_detail.alert.cancellation_success_description": {
+    "defaultMessage": "Your order was canceled successfully."
+  },
+  "account_order_detail.alert.cancellation_success_title": {
+    "defaultMessage": "Order canceled"
+  },
+  "account_order_detail.alert.return_success_description": {
+    "defaultMessage": "We'll email a return label shortly."
+  },
+  "account_order_detail.alert.return_success_title": {
+    "defaultMessage": "Return submitted"
+  },
+  "account_order_detail.button.cancel_order": {
+    "defaultMessage": "Cancel Order"
+  },
+  "account_order_detail.button.start_return": {
+    "defaultMessage": "Return Items"
+  },
+  "account_order_detail.button.track_number": {
+    "defaultMessage": "Track {trackingNumber}"
+  },
+  "account_order_detail.button.track_shipment": {
+    "defaultMessage": "Track Shipment"
+  },
+  "account_order_detail.button.track_shipment_number": {
+    "defaultMessage": "Track Shipment {number}"
+  },
+  "account_order_detail.error.back_to_history": {
+    "defaultMessage": "Back to Order History"
+  },
+  "account_order_detail.error.description": {
+    "defaultMessage": "We couldn't find the order you're looking for."
+  },
+  "account_order_detail.error.title": {
+    "defaultMessage": "Order Not Found"
+  },
   "account_order_detail.heading.billing_address": {
     "defaultMessage": "Billing Address"
   },
   "account_order_detail.heading.num_of_items": {
-    "defaultMessage": "{count} items"
+    "defaultMessage": "{count, plural, one {# item} other {# items}}"
+  },
+  "account_order_detail.heading.order_actions": {
+    "defaultMessage": "Order Actions"
+  },
+  "account_order_detail.heading.other_items": {
+    "defaultMessage": "Other items"
   },
   "account_order_detail.heading.payment_method": {
     "defaultMessage": "Payment Method"
@@ -110,17 +167,38 @@
   "account_order_detail.heading.pickup_address_number": {
     "defaultMessage": "Pickup Address {number}"
   },
+  "account_order_detail.heading.shipment": {
+    "defaultMessage": "Shipment"
+  },
+  "account_order_detail.heading.shipment_number": {
+    "defaultMessage": "Shipment {number}"
+  },
   "account_order_detail.heading.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
-  "account_order_detail.heading.shipping_address_number": {
-    "defaultMessage": "Shipping Address {number}"
+  "account_order_detail.heading.tracking": {
+    "defaultMessage": "Tracking"
   },
-  "account_order_detail.heading.shipping_method": {
-    "defaultMessage": "Shipping Method"
+  "account_order_detail.hint.cancel_unavailable": {
+    "defaultMessage": "This order can no longer be canceled."
   },
-  "account_order_detail.heading.shipping_method_number": {
-    "defaultMessage": "Shipping Method {number}"
+  "account_order_detail.hint.no_returnable_items": {
+    "defaultMessage": "No items on this order are available to return."
+  },
+  "account_order_detail.hint.no_tracking": {
+    "defaultMessage": "Tracking is not available for this order yet."
+  },
+  "account_order_detail.hint.not_cancellable": {
+    "defaultMessage": "This order isn't eligible for cancellation."
+  },
+  "account_order_detail.hint.return_unavailable": {
+    "defaultMessage": "This order can no longer be returned."
+  },
+  "account_order_detail.label.delivered_on": {
+    "defaultMessage": "Delivered"
+  },
+  "account_order_detail.label.expected_delivery": {
+    "defaultMessage": "Expected delivery"
   },
   "account_order_detail.label.order_number": {
     "defaultMessage": "Order Number: {orderNumber}"
@@ -159,7 +237,7 @@
     "defaultMessage": "You haven't placed an order yet."
   },
   "account_order_history.label.num_of_items": {
-    "defaultMessage": "{count} items",
+    "defaultMessage": "{count, plural, one {# item} other {# items}}",
     "description": "Number of items in order"
   },
   "account_order_history.label.order_number": {
@@ -172,7 +250,7 @@
     "defaultMessage": "Shipped to: {name}"
   },
   "account_order_history.link.view_details": {
-    "defaultMessage": "View details"
+    "defaultMessage": "View Details"
   },
   "account_order_history.title.order_history": {
     "defaultMessage": "Order History"
@@ -291,6 +369,30 @@
   "bonus_products_title.title.num_of_items": {
     "defaultMessage": "Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
   },
+  "cancel_order_modal.button.confirm_cancellation": {
+    "defaultMessage": "Confirm Cancellation"
+  },
+  "cancel_order_modal.button.keep_order": {
+    "defaultMessage": "Keep Order"
+  },
+  "cancel_order_modal.dropdown.select_reason": {
+    "defaultMessage": "Select a cancellation reason"
+  },
+  "cancel_order_modal.heading.cancel_order": {
+    "defaultMessage": "Cancel order {orderNo}"
+  },
+  "cancel_order_modal.label.reason": {
+    "defaultMessage": "Reason"
+  },
+  "cancel_order_modal.text.confirm_description": {
+    "defaultMessage": "Confirm cancellation below."
+  },
+  "cancel_order_modal.text.impact": {
+    "defaultMessage": "Cancel the entire order."
+  },
+  "cancel_order_modal.text.select_reason_description": {
+    "defaultMessage": "Select a reason and confirm cancellation."
+  },
   "carousel.button.scroll_left.assistive_msg": {
     "defaultMessage": "Scroll carousel left"
   },
@@ -373,10 +475,10 @@
     "defaultMessage": "Your attempted payment was unsuccessful. You have not been charged and your order has not been placed."
   },
   "checkout.message.payment_confirm_failure": {
-    "defaultMessage": "Payment confirmation failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method."
+    "defaultMessage": "Payment confirmation failed. Your order has been canceled and your basket has been restored. Please try again or select a different payment method."
   },
   "checkout.message.payment_processing_failed": {
-    "defaultMessage": "Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method."
+    "defaultMessage": "Payment processing failed. Your order has been canceled and your basket has been restored. Please try again or select a different payment method."
   },
   "checkout.message.user_registration": {
     "defaultMessage": "Your payment, address, and contact information will be saved in a new account. Use the emailed one-time password (OTP) to create your account. After creating your account, use the Forgot Password function to set a new password."
@@ -1296,6 +1398,21 @@
   "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "You're currently browsing in offline mode"
   },
+  "order_status_badge.label.cancelled": {
+    "defaultMessage": "Canceled"
+  },
+  "order_status_badge.label.partial_return_complete": {
+    "defaultMessage": "Partial Return Complete"
+  },
+  "order_status_badge.label.partial_return_initiated": {
+    "defaultMessage": "Partial Return Initiated"
+  },
+  "order_status_badge.label.return_complete": {
+    "defaultMessage": "Return Complete"
+  },
+  "order_status_badge.label.return_initiated": {
+    "defaultMessage": "Return Initiated"
+  },
   "order_summary.action.remove_promo": {
     "defaultMessage": "Remove"
   },
@@ -1733,6 +1850,84 @@
   "reset_password_form.title.reset_password": {
     "defaultMessage": "Reset Password"
   },
+  "return_items_modal.button.back": {
+    "defaultMessage": "Back"
+  },
+  "return_items_modal.button.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "return_items_modal.button.review_return": {
+    "defaultMessage": "Review Return"
+  },
+  "return_items_modal.button.submit_return": {
+    "defaultMessage": "Submit Return"
+  },
+  "return_items_modal.heading.return_items": {
+    "defaultMessage": "Return items from order #{orderNo}"
+  },
+  "return_items_modal.heading.review_return": {
+    "defaultMessage": "Review your return"
+  },
+  "return_items_modal.hint.review_disabled": {
+    "defaultMessage": "Select at least one item and choose a reason to continue."
+  },
+  "return_items_modal.hint.review_disabled_no_reason": {
+    "defaultMessage": "Select at least one item to continue."
+  },
+  "return_items_modal.label.item_checkbox": {
+    "defaultMessage": "{name}, {count, plural, one {# unit} other {# units}} available to return"
+  },
+  "return_items_modal.label.quantity": {
+    "defaultMessage": "Quantity"
+  },
+  "return_items_modal.label.reason": {
+    "defaultMessage": "Reason"
+  },
+  "return_items_modal.label.reason_for": {
+    "defaultMessage": "Reason for {name}"
+  },
+  "return_items_modal.placeholder.select_reason": {
+    "defaultMessage": "Select a reason"
+  },
+  "return_items_modal.text.available_to_return": {
+    "defaultMessage": "Up to {count, plural, one {# unit} other {# units}} available to return"
+  },
+  "return_items_modal.text.quantity_exceeded_affected_generic": {
+    "defaultMessage": "The available return quantities for some items changed. Review the updated limits."
+  },
+  "return_items_modal.text.review_description": {
+    "defaultMessage": "Confirm the items below. We'll email a return label once your request is submitted."
+  },
+  "return_items_modal.text.review_quantity": {
+    "defaultMessage": "Quantity: {count}"
+  },
+  "return_items_modal.text.review_reason": {
+    "defaultMessage": "Reason: {reason}"
+  },
+  "return_items_modal.text.select_items_description": {
+    "defaultMessage": "Select the items you want to return and tell us why."
+  },
+  "return_items_modal.text.submit_error": {
+    "defaultMessage": "We couldn't submit your return. Your return wasn't processed. Please wait a moment and try again."
+  },
+  "return_items_modal.text.submit_error_invalid_reason": {
+    "defaultMessage": "The selected reason is no longer available. Choose another reason."
+  },
+  "return_items_modal.text.submit_error_network": {
+    "defaultMessage": "We're unable to process your request right now. Try again in a few minutes."
+  },
+  "return_items_modal.text.submit_error_unknown_items": {
+    "defaultMessage": "We can't find one or more items on this order. Refresh and try again."
+  },
+  "return_items_modal.text.terminal_error_conflict": {
+    "defaultMessage": "This order can't be returned at this time. Reach out to the merchant."
+  },
+  "return_items_modal.text.terminal_error_not_found": {
+    "defaultMessage": "We can't find this order."
+  },
+  "return_items_modal.text.terminal_error_title": {
+    "defaultMessage": "We're unable to submit this return."
+  },
   "search.action.cancel": {
     "defaultMessage": "Cancel"
   },
@@ -1945,6 +2140,9 @@
   },
   "shipping_options.title.shipping_method": {
     "defaultMessage": "Shipping Options"
+  },
+  "shopper_agent.error.session_init_failed": {
+    "defaultMessage": "Something went wrong. Try again."
   },
   "signout_confirmation_dialog.button.cancel": {
     "defaultMessage": "Cancel"

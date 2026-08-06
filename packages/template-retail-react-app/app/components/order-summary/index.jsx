@@ -32,6 +32,7 @@ import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popo
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {BasketIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
+import {isCouponApplied} from '@salesforce/retail-react-app/app/utils/coupon-utils'
 
 const CartItems = ({basket}) => {
     const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
@@ -138,6 +139,11 @@ const OrderSummary = ({
     }
     const shippingItem = basket.shippingItems?.[0]
     const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
+
+    // SCAPI parks valid-but-ineligible coupons on the basket with a non-applied
+    // statusCode (e.g. 'no_applicable_promotion'); only surface coupons that
+    // actually discount the order so we don't show a phantom "applied" promotion.
+    const appliedCoupons = basket.couponItems?.filter(isCouponApplied) ?? []
 
     return (
         <Stack data-testid="sf-order-summary" spacing={5}>
@@ -302,7 +308,7 @@ const OrderSummary = ({
                         </Text>
                     </Flex>
 
-                    {basket.couponItems?.length > 0 && (
+                    {appliedCoupons.length > 0 && (
                         <Stack
                             p={4}
                             border="1px solid"
@@ -318,7 +324,7 @@ const OrderSummary = ({
                                 :
                             </Text>
                             <Stack>
-                                {basket.couponItems.map((item) => (
+                                {appliedCoupons.map((item) => (
                                     <Flex key={item.couponItemId} alignItems="center">
                                         <Text flex="1" fontSize="sm" color="gray.800">
                                             {item.code}

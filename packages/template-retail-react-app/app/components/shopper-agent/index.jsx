@@ -4,18 +4,47 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
-import {useLocation} from 'react-router-dom'
+
+import React, {useEffect, useRef, useMemo} from 'react'
+import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {useUsid} from '@salesforce/commerce-sdk-react'
+import {
+    useAccessToken,
+    useConfig,
+    useConfigurations,
+    useCustomerType,
+    useUsid
+} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
-import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
+import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import {
+    DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
+    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
+    COMMERCE_CLIENT_UI_STATE_EVENT
+} from '@salesforce/retail-react-app/app/constants'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {
+    getPersistedCommerceClientOpenState,
+    persistCommerceClientOpenState,
+    resetEmbeddedMessagingForCommerceSessionChange,
+    resolveCommerceClientScriptUrl,
+    validateCommerceClientAgentSettings
+} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+import {resolveCommerceClientOverrideOptions} from '@salesforce/retail-react-app/app/utils/commerce-client-overrides'
+import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
 
 const onClient = typeof window !== 'undefined'
+
+const HTTP_OK = 200
+
+const SESSION_INIT_ERROR_MESSAGE = defineMessage({
+    id: 'shopper_agent.error.session_init_failed',
+    defaultMessage: 'Something went wrong. Try again.'
+})
 
 /**
  * Validates that a URL is from a trusted Salesforce domain.
@@ -123,9 +152,11 @@ const isEnabled = (enabled) => {
  * Key responsibilities:
  * - Loads the embedded messaging script using useScript hook
  * - Initializes the MIAW service using useMiaw hook
- * - Sets up prechat fields with current locale, currency, and user context
+ * - Sets up prechat fields with current locale, currency, and user context on embedded messaging ready
+ * - Calls Core's Token Bridge proxy when a conversation starts (`onEmbeddedMessagingConversationStarted`)
  * - Manages event listeners for messaging lifecycle events
  * - Handles z-index management for maximized chat windows
+ * - On guest ↔ registered Commerce session transitions, resets MIAW (FAB) so shoppers start a fresh agent session
  * - Cleans up resources on unmount
  *
  * @param {Object} props - Component props
@@ -149,18 +180,19 @@ const isEnabled = (enabled) => {
  * @see {@link useScript} - For script loading functionality
  * @see {@link useMiaw} - For MIAW initialization
  * @see {@link useMultiSite} - For locale and currency information
- * @see {@link useRefreshToken} - For authentication token
  * @see {@link useUsid} - For user session identifier
  */
 const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     // Theme hook for z-index management
     const theme = useTheme()
 
-    // Multi-site hook for locale and currency information
-    const {locale, buildUrl} = useMultiSite()
+    const {formatMessage} = useIntl()
+    const toast = useToast()
+    const toastRef = useRef(toast)
+    toastRef.current = toast
 
-    // Authentication hook for refresh token
-    const refreshToken = useRefreshToken()
+    // Multi-site hook for locale and currency information
+    const {locale} = useMultiSite()
 
     // Normalize locale to Salesforce language format
     const sfLanguage = normalizeLocaleToSalesforce(locale.id)
@@ -181,6 +213,60 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
     // User session identifier hook
     const {usid} = useUsid()
+    const {customerType} = useCustomerType()
+    const {organizationId, siteId: configSiteId} = useConfig()
+
+    // Fetch my_domain from Shopper Configurations API
+    const {data: configurationsData} = useConfigurations({})
+    const myDomain = configurationsData?.configurations?.find(
+        (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
+    )?.value
+
+    // SLAS access token — needed to call Core's Token Bridge directly.
+    const {getTokenWhenReady} = useAccessToken()
+    const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    getTokenWhenReadyRef.current = getTokenWhenReady
+
+    const prevCommerceCustomerTypeRef = useRef(undefined)
+
+    /**
+     * Reset embedded messaging whenever customerType changes (login, logout, registration).
+     * This ensures the chat context is cleared when user authentication state changes.
+     */
+    useEffect(() => {
+        const prev = prevCommerceCustomerTypeRef.current
+        prevCommerceCustomerTypeRef.current = customerType
+
+        // Skip initial mount
+        if (prev === undefined) {
+            return
+        }
+
+        // Reset on any customerType change (login, logout, register)
+        if (prev !== customerType) {
+            resetEmbeddedMessagingForCommerceSessionChange()
+        }
+    }, [customerType])
+
+    const formatMessageRef = useRef(formatMessage)
+    formatMessageRef.current = formatMessage
+
+    /** Latest values for embedded messaging handlers (stable window listeners). */
+    const embeddedLifecycleRef = useRef({})
+    embeddedLifecycleRef.current = {
+        siteId,
+        localeId: locale.id,
+        preferredCurrency: locale.preferredCurrency,
+        commerceOrgId,
+        usid,
+        sfLanguage,
+        domainUrl,
+        organizationId,
+        configSiteId,
+        myDomain
+    }
+
+    const lastConversationSessionInitRef = useRef(null)
 
     /**
      * Retrieves conversation context data based on configuration.
@@ -282,30 +368,116 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         }
     }, [])
 
+    /**
+     * Register embedded messaging window listeners once. Handlers read latest values from refs so we do not
+     * remove/re-add listeners when auth or config updates (which would fight the widget and loop loading).
+     */
     useEffect(() => {
-        /**
-         * Sets up hidden prechat fields when the embedded messaging service is ready.
-         * These fields provide context to the chat agent about the current user session,
-         * site configuration, and locale settings.
-         */
-        const handleEmbeddedMessagingReady = () => {
-            window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-                SiteId: siteId,
-                Locale: locale.id,
-                OrganizationId: commerceOrgId,
-                UsId: usid,
+        const applyHiddenPrechatFields = () => {
+            const bootstrap = window.embeddedservice_bootstrap
+            if (!bootstrap?.prechatAPI?.setHiddenPrechatFields) {
+                return
+            }
+            const s = embeddedLifecycleRef.current
+            bootstrap.prechatAPI.setHiddenPrechatFields({
+                SiteId: s.siteId,
+                Locale: s.localeId,
+                OrganizationId: s.commerceOrgId,
+                UsId: s.usid,
                 IsCartMgmtSupported: 'true',
-                RefreshToken: refreshToken,
-                Currency: locale.preferredCurrency,
-                Language: sfLanguage,
-                DomainUrl: domainUrl
+                Currency: s.preferredCurrency,
+                Language: s.sfLanguage,
+                DomainUrl: s.domainUrl
             })
         }
 
-        /**
-         * Manages z-index for maximized chat windows to ensure proper layering
-         * above other page elements while maintaining accessibility.
-         */
+        const handleEmbeddedMessagingReady = () => {
+            applyHiddenPrechatFields()
+        }
+
+        // Reset the embedded messaging session and surface a localized error
+        // toast. Called from every failure branch of the conversation-started
+        // flow so the shopper sees consistent feedback and the next attempt
+        // starts from a clean state.
+        const failSessionInit = () => {
+            resetEmbeddedMessagingForCommerceSessionChange()
+            toastRef.current({
+                title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+                status: 'error'
+            })
+        }
+
+        const handleEmbeddedMessagingConversationStarted = (event) => {
+            const {
+                organizationId: orgId,
+                configSiteId: sid,
+                myDomain: domain
+            } = embeddedLifecycleRef.current
+
+            if (!orgId || !sid) return
+
+            if (!domain) return
+
+            // Prevents refiring of the event if already call has been done
+            const conversationId = event?.detail?.conversationId
+            if (!conversationId || typeof conversationId !== 'string' || !conversationId.trim()) {
+                return
+            }
+            const normalizedConversationId = conversationId.trim()
+            if (lastConversationSessionInitRef.current === normalizedConversationId) return
+            lastConversationSessionInitRef.current = normalizedConversationId
+
+            const getAuthLinkKey =
+                window.embeddedservice_bootstrap?.userVerificationAPI?.getAuthLinkKey
+            if (typeof getAuthLinkKey !== 'function') {
+                console.error('Shopper Agent: getAuthLinkKey is not available')
+                return
+            }
+
+            getAuthLinkKey()
+                .then(async (authLinkKey) => {
+                    // Direct callout to Core's Token Bridge via the same-origin
+                    // PWA Kit proxy. Replaces the prior postSessionInit SCAPI call.
+                    try {
+                        // Check if HttpOnly mode is enabled by reading the flag directly
+                        // (same source as CommerceApiProvider's enableHttpOnlySessionCookies)
+                        const isHttpOnly =
+                            typeof window !== 'undefined'
+                                ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
+                                : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+
+                        // In non-HttpOnly mode, fetch the access token from localStorage
+                        const slasAccessToken = isHttpOnly
+                            ? undefined
+                            : await getTokenWhenReadyRef.current()
+
+                        const result = await callTokenBridge({
+                            authLinkKey,
+                            // Only send access token in non-HttpOnly mode (from localStorage)
+                            // In HttpOnly mode, server reads from cc-at_{siteId} cookie
+                            slasAccessToken,
+                            siteId: sid
+                        })
+
+                        if (result.status !== HTTP_OK) {
+                            const errorCode = result.body?.error || `HTTP_${result.status}`
+                            console.error('Token Bridge failed', {
+                                status: result.status,
+                                error: errorCode
+                            })
+                            failSessionInit()
+                        }
+                    } catch (error) {
+                        console.error('Token Bridge threw', error)
+                        failSessionInit()
+                    }
+                })
+                .catch((error) => {
+                    console.error('Shopper Agent: getAuthLinkKey failed', error)
+                    failSessionInit()
+                })
+        }
+
         const handleEmbeddedMessagingWindowMaximized = () => {
             const zIndex = theme.zIndices.sticky + 1
             const embeddedMessagingFrame = document.body.querySelector(
@@ -316,31 +488,31 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
             }
         }
 
-        // Set up event listeners for messaging lifecycle events
         window.addEventListener('onEmbeddedMessagingReady', handleEmbeddedMessagingReady)
+        window.addEventListener(
+            'onEmbeddedMessagingConversationStarted',
+            handleEmbeddedMessagingConversationStarted
+        )
         window.addEventListener(
             'onEmbeddedMessagingWindowMaximized',
             handleEmbeddedMessagingWindowMaximized
         )
 
-        // Cleanup function to remove event listeners on unmount
         return () => {
             window.removeEventListener('onEmbeddedMessagingReady', handleEmbeddedMessagingReady)
+            window.removeEventListener(
+                'onEmbeddedMessagingConversationStarted',
+                handleEmbeddedMessagingConversationStarted
+            )
             window.removeEventListener(
                 'onEmbeddedMessagingWindowMaximized',
                 handleEmbeddedMessagingWindowMaximized
             )
         }
-    }, [
-        siteId,
-        locale.id,
-        locale.preferredCurrency,
-        commerceOrgId,
-        usid,
-        theme.zIndices.sticky,
-        refreshToken,
-        domainUrl
-    ])
+        // All dynamic config/auth values are read from embeddedLifecycleRef inside
+        // the handlers, so we only re-register listeners when the z-index token
+        // (used directly in the maximize handler's DOM mutation) changes.
+    }, [theme.zIndices.sticky])
 
     // Load the embedded messaging script asynchronously
     const scriptLoadStatus = useScript(scriptSourceUrl)
@@ -353,7 +525,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         embeddedServiceEndpoint,
         scrt2Url,
         locale.id,
-        refreshToken,
         enableAgentFromFloatingButton
     )
 
@@ -392,6 +563,182 @@ ShopperAgentWindow.propTypes = {
 }
 
 /**
+ * Class name added to the Commerce Client widget elements via the widget's
+ * `globalClassName` option. Provides a stable hook for targeting the widget
+ * (e.g. analytics or optional consumer CSS).
+ */
+const COMMERCE_CLIENT_GLOBAL_CLASS = 'commerce-client-shopper-agent'
+
+/**
+ * Default width of the Commerce Client side panel. Applied through the widget's
+ * `componentConfig.options.dialogWidth` option when `cc_dialogFullHeight` is 'true'.
+ */
+const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
+
+/**
+ * Internal component that renders the Commerce Client messaging widget.
+ *
+ * Unlike {@link ShopperAgentWindow} (which boots the Salesforce Embedded
+ * Messaging iframe), this component loads the Commerce Client messaging UMD bundle and
+ * injects the widget into a container element via
+ * `window.CimulateMessaging.injectMessagingWidget`. The two providers are
+ * mutually exclusive and selected by `commerceAgent.provider`.
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.commerceAgentConfiguration - Commerce agent configuration object
+ * @param {string} props.commerceAgentConfiguration.scrt2Url - SCRT2 URL (passed to `messagingConfig.scrt2Url`)
+ * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID (passed to `messagingConfig.orgId`)
+ * @param {string} [props.commerceAgentConfiguration.cc_esDeveloperName] - Embedded Service developer name
+ * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `cc_esDeveloperName`
+ * @param {string} [props.commerceAgentConfiguration.cc_capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
+ * @param {string} [props.commerceAgentConfiguration.cc_enableEscalationToAgent] - When 'true', lets shoppers escalate to a human agent; forwarded as `messagingConfig.enableEscalationToAgent`. Defaults to 'false'
+ * @param {string} [props.commerceAgentConfiguration.cc_enableDownloadTranscript] - 'true' (default) lets shoppers download the chat transcript; forwarded as `messagingConfig.enableDownloadTranscript`
+ * @param {string} [props.commerceAgentConfiguration.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0'); resolved into the full messaging bundle URL
+ * @param {string} [props.commerceAgentConfiguration.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting); wins over cc_cdnVersion
+ * @param {string} [props.commerceAgentConfiguration.cc_logoUrl] - URL of the logo shown in the widget, forwarded as `logoUrl`
+ * @param {string} [props.commerceAgentConfiguration.cc_headerText] - Header text shown at the top of the widget
+ * @param {string} [props.commerceAgentConfiguration.cc_disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
+ * @param {Object} [props.commerceAgentConfiguration.cc_searchConfig] - Search input config forwarded to the widget as `searchConfig` (e.g. `placeholder`, `buttonLabel`, `buttonType`, `buttonIconUrl`)
+ * @param {string} [props.commerceAgentConfiguration.commerceClientElementId] - Container element id (defaults to 'commerce-client-messaging-widget')
+ * @param {string} [props.commerceAgentConfiguration.cc_dialogFullHeight] - 'true' (default) renders a full-height side panel; 'false' renders a standard corner dialog
+ * @param {string} [props.commerceAgentConfiguration.cc_dialogWidth] - Width of the side panel when cc_dialogFullHeight is 'true' (e.g. '420px')
+ * @param {string} [props.commerceAgentConfiguration.cc_displayType] - Widget type: 'chat' | 'dialog' | 'modal'
+ * @param {string} [props.commerceAgentConfiguration.cc_widgetPosition] - Widget corner position: 'bottom-left' | 'bottom-right' (default)
+ * @param {string} [props.commerceAgentConfiguration.cc_isOpen] - When 'true', the widget opens automatically on page load (forwarded as `componentConfig.isOpen`); defaults to 'false'
+ * @param {string} [props.commerceAgentConfiguration.cc_isDevelopment] - When 'true', logs widget events to the console (forwarded as `isDevelopment`)
+ * @param {Object} [props.commerceAgentConfiguration.cc_theme] - Partial theme overrides for the widget
+ * @param {Object} [props.commerceAgentConfiguration.cc_routingAttributes] - Optional Agentforce routing attributes forwarded to the widget as `routingAttributes`
+ * @param {string} [props.commerceAgentConfiguration.cc_overridesUrl] - Optional HTTPS URL of a component override script, forwarded as `overridesUrl`
+ * @param {Object} [props.commerceAgentConfiguration.cc_overrides] - Optional inline map of widget override keys (e.g. `ProductTile`) to already-registered custom element tag names, forwarded as `overrides`. Mutually exclusive with `cc_overridesUrl`, which it takes precedence over
+ * @returns {JSX.Element} A container element the Commerce Client widget is rendered into
+ */
+const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
+    const {
+        scrt2Url,
+        salesforceOrgId,
+        cc_esDeveloperName,
+        embeddedServiceName,
+        cc_capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
+        cc_logoUrl,
+        cc_headerText,
+        cc_disclaimerMarkdown,
+        commerceClientElementId = DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
+        cc_dialogFullHeight = 'true',
+        cc_dialogWidth = DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH,
+        cc_displayType = 'dialog',
+        cc_widgetPosition = 'bottom-right',
+        cc_isOpen = 'false',
+        cc_isDevelopment = 'false',
+        cc_enableEscalationToAgent = 'false',
+        cc_enableDownloadTranscript = 'true',
+        cc_theme,
+        cc_searchConfig,
+        cc_routingAttributes,
+        cc_overridesUrl,
+        cc_overrides
+    } = commerceAgentConfiguration
+
+    // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
+    const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
+
+    const isFullHeight = cc_dialogFullHeight === 'true'
+
+    // Restore open-state after navigation (read once on mount); falls back to
+    // cc_isOpen when nothing is persisted (fresh tab).
+    const persistedOpenRef = useRef(getPersistedCommerceClientOpenState())
+    const initialIsOpen =
+        persistedOpenRef.current === undefined ? cc_isOpen === 'true' : persistedOpenRef.current
+
+    // Persist open-state on every change so the panel carries across pages.
+    useEffect(() => {
+        if (!onClient) return undefined
+
+        const handleUiStateUpdate = (event) => {
+            const {property, value} = event?.detail || {}
+            if (property === 'isOpen') {
+                persistCommerceClientOpenState(Boolean(value))
+            }
+        }
+
+        window.addEventListener(COMMERCE_CLIENT_UI_STATE_EVENT, handleUiStateUpdate)
+        return () => {
+            window.removeEventListener(COMMERCE_CLIENT_UI_STATE_EVENT, handleUiStateUpdate)
+        }
+    }, [])
+
+    const widgetOptions = useMemo(
+        () => ({
+            elementId: commerceClientElementId,
+            scrt2Url,
+            orgId: salesforceOrgId,
+            esDeveloperName: cc_esDeveloperName || embeddedServiceName,
+            capabilitiesVersion: cc_capabilitiesVersion,
+            enableEscalationToAgent: cc_enableEscalationToAgent !== 'false',
+            enableDownloadTranscript: cc_enableDownloadTranscript !== 'false',
+            routingAttributes: cc_routingAttributes,
+            logoUrl: cc_logoUrl,
+            headerText: cc_headerText,
+            disclaimerMarkdown: cc_disclaimerMarkdown,
+            searchConfig: cc_searchConfig,
+            globalClassName: COMMERCE_CLIENT_GLOBAL_CLASS,
+            isDevelopment: cc_isDevelopment === 'true',
+            componentConfig: {
+                isOpen: initialIsOpen,
+                type: cc_displayType,
+                options: {
+                    dialogPosition: cc_widgetPosition,
+                    ...(isFullHeight && {
+                        dialogFullHeight: true,
+                        dialogWidth: cc_dialogWidth
+                    })
+                }
+            },
+            theme: cc_theme,
+            ...resolveCommerceClientOverrideOptions({cc_overrides, cc_overridesUrl})
+        }),
+        [
+            commerceClientElementId,
+            scrt2Url,
+            salesforceOrgId,
+            cc_esDeveloperName,
+            embeddedServiceName,
+            cc_capabilitiesVersion,
+            cc_enableEscalationToAgent,
+            cc_enableDownloadTranscript,
+            cc_routingAttributes,
+            cc_logoUrl,
+            cc_headerText,
+            cc_disclaimerMarkdown,
+            cc_searchConfig,
+            cc_isDevelopment,
+            initialIsOpen,
+            isFullHeight,
+            cc_displayType,
+            cc_widgetPosition,
+            cc_dialogWidth,
+            cc_theme,
+            cc_overridesUrl,
+            cc_overrides
+        ]
+    )
+
+    // Inject the widget into the container once the bundle is loaded
+    useCommerceClientMessaging(scriptLoadStatus, widgetOptions)
+
+    return <div id={commerceClientElementId} data-testid="commerce-client-agent-widget" />
+}
+
+CommerceClientAgentWindow.propTypes = {
+    /**
+     * Commerce agent configuration object containing the Commerce Client widget settings.
+     *
+     * @type {Object}
+     * @required
+     */
+    commerceAgentConfiguration: PropTypes.object.isRequired
+}
+
+/**
  * Main ShopperAgent component that initializes and manages the embedded messaging service.
  * This component acts as a conditional wrapper that only renders the messaging service
  * when all required conditions are met (enabled, basket loaded, valid configuration).
@@ -424,8 +771,10 @@ ShopperAgentWindow.propTypes = {
  * @see {@link isEnabled} - Enabled state checker
  */
 const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
-    // Extract enabled state from configuration
-    const {enabled} = commerceAgentConfiguration
+    // Extract enabled state and provider from configuration.
+    // `provider` defaults to 'miaw' to preserve backwards compatibility with the
+    // existing Salesforce Embedded Messaging (MIAW) integration.
+    const {enabled, provider = 'miaw'} = commerceAgentConfiguration
 
     // Get current location and app origin for domain URL
     const appOrigin = useAppOrigin()
@@ -437,13 +786,27 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     // Build the current domain URL
     const domainUrl = `${appOrigin}${buildUrl('')}`
 
-    // Conditional rendering: only render when all conditions are met
-    // 1. Agent is enabled and running on client
-    // 2. Basket has finished loading
-    // 3. Configuration is valid
-    return isShopperAgentEnabled &&
-        basketDoneLoading &&
-        validateCommerceAgentSettings(commerceAgentConfiguration) ? (
+    // Fetch configurations to ensure myDomain is resolved before rendering
+    const {isLoading: isConfigurationsLoading} = useConfigurations({})
+
+    // Only render when the agent is enabled (client-side), the basket has loaded, and configurations API has completed.
+    if (!isShopperAgentEnabled || !basketDoneLoading || isConfigurationsLoading) {
+        return null
+    }
+
+    // Commerce Client widget provider
+    if (provider === 'commerce-client') {
+        return validateCommerceClientAgentSettings(commerceAgentConfiguration) ? (
+            <div data-testid="shopper-agent">
+                <CommerceClientAgentWindow
+                    commerceAgentConfiguration={commerceAgentConfiguration}
+                />
+            </div>
+        ) : null
+    }
+
+    // Default: Salesforce Embedded Messaging (MIAW) provider
+    return validateCommerceAgentSettings(commerceAgentConfiguration) ? (
         <div data-testid="shopper-agent">
             <ShopperAgentWindow
                 commerceAgentConfiguration={commerceAgentConfiguration}

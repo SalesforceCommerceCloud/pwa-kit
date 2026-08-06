@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/retail-react-app",
-  "version": "10.1.0-dev",
+  "version": "10.2.0-dev",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {
@@ -21,7 +21,7 @@
     "postinstall": "npm run compile-translations && npm run compile-translations:pseudo",
     "push": "npm run build && pwa-kit-dev push",
     "save-credentials": "pwa-kit-dev save-credentials",
-    "start": "cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
+    "start": "set -a; [ -f .env ] && . ./.env; set +a; cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
     "start:inspect": "npm run start -- --inspect",
     "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
     "tail-logs": "pwa-kit-dev tail-logs",
@@ -46,10 +46,10 @@
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
     "@salesforce/cc-datacloud-typescript": "1.1.2",
-    "@salesforce/commerce-sdk-react": "5.3.0-dev",
-    "@salesforce/pwa-kit-dev": "3.19.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "3.19.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.19.0-dev",
+    "@salesforce/commerce-sdk-react": "5.4.0-dev",
+    "@salesforce/pwa-kit-dev": "3.20.0-dev",
+    "@salesforce/pwa-kit-react-sdk": "3.20.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.20.0-dev",
     "@salesforce/storefront-next-runtime": "0.4.2",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
@@ -107,11 +107,11 @@
   "bundlesize": [
     {
       "path": "build/main.js",
-      "maxSize": "102 kB"
+      "maxSize": "105 kB"
     },
     {
       "path": "build/vendor.js",
-      "maxSize": "397 kB"
+      "maxSize": "400 kB"
     }
   ]
 }

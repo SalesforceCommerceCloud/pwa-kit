@@ -74,15 +74,22 @@ export const withReactQuery = (Wrapped, options = {}) => {
             res.__performanceTimer?.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'end')
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
+            // Distributed tracing: react-rendering (server-only) injects a child-span
+            // helper via res.locals so each SSR query fetch becomes its own span under
+            // `getProps`, without this universal module importing the server-only OTel
+            // code. Falls back to a passthrough when tracing is off / on the client.
+            const withChildSpan = res.locals?.__withChildSpan || ((_name, fn) => fn())
             await Promise.all(
                 queries.map(async (q, i) => {
                     // always include the index to avoid duplicate entries
                     const displayName = q.meta?.displayName ? `${q.meta?.displayName}-${i}` : `${i}`
                     const useQueryMarker = `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`
+                    // Span name uses the query's display name (or index), e.g. `scapi:useProductSearch`.
+                    const spanName = `scapi:${q.meta?.displayName || i}`
                     res.__performanceTimer?.mark(useQueryMarker, 'start')
 
                     try {
-                        const result = await q.fetch()
+                        const result = await withChildSpan(spanName, () => q.fetch())
                         return result
                     } catch (err) {
                         if (err?.name === 'MaintenanceError') {

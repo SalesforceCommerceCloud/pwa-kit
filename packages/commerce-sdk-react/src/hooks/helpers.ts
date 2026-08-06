@@ -8,14 +8,22 @@ import Auth from '../auth'
 import {CommerceApiProviderProps} from '../provider'
 import {Logger} from '../types'
 import {CustomEndpointArg, OptionalCustomEndpointClientConfig, TMutationVariables} from './types'
-import {onClient} from '../utils'
+import {onClient, parseResponseBodyClone} from '../utils'
 
 /**
- * A helper function for handling bad responses from SCAPI when an invalid access token is used.
+ * Handles a bad response from SCAPI caused by an invalid/expired access token, returning a
+ * token response the caller can use to retry the request once.
  *
- * Re-throws the error if it is not caused by an invalid access token
- * @param error - the error
- * @returns a new guest access token
+ * - 400 `access_token_cookie_missing` (HttpOnly proxy): clear the stale expiry and refresh.
+ * - 401 "Customer credentials changed after token was issued.": log out (clear login state).
+ * - any other 401: clear the stale expiry and refresh — the refresh returns a token for the
+ *   same identity, or falls back to a guest token if the refresh token is also dead.
+ * - anything else: re-thrown unchanged.
+ *
+ * @param error - the error thrown by the SCAPI/SLAS call
+ * @param auth - the Auth instance used to clear expiry / refresh / log out
+ * @param logger - logger for diagnostic messages
+ * @returns a token response ({@link Auth.data}) to retry with; throws if the error is not refreshable
  */
 export const handleInvalidToken = async (error: any, auth: Auth, logger: Logger) => {
     // The proxy returns a 400 with this message when the HttpOnly access token cookie
@@ -24,7 +32,10 @@ export const handleInvalidToken = async (error: any, auth: Auth, logger: Logger)
     // valid, causing isAccessTokenExpired() to incorrectly report the token as not expired.
     // Clear the stale expiry cookie and trigger a token refresh.
     if (error?.response?.status === 400) {
-        const response = await error?.response?.json()
+        // Read a clone so the original body stream stays intact for the caller. When this is
+        // not a recognized token error, the original `error` is re-thrown below and the caller
+        // (e.g. a mutation's .catch) must still be able to read the response body for details.
+        const response = await parseResponseBodyClone(error?.response)
         if (response?.message === 'access_token_cookie_missing') {
             logger.warn('Access token cookie missing. Clearing expiry and refreshing token.')
             auth.clearAccessTokenExpiry()
@@ -36,13 +47,25 @@ export const handleInvalidToken = async (error: any, auth: Auth, logger: Logger)
         throw error
     }
 
-    const response = await error?.response?.json()
+    const response = await parseResponseBodyClone(error?.response)
     if (response?.detail === 'Customer credentials changed after token was issued.') {
         logger.info('Login was invalidated. Clearing login state.')
         return await auth.logout()
     }
 
-    throw error
+    // SCAPI rejected the access token (revoked, tampered, or invalidated after a SLAS
+    // key rotation) while the non-HttpOnly cc-at-expires indicator still read valid, so
+    // ready() trusted the indicator and never refreshed. Clear the stale expiry FIRST so
+    // _refreshAccessToken() can't short-circuit on the still-"valid" indicator, then
+    // refresh so the request can be retried with a fresh token. A still-valid refresh
+    // token (cc-nx) yields a new access token for the same identity; if the refresh token
+    // is also dead, refreshAccessToken() falls back to a guest token (downgrading a dead
+    // registered session to guest) rather than throwing — the same fallback ready() and
+    // the 400 handler above already rely on. The caller retries exactly once, so a repeat
+    // 401 still propagates.
+    logger.warn('Access token rejected with a 401. Clearing expiry and refreshing token.')
+    auth.clearAccessTokenExpiry()
+    return await auth.refreshAccessToken()
 }
 
 /**

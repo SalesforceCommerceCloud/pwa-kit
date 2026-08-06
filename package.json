@@ -1,6 +1,6 @@
 {
     "name": "pwa-kit",
-    "version": "3.19.0-dev",
+    "version": "3.20.0-dev",
     "scripts": {
         "bump-version": "node ./scripts/bump-version/index.js",
         "bump-version:retail-react-app": "node ./scripts/bump-version/index.js --package=@salesforce/retail-react-app",
@@ -27,7 +27,7 @@
     },
     "devDependencies": {
         "@axe-core/playwright": "^4.10.1",
-        "@playwright/test": "^1.49.0",
+        "@playwright/test": "^1.61.1",
         "@typescript-eslint/eslint-plugin": "^5.57.0",
         "@typescript-eslint/parser": "^5.57.0",
         "commander": "^9.5.0",

@@ -13,6 +13,19 @@ import {SDKClientTransformConfig} from './hooks/types'
 /** Utility to determine if you are on the browser (client) or not. */
 export const onClient = (): boolean => typeof window !== 'undefined'
 
+/**
+ * Parses a JSON body from a fetch `Response` without consuming the original body stream.
+ *
+ * A `Response` body is single-use — once read (e.g. via `.json()`) it cannot be read again.
+ * To inspect an error response body while still letting the caller read it (for example to
+ * surface SCAPI/SFRA hook error details), read a clone and leave the original intact.
+ *
+ * @param response - the fetch Response to read; may be undefined for non-Response errors.
+ * @returns the parsed JSON body, or undefined when there is no cloneable response.
+ */
+export const parseResponseBodyClone = async (response?: Response) =>
+    typeof response?.clone === 'function' ? await response.clone().json() : undefined
+
 /** Detects whether the storefront is running in an iframe. */
 export const detectInIframe = () => typeof window !== 'undefined' && window.top !== window.self
 
@@ -59,6 +72,25 @@ export const getCookieSameSiteAttribute = () => {
     const isLocalHost = window.location.hostname === 'localhost'
     const parentOrigin = getParentOrigin()
     return !isLocalHost && isOriginTrusted(parentOrigin) ? 'none' : 'Lax'
+}
+
+/**
+ * Returns the parent origin when the storefront is running inside a trusted
+ * Storefront Preview iframe (i.e. the same condition under which
+ * `getCookieSameSiteAttribute` returns `"none"`), otherwise `undefined`.
+ *
+ * Used to signal the trusted parent origin to the BFF (via the
+ * `x-pwakit-preview-parent` header) on SLAS token requests when HttpOnly
+ * session cookies are enabled, so the server can set session cookies with
+ * SameSite=None; Partitioned. Returns `undefined` on the server and on
+ * localhost (the server-side allow-list does not include the local dev
+ * origin, and local dev is not fronted by the CDN that motivates this header).
+ */
+export const getTrustedPreviewParentOrigin = (): string | undefined => {
+    if (!onClient()) return undefined
+    const isLocalHost = window.location.hostname === 'localhost'
+    const parentOrigin = getParentOrigin()
+    return !isLocalHost && isOriginTrusted(parentOrigin) ? parentOrigin : undefined
 }
 
 /**

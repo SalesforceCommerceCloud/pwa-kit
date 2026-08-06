@@ -29,9 +29,12 @@ import {
     buildTheme,
     getSFPaymentsInstrument,
     transformAddressDetails,
+    transformPayPalAddressFromPaymentReference,
+    getPaymentReference,
     transformShippingMethods,
     getSelectedShippingMethodId,
     createPaymentInstrumentBody,
+    createPayPalShippingPatchBody,
     isPayPalPaymentMethodType,
     getClientSecret,
     getGatewayFromPaymentMethod,
@@ -95,6 +98,9 @@ const SFPaymentsExpressButtons = ({
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
+    const {mutateAsync: updatePaymentInstrumentInBasket} = useShopperBasketsMutation(
+        'updatePaymentInstrumentInBasket'
+    )
     const {mutateAsync: updatePaymentInstrumentForOrder} = useShopperOrdersMutation(
         'updatePaymentInstrumentForOrder'
     )
@@ -154,7 +160,7 @@ const SFPaymentsExpressButtons = ({
         },
         FAIL_ORDER: {
             defaultMessage:
-                'Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
+                'Payment processing failed. Your order has been canceled and your basket has been restored. Please try again or select a different payment method.',
             id: 'sfp_payments_express.error.fail_order'
         },
         PREPARE_BASKET: {
@@ -498,6 +504,33 @@ const SFPaymentsExpressButtons = ({
                 }
             }
 
+            const resolvePayPalAddresses = async () => {
+                const token = await getTokenWhenReady()
+                const basketWithRefs = await api.shopperBasketsV2.getBasket({
+                    parameters: {
+                        basketId: expressBasket.current.basketId,
+                        expand: ['payment_references']
+                    },
+                    headers: {Authorization: `Bearer ${token}`}
+                })
+                const paypalRef = getPaymentReference(basketWithRefs, 'paypal')
+                const paypalAddress = transformPayPalAddressFromPaymentReference(
+                    paypalRef?.gatewayProperties?.paypal
+                )
+                if (!paypalAddress) {
+                    logger.error('Missing PayPal address on paymentReference', {
+                        namespace: 'SFPaymentsExpressButtons.onPayerApprove',
+                        additionalProperties: {
+                            basketId: expressBasket.current?.basketId,
+                            paymentMethodType,
+                            hasPaypalRef: Boolean(paypalRef)
+                        }
+                    })
+                    throw new Error('Missing PayPal address on paymentReference')
+                }
+                return {billingAddress: paypalAddress, shippingAddress: paypalAddress}
+            }
+
             const onCancel = async () => {
                 isPaymentInProgress.current = false
                 endConfirming()
@@ -548,6 +581,46 @@ const SFPaymentsExpressButtons = ({
                         updatedBasket,
                         updatedShippingMethods
                     )
+                    expressBasket.current = updatedBasket
+
+                    // PayPal/Venmo: PATCH the basket payment instrument so the upstream
+                    // PayPal Order reflects the new amount and shipping options.
+                    if (isPayPalPaymentMethodType(paymentMethodType)) {
+                        const sfPaymentsInstrument = getSFPaymentsInstrument(updatedBasket)
+                        if (sfPaymentsInstrument) {
+                            try {
+                                expressBasket.current = await updatePaymentInstrumentInBasket({
+                                    parameters: {
+                                        basketId: updatedBasket.basketId,
+                                        paymentInstrumentId:
+                                            sfPaymentsInstrument.paymentInstrumentId
+                                    },
+                                    body: createPayPalShippingPatchBody({
+                                        basket: updatedBasket,
+                                        shippingMethods: updatedShippingMethods,
+                                        selectedShippingMethodId: getSelectedShippingMethodId(
+                                            updatedBasket,
+                                            updatedShippingMethods
+                                        ),
+                                        paymentMethodType,
+                                        zoneId
+                                    })
+                                })
+                            } catch (error) {
+                                logger.error(
+                                    'Failed to PATCH PayPal payment instrument with shipping options',
+                                    {
+                                        namespace:
+                                            'SFPaymentsExpressButtons.onShippingAddressChange',
+                                        additionalProperties: {
+                                            error,
+                                            basketId: updatedBasket.basketId
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
 
                     const expressCallback = createExpressCallback(
                         updatedBasket,
@@ -578,7 +651,7 @@ const SFPaymentsExpressButtons = ({
                     }
 
                     // Update the shipping method in the default shipment
-                    const updatedBasket = await updateShippingMethod.mutateAsync({
+                    let updatedBasket = await updateShippingMethod.mutateAsync({
                         parameters: {
                             basketId: expressBasket.current.basketId,
                             shipmentId: DEFAULT_SHIPMENT_ID
@@ -592,6 +665,43 @@ const SFPaymentsExpressButtons = ({
 
                     // Fetch applicable shipping methods after shipping method update
                     const {data: updatedShippingMethods} = await refetchShippingMethods()
+
+                    // PayPal/Venmo: PATCH the basket payment instrument so the upstream
+                    // PayPal Order reflects the new amount. shippingMethods is intentionally
+                    // omitted so the body carries no shippingOptions — the option list is
+                    // unchanged on a method-selection.
+                    if (isPayPalPaymentMethodType(paymentMethodType)) {
+                        const sfPaymentsInstrument = getSFPaymentsInstrument(updatedBasket)
+                        if (sfPaymentsInstrument) {
+                            try {
+                                updatedBasket = await updatePaymentInstrumentInBasket({
+                                    parameters: {
+                                        basketId: updatedBasket.basketId,
+                                        paymentInstrumentId:
+                                            sfPaymentsInstrument.paymentInstrumentId
+                                    },
+                                    body: createPayPalShippingPatchBody({
+                                        basket: updatedBasket,
+                                        paymentMethodType,
+                                        zoneId
+                                    })
+                                })
+                                expressBasket.current = updatedBasket
+                            } catch (error) {
+                                logger.error(
+                                    'Failed to PATCH PayPal payment instrument with updated amount',
+                                    {
+                                        namespace:
+                                            'SFPaymentsExpressButtons.onShippingMethodChange',
+                                        additionalProperties: {
+                                            error,
+                                            basketId: updatedBasket.basketId
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
 
                     const expressCallback = createExpressCallback(
                         updatedBasket,
@@ -610,20 +720,24 @@ const SFPaymentsExpressButtons = ({
                 // Set confirmingBasket to show loading spinner during address updates
                 startConfirming(expressBasket.current)
 
-                // For non-PayPal methods, if order was already created in createIntentFunction,
+                // If the order was already created in createIntentFunction,
                 // the basket is consumed and we shouldn't try to update addresses
-                if (!isPayPalPaymentMethodType(paymentMethodType) && orderRef.current) {
+                if (orderRef.current) {
                     logger.info('Order already created, skipping address updates', {
                         namespace: 'SFPaymentsExpressButtons.onPayerApprove'
                     })
                     return
                 }
+
                 try {
-                    // Transform both billing and shipping addresses
-                    const {billingAddress, shippingAddress} = transformAddressDetails(
-                        billingDetails,
-                        shippingDetails
+                    // For scenarios where the addresses aren't provided client side such as PayPal/Venmo,
+                    // fetch the basket back with expand=payment_references so the addresses
+                    // can be fetched server side from the gateway and returned to the client
+                    const {billingAddress, shippingAddress} = isPayPalPaymentMethodType(
+                        paymentMethodType
                     )
+                        ? await resolvePayPalAddresses()
+                        : transformAddressDetails(billingDetails, shippingDetails)
 
                     // Next update shipping address in basket
                     const updatedBasket = await updateShippingAddressForShipment.mutateAsync({

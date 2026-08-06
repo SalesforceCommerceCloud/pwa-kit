@@ -10,7 +10,7 @@ import {
     expireHttpOnlySessionCookies
 } from './process-token-response'
 import {_resetWarnedDomainsForTesting} from './cookie-domain'
-import {X_SITE_ID} from './constants'
+import {X_SITE_ID, X_PREVIEW_PARENT} from './constants'
 import {parse as parseSetCookie} from 'set-cookie-parser'
 
 jest.mock('../../utils/logger-instance', () => ({
@@ -58,6 +58,26 @@ function makeOptionsWithCookieDomain(cookieDomain) {
 
 function findCookies(cookies, name) {
     return cookies.filter((c) => c.startsWith(`${name}=`)).map(parseCookie)
+}
+
+// Mirrors commerce-sdk-isomorphic's SSR TokenResponse reconstruction: it walks
+// the response's Set-Cookie array in emission order and assigns per token field
+// with last-write-wins, keyed only by cookie NAME (the Domain attribute is
+// ignored). The SDK reconstructs exactly three fields — cc-at → access_token,
+// cc-nx/cc-nx-g → refresh_token (BOTH names), idp_access_token → idp_access_token
+// — so those are the ones modelled here. This is what a cookieless SSR guest
+// login uses to recover its tokens, so the raw emission order of these
+// Set-Cookie headers is load-bearing — see the ordering notes in makeAppendCookie
+// and the refresh-token block of process-token-response.js.
+function reconstructSsrTokens(cookies, site = 'testsite') {
+    const out = {}
+    for (const raw of cookies) {
+        const {name, value} = parseCookie(raw)
+        if (name === `cc-at_${site}`) out.access_token = value
+        else if (name === `cc-nx_${site}` || name === `cc-nx-g_${site}`) out.refresh_token = value
+        else if (name === `idp_access_token_${site}`) out.idp_access_token = value
+    }
+    return out
 }
 
 describe('getRefreshTokenCookieTTL', () => {
@@ -220,7 +240,7 @@ describe('setHttpOnlySessionCookies', () => {
         expect(staleRegisteredCookie.value).toBe('')
         expect(staleRegisteredCookie.expires).toEqual(new Date(0))
 
-        // customer_id (non-HttpOnly, refresh TTL)
+        // customer_id (non-HttpOnly, aligned to access-token expiry)
         const custIdCookie = parseCookie(
             res.cookies.find((c) => c.includes('customer_id_testsite='))
         )
@@ -228,6 +248,8 @@ describe('setHttpOnlySessionCookies', () => {
         expect(custIdCookie.httpOnly).toBeUndefined()
         expect(custIdCookie.secure).toBe(true)
         expect(custIdCookie.path).toBe('/')
+        // Expiry tied to the access-token JWT exp (2800), matching cc-at-expires/id_token.
+        expect(custIdCookie.expires).toEqual(new Date(2800 * 1000))
 
         // enc_user_id (non-HttpOnly, refresh TTL)
         const encUserIdCookie = parseCookie(
@@ -242,11 +264,18 @@ describe('setHttpOnlySessionCookies', () => {
         )
         expect(custTypeCookie.value).toBe('guest')
         expect(custTypeCookie.httpOnly).toBeUndefined()
+        // Expiry tied to the access-token JWT exp (2800), not the refresh-token TTL.
+        expect(custTypeCookie.expires).toEqual(new Date(2800 * 1000))
 
         // usid (non-HttpOnly, refresh-TTL-aligned)
         const usidCookie = parseCookie(res.cookies.find((c) => c.includes('usid_testsite=')))
         expect(usidCookie.value).toBe('usid-abc')
         expect(usidCookie.httpOnly).toBeUndefined()
+
+        // customer_id/customer_type expire with the access token, which is sooner
+        // than the refresh-TTL-aligned usid cookie (the previous behavior).
+        expect(custIdCookie.expires.getTime()).toBeLessThan(usidCookie.expires.getTime())
+        expect(custTypeCookie.expires.getTime()).toBeLessThan(usidCookie.expires.getTime())
 
         // cc-nx-expires (non-HttpOnly, absolute epoch when refresh token expires)
         const refreshExpiresCookie = parseCookie(
@@ -331,6 +360,8 @@ describe('setHttpOnlySessionCookies', () => {
         )
         expect(custTypeCookie.value).toBe('registered')
         expect(custTypeCookie.httpOnly).toBeUndefined()
+        // Expiry tied to the access-token JWT exp (3800), not the refresh-token TTL.
+        expect(custTypeCookie.expires).toEqual(new Date(3800 * 1000))
 
         // cc-nx-exists has been removed; cc-nx-expires now serves as the
         // non-HttpOnly indicator that a refresh token cookie exists.
@@ -350,6 +381,41 @@ describe('setHttpOnlySessionCookies', () => {
         const body = JSON.parse(result.toString('utf8'))
         expect(body).not.toHaveProperty('access_token')
         expect(body).not.toHaveProperty('refresh_token')
+    })
+
+    test('writes customer_id/customer_type on an access-token response with no refresh_token, aligned to access-token expiry', () => {
+        // customer_id/customer_type follow the access token, not the refresh
+        // token, so an access-token-only response (e.g. a refresh without
+        // refresh-token rotation) still refreshes them — keeping them in sync
+        // with the current token instead of leaving stale/evicted cookies.
+        const res = makeRes()
+        const accessToken = makeJWT({
+            iat: 1000,
+            exp: 2800,
+            isb: 'uido:ecom::upn:john@example.com::uidn:John'
+        })
+        const buf = makeResponseBuffer({
+            access_token: accessToken,
+            customer_id: 'cust-x'
+            // no refresh_token
+        })
+        setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
+
+        const custTypeCookie = parseCookie(
+            res.cookies.find((c) => c.includes('customer_type_testsite='))
+        )
+        expect(custTypeCookie.value).toBe('registered')
+        expect(custTypeCookie.expires).toEqual(new Date(2800 * 1000))
+
+        const custIdCookie = parseCookie(
+            res.cookies.find((c) => c.includes('customer_id_testsite='))
+        )
+        expect(custIdCookie.value).toBe('cust-x')
+        expect(custIdCookie.expires).toEqual(new Date(2800 * 1000))
+
+        // No refresh_token → the refresh-token block is skipped entirely.
+        expect(res.cookies.find((c) => c.includes('cc-nx-expires_testsite='))).toBeUndefined()
+        expect(res.cookies.find((c) => c.startsWith('cc-nx_testsite='))).toBeUndefined()
     })
 
     test('omits optional metadata cookies when SLAS response fields are absent', () => {
@@ -587,6 +653,118 @@ describe('cookieDomain support', () => {
         expect(atActive.httpOnly).toBe(true)
     })
 
+    test('emits the host-scoped deletion BEFORE the real Domain-scoped write (raw emission order)', () => {
+        // The existing cleanup test above sorts the two writes by Domain, so it
+        // would still pass if the two res.append calls in makeAppendCookie were
+        // flipped back — reintroducing the SSR-reconstruction 401. Assert the
+        // raw emission order directly so that regression is caught.
+        const res = makeRes()
+        const accessToken = makeJWT({iat: 1000, exp: 2800, isb: 'uido:ecom::upn:Guest'})
+        const buf = makeResponseBuffer({access_token: accessToken, refresh_token: 'refresh-value'})
+        setHttpOnlySessionCookies(
+            buf,
+            {},
+            makeReq(),
+            res,
+            makeOptionsWithCookieDomain('.example.com')
+        )
+
+        // For a given cookie name, the empty host-scoped deletion must be emitted
+        // before the real Domain-scoped value so last-write-wins recovers the value.
+        const assertDeletionFirst = (name, realValue) => {
+            const idxOf = (predicate) =>
+                res.cookies.findIndex((c) => c.startsWith(`${name}=`) && predicate(parseCookie(c)))
+            const deletionIdx = idxOf((c) => c.value === '' && c.domain === undefined)
+            const realIdx = idxOf((c) => c.value === realValue && c.domain === '.example.com')
+            expect(deletionIdx).toBeGreaterThanOrEqual(0)
+            expect(realIdx).toBeGreaterThanOrEqual(0)
+            expect(deletionIdx).toBeLessThan(realIdx)
+        }
+
+        assertDeletionFirst('cc-at_testsite', accessToken)
+        assertDeletionFirst('cc-nx-g_testsite', 'refresh-value')
+    })
+
+    test('SSR last-write-wins reconstruction recovers the real access, refresh AND idp tokens', () => {
+        // Guards the end-to-end invariant, including the cross-name refresh case
+        // that the per-name ordering test above cannot catch: the empty
+        // opposite-refresh deletion (cc-nx) is emitted as a separate appendCookie
+        // AFTER the real cc-nx-g in the pre-fix code, and both names map to
+        // refresh_token — so the deletion would clobber the reconstructed token.
+        // idp_access_token is also SDK-reconstructed and body-stripped, so it
+        // relies on the same makeAppendCookie deletion-before-real ordering; pin
+        // it here too.
+        const accessToken = makeJWT({iat: 1000, exp: 2800, isb: 'uido:ecom::upn:Guest'})
+        const body = {
+            access_token: accessToken,
+            refresh_token: 'refresh-value',
+            idp_access_token: 'idp-at-value'
+        }
+        const expected = {
+            access_token: accessToken,
+            refresh_token: 'refresh-value',
+            idp_access_token: 'idp-at-value'
+        }
+
+        // With cookieDomain configured (the reported 401 scenario).
+        const withDomain = makeRes()
+        setHttpOnlySessionCookies(
+            makeResponseBuffer(body),
+            {},
+            makeReq(),
+            withDomain,
+            makeOptionsWithCookieDomain('.example.com')
+        )
+        expect(reconstructSsrTokens(withDomain.cookies)).toEqual(expected)
+
+        // And without cookieDomain: the opposite-refresh deletion is still emitted
+        // last in the pre-fix code, so refresh_token must survive here too.
+        const noDomain = makeRes()
+        setHttpOnlySessionCookies(makeResponseBuffer(body), {}, makeReq(), noDomain, {})
+        expect(reconstructSsrTokens(noDomain.cookies)).toEqual(expected)
+    })
+
+    test('SSR last-write-wins reconstruction recovers tokens for a REGISTERED login (mirror case)', () => {
+        // The guest test above exercises cc-nx-g as the real cookie and cc-nx as
+        // the empty opposite-deletion. The registered branch is the mirror: cc-nx
+        // is the real refresh cookie and cc-nx-g is the empty deletion, so the
+        // deletion-before-real ordering must hold for it too. A registered JWT
+        // uses a non-Guest `isb`.
+        const registeredToken = makeJWT({
+            iat: 1000,
+            exp: 2800,
+            isb: 'uido:ecom::upn:user@example.com::uidn:Jane'
+        })
+        const res = makeRes()
+        setHttpOnlySessionCookies(
+            makeResponseBuffer({access_token: registeredToken, refresh_token: 'refresh-value'}),
+            {},
+            makeReq(),
+            res,
+            makeOptionsWithCookieDomain('.example.com')
+        )
+        expect(reconstructSsrTokens(res.cookies)).toEqual({
+            access_token: registeredToken,
+            refresh_token: 'refresh-value'
+        })
+    })
+
+    test('logout expires both refresh cookies so SSR cannot reconstruct a token', () => {
+        // After logout SSR must not be able to rebuild a refresh token from the
+        // response. Order doesn't matter here (all writes are empty) but presence
+        // does: cc-nx and cc-nx-g both map to refresh_token, so both must be
+        // emitted empty.
+        const res = makeRes()
+        expireHttpOnlySessionCookies(makeReq(), res, makeOptionsWithCookieDomain('.example.com'))
+
+        for (const name of ['cc-nx_testsite', 'cc-nx-g_testsite']) {
+            const matches = findCookies(res.cookies, name)
+            expect(matches.length).toBeGreaterThan(0)
+            expect(matches.every((c) => c.value === '')).toBe(true)
+        }
+        expect(reconstructSsrTokens(res.cookies).refresh_token).toBe('')
+    })
+
     test('setHttpOnlySessionCookies warns and ignores invalid cookieDomain', () => {
         const res = makeRes()
         const accessToken = makeJWT({iat: 1000, exp: 2800, isb: 'uido:ecom::upn:Guest'})
@@ -676,6 +854,12 @@ describe('trusted Storefront Preview iframe', () => {
         return {headers: {[X_SITE_ID]: siteId, cookie: `${MARKER}=${value}`}}
     }
 
+    // The client-sent header path — used when the iframe document load is
+    // served from the CDN cache and never sets the marker cookie.
+    function makeReqWithHeader(value, siteId = 'testsite') {
+        return {headers: {[X_SITE_ID]: siteId, [X_PREVIEW_PARENT]: value}}
+    }
+
     function makeFullSlasResponse() {
         const accessToken = makeJWT({
             iat: 1000,
@@ -749,6 +933,36 @@ describe('trusted Storefront Preview iframe', () => {
         const res = makeRes()
         const {buf} = makeFullSlasResponse()
         setHttpOnlySessionCookies(buf, {}, makeReq(), res, {})
+
+        for (const cookieStr of res.cookies) {
+            expect(cookieStr).toMatch(/SameSite=lax/i)
+            expect(cookieStr).not.toMatch(/Partitioned/i)
+        }
+    })
+
+    test('every session cookie carries SameSite=none; Partitioned when only the client header is present (CDN-cached document load, no marker cookie)', () => {
+        const res = makeRes()
+        const {buf} = makeFullSlasResponse()
+        setHttpOnlySessionCookies(buf, {}, makeReqWithHeader(TRUSTED_PARENT), res, {})
+
+        expect(res.cookies.length).toBeGreaterThan(0)
+        for (const cookieStr of res.cookies) {
+            expect(cookieStr).toMatch(/SameSite=none/i)
+            expect(cookieStr).toMatch(/Partitioned/i)
+            expect(cookieStr).not.toMatch(/SameSite=lax/i)
+        }
+    })
+
+    test('falls back to SameSite=Lax when the client header value is not on the allow-list', () => {
+        const res = makeRes()
+        const {buf} = makeFullSlasResponse()
+        setHttpOnlySessionCookies(
+            buf,
+            {},
+            makeReqWithHeader('https://attacker.example.com'),
+            res,
+            {}
+        )
 
         for (const cookieStr of res.cookies) {
             expect(cookieStr).toMatch(/SameSite=lax/i)

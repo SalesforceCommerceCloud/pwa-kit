@@ -10,15 +10,8 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 
 // Project Components
-import {
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
-    Stack,
-    Text,
-    Heading
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Stack, Text, useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
+import RefinementDisclosure from '@salesforce/retail-react-app/app/components/refinement-disclosure'
 import Link from '@salesforce/retail-react-app/app/components/link'
 
 // Others
@@ -26,35 +19,33 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 const CategoryLinks = ({category = {}, onSelect = noop}) => {
     const {categories = []} = category
+    const {isOpen, onToggle} = useDisclosure({defaultIsOpen: true})
 
     return (
-        <AccordionItem paddingBottom={6} borderTop="none" key="show-all">
-            <AccordionButton>
-                <Heading as="h2" flex="1" textAlign="left" fontSize="md" fontWeight={600}>
-                    <FormattedMessage defaultMessage="Categories" id="category_links.button_text" />
-                </Heading>
-                <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>
-                <Stack spacing={1}>
-                    {categories.map(({id, name}) => {
-                        return (
-                            <Link
-                                display="flex"
-                                alignItems="center"
-                                lineHeight={{base: '44px', lg: '24px'}}
-                                key={id}
-                                href={`/category/${id}`}
-                                onClick={onSelect}
-                                useNavLink
-                            >
-                                <Text fontSize="sm">{name}</Text>
-                            </Link>
-                        )
-                    })}
-                </Stack>
-            </AccordionPanel>
-        </AccordionItem>
+        <RefinementDisclosure
+            isOpen={isOpen}
+            onToggle={onToggle}
+            label={<FormattedMessage defaultMessage="Categories" id="category_links.button_text" />}
+            paddingBottom={6}
+        >
+            <Stack spacing={1}>
+                {categories.map(({id, name}) => {
+                    return (
+                        <Link
+                            display="flex"
+                            alignItems="center"
+                            lineHeight={{base: '44px', lg: '24px'}}
+                            key={id}
+                            href={`/category/${id}`}
+                            onClick={onSelect}
+                            useNavLink
+                        >
+                            <Text fontSize="sm">{name}</Text>
+                        </Link>
+                    )
+                })}
+            </Stack>
+        </RefinementDisclosure>
     )
 }
 

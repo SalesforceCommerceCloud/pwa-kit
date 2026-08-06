@@ -185,9 +185,7 @@ Browser                       Express App (SLAS Proxy)                    SLAS
 
 ### 4. Logout
 
-The logout call is awaited so the browser processes the Set-Cookie response headers (which expire the
-HttpOnly session cookies) before the subsequent guest login sets fresh cookies. The proxy expires
-cookies on SLAS logout response, regardless of whether SLAS returned success or failure.
+The implementation awaits the logout call so that the browser processes the Set-Cookie response headers (which expire the HttpOnly session cookies) before the subsequent guest login sets fresh cookies. The proxy expires cookies on SLAS logout response, regardless of whether SLAS returned success or failure.
 
 ```
 Browser                       Express App (SLAS Proxy)                    SLAS

@@ -21,8 +21,10 @@ import {
     isOriginTrusted,
     onClient,
     getDefaultCookieAttributes,
+    getTrustedPreviewParentOrigin,
     stringToBase64,
-    extractCustomParameters
+    extractCustomParameters,
+    parseResponseBodyClone
 } from '../utils'
 import {
     SLAS_SECRET_WARNING_MSG,
@@ -31,7 +33,8 @@ import {
     DNT_COOKIE_NAME,
     DWSID_COOKIE_NAME,
     SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG,
-    X_GRANT_TYPE
+    X_GRANT_TYPE,
+    X_PREVIEW_PARENT
 } from '../constant'
 
 import {Logger} from '../types'
@@ -366,6 +369,22 @@ class Auth {
                 ...config.fetchOptions
             }
         })
+
+        // When HttpOnly session cookies are enabled and the storefront is
+        // running inside a trusted Storefront Preview iframe, signal the parent
+        // origin to the BFF so it sets session cookies with SameSite=None;
+        // Partitioned (required for the cross-site iframe). This rides on the
+        // SLAS token POST — which is never CDN-cached — so it always reaches
+        // the origin, unlike the server-set `__Host-pwakit_preview_ctx` marker
+        // cookie that depends on the (cacheable) iframe document load hitting
+        // the origin. The BFF re-validates the value against its allow-list.
+        if (config.enableHttpOnlySessionCookies) {
+            const previewParentOrigin = getTrustedPreviewParentOrigin()
+            if (previewParentOrigin) {
+                this.client.clientConfig.headers[X_PREVIEW_PARENT] = previewParentOrigin
+            }
+        }
+
         this.shopperCustomersClient = new ShopperCustomers({
             proxy: config.proxy,
             headers: config.headers || {},
@@ -491,7 +510,7 @@ class Auth {
         }
         const accessToken = this.getAccessToken()
         if (accessToken) {
-            return this.parseSlasJWT(accessToken).dnt
+            return this.parseSlasJWT(accessToken)?.dnt
         }
         return undefined
     }
@@ -668,7 +687,21 @@ class Auth {
         }
         // Server (SSR) or httpOnly disabled: decode JWT from stored token
         const token = this.getAccessToken()
-        return !token || this.isTokenExpired(token)
+        if (!token) return true
+        try {
+            return this.isTokenExpired(token)
+        } catch (e) {
+            // A stale or truncated cookie can leave a value that isn't a decodable
+            // JWT. Clear it and treat the token as expired so the flow re-bootstraps
+            // via refresh / guest login instead of surfacing jwt-decode's error.
+            this.logWarning(
+                `Clearing undecodable access token and forcing re-authentication: ${
+                    (e as Error).message
+                }`
+            )
+            this.delete('access_token')
+            return true
+        }
     }
 
     /**
@@ -711,7 +744,15 @@ class Auth {
                 this.clearSFRAAuthToken()
                 return ''
             }
-            const {isGuest, customerId, usid} = this.parseSlasJWT(sfraAuthToken)
+            const parsed = this.parseSlasJWT(sfraAuthToken)
+            if (!parsed) {
+                // The SFRA cc-at handoff cookie is stale/truncated and can't be
+                // decoded. Clear it so it can't keep re-triggering the failure and
+                // fall back to the access token from local store.
+                this.clearSFRAAuthToken()
+                return accessToken
+            }
+            const {isGuest, customerId, usid} = parsed
 
             /**
              * This if block is only executed in a hybrid setup when the cc-at cookie is set.
@@ -875,8 +916,10 @@ class Auth {
         this.set('access_token', res.access_token)
         this.set('idp_access_token', res.idp_access_token)
         if (res.access_token) {
-            const {uido} = this.parseSlasJWT(res.access_token)
-            this.set('uido', uido)
+            const parsed = this.parseSlasJWT(res.access_token)
+            if (parsed) {
+                this.set('uido', parsed.uido)
+            }
         }
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         this.set(refreshTokenKey, res.refresh_token, {expires: expiresDate})
@@ -952,9 +995,10 @@ class Auth {
                 if (error instanceof Error && 'response' in error) {
                     // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
                     // We can't use `instanceof`, so instead we just check for the `response` property
-                    // and assume it is a fetch Response.
-                    const json = await (error['response'] as Response).json()
-                    if (json.message === 'invalid refresh_token') {
+                    // and assume it is a fetch Response. Read a clone so the original body stream
+                    // stays intact for any downstream consumer of the error.
+                    const json = await parseResponseBodyClone(error['response'] as Response)
+                    if (json?.message === 'invalid refresh_token') {
                         // In a multi-tab scenario, another tab may have already consumed the
                         // one-time-use refresh token and stored fresh tokens. Re-check storage
                         // before clearing — if a valid access token exists, use it instead of
@@ -974,15 +1018,15 @@ class Auth {
         // refresh flow for TAOB
         const accessToken = this.getAccessToken()
         if (this.isAccessTokenExpired()) {
-            try {
-                const {isGuest, usid, loginId, isAgent} = this.parseSlasJWT(accessToken)
-                if (isAgent) {
-                    const token = await this.refreshTrustedAgent(loginId, usid)
-                    this.handleTokenResponse(token, isGuest)
+            const parsed = this.parseSlasJWT(accessToken)
+            if (parsed?.isAgent) {
+                try {
+                    const token = await this.refreshTrustedAgent(parsed.loginId, parsed.usid)
+                    this.handleTokenResponse(token, parsed.isGuest)
                     return this.data
+                } catch (e) {
+                    /* fall through to guest login if the TAOB refresh fails */
                 }
-            } catch (e) {
-                /* catch invalid jwt */
             }
         }
 
@@ -1024,9 +1068,11 @@ class Auth {
         // ie. 'Bad Request' for 400. We need to drill specifically into the ResponseError
         // to get a more descriptive error message from SLAS
         if ('response' in error) {
-            const json = await (error['response'] as Response).json()
-            const status_code: string = json.status_code
-            const responseMessage: string = json.message
+            // Read a clone so the original body stream stays intact for any caller that
+            // surfaces or re-throws this error after extracting the status/message.
+            const json = await parseResponseBodyClone(error['response'] as Response)
+            const status_code: string | undefined = json?.status_code
+            const responseMessage: string | undefined = json?.message
 
             return {
                 status_code,
@@ -1065,42 +1111,48 @@ class Auth {
         }
 
         if (this.fetchedToken && this.fetchedToken !== '') {
-            const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
+            const parsed = this.parseSlasJWT(this.fetchedToken)
+            // A malformed fetchedToken (stale/truncated JWT captured during SSR)
+            // can't be used to hydrate session state. Discard it and fall through
+            // to the refresh / guest-login path below instead of throwing.
+            if (parsed) {
+                const {isGuest, customerId, usid} = parsed
 
-            // Write to localStorage in non-httpOnly mode
-            this.set('access_token', this.fetchedToken)
-            this.set('customer_id', customerId)
-            this.set('customer_type', isGuest ? 'guest' : 'registered')
+                // Write to localStorage in non-httpOnly mode
+                this.set('access_token', this.fetchedToken)
+                this.set('customer_id', customerId)
+                this.set('customer_type', isGuest ? 'guest' : 'registered')
 
-            /**
-             * If the login state of the shopper changes on SFRA, the "refresh_token_expires_in"
-             * will change and the updated value is not propagated back to PWA Kit via cookies or cc-at token.
-             * This results in the "refresh_token_expires_in" to be incorrect so we can't read it from localStorage.
-             * We must instead read the login state by decoding the cc-at token and rely on the default values for the guest or registered user.
-             * This in worst cases will cause the usid cookie to expire a few hours after the refreshToken which should be acceptable given
-             * a few hours are insignificant compared tothe overall validty of the refreshToken.
-             */
-            const refreshTokenExpiresIn = isGuest
-                ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
-                : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
-            const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
-                refreshTokenExpiresIn,
-                isGuest
-            )
+                /**
+                 * If the login state of the shopper changes on SFRA, the "refresh_token_expires_in"
+                 * will change and the updated value is not propagated back to PWA Kit via cookies or cc-at token.
+                 * This results in the "refresh_token_expires_in" to be incorrect so we can't read it from localStorage.
+                 * We must instead read the login state by decoding the cc-at token and rely on the default values for the guest or registered user.
+                 * This in worst cases will cause the usid cookie to expire a few hours after the refreshToken which should be acceptable given
+                 * a few hours are insignificant compared tothe overall validty of the refreshToken.
+                 */
+                const refreshTokenExpiresIn = isGuest
+                    ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+                    : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
+                const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
+                    refreshTokenExpiresIn,
+                    isGuest
+                )
 
-            /**
-             * The usid cookie always set when setting up auth in pure composable env or session bridging in a hybrid setup. This makes resetting the usid
-             * cookie here redundant. However, if the usid cookie is not set, we can have a fallback to read the usid from the accesstoken and set it.
-             * Setting the usid cookie conditionally ensures the usid is always set and minimizes the discrepancy between usid cookie and refresh_token cookie expiration.
-             */
-            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
-            const usidCookieValue = this.get('usid')
-            if (!usidCookieValue || usidCookieValue !== usid) {
-                this.set('usid', usid, {
-                    expires: expiresDate
-                })
+                /**
+                 * The usid cookie always set when setting up auth in pure composable env or session bridging in a hybrid setup. This makes resetting the usid
+                 * cookie here redundant. However, if the usid cookie is not set, we can have a fallback to read the usid from the accesstoken and set it.
+                 * Setting the usid cookie conditionally ensures the usid is always set and minimizes the discrepancy between usid cookie and refresh_token cookie expiration.
+                 */
+                const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
+                const usidCookieValue = this.get('usid')
+                if (!usidCookieValue || usidCookieValue !== usid) {
+                    this.set('usid', usid, {
+                        expires: expiresDate
+                    })
+                }
+                return this.data
             }
-            return this.data
         }
         if (onClient()) {
             const pendingRefresh = pendingRefreshTokens.get(this.refreshDedupKey)
@@ -1173,7 +1225,11 @@ class Auth {
         } catch (error) {
             // We catch the error here to do logging but we still need to
             // throw an error to stop the login flow from continuing.
-            const {status_code, responseMessage} = await this.extractResponseError(error as Error)
+            // extractResponseError can return undefined fields (non-JSON / non-Response error);
+            // default to '' so the log and error messages stay well-formed strings.
+            const {status_code = '', responseMessage = ''} = await this.extractResponseError(
+                error as Error
+            )
             this.logger.error(`${status_code} ${responseMessage}`)
             throw new Error(
                 `New guest user could not be logged in. ${status_code} ${responseMessage}`
@@ -1686,43 +1742,53 @@ class Auth {
     }
 
     /**
-     * Decode SLAS JWT and extract information such as customer id, usid, etc.
+     * Decode a SLAS JWT and extract information such as customer id, usid, etc.
      *
+     * Returns null (instead of throwing) when the token is missing, truncated, or
+     * otherwise not a valid JWT — e.g. a stale session cookie or a lost `cc-at`
+     * chunk. Callers treat null as "no usable token" and fall through to a refresh
+     * / guest login rather than surfacing jwt-decode's "Invalid token specified:
+     * missing part #2" error to the storefront.
      */
     parseSlasJWT(jwt: string) {
-        const payload: SlasJwtPayload = jwtDecode(jwt)
-        const {sub, isb, dnt} = payload
+        try {
+            const payload: SlasJwtPayload = jwtDecode(jwt)
+            const {sub, isb, dnt} = payload
 
-        if (!sub || !isb) {
-            throw new Error('Unable to parse access token payload: missing sub and isb.')
-        }
+            if (!sub || !isb) {
+                throw new Error('Unable to parse access token payload: missing sub and isb.')
+            }
 
-        // ISB format
-        // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
-        const isbParts = isb.split('::')
-        const uido = isbParts[0].split('uido:')[1]
-        const isGuest = isbParts[1] === 'upn:Guest'
-        const customerId = isGuest
-            ? isbParts[3].replace('gcid:', '')
-            : isbParts[4].replace('rcid:', '')
+            // ISB format
+            // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
+            const isbParts = isb.split('::')
+            const uido = isbParts[0].split('uido:')[1]
+            const isGuest = isbParts[1] === 'upn:Guest'
+            const customerId = isGuest
+                ? isbParts[3].replace('gcid:', '')
+                : isbParts[4].replace('rcid:', '')
 
-        const loginId = isGuest ? 'guest' : isbParts[1].replace('upn:', '')
+            const loginId = isGuest ? 'guest' : isbParts[1].replace('upn:', '')
 
-        const isAgent = !!isbParts?.[isGuest ? 5 : 6]?.startsWith('agent:')
-        const agentId = isAgent ? isbParts?.[isGuest ? 5 : 6]?.replace('agent:', '') : null
+            const isAgent = !!isbParts?.[isGuest ? 5 : 6]?.startsWith('agent:')
+            const agentId = isAgent ? isbParts?.[isGuest ? 5 : 6]?.replace('agent:', '') : null
 
-        // SUB format
-        // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
-        const usid = sub.split('::')[3].replace('usid:', '')
-        return {
-            isGuest,
-            customerId,
-            usid,
-            dnt,
-            loginId,
-            isAgent,
-            agentId,
-            uido
+            // SUB format
+            // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
+            const usid = sub.split('::')[3].replace('usid:', '')
+            return {
+                isGuest,
+                customerId,
+                usid,
+                dnt,
+                loginId,
+                isAgent,
+                agentId,
+                uido
+            }
+        } catch (e) {
+            this.logWarning(`Ignoring invalid access token: ${(e as Error).message}`)
+            return null
         }
     }
 }

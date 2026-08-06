@@ -16,16 +16,12 @@ jest.mock('@opentelemetry/sdk-trace-node', () => ({
     NodeTracerProvider: jest.fn()
 }))
 
-jest.mock('@opentelemetry/sdk-trace-base', () => ({
-    SimpleSpanProcessor: jest.fn()
-}))
-
 jest.mock('@opentelemetry/propagator-b3', () => ({
     B3Propagator: jest.fn()
 }))
 
 jest.mock('@opentelemetry/resources', () => ({
-    Resource: jest.fn()
+    resourceFromAttributes: jest.fn()
 }))
 
 jest.mock('@opentelemetry/api', () => ({
@@ -83,7 +79,6 @@ jest.mock('@opentelemetry/api', () => ({
 
 describe('OpenTelemetry Server Tracing', () => {
     let mockNodeTracerProvider
-    let mockSimpleSpanProcessor
     let mockB3Propagator
     let mockResource
     let mockPropagation
@@ -100,9 +95,8 @@ describe('OpenTelemetry Server Tracing', () => {
         // Get mocked constructors
         /* eslint-disable @typescript-eslint/no-var-requires */
         const {NodeTracerProvider} = require('@opentelemetry/sdk-trace-node')
-        const {SimpleSpanProcessor} = require('@opentelemetry/sdk-trace-base')
         const {B3Propagator} = require('@opentelemetry/propagator-b3')
-        const {Resource} = require('@opentelemetry/resources')
+        const {resourceFromAttributes} = require('@opentelemetry/resources')
         const {propagation} = require('@opentelemetry/api')
         const logger = require('../../utils/logger-instance')
 
@@ -110,9 +104,8 @@ describe('OpenTelemetry Server Tracing', () => {
         /* eslint-enable @typescript-eslint/no-var-requires */
 
         mockNodeTracerProvider = NodeTracerProvider
-        mockSimpleSpanProcessor = SimpleSpanProcessor
         mockB3Propagator = B3Propagator
-        mockResource = Resource
+        mockResource = resourceFromAttributes
         mockPropagation = propagation
         mockLogger = logger
         defaultOptions = {enabled: true}
@@ -124,13 +117,11 @@ describe('OpenTelemetry Server Tracing', () => {
         }
 
         const mockResourceInstance = {}
-        const mockSpanProcessorInstance = {}
         const mockB3PropagatorInstance = {}
 
         // Configure mocks
         mockNodeTracerProvider.mockImplementation(() => mockProviderInstance)
         mockResource.mockImplementation(() => mockResourceInstance)
-        mockSimpleSpanProcessor.mockImplementation(() => mockSpanProcessorInstance)
         mockB3Propagator.mockImplementation(() => mockB3PropagatorInstance)
 
         // Import the functions after mocks are set up
@@ -153,19 +144,15 @@ describe('OpenTelemetry Server Tracing', () => {
         test('should successfully initialize OpenTelemetry tracing with default options', () => {
             const result = initializeServerTracing(defaultOptions)
 
-            // Verify NodeTracerProvider was called with correct resource and span processor
+            // Verify NodeTracerProvider was called with correct resource (no spanProcessors - handled via logSpanData)
             expect(mockNodeTracerProvider).toHaveBeenCalledWith({
-                resource: expect.any(Object),
-                spanProcessor: expect.any(Object)
+                resource: expect.any(Object)
             })
 
             // Verify Resource was created with correct service name only (no version by default)
             expect(mockResource).toHaveBeenCalledWith({
                 'service.name': 'pwa-kit-react-sdk'
             })
-
-            // Verify span processor was created
-            expect(mockSimpleSpanProcessor).toHaveBeenCalled()
 
             // Verify B3 propagator was set globally
             expect(mockB3Propagator).toHaveBeenCalled()
@@ -449,7 +436,6 @@ describe('OpenTelemetry Server Tracing', () => {
             // Verify all setup was done
             expect(mockNodeTracerProvider).toHaveBeenCalled()
             expect(mockResource).toHaveBeenCalled()
-            expect(mockSimpleSpanProcessor).toHaveBeenCalled()
             expect(mockB3Propagator).toHaveBeenCalled()
             expect(mockPropagation.setGlobalPropagator).toHaveBeenCalled()
             expect(provider.register).toHaveBeenCalled()
@@ -496,7 +482,7 @@ describe('OpenTelemetry Server Tracing', () => {
                 })),
                 end: jest.fn(),
                 setStatus: jest.fn(),
-                parentSpanId: 'test-parent-span-id'
+                parentSpanContext: {spanId: 'test-parent-span-id'}
             }
 
             // Setup tracer mock

@@ -18,6 +18,7 @@ describe('Shopper Baskets V2 hooks', () => {
         // or add it to the `expected` array with a comment explaining "TODO" or "never" (and why).
         expect(unimplemented).toEqual([
             'addPriceAdjustmentToBasket', //TODO: implement later
+            'promoteTemporaryBasket', //TODO: added with the commerce-sdk-isomorphic 5.4.0 bump; implement later.
             'removePriceAdjustmentFromBasket', //TODO: implement later
             'updateAsAgentBasket', //TODO: implement later
             'updateAsStorefrontBasket', //TODO: implement later
