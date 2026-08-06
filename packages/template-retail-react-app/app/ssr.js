@@ -573,6 +573,303 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
     })
 
+    // S15: defense-in-depth throttle on /api/order-lookup/* endpoints
+    app.use(createVerifyThrottle())
+
+    app.post('/api/order-lookup/verify', async (req, res) => {
+        const appConfig = getConfig()?.app
+        if (!appConfig?.guestOrderLookup?.enabled)
+            return res.status(503).json({error: 'Feature not enabled'})
+
+        const {orderNo, email, accessCode} = req.body || {}
+        if (!orderNo || !email || !accessCode)
+            return res.status(400).json({error: 'Missing required fields'})
+
+        // Read the SLAS access token from the HttpOnly cc-at_{siteId} cookie written by
+        // pwa-kit-runtime's SLAS proxy. With enableHttpOnlySessionCookies: true the browser
+        // cannot read the token, so client-forwarded Authorization headers are always empty.
+        const siteIdForToken = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const slasToken = parseCookieValue(req, `cc-at_${siteIdForToken}`)
+        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
+        const authorization = `Bearer ${slasToken}`
+
+        const correlationId = req.headers['x-correlation-id']
+        const start = Date.now()
+
+        try {
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
+
+            const order = await shopperOrders.guestOrderLookup({
+                parameters: {orderNo},
+                body: {orderViewCode: accessCode, email}
+            })
+            // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
+            if (!order?.orderNo) {
+                const title = order?.title || ''
+                const fakeStatus = /unauthorized/i.test(title) ? 401
+                    : /not.found/i.test(title) ? 404
+                    : 500
+                const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
+                proxyErr.response = {status: fakeStatus}
+                throw proxyErr
+            }
+
+            // Apply guest field allowlist
+            const filtered = filterGuestOrderFields(order)
+
+            const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+            const cookieName = `cc-goa_${siteId}`
+            const existing = parseGuestOrderCookie(req, cookieName)
+            existing[orderNo] = {email, verifiedCode: accessCode}
+            const cookieVal = evictIfNeeded(existing)
+            res.setHeader(
+                'Set-Cookie',
+                `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=3600`
+            )
+
+            logger.info('guest-order-lookup verify success', {
+                namespace: 'guest-order-lookup',
+                additionalProperties: {
+                    correlationId,
+                    orderNoPrefix: orderNo?.slice(0, 4),
+                    scapiStatus: 200,
+                    durationMs: Date.now() - start
+                }
+            })
+            res.json(filtered)
+        } catch (err) {
+            const scapiStatus = err?.response?.status || 500
+            const errorKind = scapiStatus === 404 ? 'invalid_code' : 'scapi_error'
+            logger.warn('guest-order-lookup verify error', {
+                namespace: 'guest-order-lookup',
+                additionalProperties: {
+                    correlationId,
+                    orderNoPrefix: orderNo?.slice(0, 4),
+                    scapiStatus,
+                    errorKind,
+                    durationMs: Date.now() - start
+                }
+            })
+            if (scapiStatus === 404) return res.status(404).json({error: 'Invalid or expired access code'})
+            if (scapiStatus === 401) return res.status(401).json({error: 'Missing authorization'})
+            if (scapiStatus === 403) return res.status(403).json({error: 'Forbidden'})
+            res.status(502).json({error: 'Service error'})
+        }
+    })
+
+    app.get('/api/order-lookup/order/:orderNo', async (req, res) => {
+        const appConfig = getConfig()?.app
+        if (!appConfig?.guestOrderLookup?.enabled)
+            return res.status(503).json({error: 'Feature not enabled'})
+
+        const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
+        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
+        const authorization = `Bearer ${slasToken}`
+
+        const cookieName = `cc-goa_${siteId}`
+        const cookieData = parseGuestOrderCookie(req, cookieName)
+
+        const orderNo = req.params.orderNo
+        if (!orderNo || !cookieData[orderNo])
+            return res.status(403).json({error: 'No verified session for this order'})
+
+        const {email, verifiedCode} = cookieData[orderNo]
+        const correlationId = req.headers['x-correlation-id']
+        const start = Date.now()
+
+        try {
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
+            const order = await shopperOrders.guestOrderLookup({
+                parameters: {orderNo},
+                body: {orderViewCode: verifiedCode, email}
+            })
+            // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
+            if (!order?.orderNo) {
+                const title = order?.title || ''
+                const fakeStatus = /unauthorized/i.test(title) ? 401
+                    : /not.found/i.test(title) ? 404
+                    : 500
+                const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
+                proxyErr.response = {status: fakeStatus}
+                throw proxyErr
+            }
+            const filtered = filterGuestOrderFields(order)
+            logger.info('guest-order-lookup order fetch success', {
+                namespace: 'guest-order-lookup',
+                additionalProperties: {
+                    correlationId,
+                    orderNoPrefix: orderNo?.slice(0, 4),
+                    scapiStatus: 200,
+                    durationMs: Date.now() - start
+                }
+            })
+            res.json(filtered)
+        } catch (err) {
+            const scapiStatus = err?.response?.status || 500
+            const errorKind = scapiStatus === 404 ? 'expired_code' : 'scapi_error'
+            logger.warn('guest-order-lookup order fetch error', {
+                namespace: 'guest-order-lookup',
+                additionalProperties: {
+                    correlationId,
+                    orderNoPrefix: orderNo?.slice(0, 4),
+                    scapiStatus,
+                    errorKind,
+                    durationMs: Date.now() - start
+                }
+            })
+            if (scapiStatus === 404) {
+                // Clear this order's cookie entry
+                const cookieData2 = parseGuestOrderCookie(req, cookieName)
+                delete cookieData2[orderNo]
+                res.setHeader(
+                    'Set-Cookie',
+                    `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=3600`
+                )
+                return res.status(404).json({error: 'Session expired'})
+            }
+            if (scapiStatus === 401) return res.status(401).json({error: 'Unauthorized'})
+            if (scapiStatus === 403) return res.status(403).json({error: 'Forbidden'})
+            res.status(502).json({error: 'Service error'})
+        }
+    })
+
+    app.get('/api/order-lookup/oms-meta', async (req, res) => {
+        const {app: appConfig} = getConfig()
+        if (!appConfig?.guestOrderLookup?.enabled)
+            return res.status(503).json({error: 'Feature not enabled'})
+
+        const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
+        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
+        const authorization = `Bearer ${slasToken}`
+        const cookieName = `cc-goa_${siteId}`
+        const cookieData = parseGuestOrderCookie(req, cookieName)
+        if (!cookieData || Object.keys(cookieData).length === 0)
+            return res.status(401).json({error: 'No active session'})
+
+        try {
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
+            const meta = await shopperOrders.getOmsMetaData({parameters: {}})
+            return res.json({
+                omsActive: meta.omsActive ?? false,
+                cancelReasonCodes: meta.cancelReasonCodes ?? [],
+                returnReasonCodes: meta.returnReasonCodes ?? []
+            })
+        } catch (err) {
+            if (err?.response?.status === 409) {
+                return res.json({omsActive: false, cancelReasonCodes: [], returnReasonCodes: []})
+            }
+            return res.status(502).json({error: 'Failed to fetch OMS metadata'})
+        }
+    })
+
+    app.post('/api/order-lookup/cancel', async (req, res) => {
+        const {app: appConfig} = getConfig()
+        if (!appConfig?.guestOrderLookup?.enabled)
+            return res.status(503).json({error: 'Feature not enabled'})
+
+        const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
+        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
+        const authorization = `Bearer ${slasToken}`
+        const cookieName = `cc-goa_${siteId}`
+        const cookieData = parseGuestOrderCookie(req, cookieName)
+
+        const {orderNo, reason} = req.body ?? {}
+        // errorKind: 'invalid_input' for client input errors; SCAPI-classified kinds for downstream errors
+        if (!orderNo || typeof orderNo !== 'string')
+            return res.status(400).json({errorKind: 'invalid_input', message: 'orderNo is required'})
+        if (!cookieData?.[orderNo])
+            return res.status(401).json({error: 'No session for this order'})
+
+        let regex
+        try {
+            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$')
+        } catch {
+            regex = /^[a-zA-Z0-9-]{6,32}$/
+        }
+        if (!regex.test(orderNo))
+            return res.status(400).json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
+
+        try {
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
+            await shopperOrders.cancelOmsOrder({
+                parameters: {orderNo},
+                body: reason && typeof reason === 'string' ? {reason} : {}
+            })
+            return res.json({success: true})
+        } catch (err) {
+            const status = err?.response?.status
+            if (status === 400) return res.status(400).json({errorKind: 'invalid_reason'})
+            if (status === 404) return res.status(404).json({errorKind: 'not_found'})
+            if (status === 409) return res.status(409).json({errorKind: 'not_cancellable'})
+            return res.status(500).json({errorKind: 'transient'})
+        }
+    })
+
+    app.post('/api/order-lookup/return', async (req, res) => {
+        const {app: appConfig} = getConfig()
+        if (!appConfig?.guestOrderLookup?.enabled)
+            return res.status(503).json({error: 'Feature not enabled'})
+
+        const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
+        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
+        const authorization = `Bearer ${slasToken}`
+        const cookieName = `cc-goa_${siteId}`
+        const cookieData = parseGuestOrderCookie(req, cookieName)
+
+        const {orderNo, productItems} = req.body ?? {}
+        // errorKind: 'invalid_input' for client input errors; SCAPI-classified kinds for downstream errors
+        if (!orderNo || typeof orderNo !== 'string')
+            return res.status(400).json({errorKind: 'invalid_input', message: 'orderNo is required'})
+        if (!cookieData?.[orderNo])
+            return res.status(401).json({error: 'No session for this order'})
+
+        let regex
+        try {
+            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$')
+        } catch {
+            regex = /^[a-zA-Z0-9-]{6,32}$/
+        }
+        if (!regex.test(orderNo))
+            return res.status(400).json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
+
+        if (!Array.isArray(productItems) || productItems.length === 0)
+            return res.status(400).json({errorKind: 'invalid_input', message: 'productItems must be a non-empty array'})
+
+        for (const item of productItems) {
+            if (!item.itemId || typeof item.itemId !== 'string')
+                return res.status(400).json({errorKind: 'invalid_input', message: 'Each productItem must have a string itemId'})
+            const qty = Number(item.quantity)
+            if (!Number.isFinite(qty) || qty < 1)
+                return res.status(400).json({errorKind: 'invalid_input', message: 'Each productItem must have a positive quantity'})
+        }
+
+        try {
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
+            await shopperOrders.returnOmsOrder({
+                parameters: {orderNo},
+                body: {productItems}
+            })
+            return res.json({success: true})
+        } catch (err) {
+            const status = err?.response?.status
+            if (status === 400) {
+                let errorCode
+                try { errorCode = (await err.response.clone().json())?.errorCode } catch {}
+                if (errorCode === 'InvalidReasonCode') return res.status(400).json({errorKind: 'invalid_reason'})
+                if (errorCode === 'UnknownProductItemIds') return res.status(400).json({errorKind: 'unknown_items'})
+                if (errorCode === 'ReturnQuantityExceeded') return res.status(400).json({errorKind: 'quantity_exceeded'})
+                return res.status(400).json({errorKind: 'transient'})
+            }
+            if (status === 404) return res.status(404).json({errorKind: 'not_found'})
+            if (status === 409) return res.status(409).json({errorKind: 'not_returnable'})
+            return res.status(500).json({errorKind: 'transient'})
+        }
+    })
+
     app.get('*', runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that
