@@ -129,7 +129,11 @@ const GuestOrderLookupResults = () => {
         },
         enabled: !!orderNo,
         retry: false,
-        staleTime: 30_000
+        // Access code is valid for 15 min — never serve data older than that from cache.
+        staleTime: 15 * 60 * 1000,
+        // Kick the query out of cache after 15 min of inactivity so a returning
+        // tab is forced to re-verify rather than showing stale data.
+        gcTime: 15 * 60 * 1000
     })
 
     // ─── OMS metadata ──────────────────────────────────────────────────────────
@@ -413,7 +417,12 @@ const GuestOrderLookupResults = () => {
 
     // ─── Verify form (401/403 = not yet verified) ──────────────────────────────
 
-    if (!order) {
+    // React Query retains the last successful `order` value even when a background
+    // refetch (e.g. window-focus) returns a 401/403 (cookie expired). Without this
+    // guard, stale order data stays on screen indefinitely after the cookie expires.
+    const requiresVerification = !order || (isError && (error?.status === 401 || error?.status === 403))
+
+    if (requiresVerification) {
         return (
             <Container maxW="lg" py={12}>
                 <Stack spacing={8}>
