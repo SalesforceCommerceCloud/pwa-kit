@@ -843,7 +843,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 delete cookieData2[orderNo]
                 res.setHeader(
                     'Set-Cookie',
-                    `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/`
+                    `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=3600`
                 )
                 return res.status(404).json({error: 'Session expired'})
             }
