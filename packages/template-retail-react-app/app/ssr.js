@@ -26,10 +26,131 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
+import {ShopperOrders} from 'commerce-sdk-isomorphic'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 
 const config = getConfig()
+
+// Guest order access helpers
+function getSiteIdFromRequest(req) {
+    return req.headers['x-site-id'] || null
+}
+
+// Route server-side SCAPI calls through the MRT proxy so they work in Lambda.
+// MRT Lambdas have no direct outbound internet; all external API traffic must
+// go via /mobify/proxy/api (same path the client SDK uses).
+function makeShopperOrders(apiParams, authorization) {
+    const {clientId, organizationId, shortCode, siteId} = apiParams
+    const proxy = `${getAppOrigin()}${getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
+    return new ShopperOrders({
+        parameters: {clientId, organizationId, shortCode, siteId},
+        headers: {authorization},
+        proxy
+    })
+}
+
+function parseCookieValue(req, cookieName) {
+    const raw = req.headers?.cookie
+        ?.split(';')
+        .map((c) => c.trim())
+        .find((c) => c.startsWith(cookieName + '='))
+    return raw ? decodeURIComponent(raw.slice(cookieName.length + 1)) : null
+}
+
+export function parseGuestOrderCookie(req, cookieName) {
+    try {
+        const raw = req.headers?.cookie
+            ?.split(';')
+            .map((c) => c.trim())
+            .find((c) => c.startsWith(cookieName + '='))
+        if (!raw) return {}
+        return JSON.parse(decodeURIComponent(raw.slice(cookieName.length + 1)))
+    } catch {
+        return {}
+    }
+}
+
+export function evictIfNeeded(cookieMap) {
+    // FIFO eviction if raw JSON would exceed ~2500 bytes (leaves headroom for URL-encoding expansion)
+    let entries = Object.entries(cookieMap)
+    while (JSON.stringify(Object.fromEntries(entries)).length > 2500 && entries.length > 1) {
+        entries.shift()
+    }
+    return Object.fromEntries(entries)
+}
+
+const GUEST_ORDER_SUPPRESSED_FIELDS = new Set([
+    'paymentCard',
+    'expirationMonth',
+    'expirationYear',
+    'phone',
+    'globalPartyId',
+    'orderToken',
+    'orderViewCode'
+])
+
+export function filterGuestOrderFields(order) {
+    if (!order || typeof order !== 'object') return order
+    const filtered = {}
+    for (const [key, val] of Object.entries(order)) {
+        if (key.startsWith('c_')) continue // suppress all custom attributes
+        if (GUEST_ORDER_SUPPRESSED_FIELDS.has(key)) continue
+        if (key === 'customerInfo') {
+            // Keep only email echo; suppress phone, globalPartyId
+            const {email, customerEmail} = val || {}
+            filtered.customerInfo = {email: email || customerEmail}
+            continue
+        }
+        if (key === 'paymentInstruments') {
+            // Keep card type, last digits, masked number, method id — matches sf-next allowedFields
+            filtered.paymentInstruments = (val || []).map((pi) => ({
+                paymentInstrumentId: pi.paymentInstrumentId,
+                paymentMethodId: pi.paymentMethodId,
+                cardType: pi.cardType,
+                numberLastDigits: pi.numberLastDigits,
+                maskedNumber: pi.maskedNumber
+            }))
+            continue
+        }
+        if (key === 'shipments') {
+            // Full shippingAddress matches sf-next allowedFields; tracking fields are additive
+            filtered.shipments = (val || []).map((s) => ({
+                shipmentId: s.shipmentId,
+                shippingStatus: s.shippingStatus,
+                trackingNumber: s.trackingNumber,
+                trackingUrl: s.trackingUrl,
+                expectedDeliveryDate: s.expectedDeliveryDate,
+                shippingMethod: s.shippingMethod,
+                shippingAddress: s.shippingAddress
+                    ? {
+                          firstName: s.shippingAddress.firstName,
+                          lastName: s.shippingAddress.lastName,
+                          address1: s.shippingAddress.address1,
+                          address2: s.shippingAddress.address2,
+                          city: s.shippingAddress.city,
+                          stateCode: s.shippingAddress.stateCode,
+                          countryCode: s.shippingAddress.countryCode,
+                          postalCode: s.shippingAddress.postalCode
+                      }
+                    : undefined
+            }))
+            continue
+        }
+        filtered[key] = val
+    }
+    // Strip c_* custom attributes from individual productItems (server-side security)
+    if (filtered.productItems) {
+        filtered.productItems = filtered.productItems.map((item) => {
+            const filteredItem = {...item}
+            Object.keys(filteredItem).forEach((key) => {
+                if (key.startsWith('c_')) delete filteredItem[key]
+            })
+            return filteredItem
+        })
+    }
+    return filtered
+}
 
 const options = {
     // The build directory (an absolute path)
