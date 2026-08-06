@@ -208,6 +208,9 @@ const GuestOrderLookupResults = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [serverError, setServerError] = useState(null)
     const inputRefs = useRef([])
+    // Set to true between a successful verify POST and the refetch completing so
+    // the loading branch knows to show the order skeleton, not the verify skeleton.
+    const verifySucceededRef = useRef(false)
 
     const handleDigitChange = useCallback(
         (index, value) => {
@@ -265,7 +268,12 @@ const GuestOrderLookupResults = () => {
             if (res.ok) {
                 // Cookie is now written server-side. Refetch so the query transitions
                 // out of error state and renders order details.
-                await refetch()
+                verifySucceededRef.current = true
+                try {
+                    await refetch()
+                } finally {
+                    verifySucceededRef.current = false
+                }
                 return
             }
             if (res.status === 404) {
@@ -372,30 +380,31 @@ const GuestOrderLookupResults = () => {
     // ─── Loading ───────────────────────────────────────────────────────────────
 
     if (isLoading) {
-        // If there's no cached order yet, this is a first visit — the fetch will almost
-        // certainly return 403 (no cookie). Show a minimal spinner inside the verify
-        // form container rather than the order-details skeleton, which would be misleading.
-        if (!order) {
+        // Show the order-details skeleton when:
+        //   (a) we already have cached order data (background refetch), or
+        //   (b) the user just submitted a correct access code (verifySucceededRef is true)
+        // Otherwise this is a first visit with no cookie — the fetch will return 403
+        // and we'll show the verify form, so render the compact verify-shaped skeleton.
+        if (order || verifySucceededRef.current) {
             return (
-                <Container maxW="lg" py={12}>
-                    <Stack spacing={8} align="center">
-                        <Skeleton height="32px" width="220px" />
-                        <Skeleton height="20px" width="300px" />
-                        <Skeleton height="200px" width="100%" />
+                <Box layerStyle="page"><Stack spacing={6}>
+                    <Skeleton height="20px" width="200px" />
+                    <Stack spacing={2}>
+                        <Skeleton height="32px" width="200px" />
+                        <Skeleton height="20px" width="150px" />
                     </Stack>
-                </Container>
+                    <Skeleton height="300px" />
+                </Stack></Box>
             )
         }
-        // Re-fetching an already-verified session — show the order-details skeleton.
         return (
-            <Box layerStyle="page"><Stack spacing={6}>
-                <Skeleton height="20px" width="200px" />
-                <Stack spacing={2}>
-                    <Skeleton height="32px" width="200px" />
-                    <Skeleton height="20px" width="150px" />
+            <Container maxW="lg" py={12}>
+                <Stack spacing={8} align="center">
+                    <Skeleton height="32px" width="220px" />
+                    <Skeleton height="20px" width="300px" />
+                    <Skeleton height="200px" width="100%" />
                 </Stack>
-                <Skeleton height="300px" />
-            </Stack></Box>
+            </Container>
         )
     }
 
