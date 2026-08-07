@@ -37,6 +37,8 @@ Tell the operator which step they're on and why, then start there.
 
 There is **no publish button.** Pushing a commit to a `release-X.Y.x` branch runs `.github/workflows/test.yml`, whose "Publish to NPM" step runs `npm run publish-to-npm` (`lerna publish from-package`). It publishes a package when **(a)** the monorepo version does **not** end in `-dev`, and **(b)** that version is **not already on npm**. A merged PR into the release branch is a push — so **merging a bump PR into the release branch is what publishes.**
 
+**Where to watch it.** The publish is one step buried in a large matrix — dozens of legs across `pwa-kit` / `pwa-kit-windows` / `generated` / `lighthouse` jobs, most of which are just tests. The one that publishes is the **`pwa-kit` job's single `ubuntu-latest` leg on node 24 + npm 11** (`IS_MRT_NODE`), step **"Publish to NPM"** — every other leg skips it. So don't wait on the whole run to go green; watch that leg's Publish step. It's also gated on the version not being `-dev`, so a green run whose Publish step was *skipped* published nothing. Don't infer success from a green check either way — **confirm against npm** (`npm view`, Step 3) as the source of truth.
+
 Two consequences the steps depend on:
 
 - **Branch creation and version bumping are separate acts.** Cut `release-X.Y.x` *clean from develop* while versions still end in `-dev` — that push publishes nothing (gate (a)). The bump lands afterward via PR; that merge is the deliberate, only publish trigger.
