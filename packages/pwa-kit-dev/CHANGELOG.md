@@ -1,3 +1,4 @@
+## v3.20.0-nightly-20260807082212 (Aug 07, 2026)
 ## v3.20.0-dev (Jul 13, 2026)
 - The dev server's `app.sendMetric()` is now a backwards-compatible no-op, following removal of custom per-request CloudWatch metrics in `pwa-kit-runtime`.
 ## v3.19.0 (Jul 13, 2026)

@@ -1,3 +1,4 @@
+## v3.20.0-nightly-20260807082212 (Aug 07, 2026)
 ## v3.20.0-dev (Jul 13, 2026)
 ## v3.19.0 (Jul 13, 2026)
 - Fix OpenTelemetry v2 breaking change: `ReadableSpan.parentSpanId` renamed to `parentSpanContext`. Updated `src/utils/opentelemetry.js` and `src/ssr/server/mrt-console-span-exporter.js` to use `span.parentSpanContext?.spanId` instead of `span.parentSpanId` to restore parent span links in exported spans. Add `TextEncoder` polyfill alongside existing `TextDecoder` for complete AWS SDK 3.x CBOR support. [#3917](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3917)
