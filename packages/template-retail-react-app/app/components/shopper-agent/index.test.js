@@ -76,6 +76,19 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
     default: jest.fn()
 }))
 
+// Mock the Commerce Client FAB (internals covered by commerce-client-fab.test.js).
+jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/commerce-client-fab', () => ({
+    __esModule: true,
+    default: (props) => {
+        const React = jest.requireActual('react')
+        return React.createElement('button', {
+            'data-testid': 'commerce-client-fab',
+            'data-position': props.position,
+            'data-panel-open-by-default': String(props.isPanelOpenByDefault)
+        })
+    }
+}))
+
 // Mock the useMiaw hook
 jest.mock('@salesforce/retail-react-app/app/hooks/use-miaw', () => ({
     __esModule: true,
@@ -1530,6 +1543,44 @@ describe('ShopperAgent Component', () => {
             expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
         })
 
+        describe('floating action button gating', () => {
+            test('renders the FAB once the bundle has loaded when cc_showFab is true', () => {
+                mockedUseScript.mockReturnValue({loaded: true, error: false})
+
+                renderCommerceClient({cc_showFab: 'true'})
+
+                expect(screen.getByTestId('commerce-client-fab')).toBeInTheDocument()
+            })
+
+            test('hides the FAB while the bundle is still loading', () => {
+                // Cold/slow load: the bundle has not finished loading yet, so the
+                // widget cannot be injected and a FAB click would be dropped.
+                mockedUseScript.mockReturnValue({loaded: false, error: false})
+
+                renderCommerceClient({cc_showFab: 'true'})
+
+                expect(screen.queryByTestId('commerce-client-fab')).toBeNull()
+                // The container still renders so injection can run once loaded.
+                expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
+            })
+
+            test('keeps the FAB hidden when the bundle fails to load', () => {
+                mockedUseScript.mockReturnValue({loaded: false, error: true})
+
+                renderCommerceClient({cc_showFab: 'true'})
+
+                expect(screen.queryByTestId('commerce-client-fab')).toBeNull()
+            })
+
+            test('does not render the FAB when cc_showFab is not enabled', () => {
+                mockedUseScript.mockReturnValue({loaded: true, error: false})
+
+                renderCommerceClient()
+
+                expect(screen.queryByTestId('commerce-client-fab')).toBeNull()
+            })
+        })
+
         test('does not render the MIAW iframe window for the commerce-client provider', () => {
             renderCommerceClient()
 
@@ -1834,6 +1885,24 @@ describe('ShopperAgent Component', () => {
 
             expect(widgetOptions.componentConfig.type).toBe('modal')
             expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'bottom-left'})
+        })
+
+        test('sends dialogFullHeight false explicitly so the widget default cannot win', () => {
+            renderCommerceClient({cc_dialogFullHeight: 'false', cc_displayType: 'dialog'})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.options.dialogFullHeight).toBe(false)
+        })
+
+        test('omits dialog layout options for a modal widget', () => {
+            renderCommerceClient({cc_dialogFullHeight: 'true', cc_displayType: 'modal'})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'bottom-right'})
         })
     })
 })

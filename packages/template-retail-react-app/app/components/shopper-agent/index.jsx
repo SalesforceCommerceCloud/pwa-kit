@@ -36,6 +36,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {resolveCommerceClientOverrideOptions} from '@salesforce/retail-react-app/app/utils/commerce-client-overrides'
 import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
+import CommerceClientFab from '@salesforce/retail-react-app/app/components/shopper-agent/commerce-client-fab'
 
 const onClient = typeof window !== 'undefined'
 
@@ -604,6 +605,7 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {string} [props.commerceAgentConfiguration.cc_dialogWidth] - Width of the side panel when cc_dialogFullHeight is 'true' (e.g. '420px')
  * @param {string} [props.commerceAgentConfiguration.cc_displayType] - Widget type: 'chat' | 'dialog' | 'modal'
  * @param {string} [props.commerceAgentConfiguration.cc_widgetPosition] - Widget corner position: 'bottom-left' | 'bottom-right' (default)
+ * @param {string} [props.commerceAgentConfiguration.cc_showFab] - When 'true', renders a floating action button at `cc_widgetPosition` that opens the agent; defaults to 'false'
  * @param {string} [props.commerceAgentConfiguration.cc_isOpen] - When 'true', the widget opens automatically on page load (forwarded as `componentConfig.isOpen`); defaults to 'false'
  * @param {string} [props.commerceAgentConfiguration.cc_isDevelopment] - When 'true', logs widget events to the console (forwarded as `isDevelopment`)
  * @param {Object} [props.commerceAgentConfiguration.cc_theme] - Partial theme overrides for the widget
@@ -627,6 +629,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         cc_dialogWidth = DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH,
         cc_displayType = 'dialog',
         cc_widgetPosition = 'bottom-right',
+        cc_showFab = 'false',
         cc_isOpen = 'false',
         cc_isDevelopment = 'false',
         cc_enableEscalationToAgent = 'false',
@@ -641,7 +644,9 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
     const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
 
-    const isFullHeight = cc_dialogFullHeight === 'true'
+    const isDialog = cc_displayType === 'dialog'
+    const isFullHeight = isDialog && cc_dialogFullHeight === 'true'
+    const showFab = cc_showFab === 'true'
 
     // Restore open-state after navigation (read once on mount); falls back to
     // cc_isOpen when nothing is persisted (fresh tab).
@@ -687,8 +692,8 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
                 type: cc_displayType,
                 options: {
                     dialogPosition: cc_widgetPosition,
-                    ...(isFullHeight && {
-                        dialogFullHeight: true,
+                    ...(isDialog && {
+                        dialogFullHeight: isFullHeight,
                         dialogWidth: cc_dialogWidth
                     })
                 }
@@ -712,6 +717,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             cc_searchConfig,
             cc_isDevelopment,
             initialIsOpen,
+            isDialog,
             isFullHeight,
             cc_displayType,
             cc_widgetPosition,
@@ -725,7 +731,18 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
     // Inject the widget into the container once the bundle is loaded
     useCommerceClientMessaging(scriptLoadStatus, widgetOptions)
 
-    return <div id={commerceClientElementId} data-testid="commerce-client-agent-widget" />
+    return (
+        <>
+            <div id={commerceClientElementId} data-testid="commerce-client-agent-widget" />
+            {/* Gate the FAB on bundle load; before injection there is no widget for its click to reach. */}
+            {showFab && scriptLoadStatus?.loaded && !scriptLoadStatus?.error && (
+                <CommerceClientFab
+                    position={cc_widgetPosition}
+                    isPanelOpenByDefault={initialIsOpen}
+                />
+            )}
+        </>
+    )
 }
 
 CommerceClientAgentWindow.propTypes = {
