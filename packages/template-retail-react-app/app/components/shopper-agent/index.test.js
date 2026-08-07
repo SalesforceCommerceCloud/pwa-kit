@@ -39,6 +39,10 @@ jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/token-bridg
 
 // Import ShopperAgent after all mocks are set up
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
+import {
+    COMMERCE_CLIENT_CDN_BASE_URL,
+    COMMERCE_CLIENT_OPEN_STATE_KEY
+} from '@salesforce/retail-react-app/app/constants'
 
 // Mock the embedded messaging service
 const mockEmbeddedService = {
@@ -70,6 +74,19 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-script', () => ({
 jest.mock('@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging', () => ({
     __esModule: true,
     default: jest.fn()
+}))
+
+// Mock the Commerce Client FAB (internals covered by commerce-client-fab.test.js).
+jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/commerce-client-fab', () => ({
+    __esModule: true,
+    default: (props) => {
+        const React = jest.requireActual('react')
+        return React.createElement('button', {
+            'data-testid': 'commerce-client-fab',
+            'data-position': props.position,
+            'data-panel-open-by-default': String(props.isPanelOpenByDefault)
+        })
+    }
 }))
 
 // Mock the useMiaw hook
@@ -1507,9 +1524,8 @@ describe('ShopperAgent Component', () => {
             provider: 'commerce-client',
             scrt2Url: 'https://test.salesforce-scrt.com',
             salesforceOrgId: 'test-org-id',
-            esDeveloperName: 'My_Embedded_Service',
-            commerceClientScriptSourceUrl:
-                'https://cdn.search.cimulate.ai/copilot-widget/1.0.0/messaging.umd.js'
+            cc_esDeveloperName: 'My_Embedded_Service',
+            cc_cdnVersion: '1.0.0'
         }
 
         const renderCommerceClient = (overrides = {}) =>
@@ -1527,6 +1543,44 @@ describe('ShopperAgent Component', () => {
             expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
         })
 
+        describe('floating action button gating', () => {
+            test('renders the FAB once the bundle has loaded when cc_showFab is true', () => {
+                mockedUseScript.mockReturnValue({loaded: true, error: false})
+
+                renderCommerceClient({cc_showFab: 'true'})
+
+                expect(screen.getByTestId('commerce-client-fab')).toBeInTheDocument()
+            })
+
+            test('hides the FAB while the bundle is still loading', () => {
+                // Cold/slow load: the bundle has not finished loading yet, so the
+                // widget cannot be injected and a FAB click would be dropped.
+                mockedUseScript.mockReturnValue({loaded: false, error: false})
+
+                renderCommerceClient({cc_showFab: 'true'})
+
+                expect(screen.queryByTestId('commerce-client-fab')).toBeNull()
+                // The container still renders so injection can run once loaded.
+                expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
+            })
+
+            test('keeps the FAB hidden when the bundle fails to load', () => {
+                mockedUseScript.mockReturnValue({loaded: false, error: true})
+
+                renderCommerceClient({cc_showFab: 'true'})
+
+                expect(screen.queryByTestId('commerce-client-fab')).toBeNull()
+            })
+
+            test('does not render the FAB when cc_showFab is not enabled', () => {
+                mockedUseScript.mockReturnValue({loaded: true, error: false})
+
+                renderCommerceClient()
+
+                expect(screen.queryByTestId('commerce-client-fab')).toBeNull()
+            })
+        })
+
         test('does not render the MIAW iframe window for the commerce-client provider', () => {
             renderCommerceClient()
 
@@ -1535,16 +1589,18 @@ describe('ShopperAgent Component', () => {
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledTimes(1)
         })
 
-        test('does not render when the script URL is not a trusted cimulate.ai domain', () => {
+        test('does not render when the script URL override is not a trusted cimulate.ai domain', () => {
             renderCommerceClient({
+                cc_cdnVersion: undefined,
                 commerceClientScriptSourceUrl: 'https://evil.example.com/messaging.umd.js'
             })
 
             expect(screen.queryByTestId('shopper-agent')).toBeNull()
         })
 
-        test('renders when the script URL is served from a trusted sfcc-store-internal.net domain', () => {
+        test('renders when the script URL override is served from a trusted sfcc-store-internal.net domain', () => {
             renderCommerceClient({
+                cc_cdnVersion: undefined,
                 commerceClientScriptSourceUrl:
                     'https://www.shop.prd.tbdp.sfcc-store-internal.net/on/demandware.static/Sites-nto-Site/-/en_US/v1782164019601/jscript/cimulate/messaging.umd.js'
             })
@@ -1559,8 +1615,8 @@ describe('ShopperAgent Component', () => {
             expect(screen.queryByTestId('shopper-agent')).toBeNull()
         })
 
-        test('falls back to embeddedServiceName when esDeveloperName is not provided', () => {
-            renderCommerceClient({esDeveloperName: '', embeddedServiceName: 'Fallback_Service'})
+        test('falls back to embeddedServiceName when cc_esDeveloperName is not provided', () => {
+            renderCommerceClient({cc_esDeveloperName: '', embeddedServiceName: 'Fallback_Service'})
 
             expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
@@ -1579,7 +1635,7 @@ describe('ShopperAgent Component', () => {
         })
 
         test('forwards a configured capabilitiesVersion to the widget options', () => {
-            renderCommerceClient({capabilitiesVersion: '70'})
+            renderCommerceClient({cc_capabilitiesVersion: '70'})
 
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
                 expect.anything(),
@@ -1587,16 +1643,211 @@ describe('ShopperAgent Component', () => {
             )
         })
 
-        test('loads the Commerce Client bundle via useScript', () => {
-            renderCommerceClient()
+        test('forwards cc_routingAttributes to the widget options as routingAttributes', () => {
+            renderCommerceClient({cc_routingAttributes: {foo: 'bar'}})
 
-            expect(mockedUseScript).toHaveBeenCalledWith(
-                commerceClientSettings.commerceClientScriptSourceUrl
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({routingAttributes: {foo: 'bar'}})
             )
         })
 
-        test('builds full-height side panel options in the default panel display mode', () => {
-            renderCommerceClient({commerceClientPanelWidth: '500px'})
+        test('forwards cc_overridesUrl to the widget options as overridesUrl', () => {
+            renderCommerceClient({cc_overridesUrl: 'https://example.com/overrides.js'})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({overridesUrl: 'https://example.com/overrides.js'})
+            )
+        })
+
+        test('forwards cc_overrides to the widget options as overrides', () => {
+            renderCommerceClient({cc_overrides: {ProductTile: 'my-product-tile'}})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({overrides: {ProductTile: 'my-product-tile'}})
+            )
+        })
+
+        test('prefers cc_overrides and drops cc_overridesUrl when both are set', () => {
+            renderCommerceClient({
+                cc_overridesUrl: 'https://example.com/overrides.js',
+                cc_overrides: {ProductTile: 'my-product-tile'}
+            })
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.overrides).toEqual({ProductTile: 'my-product-tile'})
+            expect(widgetOptions).not.toHaveProperty('overridesUrl')
+        })
+
+        test('falls back to cc_overridesUrl when cc_overrides is an empty map', () => {
+            renderCommerceClient({
+                cc_overridesUrl: 'https://example.com/overrides.js',
+                cc_overrides: {}
+            })
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.overridesUrl).toBe('https://example.com/overrides.js')
+            expect(widgetOptions).not.toHaveProperty('overrides')
+        })
+
+        test('omits both override options when neither is configured', () => {
+            renderCommerceClient()
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions).not.toHaveProperty('overridesUrl')
+            expect(widgetOptions).not.toHaveProperty('overrides')
+        })
+
+        test('omits overrides when cc_overrides is an empty object', () => {
+            renderCommerceClient({cc_overrides: {}})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions).not.toHaveProperty('overrides')
+        })
+
+        test('opens the widget automatically when cc_isOpen is true', () => {
+            renderCommerceClient({cc_isOpen: 'true'})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.isOpen).toBe(true)
+        })
+
+        test('keeps the widget closed by default (cc_isOpen defaults to false)', () => {
+            renderCommerceClient()
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.isOpen).toBe(false)
+        })
+
+        describe('persisted open-state', () => {
+            afterEach(() => {
+                window.sessionStorage.removeItem(COMMERCE_CLIENT_OPEN_STATE_KEY)
+            })
+
+            test('reopens the widget when the shopper left it open before navigating', () => {
+                // Simulate the shopper having left the panel open on a prior page.
+                window.sessionStorage.setItem(COMMERCE_CLIENT_OPEN_STATE_KEY, 'true')
+
+                renderCommerceClient({cc_isOpen: 'false'})
+
+                const calls = mockedUseCommerceClientMessaging.mock.calls
+                const widgetOptions = calls[calls.length - 1][1]
+
+                // Persisted open-state wins over the cc_isOpen default.
+                expect(widgetOptions.componentConfig.isOpen).toBe(true)
+            })
+
+            test('keeps the widget closed when the shopper closed it before navigating', () => {
+                window.sessionStorage.setItem(COMMERCE_CLIENT_OPEN_STATE_KEY, 'false')
+
+                // Even with cc_isOpen true, the shopper's explicit close must stick.
+                renderCommerceClient({cc_isOpen: 'true'})
+
+                const calls = mockedUseCommerceClientMessaging.mock.calls
+                const widgetOptions = calls[calls.length - 1][1]
+
+                expect(widgetOptions.componentConfig.isOpen).toBe(false)
+            })
+
+            test('falls back to cc_isOpen when nothing is persisted (fresh tab)', () => {
+                renderCommerceClient({cc_isOpen: 'true'})
+
+                const calls = mockedUseCommerceClientMessaging.mock.calls
+                const widgetOptions = calls[calls.length - 1][1]
+
+                expect(widgetOptions.componentConfig.isOpen).toBe(true)
+            })
+        })
+
+        test('forwards cc_isDevelopment as the boolean isDevelopment widget option', () => {
+            renderCommerceClient({cc_isDevelopment: 'true'})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({isDevelopment: true})
+            )
+        })
+
+        test('defaults isDevelopment to false when cc_isDevelopment is not set', () => {
+            renderCommerceClient()
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({isDevelopment: false})
+            )
+        })
+
+        test('defaults escalation to false and transcript to true in the widget options', () => {
+            renderCommerceClient()
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    enableEscalationToAgent: false,
+                    enableDownloadTranscript: true
+                })
+            )
+        })
+
+        test('forwards cc_enableEscalationToAgent as true when explicitly set', () => {
+            renderCommerceClient({cc_enableEscalationToAgent: 'true'})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({enableEscalationToAgent: true})
+            )
+        })
+
+        test('forwards escalation and transcript toggles as booleans when set to false', () => {
+            renderCommerceClient({
+                cc_enableEscalationToAgent: 'false',
+                cc_enableDownloadTranscript: 'false'
+            })
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    enableEscalationToAgent: false,
+                    enableDownloadTranscript: false
+                })
+            )
+        })
+
+        test('loads the Commerce Client bundle via useScript, resolving cc_cdnVersion to a CDN URL', () => {
+            renderCommerceClient()
+
+            expect(mockedUseScript).toHaveBeenCalledWith(
+                `${COMMERCE_CLIENT_CDN_BASE_URL}/1.0.0/messaging.umd.js`
+            )
+        })
+
+        test('loads an explicit commerceClientScriptSourceUrl override via useScript', () => {
+            const overrideUrl =
+                'https://www.shop.prd.tbdp.sfcc-store-internal.net/jscript/messaging.umd.js'
+            renderCommerceClient({
+                cc_cdnVersion: undefined,
+                commerceClientScriptSourceUrl: overrideUrl
+            })
+
+            expect(mockedUseScript).toHaveBeenCalledWith(overrideUrl)
+        })
+
+        test('builds full-height side panel options by default (cc_dialogFullHeight defaults to true)', () => {
+            renderCommerceClient({cc_dialogWidth: '500px'})
 
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
                 expect.anything(),
@@ -1613,18 +1864,45 @@ describe('ShopperAgent Component', () => {
             )
         })
 
-        test('does not apply panel-specific options in dialog display mode', () => {
+        test('forwards cc_widgetPosition as the dialogPosition', () => {
+            renderCommerceClient({cc_widgetPosition: 'bottom-left'})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.options.dialogPosition).toBe('bottom-left')
+        })
+
+        test('does not apply full-height options when cc_dialogFullHeight is false', () => {
             renderCommerceClient({
-                commerceClientDisplayMode: 'dialog',
-                commerceClientComponentType: 'modal',
-                commerceClientDialogPosition: 'top-left'
+                cc_dialogFullHeight: 'false',
+                cc_displayType: 'modal',
+                cc_widgetPosition: 'bottom-left'
             })
 
             const calls = mockedUseCommerceClientMessaging.mock.calls
             const widgetOptions = calls[calls.length - 1][1]
 
             expect(widgetOptions.componentConfig.type).toBe('modal')
-            expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'top-left'})
+            expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'bottom-left'})
+        })
+
+        test('sends dialogFullHeight false explicitly so the widget default cannot win', () => {
+            renderCommerceClient({cc_dialogFullHeight: 'false', cc_displayType: 'dialog'})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.options.dialogFullHeight).toBe(false)
+        })
+
+        test('omits dialog layout options for a modal widget', () => {
+            renderCommerceClient({cc_dialogFullHeight: 'true', cc_displayType: 'modal'})
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'bottom-right'})
         })
     })
 })

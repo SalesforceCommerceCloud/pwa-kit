@@ -30,7 +30,6 @@
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
-    "@aws-sdk/client-cloudwatch": "^3.962.0",
     "@h4ad/serverless-adapter": "4.4.0",
     "@loadable/babel-plugin": "^5.15.3",
     "@salesforce/mrt-utilities": "^0.2.2",

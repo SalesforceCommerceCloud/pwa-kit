@@ -160,7 +160,7 @@ const SFPaymentsExpressButtons = ({
         },
         FAIL_ORDER: {
             defaultMessage:
-                'Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method.',
+                'Payment processing failed. Your order has been canceled and your basket has been restored. Please try again or select a different payment method.',
             id: 'sfp_payments_express.error.fail_order'
         },
         PREPARE_BASKET: {
