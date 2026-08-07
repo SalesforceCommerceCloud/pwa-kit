@@ -18,11 +18,11 @@ const DEFAULT_PANEL_WIDTH = '420px'
  * the Commerce Client widget's full-height side panel (the "page push" effect).
  *
  * The widget renders as a `position: fixed` overlay in its own DOM subtree, so it
- * cannot reflow the host page — the template has to apply the shift. Open-state and
- * dock position are read from the widget's `cimulate:ui-state-update` window event,
- * which fires for every state change (our `toggleWidgetOpen` calls, the panel's own
- * close/minimize buttons, and the header's Move left/right control alike), so the
- * layout stays in sync however the panel moves or closes.
+ * cannot reflow the host page — the template has to apply the shift. Open-state, dock
+ * position and widget type are read from the widget's `cimulate:ui-state-update` window
+ * event, which fires for every state change (our `toggleWidgetOpen` calls, the panel's
+ * own close/minimize buttons, and the header's Move left/right and expand controls
+ * alike), so the layout stays in sync however the panel moves, expands or closes.
  *
  * @param {Object} [commerceAgentConfiguration] - Commerce agent configuration object
  * @param {string} [commerceAgentConfiguration.enabled] - 'true' when the shopper agent renders at all
@@ -50,7 +50,7 @@ export const useCommerceClientPagePush = (commerceAgentConfiguration = {}) => {
     // Page-push only applies to a rendered, full-height Commerce Client side panel:
     // modal and inline chat widgets never occupy the edge of the viewport, and a
     // disabled agent has no panel to make room for.
-    const isPagePushEnabled =
+    const isPagePushConfigured =
         enabled === 'true' &&
         provider === 'commerce-client' &&
         cc_pagePush === 'true' &&
@@ -65,8 +65,12 @@ export const useCommerceClientPagePush = (commerceAgentConfiguration = {}) => {
     // so the configured corner is the right seed on each page.
     const [panelPosition, setPanelPosition] = useState(cc_widgetPosition)
 
+    // The header's expand control swaps the docked panel for a centered modal, so the
+    // live type — not the configured one — decides whether content should shift.
+    const [widgetType, setWidgetType] = useState(cc_displayType)
+
     useEffect(() => {
-        if (!onClient || !isPagePushEnabled) {
+        if (!onClient || !isPagePushConfigured) {
             return undefined
         }
 
@@ -82,6 +86,8 @@ export const useCommerceClientPagePush = (commerceAgentConfiguration = {}) => {
                 setIsPanelOpen(Boolean(value))
             } else if (property === 'position' && typeof value === 'string') {
                 setPanelPosition(value)
+            } else if (property === 'type' && typeof value === 'string') {
+                setWidgetType(value)
             }
         }
 
@@ -89,18 +95,20 @@ export const useCommerceClientPagePush = (commerceAgentConfiguration = {}) => {
         return () => {
             window.removeEventListener(COMMERCE_CLIENT_UI_STATE_EVENT, handleUiStateUpdate)
         }
-    }, [isPagePushEnabled])
+    }, [isPagePushConfigured])
 
-    if (!isPagePushEnabled) {
+    if (!isPagePushConfigured) {
         return {}
     }
+
+    const isContentShifted = isPanelOpen && widgetType === 'dialog'
 
     // Shift content away from the side the panel currently occupies.
     const paddingProp = panelPosition === 'bottom-left' ? 'paddingLeft' : 'paddingRight'
 
     return {
         // Below `lg` the panel overlays content instead of pushing it.
-        [paddingProp]: isPanelOpen ? {base: 0, lg: cc_dialogWidth} : 0,
+        [paddingProp]: isContentShifted ? {base: 0, lg: cc_dialogWidth} : 0,
         transition: 'padding 0.3s ease-in-out'
     }
 }
