@@ -8,8 +8,6 @@ import React from 'react'
 import {useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
-    Alert,
-    AlertIcon,
     Box,
     Button,
     Container,
@@ -27,29 +25,26 @@ const GuestOrderLookupRequest = () => {
     const {isRegistered} = useCustomerType()
     const history = useHistory()
     const location = useLocation()
-    const isExpired = new URLSearchParams(location.search).get('expired') === '1'
 
-    // @ts-expect-error SDK 26.8 pending — requestOrderAccessCode is not yet in commerce-sdk-isomorphic 5.4.0
     const {mutateAsync: requestOrderAccessCode, isLoading} =
         useShopperOrdersMutation('requestOrderAccessCode')
 
     const orderNumberRegex =
-        getConfig()?.app?.guestOrderLookup?.orderNumberRegex ?? '^[A-Za-z0-9]{6,20}$'
+        getConfig()?.app?.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$'
 
-    // Prefill from query params — matches sf-next /order-lookup?order=<n>&email=<e> pattern
+    // Prefill orderNo from query param (?order=) — used by the expired-session redirect
+    // from results.jsx so the user doesn't have to retype their order number.
+    // Email is intentionally NOT passed via URL — email+orderNo together in a URL would
+    // be logged by CDN/server access logs, browser history, and Referer headers, creating
+    // a PII leak tuple. See decision note in results.jsx for full rationale.
     const searchParams = new URLSearchParams(location.search)
     const prefillOrderNo = searchParams.get('order') || ''
-    const prefillEmail = searchParams.get('email') || ''
-
-    const form = useForm({
-        defaultValues: {orderNo: prefillOrderNo, email: prefillEmail}
-    })
 
     const {
         control,
         handleSubmit,
         formState: {errors}
-    } = form
+    } = useForm({defaultValues: {orderNo: prefillOrderNo, email: ''}})
 
     if (isRegistered) return <Redirect to="/account/orders" />
 
@@ -60,52 +55,48 @@ const GuestOrderLookupRequest = () => {
                 body: {email}
             })
         } catch (err) {
-            // Non-400 errors: route to results anyway (anti-enumeration).
-            // 400 errors are also routed to results — the server rejects
-            // malformed payloads, but the UI must never leak order existence.
+            // Route to results regardless (anti-enumeration — never leak order existence).
             if (err?.response?.status === 400) {
-                history.push(`/order-lookup/results?order=${encodeURIComponent(orderNo)}&email=${encodeURIComponent(email)}`)
+                history.push(`/order-lookup/results/${encodeURIComponent(orderNo)}`, {email})
                 return
             }
         }
-        history.push(`/order-lookup/results?order=${encodeURIComponent(orderNo)}&email=${encodeURIComponent(email)}`)
+        history.push(`/order-lookup/results/${encodeURIComponent(orderNo)}`, {email})
     }
 
     return (
-        <Container maxW="md" py={12}>
+        <Container maxW="lg" py={12}>
             <Stack spacing={8}>
-                {isExpired && (
-                    <Alert status="warning" borderRadius="md" role="alert">
-                        <AlertIcon />
-                        {formatMessage({
-                            id: 'guestOrderLookup.request.alert.sessionExpired',
-                            defaultMessage:
-                                'Your session has expired. Please request a new access code.'
-                        })}
-                    </Alert>
-                )}
-                <Box>
-                    <Heading as="h1" fontSize="2xl" mb={2}>
+                <Box textAlign="center">
+                    <Heading as="h1" fontSize="3xl" fontWeight="bold" mb={2}>
                         {formatMessage({
                             id: 'guestOrderLookup.request.heading',
-                            defaultMessage: 'Find Your Order'
+                            defaultMessage: 'Look Up Your Order'
                         })}
                     </Heading>
                     <Text color="gray.600">
                         {formatMessage({
                             id: 'guestOrderLookup.request.subtext',
                             defaultMessage:
-                                'Enter your order number and email address to receive a one-time access code.'
+                                'Enter your order details to track your order or view your receipt.'
                         })}
                     </Text>
                 </Box>
-                <Box as="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-                    <Stack spacing={5}>
+
+                <Box
+                    as="form"
+                    onSubmit={handleSubmit(onSubmit)}
+                    noValidate
+                    borderWidth="1px"
+                    borderRadius="lg"
+                    p={8}
+                >
+                    <Stack spacing={6}>
                         <Field
                             name="orderNo"
                             label={formatMessage({
                                 id: 'guestOrderLookup.request.label.orderNumber',
-                                defaultMessage: 'Order Number'
+                                defaultMessage: 'Order number'
                             })}
                             type="text"
                             control={control}
@@ -130,7 +121,7 @@ const GuestOrderLookupRequest = () => {
                             name="email"
                             label={formatMessage({
                                 id: 'guestOrderLookup.request.label.email',
-                                defaultMessage: 'Email Address'
+                                defaultMessage: 'Email address'
                             })}
                             type="email"
                             control={control}
@@ -157,10 +148,11 @@ const GuestOrderLookupRequest = () => {
                             isLoading={isLoading}
                             isDisabled={isLoading}
                             width="full"
+                            size="lg"
                         >
                             {formatMessage({
                                 id: 'guestOrderLookup.request.button.submit',
-                                defaultMessage: 'Send Access Code'
+                                defaultMessage: 'Find My Order'
                             })}
                         </Button>
                     </Stack>
