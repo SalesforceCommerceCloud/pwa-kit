@@ -31,9 +31,7 @@ import {
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCustomerType, useAccessToken} from '@salesforce/commerce-sdk-react'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
-import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import {Redirect, useHistory, useLocation, Link as RouterLink} from 'react-router-dom'
+import {Redirect, useHistory, useLocation, useParams, Link as RouterLink} from 'react-router-dom'
 import {ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import OrderProducts, {groupProductItemsByShipmentId} from '@salesforce/retail-react-app/app/components/order-products'
@@ -76,6 +74,37 @@ const isCancellable = (order) => {
     })
 }
 
+// ─── Architecture note ─────────────────────────────────────────────────────────
+// The order query is intentionally client-side only (enabled: typeof window !== 'undefined').
+//
+// We evaluated three approaches for serving order data on hard refresh:
+//
+//   A. SSR fetch + forward cookies to Express endpoint (removed here):
+//      Rejected because PWA Kit SSR HTML is cached and shared across users at the
+//      CDN layer. Merchants routinely stack their own CDNs on top of MRT, and
+//      Cache-Control: private behavior across arbitrary CDN stacks is unknowable —
+//      user A's order HTML could be served to user B. That's a data breach, not
+//      a misconfiguration.
+//
+//   B. Cache-Control: private, no-store on the SSR response:
+//      Rejected for the same reason — we cannot guarantee every CDN in every SI
+//      stack honors Cache-Control: private. Support issues would become an
+//      unresolvable finger-pointing exercise between us and the SI.
+//
+//   C. Client-side only fetch (this implementation):
+//      The SSR response contains only a loading skeleton — no order data, nothing
+//      for any CDN to cache and share. The browser fetches the order after hydration
+//      using the cc-goa_{siteId} HttpOnly cookie written by POST /api/order-lookup/verify.
+//      Hard refresh works because the cookie survives. The trade-off is a brief
+//      skeleton on hard refresh, which is acceptable for a session-gated private page.
+//
+// Email is passed via router state (location.state.email), not as a URL param.
+// email+orderNo together in a URL would be logged by CDN/server access logs, browser
+// history, and Referer headers sent to third-party analytics/support scripts —
+// creating a PII leak tuple. On hard refresh location.state is absent; the verify
+// form subtext degrades gracefully (generic message instead of "sent to <email>").
+// ──────────────────────────────────────────────────────────────────────────────────
+
 const GuestOrderLookupResults = () => {
     const {formatMessage, formatDate} = useIntl()
     const breadcrumbStyles = useStyleConfig('Breadcrumb')
@@ -83,13 +112,10 @@ const GuestOrderLookupResults = () => {
     const history = useHistory()
     const location = useLocation()
     const {getTokenWhenReady} = useAccessToken()
-    const appOrigin = useAppOrigin()
-    const {req} = useServerContext()
+    const {orderNo} = useParams()
 
-    // Read order number and email from query params — matches sf-next /order-lookup/results?order=<n>&email=<e>
-    const searchParams = new URLSearchParams(location.search)
-    const orderNo = searchParams.get('order') || ''
-    const email = searchParams.get('email') || ''
+    // email is present when navigating from Step 1 (router state), absent on hard refresh.
+    const email = location.state?.email || ''
 
     // useAccessToken returns a new getTokenWhenReady on every render — store in ref
     // so effects can always call the latest version with a stable dep array.
@@ -110,14 +136,8 @@ const GuestOrderLookupResults = () => {
         queryKey: ['guestOrderLookup', 'order', orderNo],
         queryFn: async () => {
             const token = await getTokenWhenReadyRef.current()
-            // On SSR, forward the incoming request cookies so the Express endpoint
-            // can read cc-at_{siteId} (SLAS token) and cc-goa_{siteId} (verified session).
-            const cookieHeader = typeof window === 'undefined' ? req?.headers?.cookie : undefined
-            const res = await fetch(`${appOrigin}/api/order-lookup/order/${encodeURIComponent(orderNo)}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    ...(cookieHeader && {Cookie: cookieHeader})
-                }
+            const res = await fetch(`/api/order-lookup/order/${encodeURIComponent(orderNo)}`, {
+                headers: {Authorization: `Bearer ${token}`}
             })
             if (res.status === 401 || res.status === 403) {
                 // Not verified yet — expected on first visit before OTP entry.
@@ -137,7 +157,8 @@ const GuestOrderLookupResults = () => {
             }
             return res.json()
         },
-        enabled: !!orderNo,
+        // Client-side only — see architecture note above
+        enabled: typeof window !== 'undefined' && !!orderNo,
         // Never retry auth errors — those mean the cookie is missing/expired and the
         // verify form should show immediately. Retry once on transient 5xx/502.
         retry: (failureCount, err) => failureCount < 1 && err?.status >= 500,
@@ -386,8 +407,8 @@ const GuestOrderLookupResults = () => {
 
     if (isRegistered) return <Redirect to="/account/orders" />
 
-    // Missing required query params — redirect to the entry form
-    if (!orderNo || !email) return <Redirect to="/order-lookup" />
+    // Missing orderNo (shouldn't happen via normal nav, but guard for direct URL access)
+    if (!orderNo) return <Redirect to="/order-lookup" />
 
     // ─── Loading ───────────────────────────────────────────────────────────────
 
@@ -424,7 +445,7 @@ const GuestOrderLookupResults = () => {
 
     if (isError && error?.status === 404) {
         // Redirect handled by effect — render nothing while navigating
-        history.replace(`/order-lookup?order=${encodeURIComponent(orderNo)}&email=${encodeURIComponent(email)}`)
+        history.replace(`/order-lookup?order=${encodeURIComponent(orderNo)}`)
         return null
     }
 
