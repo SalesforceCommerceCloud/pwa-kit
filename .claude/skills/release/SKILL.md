@@ -67,7 +67,13 @@ PWA Kit versions four things independently; the seven published packages collaps
 
 Multiple packages ship together in **one branch and PR** — bump each one's version and the publish script releases exactly those whose version isn't yet on npm. Name the shared branch off the **SDK** version (`release-10.0.x`).
 
-**Release a package only if it actually changed.** `develop`'s `-dev` version is a placeholder, not an obligation — an unchanged SDK does not have to ship just because develop reads `3.20.0-dev`. If the SDK has no changes since its last `3.19.x` release, keep it on the 3.19 line: the release branch is the **existing `release-3.19.x`** (reused, not recreated — a fresh cut off develop would collide with that name), and the working branch is `prepare-release-<version>` off it.
+**Release a package only if it actually changed. The code diff is the signal, not the changelog.** A changelog is a cache that can lie both ways: empty because nobody wrote the entry (not because nothing changed), or filled with entries stacked under a stale heading. Decide changed-vs-unchanged from the diff against the package's last released tag:
+```
+git diff v<last-released> -- packages/<pkg>
+```
+An empty diff means unchanged; a non-empty diff with an empty changelog means the entries are **missing** — write them before shipping, don't read the silence as "no changes."
+
+`develop`'s `-dev` version is a placeholder, not an obligation — an unchanged SDK does not have to ship just because develop reads `3.20.0-dev`. If the SDK diff is empty since its last `3.19.x` release, keep it on the 3.19 line: the release branch is the **existing `release-3.19.x`** (reused, not recreated — a fresh cut off develop would collide with that name), and the working branch is `prepare-release-<version>` off it.
 
 But `release-3.19.x` is **stale** — the changes you're shipping (e.g. new commerce-sdk-react / retail-react-app work) live on `develop`. So **merge `develop` into your working branch** to bring them in. That merge also drags in develop's `3.20.0-dev` SDK version strings, so afterward **pin the SDK/root back to the already-published `3.19.x`** (`npm run bump-version -- 3.19.<published>`) and bump only the changed packages. On merge, the root is non-`dev` so the publish step fires, `from-package` skips the SDK (already on npm), and only the bumped packages publish — and the SDK bump re-pins retail-react-app's `pwa-kit-*` deps to the published `3.19.x`. Only bump the SDK to a *new* version when its code actually changed, or when you deliberately want the whole suite version-aligned on the next minor (which republishes identical SDK code — allowed, just redundant).
 
@@ -125,7 +131,7 @@ npx lerna list --long --all
   - Preview: `## v3.19.0-preview.0`.
   - **mcp header has NO `v` prefix** (`## 0.5.0`); every other package DOES (`## v3.19.0`). Match each file's existing style.
 
-While in each file, confirm every shipping change is listed and nothing stale remains — this is the review the process calls for. **Surface the changelog diffs to the operator**; don't rubber-stamp. Completion: every changed changelog opened, one clean header each.
+While in each file, confirm every shipping change is listed and nothing stale remains — this is the review the process calls for. Two failure modes to catch, both invisible if you only skim: an entry **under the wrong header** (a change for this release stranded beneath an older version's heading, or vice versa — move it under the correct one), and a change **with no entry at all** (cross-check against `git diff v<last-released> -- packages/<pkg>`; every non-trivial diff earns a bullet). **Surface the changelog diffs to the operator**; don't rubber-stamp. Completion: every changed changelog opened, one clean header each, every shipping change filed under it.
 
 ### 2e — Commit, (preview) tag, open PR
 
