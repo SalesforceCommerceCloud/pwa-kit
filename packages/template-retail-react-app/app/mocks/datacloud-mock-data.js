@@ -381,7 +381,7 @@ export const mockViewRecommendationsEvent = {
             webStoreId: 'pwa',
             interactionName: 'catalog-object-impression',
             personalizationId: 'testRecommender',
-            personalizationContextId: '883360544021M'
+            personalizationContentId: '883360544021M'
         }),
         expect.objectContaining({
             guestId: 'guest-usid',
@@ -398,7 +398,7 @@ export const mockViewRecommendationsEvent = {
             webStoreId: 'pwa',
             interactionName: 'catalog-object-impression',
             personalizationId: 'testRecommender',
-            personalizationContextId: '883360544021M'
+            personalizationContentId: '883360544021M'
         })
     ]
 }
