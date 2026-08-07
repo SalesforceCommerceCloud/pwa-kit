@@ -61,6 +61,9 @@ module.exports = {
             // Corner the widget docks to: 'bottom-left' or 'bottom-right' (default).
             // Forwarded to the widget as `dialogPosition`.
             cc_widgetPosition: 'bottom-right',
+            // When 'true', a floating action button is rendered at cc_widgetPosition.
+            // Clicking it opens the Commerce Client shopping agent. Defaults to 'false'.
+            cc_showFab: 'false',
             // When 'true', storefront content shifts aside for the open side panel
             // instead of being overlaid by it. Handled template-side by
             // useCommerceClientPagePush; needs an enabled agent on a full-height

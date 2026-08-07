@@ -258,6 +258,45 @@ describe('useCommerceClientPagePush', () => {
             expect(result.current.paddingRight).toEqual({base: 0, lg: '520px'})
         })
 
+        test('drops the shift while the shopper expands the panel into a modal', () => {
+            const {result} = renderHook(() => useCommerceClientPagePush(enabledConfig))
+
+            dispatchUiState('isOpen', true)
+            dispatchUiState('type', 'modal')
+
+            expect(result.current.paddingRight).toBe(0)
+        })
+
+        test('restores the shift when the expanded panel is docked again', () => {
+            const {result} = renderHook(() => useCommerceClientPagePush(enabledConfig))
+
+            dispatchUiState('isOpen', true)
+            dispatchUiState('type', 'modal')
+            dispatchUiState('type', 'dialog')
+
+            expect(result.current.paddingRight).toEqual({base: 0, lg: '420px'})
+        })
+
+        test('keeps the shift off when an expanded panel is closed and reopened', () => {
+            const {result} = renderHook(() => useCommerceClientPagePush(enabledConfig))
+
+            dispatchUiState('isOpen', true)
+            dispatchUiState('type', 'modal')
+            dispatchUiState('isOpen', false)
+            dispatchUiState('isOpen', true)
+
+            expect(result.current.paddingRight).toBe(0)
+        })
+
+        test('ignores a non-string widget type value', () => {
+            const {result} = renderHook(() => useCommerceClientPagePush(enabledConfig))
+
+            dispatchUiState('isOpen', true)
+            dispatchUiState('type', undefined)
+
+            expect(result.current.paddingRight).toEqual({base: 0, lg: '420px'})
+        })
+
         test('ignores UI-state-update events for other properties', () => {
             const {result} = renderHook(() => useCommerceClientPagePush(enabledConfig))
 
