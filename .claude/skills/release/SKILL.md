@@ -1,0 +1,199 @@
+---
+name: release
+description: Operator runbook for cutting a PWA Kit release — cut the branch, bump the four versions, stamp changelogs, open the PR that publishes, smoke test, ship final, move dist-tags, merge back.
+disable-model-invocation: true
+---
+
+Drive a PWA Kit release from start to finish. A release spans a **week or more**: cut a preview, smoke test, fix blockers, cut more previews, ship the final, move npm dist-tags, then merge back. Assume the operator has never done this.
+
+You do the work. Each irreversible action is a **gate**: state the exact command and its consequence (what publishes, where it lands), then **stop and wait** for the operator's "yes" — one gate per turn, never batch them. On "yes," run the command you stated. Two carve-outs you never do — **merging any PR** and the **merge-back to develop** — the operator performs those.
+
+Reveal only the current step. The full arc below is your private map; do not dump it on the operator.
+
+## First: triage where they are
+
+`/release` may be invoked on day 1 or day 6. Never assume step 1. Run these and read the result into the map:
+
+```
+git branch --show-current
+node -p "require('./package.json').version"
+git log --oneline -5
+```
+
+| Signal | You are at |
+|---|---|
+| On `develop`, version ends `-dev`, no release branch cut | **Step 1 — Pre-release audit** |
+| Release branch exists, on a working branch, versions still `-dev` | **Step 2 — Bump + changelogs + PR** |
+| On `prepare-release-*`, versions bumped (not `-dev`), no PR open | **Step 2e — Open the PR** |
+| A `-preview.N` version is published on npm | **Step 3 — Smoke test** |
+| A preview is published but a blocker was found | **Step 2 — next `-preview.(N+1)`** |
+| Preview smoke-tested clean, no blockers left | **Step 4 — Final release** |
+| Stable version published, no GitHub release yet, or `npm dist-tag ls @salesforce/pwa-kit-react-sdk` shows `next` still on the old preview | **Step 5 — Post-release** |
+| Stable released, GitHub release done, `next` moved to the stable version | **Step 6 — Merge back** |
+
+Tell the operator which step they're on and why, then start there.
+
+## The one rule that shapes everything: when CI publishes
+
+There is **no publish button.** Pushing a commit to a `release-X.Y.x` branch runs `.github/workflows/test.yml`, whose "Publish to NPM" step runs `npm run publish-to-npm` (`lerna publish from-package`). It publishes a package when **(a)** the monorepo version does **not** end in `-dev`, and **(b)** that version is **not already on npm**. A merged PR into the release branch is a push — so **merging a bump PR into the release branch is what publishes.**
+
+Two consequences the steps depend on:
+
+- **Branch creation and version bumping are separate acts.** Cut `release-X.Y.x` *clean from develop* while versions still end in `-dev` — that push publishes nothing (gate (a)). The bump lands afterward via PR; that merge is the deliberate, only publish trigger.
+- **The flow is resilient.** Re-merging a version already on npm is a no-op (gate (b)); bumping `-preview.N` or a patch publishes a fresh artifact.
+
+Dist-tags: `-preview.N` versions publish to npm tag `next`; stable versions publish to `latest` (lerna's default from semver).
+
+## The four versions (collect all four up front)
+
+PWA Kit versions four things independently; the seven published packages collapse to four numbers. Run the bumps **in this order** — `#1` first, because it restores the independent packages and pins **mcp** to its latest *published npm* version, which `#2`–`#4` then override:
+
+| # | What | Bump command | Stamps these CHANGELOGs |
+|---|---|---|---|
+| 1 | Monorepo ("sdk") | `npm run bump-version -- <v>` | `pwa-kit-create-app`, `pwa-kit-dev`, `pwa-kit-react-sdk`, `pwa-kit-runtime` |
+| 2 | commerce-sdk-react | `npm run bump-version:commerce-sdk-react -- <v>` | `commerce-sdk-react` |
+| 3 | retail-react-app | `npm run bump-version:retail-react-app -- <v>` | `template-retail-react-app` |
+| 4 | mcp | `npm run bump-version:mcp -- <v>` | `pwa-kit-mcp` |
+
+- The **monorepo version (`#1`) drives the branch name**: `3.19.0` → `release-3.19.x` (the `x` is literal — one branch per X.Y line).
+- Don't assume a minor bump — patch or major is possible. Justify each number against its changelog before running anything.
+- Each bump script runs `npm install`; expect `package-lock.json` churn.
+
+**Which packages to release — follow the runtime dependents.** Whatever you release, release anything downstream that depends on it at runtime — **dev dependencies don't count.** `retail-react-app` runtime-depends on both the SDK packages and `commerce-sdk-react`; nothing depends on `retail-react-app`.
+
+- Releasing the **SDK** → also release **retail-react-app**. (Not commerce-sdk-react — its only pwa-kit dependency is a *dev* dependency, so bump it if you like but it needs no release.)
+- Releasing **commerce-sdk-react** → also release **retail-react-app**.
+- Releasing **retail-react-app** → nothing else (it's a leaf).
+
+Multiple packages ship together in **one branch and PR** — bump each one's version and the publish script releases exactly those whose version isn't yet on npm. Name the shared branch off the **SDK** version (`release-10.0.x`).
+
+**Release a package only if it actually changed.** `develop`'s `-dev` version is a placeholder, not an obligation — an unchanged SDK does not have to ship just because develop reads `3.20.0-dev`. If the SDK has no changes since its last `3.19.x` release, keep it on the 3.19 line: the release branch is the **existing `release-3.19.x`** (reused, not recreated — a fresh cut off develop would collide with that name), and the working branch is `prepare-release-<version>` off it.
+
+But `release-3.19.x` is **stale** — the changes you're shipping (e.g. new commerce-sdk-react / retail-react-app work) live on `develop`. So **merge `develop` into your working branch** to bring them in. That merge also drags in develop's `3.20.0-dev` SDK version strings, so afterward **pin the SDK/root back to the already-published `3.19.x`** (`npm run bump-version -- 3.19.<published>`) and bump only the changed packages. On merge, the root is non-`dev` so the publish step fires, `from-package` skips the SDK (already on npm), and only the bumped packages publish — and the SDK bump re-pins retail-react-app's `pwa-kit-*` deps to the published `3.19.x`. Only bump the SDK to a *new* version when its code actually changed, or when you deliberately want the whole suite version-aligned on the next minor (which republishes identical SDK code — allowed, just redundant).
+
+## Step 1 — Pre-release audit
+
+Goal: the base is clean and all four version numbers are chosen.
+
+1. **Audit the base** (default `develop`). It may be missing an unmerged feature branch that should ship, or carry commits that should *not* ship yet (extract those to a separate branch first). Completion: operator confirms the base holds exactly the intended changes.
+2. **Preview or final?** Preview carries `-preview.N` and gets a git tag; final has no suffix.
+3. **Choose which packages to release and their versions**, each justified from its `CHANGELOG.md`, following the dependents rule above (releasing the SDK or commerce-sdk-react pulls in retail-react-app). Prompt only for the units that ship:
+   > 1. Monorepo (sdk): ___  2. commerce-sdk-react: ___  3. retail-react-app: ___  4. mcp: ___
+
+   State the resulting `release-<major>.<minor>.x` name back and get a yes.
+
+## Step 2 — Bump, stamp changelogs, open the PR
+
+### 2a — Ensure the release branch exists
+
+Derive `release-<major>.<minor>.x` from the monorepo version. Check origin:
+```
+git fetch origin
+git ls-remote --heads origin release-<major>.<minor>.x
+```
+- **Exists** (a patch, an in-flight release cutting another `-preview.N`, or the **unchanged-SDK case** where you're reusing the last SDK line's branch — see "Release a package only if it actually changed" above): do **not** recreate it — it's the released baseline.
+- **Absent** (new minor/major): **GATE** — create it clean from the base while still `-dev` (publishes nothing):
+  ```
+  git checkout -b release-<major>.<minor>.x origin/develop
+  git push -u origin release-<major>.<minor>.x
+  ```
+  If branch protection blocks the push, an admin/UI must create it — flag it, don't force it.
+
+### 2b — Working branch off the release branch
+
+Always branch off `release-<major>.<minor>.x` (not the base), so the PR diff is just bumps + changelogs:
+```
+git fetch origin
+git checkout -b prepare-release-<version> origin/release-<major>.<minor>.x
+```
+
+### 2c — Run the bumps (in order), then verify
+
+Run the four bumps chosen in Step 1, `#1`–`#4` from the table above. For a preview, versions carry `-preview.N`. Then verify: compare the output below against the versions chosen in Step 1 — every package should show its intended version. Flag any mismatch to the operator.
+```
+npx lerna list --long --all
+```
+
+### 2d — Stamp the changelogs
+
+**Invariant: each changed changelog has exactly ONE version header at the top — the version just set — with the accumulated bullets beneath. No stacked `-dev`/`-preview.N` lines.**
+
+- **Four changelogs auto-stamp: `commerce-sdk-react`, `pwa-kit-react-sdk`, `pwa-kit-runtime`, `pwa-kit-dev`.** Each has a `version` lifecycle script (`packages/<pkg>/scripts/version.js`, all functionally identical) that prepends a dated header during the bump. The SDK bump (`#1`) runs `lerna version`, which fires the `version` lifecycle for every package — so all four get stamped with a header.
+- **Only `commerce-sdk-react` is prone to stacked headers.** `pwa-kit-react-sdk/runtime/dev` ride the SDK version, so `lerna version` stamps each exactly **once** — one clean header; just verify it matches the version you set. `commerce-sdk-react` is versioned **independently**, so it gets stamped **twice**: once by the SDK bump's `lerna version` (at the SDK version — wrong), then again by its own bump (`#2`, the correct version). (`scripts/bump-version/index.js` even flags this: `// TODO: is it possible to _not_ trigger the lifecycle scripts? See commerce-sdk-react/CHANGELOG.md`.) So open `commerce-sdk-react/CHANGELOG.md` and **dedupe**: keep the one header matching the version you just set (verified above). If the stale header has bullets that belong in this release, **move those bullets up** under the kept header first — then delete the stale header line. Never delete a header without rehoming its bullets. Confirm no duplicate bullets remain across headers.
+- **The remaining three changelogs need a manual header rewrite** — `pwa-kit-create-app`, `template-retail-react-app`, and `pwa-kit-mcp` have no `version.js`, so the bump only touched their `package.json`/lockfiles. Rewrite the top line:
+  - Final: `## v3.19.0 (Jul 06, 2026)` (today's date).
+  - Preview: `## v3.19.0-preview.0`.
+  - **mcp header has NO `v` prefix** (`## 0.5.0`); every other package DOES (`## v3.19.0`). Match each file's existing style.
+
+While in each file, confirm every shipping change is listed and nothing stale remains — this is the review the process calls for. **Surface the changelog diffs to the operator**; don't rubber-stamp. Completion: every changed changelog opened, one clean header each.
+
+### 2e — Commit, (preview) tag, open PR
+
+```
+git add -A
+git commit -m "Bump versions and update changelogs for <version> release"
+```
+Preview only — tag it:
+```
+git tag -a v<version>-preview.<n> -m "v<version>-preview.<n>"
+git push origin v<version>-preview.<n>
+```
+**GATE — open the PR into `release-<major>.<minor>.x`.** State: "Merging this publishes `<the four versions>` to npm tag `<next|latest>`." Lead the title with the GUS work ID. pwa-kit is a public repo — make sure `gh` is on your regular public GitHub account (`gh auth switch --user <your-public-account>`):
+```
+git push -u origin prepare-release-<version>
+gh pr create --base release-<major>.<minor>.x --head prepare-release-<version> \
+  --title "@W-XXXXXXXX@ Release <version>" \
+  --body "<four versions + changelog highlights>"
+```
+You open it; the **operator merges it.** The merge triggers CI, which publishes.
+
+Once the preview is published, **remind the operator to announce it on Slack** so each team tests its own features against this preview — testing is a shared effort across teams, not the operator's alone. Give them the generate command to paste into the announcement:
+```
+npx @salesforce/pwa-kit-create-app@<version>-preview.N --templateVersion <retail-preview-version> --outputDir ./smoke-test
+```
+
+## Step 3 — Smoke test the generated project
+
+**Testing is a multi-team effort.** Each team exercises its own features against the generated preview; the operator drives the core-flow smoke test below and collects blockers reported back. End users start by *generating* a project, and that's where bugs hide (usually a stale asset file in the generator that wasn't updated) — testing the retail app straight from the monorepo would miss them.
+
+1. Generate from the just-published preview:
+   ```
+   npx @salesforce/pwa-kit-create-app@<version>-preview.N --templateVersion <retail-preview-version> --outputDir ./smoke-test
+   ```
+2. Run it, exercise the core flows; gather the teams' results.
+3. **Blocker found** (by the operator or any team)? Fix on the release branch, then return to **Step 2** for `-preview.(N+1)` — increment N, since republishing the same version is a no-op (lerna skips already-published versions). Once that preview publishes, generate a fresh project from it and **re-test the exact scenario that was blocked** before re-running the full smoke test. Loop until a preview smoke-tests clean across all teams. Completion: a preview with zero blockers from every team.
+
+## Step 4 — Final release
+
+Same as Step 2, with the clean stable versions (no suffix). Bump `#1`–`#4`, re-verify every changelog reads final (no `-preview` left, dates correct), commit, tag `v<version>`, **GATE** the final PR into `release-X.Y.x` — state it publishes stable to `latest`. You open it; the **operator merges it.**
+
+## Step 5 — Post-release
+
+1. **GitHub release notes.** Compile every changed `CHANGELOG.md` into a release at https://github.com/SalesforceCommerceCloud/pwa-kit/releases.
+   - **Check "Set as the latest release"** — this fires `deploy_latest_release.yml`, redeploying the demo + bug-bounty sites.
+   - Optionally link the Dev Portal changelog anchor (recent releases have often skipped it). It's constructable from the version — strip the dots: `3.17.0` → `#pwa-kit-317-changes`:
+     ```
+     https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/references/about-pwa-kit-managed-runtime/about.html#pwa-kit-<XYZ>-changes
+     ```
+2. **npm dist-tags** (stable releases only). Publishing already tagged the release: previews land on `next`, stables land on `latest` (lerna's default) — so `latest` is already correct. The one thing left after a **stable** release is to move `next` off the old preview and onto the new stable version. Previews need nothing here. **GATE**, since it writes to the public registry. Move `next` on each published package (use the versions just **released**, from the release PR / GitHub release — NOT develop's `package.json`, already back on `-dev`):
+   ```
+   npm dist-tag add @salesforce/pwa-kit-react-sdk@<sdk-v> next
+   npm dist-tag add @salesforce/pwa-kit-runtime@<sdk-v> next
+   npm dist-tag add @salesforce/pwa-kit-dev@<sdk-v> next
+   npm dist-tag add @salesforce/pwa-kit-create-app@<sdk-v> next
+   npm dist-tag add @salesforce/commerce-sdk-react@<csr-v> next
+   npm dist-tag add @salesforce/retail-react-app@<retail-v> next
+   npm dist-tag add @salesforce/pwa-kit-mcp@<mcp-v> next
+   ```
+   Only tag packages that actually released. `npm login` first if `npm whoami` fails; npm will prompt for a fresh OTP on each write — enter it each time. Confirm with `npm dist-tag ls @salesforce/<pkg>`.
+3. **Snyk.** Point Snyk at the new release branch (follow the team's internal Snyk setup doc for the exact steps). Completion: the Snyk dashboard tracks `release-X.Y.x`.
+
+## Step 6 — Merge back to develop
+
+Get the release commits onto `develop` and reset it to the next dev version.
+
+1. Create an **intermediary branch** off the release branch. Merge the latest `develop` *into it* — resolve conflicts here, not on `develop`.
+2. Bump the monorepo to the next dev version: shipped `X.Y.0` → develop becomes `X.(Y+1).0-dev`.
+3. **GATE — open a PR from the intermediary branch targeting `develop`.** You open it; the **operator merges it**, using a **regular merge, not squash** (squash causes worse conflicts on later releases).
+
+Release complete when `develop` is on the next `-dev` version and carries the release commits.
