@@ -734,7 +734,8 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
     return (
         <>
             <div id={commerceClientElementId} data-testid="commerce-client-agent-widget" />
-            {showFab && (
+            {/* Gate the FAB on bundle load; before injection there is no widget for its click to reach. */}
+            {showFab && scriptLoadStatus?.loaded && !scriptLoadStatus?.error && (
                 <CommerceClientFab
                     position={cc_widgetPosition}
                     isPanelOpenByDefault={initialIsOpen}

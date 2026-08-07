@@ -8,7 +8,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {IconButton} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {IconButton, Portal} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {SparkleIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {COMMERCE_CLIENT_UI_STATE_EVENT} from '@salesforce/retail-react-app/app/constants'
 import {
@@ -61,27 +61,29 @@ const CommerceClientFab = ({position = 'bottom-right', isPanelOpenByDefault = fa
     }
 
     return (
-        <IconButton
-            data-testid="commerce-client-fab"
-            aria-label={intl.formatMessage({
-                id: 'header.button.assistive_msg.ask_shopping_agent',
-                defaultMessage: 'Ask Shopping Agent'
-            })}
-            icon={<SparkleIcon boxSize={6} />}
-            onClick={() => openCommerceClientWidget(true)}
-            position="fixed"
-            bottom={6}
-            {...(position === 'bottom-left' ? {left: 6} : {right: 6})}
-            zIndex="sticky"
-            isRound
-            boxSize="56px"
-            minWidth="56px"
-            bg="black"
-            color="white"
-            boxShadow="lg"
-            _hover={{bg: 'gray.700'}}
-            _active={{bg: 'gray.800'}}
-        />
+        <Portal>
+            <IconButton
+                data-testid="commerce-client-fab"
+                aria-label={intl.formatMessage({
+                    id: 'header.button.assistive_msg.ask_shopping_agent',
+                    defaultMessage: 'Ask Shopping Agent'
+                })}
+                icon={<SparkleIcon boxSize={6} />}
+                onClick={() => openCommerceClientWidget(true)}
+                position="fixed"
+                bottom={6}
+                {...(position === 'bottom-left' ? {left: 6} : {right: 6})}
+                zIndex="sticky"
+                isRound
+                boxSize="56px"
+                minWidth="56px"
+                bg="black"
+                color="white"
+                boxShadow="lg"
+                _hover={{bg: 'gray.700'}}
+                _active={{bg: 'gray.800'}}
+            />
+        </Portal>
     )
 }
 

@@ -55,6 +55,26 @@ describe('CommerceClientFab', () => {
         })
     })
 
+    test('portals the FAB after preceding content so the skip link keeps first focus', () => {
+        renderWithProviders(
+            <>
+                <a href="#app-main" data-testid="skip-link">
+                    Skip to Content
+                </a>
+                <CommerceClientFab />
+            </>
+        )
+
+        const skipLink = screen.getByTestId('skip-link')
+        const fab = screen.getByTestId('commerce-client-fab')
+
+        // Portaled to the end of <body>, so the FAB follows the skip link in DOM/tab order.
+        // eslint-disable-next-line no-bitwise
+        expect(
+            skipLink.compareDocumentPosition(fab) & Node.DOCUMENT_POSITION_FOLLOWING
+        ).toBeTruthy()
+    })
+
     test('hides while the agent panel is open', () => {
         renderWithProviders(<CommerceClientFab isPanelOpenByDefault={true} />)
 
