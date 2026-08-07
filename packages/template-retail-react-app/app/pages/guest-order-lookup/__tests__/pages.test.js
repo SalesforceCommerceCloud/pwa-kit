@@ -1214,10 +1214,10 @@ describe('GuestOrderLookupOrder — S10 field suppression security backstop', ()
 // a tab left open past the 15-minute access-code TTL would show order details
 // without re-verification on the next focus-refetch.
 
-const renderResultsPage = (search = '?order=ABC123&email=test%40example.com') => {
+const renderResultsPage = (orderNo = 'ABC123', state = {email: 'test@example.com'}) => {
     return renderWithProviders(
-        <MemoryRouter initialEntries={[{pathname: '/order-lookup/results', search}]}>
-            <Route path="/order-lookup/results" component={GuestOrderLookupResults} />
+        <MemoryRouter initialEntries={[{pathname: `/order-lookup/results/${orderNo}`, state}]}>
+            <Route path="/order-lookup/results/:orderNo" component={GuestOrderLookupResults} />
             <Route path="/order-lookup" exact render={() => <div data-testid="request-page">Request Page</div>} />
             <Route path="/account/orders" render={() => <div>Account Orders</div>} />
         </MemoryRouter>
@@ -1353,9 +1353,10 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
         expect(screen.getByText('Account Orders')).toBeInTheDocument()
     })
 
-    test('redirects to /order-lookup when orderNo query param is missing', () => {
+    test('redirects to /order-lookup when orderNo path param is missing', () => {
         useQuery.mockReturnValue(defaultUseQueryMock())
-        renderResultsPage('?email=test%40example.com') // no order param
+        // Render with empty orderNo — simulates navigating without a valid order path param
+        renderResultsPage('')
         expect(screen.getByTestId('request-page')).toBeInTheDocument()
     })
 })
