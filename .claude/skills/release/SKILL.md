@@ -151,18 +151,15 @@ gh pr create --base release-<major>.<minor>.x --head prepare-release-<version> \
   --title "@W-XXXXXXXX@ Release <version>" \
   --body "<four versions + changelog highlights>"
 ```
-You open it; the **operator merges it.** The merge triggers CI, which publishes.
-
-Once the preview is published, **remind the operator to announce it on Slack** so each team tests its own features against this preview — testing is a shared effort across teams, not the operator's alone. Give them the generate command to paste into the announcement:
-```
-npx @salesforce/pwa-kit-create-app@<version>-preview.N --templateVersion <retail-preview-version> --outputDir ./smoke-test
-```
+You open it; the **operator merges it.** The merge triggers CI, which publishes. Announcing to teams and smoke testing both wait on that publish — they are Step 3, gated on the preview actually being on npm.
 
 ## Step 3 — Smoke test the generated project
 
 **Testing is a multi-team effort.** Each team exercises its own features against the generated preview; the operator drives the core-flow smoke test below and collects blockers reported back. End users start by *generating* a project, and that's where bugs hide (usually a stale asset file in the generator that wasn't updated) — testing the retail app straight from the monorepo would miss them.
 
-1. Generate from the just-published preview:
+**First confirm the preview is actually published** — `npm view @salesforce/pwa-kit-react-sdk@<version>-preview.N version` returns the version, not a 404. Everything below depends on that version being installable; announcing or generating before it points teams at a version that doesn't exist yet.
+
+1. **Generate from the just-published preview**, and give the operator this same command to paste into a Slack **announcement** so each team tests its own features against the preview — testing is shared across teams, not the operator's alone:
    ```
    npx @salesforce/pwa-kit-create-app@<version>-preview.N --templateVersion <retail-preview-version> --outputDir ./smoke-test
    ```
