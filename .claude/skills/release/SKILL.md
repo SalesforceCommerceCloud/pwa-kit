@@ -165,8 +165,9 @@ You open it; the **operator merges it.** The merge triggers CI, which publishes.
    ```
    npx @salesforce/pwa-kit-create-app@<version>-preview.N --templateVersion <retail-preview-version> --outputDir ./smoke-test
    ```
-2. Run it, exercise the core flows; gather the teams' results.
-3. **Blocker found** (by the operator or any team)? Fix on the release branch, then return to **Step 2** for `-preview.(N+1)` — increment N, since republishing the same version is a no-op (lerna skips already-published versions). Once that preview publishes, generate a fresh project from it and **re-test the exact scenario that was blocked** before re-running the full smoke test. Loop until a preview smoke-tests clean across all teams. Completion: a preview with zero blockers from every team.
+2. In the generated project, **you (the agent) run the automated checks**: `npm ci` (or `npm install`), `npm run lint`, `npm run build`, `npm test`. These must pass before the manual pass is worth anyone's time.
+3. **The operator runs the manual happy-path smoke test** — this is theirs, not yours; you can't drive a browser through checkout. Start the local dev server (`npm start`) and walk the core purchase flow end to end: **homepage → browse/search a product → PDP → add to cart → cart → checkout (shipping, payment) → place order → order confirmation.** Hand the operator this flow and wait for their result; a clean build with a broken checkout is still a blocker. Meanwhile each team exercises its own features and reports back.
+4. **Blocker found** (by the operator or any team)? Fix on the release branch, then return to **Step 2** for `-preview.(N+1)` — increment N, since republishing the same version is a no-op (lerna skips already-published versions). Once that preview publishes, generate a fresh project from it and **re-test the exact scenario that was blocked** before re-running the full smoke test. Loop until a preview smoke-tests clean across all teams. Completion: a preview with zero blockers from every team.
 
 ## Step 4 — Final release
 
