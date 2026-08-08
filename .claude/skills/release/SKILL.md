@@ -8,7 +8,7 @@ Drive a PWA Kit release from start to finish. A release spans a **week or more**
 
 You do the work. Each irreversible action is a **gate**: state the exact command and its consequence (what publishes, where it lands), then **stop and wait** for the operator's "yes" — one gate per turn, never batch them. On "yes," run the command you stated. Two carve-outs you never do — **merging any PR** and the **merge-back to develop** — the operator performs those.
 
-Reveal only the current step. The full arc below is your private map; do not dump it on the operator.
+Reveal only the current step. The full arc below is your private map; walk the operator through one step at a time.
 
 ## First: triage where they are
 
@@ -167,7 +167,7 @@ You open it; the **operator merges it.** The merge triggers CI, which publishes.
    ```
 2. In the generated project, **you (the agent) run the automated checks**: `npm ci` (or `npm install`), `npm run lint`, `npm run build`, `npm test`. These must pass before the manual pass is worth anyone's time.
 3. **The operator runs the manual happy-path smoke test** — this is theirs, not yours; you can't drive a browser through checkout. Start the local dev server (`npm start`) and walk the core purchase flow end to end: **homepage → browse/search a product → PDP → add to cart → cart → checkout (shipping, payment) → place order → order confirmation.** Hand the operator this flow and wait for their result; a clean build with a broken checkout is still a blocker. Meanwhile each team exercises its own features and reports back.
-4. **Blocker found** (by the operator or any team)? Fix on the release branch, then return to **Step 2** for `-preview.(N+1)` — increment N, since republishing the same version is a no-op (lerna skips already-published versions). Once that preview publishes, generate a fresh project from it and **re-test the exact scenario that was blocked** before re-running the full smoke test. Loop until a preview smoke-tests clean across all teams. Completion: a preview with zero blockers from every team.
+4. When testing settles, **ask the operator directly: "any blockers from you or any team?"** — don't infer "clean" from silence. **Blocker found?** Fix on the release branch, then return to **Step 2** for `-preview.(N+1)` — increment N, since republishing the same version is a no-op (lerna skips already-published versions). Once that preview publishes, generate a fresh project from it and **re-test the exact scenario that was blocked** before re-running the full smoke test. Loop until a preview smoke-tests clean across all teams. Completion: the operator explicitly confirms zero blockers from every team; only then proceed to Step 4.
 
 ## Step 4 — Final release
 
