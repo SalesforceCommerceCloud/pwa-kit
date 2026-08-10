@@ -107,9 +107,9 @@ const mockOrder = {
 }
 
 // Default useQuery mock that returns loaded data
-const defaultUseQueryMock = ({data = mockOrder, status = 'success', isError = false, error = null, isFetching = false, isSuccess = true, dataUpdatedAt = Date.now()} = {}) => ({
+const defaultUseQueryMock = ({data = mockOrder, isLoading = false, isError = false, error = null, isFetching = false, isSuccess = true, dataUpdatedAt = Date.now()} = {}) => ({
     data,
-    status,
+    isLoading,
     isError,
     error,
     isFetching,
@@ -319,14 +319,16 @@ describe('GuestOrderLookupVerify', () => {
         expect(screen.getByText('Request Page')).toBeInTheDocument()
     })
 
-    test('shows generic subtext when email is absent (hard refresh)', () => {
+    test('shows skeleton in subtext when email is absent (hard refresh)', () => {
         renderWithProviders(
             <MemoryRouter initialEntries={[{pathname: '/order-lookup/verify/ABC123', state: null}]}>
                 <Route path="/order-lookup/verify/:orderNo" component={GuestOrderLookupVerify} />
             </MemoryRouter>
         )
         expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
-        expect(screen.getByText(/Enter the verification code/)).toBeInTheDocument()
+        // Skeleton renders in place of the email address
+        const subtextEl = screen.getByText(/We've sent a verification code to/)
+        expect(subtextEl).toBeInTheDocument()
     })
 
     test('redirects to /account/orders when user is registered', () => {
@@ -575,7 +577,7 @@ describe('GuestOrderLookupOrder', () => {
     })
 
     test('shows skeleton while loading', () => {
-        useQuery.mockReturnValue(defaultUseQueryMock({data: undefined, status: 'pending', isSuccess: false}))
+        useQuery.mockReturnValue(defaultUseQueryMock({data: undefined, isLoading: true, isSuccess: false}))
         const {container} = renderOrderPage()
         // Skeleton renders via aria roles; check loading state indirectly via absence of content
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
@@ -1261,7 +1263,7 @@ describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
     test('shows loading skeleton when query is in loading state', () => {
         useQuery.mockReturnValue({
             data: undefined,
-            status: 'pending',
+            isLoading: true,
             isError: false,
             error: null,
             isFetching: true,
