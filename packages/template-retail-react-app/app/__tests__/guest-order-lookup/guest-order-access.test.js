@@ -406,7 +406,7 @@ describe('structured logging: no full sensitive data in log output', () => {
         const orderNo = 'ABCDEF123'
         const prefix = orderNo?.slice(0, 4)
         expect(prefix).toBe('ABCD')
-        expect(prefix.length).toBe(4)
+        expect(prefix).toHaveLength(4)
     })
 
     test('logged orderNoPrefix is never the full orderNo', () => {
@@ -442,7 +442,9 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         orderTotal: 100,
         status: 'created',
         customerInfo: {email: 'guest@test.com'},
-        paymentInstruments: [{maskedNumber: '****4242', cardType: 'Visa', paymentMethodId: 'CREDIT_CARD'}],
+        paymentInstruments: [
+            {maskedNumber: '****4242', cardType: 'Visa', paymentMethodId: 'CREDIT_CARD'}
+        ],
         phone: 'should-be-stripped',
         orderViewCode: 'should-be-stripped',
         c_customAttr: 'should-be-stripped'
@@ -509,8 +511,12 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         const email = 'guest@test.com'
         const accessCode = 'VALIDCODE'
         const appConfig = makeAppConfig().app
-        const {clientId, organizationId, shortCode, siteId: configSiteId} =
-            appConfig.commerceAPI.parameters
+        const {
+            clientId,
+            organizationId,
+            shortCode,
+            siteId: configSiteId
+        } = appConfig.commerceAPI.parameters
 
         // Simulate the lookup
         const order = await mockGuestOrderLookup({
@@ -528,7 +534,9 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         // Check cookie construction
         const cookieName = `cc-goa_${configSiteId}`
         const cookieData = {[orderNo]: {email, accessCode}}
-        const cookieHeaderValue = `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+        const cookieHeaderValue = `${cookieName}=${encodeURIComponent(
+            JSON.stringify(cookieData)
+        )}; HttpOnly; Secure; SameSite=Strict; Path=/`
         expect(cookieHeaderValue).toContain('HttpOnly')
         expect(cookieHeaderValue).toContain('Secure')
         expect(cookieHeaderValue).toContain('SameSite=Strict')
@@ -584,7 +592,7 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         expect(JSON.stringify(loggedPayload)).not.toContain(fullOrderNo)
         expect(JSON.stringify(loggedPayload)).not.toContain(fullEmail)
         expect(JSON.stringify(loggedPayload)).not.toContain(fullAccessCode)
-        expect(orderNoPrefix.length).toBe(4)
+        expect(orderNoPrefix).toHaveLength(4)
     })
 })
 
@@ -666,16 +674,27 @@ describe('GET /api/order-lookup/order handler logic', () => {
         const orderNo = 'ORD456'
 
         // Simulate cookie clearing
-        const cookieData2 = {ORD456: {email: 'a@b.com', accessCode: 'code'}, ORD789: {email: 'b@c.com', accessCode: 'code2'}}
+        const cookieData2 = {
+            ORD456: {email: 'a@b.com', accessCode: 'code'},
+            ORD789: {email: 'b@c.com', accessCode: 'code2'}
+        }
         delete cookieData2[orderNo]
 
         const res = makeMockRes()
         if (scapiStatus === 404) {
-            res.setHeader('Set-Cookie', `cc-goa_TestSite=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly; Secure; SameSite=Strict; Path=/`)
+            res.setHeader(
+                'Set-Cookie',
+                `cc-goa_TestSite=${encodeURIComponent(
+                    JSON.stringify(cookieData2)
+                )}; HttpOnly; Secure; SameSite=Strict; Path=/`
+            )
             res.status(404).json({error: 'Session expired'})
         }
 
-        expect(res.setHeader).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('HttpOnly'))
+        expect(res.setHeader).toHaveBeenCalledWith(
+            'Set-Cookie',
+            expect.stringContaining('HttpOnly')
+        )
         expect(res.status).toHaveBeenCalledWith(404)
         expect(res.json).toHaveBeenCalledWith({error: 'Session expired'})
         // The deleted orderNo should not be in the cookie
@@ -702,7 +721,9 @@ describe('cookie security flags', () => {
     test('cookie header contains all required security flags', () => {
         const cookieName = 'cc-goa_TestSite'
         const cookieData = {ORD123: {email: 'a@b.com', accessCode: 'code'}}
-        const cookieHeader = `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+        const cookieHeader = `${cookieName}=${encodeURIComponent(
+            JSON.stringify(cookieData)
+        )}; HttpOnly; Secure; SameSite=Strict; Path=/`
 
         expect(cookieHeader).toContain('HttpOnly')
         expect(cookieHeader).toContain('Secure')

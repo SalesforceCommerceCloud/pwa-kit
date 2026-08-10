@@ -42,7 +42,9 @@ function getSiteIdFromRequest(req) {
 // go via /mobify/proxy/api (same path the client SDK uses).
 function makeShopperOrders(apiParams, authorization) {
     const {clientId, organizationId, shortCode, siteId} = apiParams
-    const proxy = `${getAppOrigin()}${getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
+    const proxy = `${getAppOrigin()}${
+        getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'
+    }`
     return new ShopperOrders({
         parameters: {clientId, organizationId, shortCode, siteId},
         headers: {authorization},
@@ -483,8 +485,7 @@ export function createVerifyThrottle() {
         // Throttle keyed on x-forwarded-for. In MRT deployments this header is set
         // by the trusted CDN edge. In non-MRT environments (local dev, custom hosting)
         // it may be spoofable — SCAPI rate limiting is the authoritative backstop.
-        const ip =
-            (req.headers['x-forwarded-for']?.split(',')[0]?.trim()) || req.ip || 'unknown'
+        const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || 'unknown'
         const now = Date.now()
         const entry = store.get(ip)
 
@@ -500,7 +501,6 @@ export function createVerifyThrottle() {
         return next()
     }
 }
-
 
 // Guest order lookup: warn if feature is enabled but cookies are not allowed
 const _golConfig = getConfig()?.app?.guestOrderLookup
@@ -768,8 +768,10 @@ const {handler} = runtime.createHandler(options, (app) => {
             // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
             if (!order?.orderNo) {
                 const title = order?.title || ''
-                const fakeStatus = /unauthorized/i.test(title) ? 401
-                    : /not.found/i.test(title) ? 404
+                const fakeStatus = /unauthorized/i.test(title)
+                    ? 401
+                    : /not.found/i.test(title)
+                    ? 404
                     : 500
                 const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
                 proxyErr.response = {status: fakeStatus}
@@ -786,7 +788,9 @@ const {handler} = runtime.createHandler(options, (app) => {
             const cookieVal = evictIfNeeded(existing)
             res.setHeader(
                 'Set-Cookie',
-                `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
+                `${cookieName}=${encodeURIComponent(
+                    JSON.stringify(cookieVal)
+                )}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
             )
 
             logger.info('guest-order-lookup verify success', {
@@ -812,7 +816,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                     durationMs: Date.now() - start
                 }
             })
-            if (scapiStatus === 404) return res.status(404).json({error: 'Invalid or expired access code'})
+            if (scapiStatus === 404)
+                return res.status(404).json({error: 'Invalid or expired access code'})
             if (scapiStatus === 401) return res.status(401).json({error: 'Missing authorization'})
             if (scapiStatus === 403) return res.status(403).json({error: 'Forbidden'})
             res.status(502).json({error: 'Service error'})
@@ -849,8 +854,10 @@ const {handler} = runtime.createHandler(options, (app) => {
             // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
             if (!order?.orderNo) {
                 const title = order?.title || ''
-                const fakeStatus = /unauthorized/i.test(title) ? 401
-                    : /not.found/i.test(title) ? 404
+                const fakeStatus = /unauthorized/i.test(title)
+                    ? 401
+                    : /not.found/i.test(title)
+                    ? 404
                     : 500
                 const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
                 proxyErr.response = {status: fakeStatus}
@@ -886,7 +893,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                 delete cookieData2[orderNo]
                 res.setHeader(
                     'Set-Cookie',
-                    `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
+                    `${cookieName}=${encodeURIComponent(
+                        JSON.stringify(cookieData2)
+                    )}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
                 )
                 return res.status(404).json({error: 'Session expired'})
             }

@@ -50,10 +50,6 @@ const GuestOrderLookupVerify = () => {
     const [serverError, setServerError] = useState(null)
     const inputRefs = useRef([])
 
-    if (authResolved && isRegistered) return <Redirect to="/account/orders" />
-
-    if (!orderNo) return <Redirect to="/order-lookup" />
-
     const handleDigitChange = useCallback(
         (index, value) => {
             const cleaned = value.replace(/\D/g, '').slice(-1)
@@ -91,6 +87,10 @@ const GuestOrderLookupVerify = () => {
 
     const enteredCode = digits.join('')
     const isComplete = enteredCode.length === OTP_LENGTH
+
+    if (authResolved && isRegistered) return <Redirect to="/account/orders" />
+
+    if (!orderNo) return <Redirect to="/order-lookup" />
 
     const onSubmit = async (e) => {
         e.preventDefault()
@@ -168,7 +168,8 @@ const GuestOrderLookupVerify = () => {
                             {formatMessage(
                                 {
                                     id: 'guestOrderLookup.verify.subtext',
-                                    defaultMessage: "We've sent a verification code to {email}. Please enter it below."
+                                    defaultMessage:
+                                        "We've sent a verification code to {email}. Please enter it below."
                                 },
                                 {email}
                             )}

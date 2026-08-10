@@ -67,11 +67,10 @@ The payment instrument is added with the provided details. The payment method mu
 } as const
 
 // SDK 26.8 pending — requestOrderAccessCode lands in commerce-sdk-isomorphic 5.5.0.
-// We extend the enum here (outside the typed const) so that request.jsx can call
+// We extend the enum outside the typed const so that request.jsx can call
 // useShopperOrdersMutation('requestOrderAccessCode') without TypeScript errors when
 // compiled against the lockfile version (5.4.0) which does not yet have this method.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-;(ShopperOrdersMutations as any).RequestOrderAccessCode = 'requestOrderAccessCode'
+Object.assign(ShopperOrdersMutations, {RequestOrderAccessCode: 'requestOrderAccessCode'})
 
 /**
  * Mutation for Shopper Orders.
