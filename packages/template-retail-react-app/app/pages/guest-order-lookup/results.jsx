@@ -358,7 +358,7 @@ const GuestOrderLookupResults = () => {
     const requiresVerification = !order || (isError && (error?.status === 401 || error?.status === 403))
 
     if (requiresVerification) {
-        return <Redirect to={{pathname: '/order-lookup/verify', state: {orderNo}}} />
+        return <Redirect to={`/order-lookup/verify/${encodeURIComponent(orderNo)}`} />
     }
 
     // ─── Order details ─────────────────────────────────────────────────────────

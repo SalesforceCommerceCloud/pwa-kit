@@ -167,12 +167,12 @@ export default () => {
             exact: true
         },
         guestOrderLookupEnabled && {
-            path: '/order-lookup/verify',
+            path: '/order-lookup/verify/:orderNo',
             component: GuestOrderLookupVerify,
             exact: true
         },
         guestOrderLookupEnabled && {
-            path: '/order-lookup/order',
+            path: '/order-lookup/order/:orderNo',
             component: GuestOrderLookupOrder,
             exact: true
         },

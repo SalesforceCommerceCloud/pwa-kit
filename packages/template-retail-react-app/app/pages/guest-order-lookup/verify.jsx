@@ -22,7 +22,7 @@ import {
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCustomerType, useAccessToken} from '@salesforce/commerce-sdk-react'
-import {Redirect, useHistory, useLocation} from 'react-router-dom'
+import {Redirect, useHistory, useLocation, useParams} from 'react-router-dom'
 
 const OTP_LENGTH = 6
 
@@ -31,12 +31,17 @@ const GuestOrderLookupVerify = () => {
     const {isRegistered} = useCustomerType()
     const history = useHistory()
     const location = useLocation()
+    const {orderNo} = useParams()
     const {getTokenWhenReady} = useAccessToken()
     const queryClient = useQueryClient()
     const getTokenWhenReadyRef = useRef(getTokenWhenReady)
     useEffect(() => {
         getTokenWhenReadyRef.current = getTokenWhenReady
     })
+
+    // email arrives via router state when navigating from request.jsx; absent on hard refresh.
+    // On hard refresh the subtext degrades gracefully to a generic message.
+    const email = location.state?.email || ''
 
     const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(''))
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -45,12 +50,7 @@ const GuestOrderLookupVerify = () => {
 
     if (isRegistered) return <Redirect to="/account/orders" />
 
-    const routeState = location.state
-    if (!routeState?.orderNo || !routeState?.email) {
-        return <Redirect to="/order-lookup" />
-    }
-
-    const {orderNo, email} = routeState
+    if (!orderNo) return <Redirect to="/order-lookup" />
 
     const handleDigitChange = useCallback(
         (index, value) => {
@@ -112,7 +112,7 @@ const GuestOrderLookupVerify = () => {
                 } catch {
                     // Best-effort cache prime — navigation proceeds regardless
                 }
-                history.push('/order-lookup/order', {orderNo})
+                history.push(`/order-lookup/order/${encodeURIComponent(orderNo)}`)
                 return
             }
             if (res.status === 404) {
@@ -162,14 +162,20 @@ const GuestOrderLookupVerify = () => {
                         })}
                     </Heading>
                     <Text color="gray.600">
-                        {formatMessage(
-                            {
-                                id: 'guestOrderLookup.verify.subtext',
-                                defaultMessage:
-                                    "We've sent a verification code to {email}. Please enter it below."
-                            },
-                            {email}
-                        )}
+                        {email
+                            ? formatMessage(
+                                  {
+                                      id: 'guestOrderLookup.verify.subtext',
+                                      defaultMessage:
+                                          "We've sent a verification code to {email}. Please enter it below."
+                                  },
+                                  {email}
+                              )
+                            : formatMessage({
+                                  id: 'guestOrderLookup.verify.subtext.noEmail',
+                                  defaultMessage:
+                                      "Enter the verification code we sent to your email address."
+                              })}
                     </Text>
                 </Box>
 
