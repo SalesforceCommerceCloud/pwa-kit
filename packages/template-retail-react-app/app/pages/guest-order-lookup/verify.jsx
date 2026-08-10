@@ -106,9 +106,13 @@ const GuestOrderLookupVerify = () => {
                 body: JSON.stringify({orderNo, email, accessCode: enteredCode})
             })
             if (res.ok) {
-                const orderData = await res.json()
-                queryClient.setQueryData(['guestOrderLookup', 'order', orderNo], orderData)
-                history.push(`/order-lookup/order/${encodeURIComponent(orderNo)}`)
+                try {
+                    const orderData = await res.json()
+                    queryClient.setQueryData(['guestOrderLookup', 'order', orderNo], orderData)
+                } catch {
+                    // Best-effort cache prime — navigation proceeds regardless
+                }
+                history.push('/order-lookup/order', {orderNo})
                 return
             }
             if (res.status === 404) {

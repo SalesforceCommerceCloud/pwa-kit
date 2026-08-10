@@ -2317,10 +2317,10 @@
       "value": "Contact Us"
     }
   ],
-  "footer.link.find_your_order": [
+  "footer.link.order_lookup": [
     {
       "type": 0,
-      "value": "Find Your Order"
+      "value": "Order Lookup"
     }
   ],
   "footer.link.order_status": [
@@ -2581,28 +2581,22 @@
       "value": "View"
     }
   ],
+  "guestOrderLookup.order.breadcrumb.home": [
+    {
+      "type": 0,
+      "value": "Home"
+    }
+  ],
+  "guestOrderLookup.order.breadcrumb.orderLookup": [
+    {
+      "type": 0,
+      "value": "Order Lookup"
+    }
+  ],
   "guestOrderLookup.order.button.cancel": [
     {
       "type": 0,
       "value": "Cancel Order"
-    }
-  ],
-  "guestOrderLookup.order.button.refreshStatus": [
-    {
-      "type": 0,
-      "value": "Refresh Status"
-    }
-  ],
-  "guestOrderLookup.order.button.refreshStatus.aria": [
-    {
-      "type": 0,
-      "value": "Refresh order status"
-    }
-  ],
-  "guestOrderLookup.order.button.refreshing": [
-    {
-      "type": 0,
-      "value": "Refreshing…"
     }
   ],
   "guestOrderLookup.order.button.retry": [
@@ -2629,56 +2623,80 @@
       "value": "Something went wrong loading your order. Please try again."
     }
   ],
+  "guestOrderLookup.order.error.tooManyRequests": [
+    {
+      "type": 0,
+      "value": "You've refreshed too many times. Please wait a moment before trying again."
+    }
+  ],
   "guestOrderLookup.order.heading": [
     {
       "type": 0,
       "value": "Order Details"
     }
   ],
-  "guestOrderLookup.order.item.qty": [
+  "guestOrderLookup.order.heading.billingAddress": [
     {
       "type": 0,
-      "value": "Qty: "
-    },
-    {
-      "type": 1,
-      "value": "qty"
+      "value": "Billing Address"
     }
   ],
-  "guestOrderLookup.order.item.unnamed": [
+  "guestOrderLookup.order.itemCount": [
     {
-      "type": 0,
-      "value": "Product"
-    }
-  ],
-  "guestOrderLookup.order.lastUpdated": [
-    {
-      "type": 0,
-      "value": "Last updated at "
-    },
-    {
-      "type": 1,
-      "value": "time"
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "count"
     }
   ],
   "guestOrderLookup.order.orderNumber": [
     {
       "type": 0,
-      "value": "Order #"
+      "value": "Order Number: "
     },
     {
       "type": 1,
       "value": "orderNo"
     }
   ],
-  "guestOrderLookup.order.placedOn": [
+  "guestOrderLookup.order.orderedDate": [
     {
       "type": 0,
-      "value": "Placed on "
+      "value": "Ordered: "
     },
     {
       "type": 1,
       "value": "date"
+    }
+  ],
+  "guestOrderLookup.order.otherItems": [
+    {
+      "type": 0,
+      "value": "Other items"
     }
   ],
   "guestOrderLookup.order.return.success": [
@@ -2690,99 +2708,35 @@
   "guestOrderLookup.order.section.items": [
     {
       "type": 0,
-      "value": "Items"
+      "value": "Items Ordered"
     }
   ],
-  "guestOrderLookup.order.section.shipping": [
+  "guestOrderLookup.order.section.tracking": [
     {
       "type": 0,
-      "value": "Shipping"
+      "value": "Tracking"
     }
   ],
-  "guestOrderLookup.order.section.totals": [
+  "guestOrderLookup.order.shipment": [
     {
       "type": 0,
-      "value": "Order Summary"
+      "value": "Shipment"
     }
   ],
-  "guestOrderLookup.order.shipping.expectedDelivery": [
+  "guestOrderLookup.order.shipment.number": [
     {
       "type": 0,
-      "value": "Expected delivery: "
+      "value": "Shipment "
     },
     {
       "type": 1,
-      "value": "date"
+      "value": "number"
     }
   ],
-  "guestOrderLookup.order.shipping.postalCode": [
+  "guestOrderLookup.order.shippingAddress": [
     {
       "type": 0,
-      "value": "Postal code: "
-    },
-    {
-      "type": 1,
-      "value": "postalCode"
-    }
-  ],
-  "guestOrderLookup.order.shipping.status": [
-    {
-      "type": 0,
-      "value": "Shipping status: "
-    },
-    {
-      "type": 1,
-      "value": "status"
-    }
-  ],
-  "guestOrderLookup.order.shipping.tracking": [
-    {
-      "type": 0,
-      "value": "Tracking: "
-    },
-    {
-      "type": 1,
-      "value": "trackingNumber"
-    }
-  ],
-  "guestOrderLookup.order.status": [
-    {
-      "type": 0,
-      "value": "Status: "
-    },
-    {
-      "type": 1,
-      "value": "status"
-    }
-  ],
-  "guestOrderLookup.order.totals.shipping": [
-    {
-      "type": 0,
-      "value": "Shipping"
-    }
-  ],
-  "guestOrderLookup.order.totals.subtotal": [
-    {
-      "type": 0,
-      "value": "Subtotal"
-    }
-  ],
-  "guestOrderLookup.order.totals.tax": [
-    {
-      "type": 0,
-      "value": "Tax"
-    }
-  ],
-  "guestOrderLookup.order.totals.total": [
-    {
-      "type": 0,
-      "value": "Total"
-    }
-  ],
-  "guestOrderLookup.request.alert.sessionExpired": [
-    {
-      "type": 0,
-      "value": "Your session has expired. Please request a new access code."
+      "value": "Shipping Address"
     }
   ],
   "guestOrderLookup.request.button.submit": [
@@ -2845,18 +2799,6 @@
       "value": "Verify Code"
     }
   ],
-  "guestOrderLookup.verify.error.codeInvalid": [
-    {
-      "type": 0,
-      "value": "Enter the 6-digit code from your email"
-    }
-  ],
-  "guestOrderLookup.verify.error.codeRequired": [
-    {
-      "type": 0,
-      "value": "Access code is required"
-    }
-  ],
   "guestOrderLookup.verify.error.generic": [
     {
       "type": 0,
@@ -2867,12 +2809,6 @@
     {
       "type": 0,
       "value": "The code you entered is invalid or has expired. Please try again."
-    }
-  ],
-  "guestOrderLookup.verify.error.requestNewCode": [
-    {
-      "type": 0,
-      "value": "Request a new code"
     }
   ],
   "guestOrderLookup.verify.error.tooManyAttempts": [

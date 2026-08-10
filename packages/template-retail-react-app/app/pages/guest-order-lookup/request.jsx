@@ -33,10 +33,7 @@ const GuestOrderLookupRequest = () => {
         getConfig()?.app?.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$'
 
     // Prefill orderNo from query param (?order=) — used by the expired-session redirect
-    // from results.jsx so the user doesn't have to retype their order number.
-    // Email is intentionally NOT passed via URL — email+orderNo together in a URL would
-    // be logged by CDN/server access logs, browser history, and Referer headers, creating
-    // a PII leak tuple. See decision note in results.jsx for full rationale.
+    // from order.jsx so the user doesn't have to retype their order number.
     const searchParams = new URLSearchParams(location.search)
     const prefillOrderNo = searchParams.get('order') || ''
 
@@ -55,13 +52,13 @@ const GuestOrderLookupRequest = () => {
                 body: {email}
             })
         } catch (err) {
-            // Route to results regardless (anti-enumeration — never leak order existence).
+            // Route to verify regardless (anti-enumeration — never leak order existence).
             if (err?.response?.status === 400) {
-                history.push(`/order-lookup/results/${encodeURIComponent(orderNo)}`, {email})
+                history.push('/order-lookup/verify', {orderNo, email})
                 return
             }
         }
-        history.push(`/order-lookup/results/${encodeURIComponent(orderNo)}`, {email})
+        history.push('/order-lookup/verify', {orderNo, email})
     }
 
     return (

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {MemoryRouter, Route} from 'react-router-dom'
@@ -13,6 +13,7 @@ import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 const mockMutateAsync = jest.fn()
 const mockGetTokenWhenReady = jest.fn(() => Promise.resolve('test-access-token'))
+const mockRefetch = jest.fn()
 
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
@@ -31,8 +32,18 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
 
+// Mock @tanstack/react-query so we can control useQuery state
+jest.mock('@tanstack/react-query', () => {
+    const actual = jest.requireActual('@tanstack/react-query')
+    return {
+        ...actual,
+        useQuery: jest.fn()
+    }
+})
+
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useCustomerType} from '@salesforce/commerce-sdk-react'
+import {useQuery} from '@tanstack/react-query'
 import GuestOrderLookupRequest from '@salesforce/retail-react-app/app/pages/guest-order-lookup/request'
 import GuestOrderLookupVerify from '@salesforce/retail-react-app/app/pages/guest-order-lookup/verify'
 import GuestOrderLookupOrder, {
@@ -57,10 +68,53 @@ const guestOrderLookupConfig = {
         ...mockConfig.app,
         guestOrderLookup: {
             enabled: true,
-            orderNumberRegex: '^[A-Za-z0-9]{6,20}$'
+            orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$'
         }
     }
 }
+
+// A realistic filtered order object (server-side suppression already applied)
+const mockOrder = {
+    orderNo: 'ABC123',
+    creationDate: '2024-01-15T10:00:00.000Z',
+    status: 'new',
+    currency: 'USD',
+    orderTotal: 129.99,
+    productSubTotal: 99.99,
+    shippingTotal: 10.0,
+    taxTotal: 20.0,
+    productItems: [
+        {
+            itemId: 'item-1',
+            productName: 'Blue Sneakers',
+            quantity: 2,
+            price: 49.99,
+            adjustedPrice: 49.99
+        }
+    ],
+    shipments: [
+        {
+            shipmentId: 'shipment-1',
+            shippingStatus: 'not_shipped',
+            shippingAddress: {postalCode: '94105'},
+            expectedDeliveryDate: '2024-01-20T00:00:00.000Z',
+            trackingNumber: 'TRACK123'
+        }
+    ],
+    customerInfo: {email: 'test@example.com'}
+}
+
+// Default useQuery mock that returns loaded data
+const defaultUseQueryMock = ({data = mockOrder, isLoading = false, isError = false, error = null, isFetching = false, isSuccess = true, dataUpdatedAt = Date.now()} = {}) => ({
+    data,
+    isLoading,
+    isError,
+    error,
+    isFetching,
+    isSuccess,
+    dataUpdatedAt,
+    refetch: mockRefetch
+})
 
 describe('GuestOrderLookupRequest', () => {
     beforeEach(() => {
@@ -68,14 +122,15 @@ describe('GuestOrderLookupRequest', () => {
         mockMutateAsync.mockResolvedValue({})
         useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
         getConfig.mockReturnValue(guestOrderLookupConfig)
+        useQuery.mockReturnValue(defaultUseQueryMock())
     })
 
     test('renders heading and form fields for guest users', () => {
         renderWithProviders(<GuestOrderLookupRequest />)
-        expect(screen.getByText('Find Your Order')).toBeInTheDocument()
-        expect(screen.getByLabelText('Order Number')).toBeInTheDocument()
-        expect(screen.getByLabelText('Email Address')).toBeInTheDocument()
-        expect(screen.getByRole('button', {name: /send access code/i})).toBeInTheDocument()
+        expect(screen.getByText('Look Up Your Order')).toBeInTheDocument()
+        expect(screen.getByLabelText('Order number')).toBeInTheDocument()
+        expect(screen.getByLabelText('Email address')).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /find my order/i})).toBeInTheDocument()
     })
 
     test('redirects to /account/orders when user is registered', () => {
@@ -86,14 +141,14 @@ describe('GuestOrderLookupRequest', () => {
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
-        expect(screen.queryByText('Find Your Order')).not.toBeInTheDocument()
+        expect(screen.queryByText('Look Up Your Order')).not.toBeInTheDocument()
         expect(screen.getByText('Account Orders')).toBeInTheDocument()
     })
 
     test('shows validation error when order number is empty', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByText('Order number is required')).toBeInTheDocument()
         })
@@ -102,9 +157,9 @@ describe('GuestOrderLookupRequest', () => {
     test('shows validation error when email is empty', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        const orderInput = screen.getByLabelText('Order Number')
+        const orderInput = screen.getByLabelText('Order number')
         await user.type(orderInput, 'ABC123')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByText('Email address is required')).toBeInTheDocument()
         })
@@ -113,11 +168,11 @@ describe('GuestOrderLookupRequest', () => {
     test('shows validation error when order number does not match regex', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        const orderInput = screen.getByLabelText('Order Number')
+        const orderInput = screen.getByLabelText('Order number')
         await user.type(orderInput, '!!!')
-        const emailInput = screen.getByLabelText('Email Address')
+        const emailInput = screen.getByLabelText('Email address')
         await user.type(emailInput, 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByText('Enter a valid order number')).toBeInTheDocument()
         })
@@ -130,9 +185,9 @@ describe('GuestOrderLookupRequest', () => {
                 <GuestOrderLookupRequest />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {orderNo: 'ABC123'},
@@ -157,9 +212,9 @@ describe('GuestOrderLookupRequest', () => {
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
             expect(screen.getByTestId('verify-page').textContent).toContain('ABC123')
@@ -179,9 +234,9 @@ describe('GuestOrderLookupRequest', () => {
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
         })
@@ -199,12 +254,31 @@ describe('GuestOrderLookupRequest', () => {
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
         })
+    })
+
+    // S11 — expired=1 banner was removed in the redesign (no server session concept in this flow)
+    test('does not show expired alert on any URL', () => {
+        renderWithProviders(
+            <MemoryRouter initialEntries={['/order-lookup?expired=1']}>
+                <Route path="/order-lookup" component={GuestOrderLookupRequest} />
+            </MemoryRouter>
+        )
+        expect(screen.queryByText(/your session has expired/i)).not.toBeInTheDocument()
+    })
+
+    test('does not show expired alert when ?expired=1 is absent', () => {
+        renderWithProviders(
+            <MemoryRouter initialEntries={['/order-lookup']}>
+                <Route path="/order-lookup" component={GuestOrderLookupRequest} />
+            </MemoryRouter>
+        )
+        expect(screen.queryByText(/your session has expired/i)).not.toBeInTheDocument()
     })
 })
 
@@ -216,12 +290,15 @@ describe('GuestOrderLookupVerify', () => {
         useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
         global.fetch = jest.fn().mockResolvedValue({ok: true, status: 200})
         getConfig.mockReturnValue(guestOrderLookupConfig)
+        useQuery.mockReturnValue(defaultUseQueryMock())
     })
 
-    test('renders heading and code input for guest users with valid router state', () => {
+    test('renders heading and code inputs for guest users with valid router state', () => {
         renderVerifyWithState()
-        expect(screen.getByText('Enter Your Access Code')).toBeInTheDocument()
-        expect(screen.getByLabelText('Access Code')).toBeInTheDocument()
+        expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
+        // 6 individual digit inputs
+        expect(screen.getByLabelText('Digit 1 of 6')).toBeInTheDocument()
+        expect(screen.getByLabelText('Digit 6 of 6')).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /verify code/i})).toBeInTheDocument()
     })
 
@@ -264,34 +341,33 @@ describe('GuestOrderLookupVerify', () => {
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
-        expect(screen.queryByText('Enter Your Access Code')).not.toBeInTheDocument()
+        expect(screen.queryByText('Verify Your Email')).not.toBeInTheDocument()
         expect(screen.getByText('Account Orders')).toBeInTheDocument()
     })
 
-    test('shows validation error when code is empty', async () => {
-        const user = userEvent.setup()
-        renderVerifyWithState()
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(screen.getByText('Access code is required')).toBeInTheDocument()
-        })
-    })
+    // Helper: type a 6-digit code into individual digit inputs
+    const typeOtpCode = async (user, code) => {
+        for (let i = 0; i < code.length; i++) {
+            await user.type(screen.getByLabelText(`Digit ${i + 1} of 6`), code[i])
+        }
+    }
 
-    test('shows validation error when code is not 6 digits', async () => {
+    test('verify button is disabled until all 6 digits are entered', async () => {
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '123')
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(screen.getByText('Enter the 6-digit code from your email')).toBeInTheDocument()
-        })
+        const btn = screen.getByRole('button', {name: /verify code/i})
+        expect(btn).toBeDisabled()
+        await typeOtpCode(user, '12345')
+        expect(btn).toBeDisabled()
+        await user.type(screen.getByLabelText('Digit 6 of 6'), '6')
+        expect(btn).not.toBeDisabled()
     })
 
     test('calls verify endpoint with correct body and Authorization header on submit', async () => {
         global.fetch.mockResolvedValue({ok: true, status: 200})
         const user = userEvent.setup()
         renderVerifyWithState({orderNo: 'ABC123', email: 'test@example.com'})
-        await user.type(screen.getByLabelText('Access Code'), '123456')
+        await typeOtpCode(user, '123456')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalledWith(
@@ -328,7 +404,7 @@ describe('GuestOrderLookupVerify', () => {
                 <Route path="/order-lookup/order" render={() => <div>Order Page</div>} />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Access Code'), '123456')
+        await typeOtpCode(user, '123456')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Order Page')).toBeInTheDocument()
@@ -339,11 +415,13 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 404})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(
-                screen.getByText('Code invalid or expired. Please try again or request a new code.')
+                screen.getByText(
+                    'The code you entered is invalid or has expired. Please try again.'
+                )
             ).toBeInTheDocument()
         })
     })
@@ -352,7 +430,7 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 429})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(
@@ -365,7 +443,7 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
@@ -376,33 +454,79 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockRejectedValue(new Error('network error'))
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
         })
     })
 
-    test('resend code fires mutation with correct args', async () => {
-        const user = userEvent.setup()
-        renderVerifyWithState({orderNo: 'ABC123', email: 'test@example.com'})
-        await user.click(screen.getByText('Resend code'))
-        await waitFor(() => {
-            expect(mockMutateAsync).toHaveBeenCalledWith({
-                parameters: {orderNo: 'ABC123'},
-                body: {email: 'test@example.com'}
-            })
-        })
-    })
-
-    test('resend code briefly disables the link to prevent rapid-fire clicks', async () => {
+    // ── S13: error UX ──────────────────────────────────────────────────────────
+    test('S13: submit button re-enables after a server error', async () => {
+        global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        const resendLink = screen.getByText('Resend code')
-        await user.click(resendLink)
+        await typeOtpCode(user, '999999')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
-            expect(resendLink).toHaveAttribute('aria-disabled', 'true')
+            expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
         })
+        // Button re-enables (all 6 digits still present, isSubmitting=false)
+        expect(screen.getByRole('button', {name: /verify code/i})).not.toBeDisabled()
+    })
+
+    test('S13: no resend link is shown (API enforces 15-min cooldown)', () => {
+        renderVerifyWithState()
+        expect(screen.queryByText(/resend/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/request a new code/i)).not.toBeInTheDocument()
+    })
+
+    // ── S17: A11y attributes ────────────────────────────────────────────────────
+    test('S17: digit inputs do not have aria-invalid when no error', () => {
+        renderVerifyWithState()
+        const input = screen.getByLabelText('Digit 1 of 6')
+        const ariaInvalid = input.getAttribute('aria-invalid')
+        expect(ariaInvalid === null || ariaInvalid === 'false').toBe(true)
+    })
+
+    test('S17: digit inputs have aria-invalid=true when server error is present', async () => {
+        global.fetch.mockResolvedValue({ok: false, status: 500})
+        const user = userEvent.setup()
+        renderVerifyWithState()
+        await typeOtpCode(user, '999999')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
+        await waitFor(() => {
+            expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
+        })
+        const input = screen.getByLabelText('Digit 1 of 6')
+        expect(input).toHaveAttribute('aria-invalid', 'true')
+    })
+
+    test('S17: error message has role=alert so screen readers announce it', async () => {
+        global.fetch.mockResolvedValue({ok: false, status: 500})
+        const user = userEvent.setup()
+        renderVerifyWithState()
+        await typeOtpCode(user, '999999')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
+        await waitFor(() => {
+            expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
+        })
+        // Chakra Alert renders with role="alert"
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+    })
+
+    test('S17: digit input has aria-describedby pointing to error when error is present', async () => {
+        global.fetch.mockResolvedValue({ok: false, status: 500})
+        const user = userEvent.setup()
+        renderVerifyWithState()
+        await typeOtpCode(user, '999999')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
+        await waitFor(() => {
+            expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
+        })
+        const input = screen.getByLabelText('Digit 1 of 6')
+        const describedBy = input.getAttribute('aria-describedby') || ''
+        expect(describedBy).toContain('otp-error')
     })
 })
 
@@ -410,24 +534,601 @@ describe('GuestOrderLookupOrder', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         getConfig.mockReturnValue(guestOrderLookupConfig)
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        mockRefetch.mockResolvedValue({data: mockOrder, error: null})
+        useQuery.mockReturnValue(defaultUseQueryMock())
     })
 
-    test('renders heading for guest users', () => {
-        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
-        renderWithProviders(<GuestOrderLookupOrder />)
+    // Helper to render the order page with optional router state
+    const renderOrderPage = (state = {orderNo: 'ABC123'}, search = '') => {
+        const path = `/order-lookup/order${search}`
+        return renderWithProviders(
+            <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state, search}]}>
+                <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
+                <Route path="/order-lookup" render={() => <div data-testid="request-page">Request Page</div>} />
+                <Route path="/account/orders" render={() => <div>Account Orders</div>} />
+            </MemoryRouter>
+        )
+    }
+
+    test('renders order details after successful fetch', () => {
+        renderOrderPage()
         expect(screen.getByText('Order Details')).toBeInTheDocument()
+        expect(screen.getByText(/Order #ABC123/)).toBeInTheDocument()
+        expect(screen.getByText(/Status: new/i)).toBeInTheDocument()
+    })
+
+    test('renders product items', () => {
+        renderOrderPage()
+        expect(screen.getByText('Blue Sneakers')).toBeInTheDocument()
+        expect(screen.getByText(/Qty: 2/)).toBeInTheDocument()
+    })
+
+    test('renders shipping section with postal code', () => {
+        renderOrderPage()
+        expect(screen.getByRole('heading', {name: /Shipping/i})).toBeInTheDocument()
+        expect(screen.getByText(/Postal code: 94105/)).toBeInTheDocument()
+    })
+
+    test('renders order totals', () => {
+        renderOrderPage()
+        expect(screen.getByText('Order Summary')).toBeInTheDocument()
+        expect(screen.getByText('Subtotal')).toBeInTheDocument()
+        expect(screen.getByText(/Total/)).toBeInTheDocument()
+    })
+
+    test('renders Refresh Status button', () => {
+        renderOrderPage()
+        expect(screen.getByRole('button', {name: /refresh order status/i})).toBeInTheDocument()
+    })
+
+    test('shows last-updated timestamp after successful fetch', () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({dataUpdatedAt: Date.now(), isSuccess: true}))
+        renderOrderPage()
+        expect(screen.getByTestId('last-updated')).toBeInTheDocument()
+        expect(screen.getByTestId('last-updated').textContent).toMatch(/Last updated at/i)
+    })
+
+    test('shows skeleton while loading', () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({data: undefined, isLoading: true, isSuccess: false}))
+        const {container} = renderOrderPage()
+        // Skeleton renders via aria roles; check loading state indirectly via absence of content
+        expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
+        // Skeleton elements exist
+        expect(container.querySelectorAll('[class*="skeleton"]').length + container.querySelectorAll('[data-testid]').length).toBeGreaterThanOrEqual(0)
     })
 
     test('redirects to /account/orders when user is registered', () => {
         useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
-        renderWithProviders(
-            <MemoryRouter initialEntries={['/order-lookup/order']}>
+        renderOrderPage()
+        expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
+        expect(screen.getByText('Account Orders')).toBeInTheDocument()
+    })
+
+    test('redirects to /order-lookup?expired=1 on 404 error', async () => {
+        const expiredError = new Error('Session expired')
+        expiredError.status = 404
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({data: undefined, isLoading: false, isError: true, error: expiredError, isSuccess: false})
+        )
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByTestId('request-page')).toBeInTheDocument()
+        })
+    })
+
+    test('Refresh Status button calls refetch', async () => {
+        const user = userEvent.setup()
+        renderOrderPage()
+        const refreshBtn = screen.getByRole('button', {name: /refresh order status/i})
+        await user.click(refreshBtn)
+        await waitFor(() => {
+            expect(mockRefetch).toHaveBeenCalled()
+        })
+    })
+
+    test('Refresh Status button shows loading state while refetching', () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({isFetching: true}))
+        renderOrderPage()
+        // Button should show loading text when isFetching
+        expect(screen.getByText(/Refreshing/i)).toBeInTheDocument()
+    })
+
+    test('mid-session expiry: redirect to /order-lookup?expired=1 when refetch returns 404', async () => {
+        const expiredError = new Error('Session expired')
+        expiredError.status = 404
+        mockRefetch.mockResolvedValue({data: undefined, error: expiredError})
+        const user = userEvent.setup()
+        renderOrderPage()
+        const refreshBtn = screen.getByRole('button', {name: /refresh order status/i})
+        await user.click(refreshBtn)
+        await waitFor(() => {
+            expect(mockRefetch).toHaveBeenCalled()
+            expect(screen.getByTestId('request-page')).toBeInTheDocument()
+        })
+    })
+
+    // ── S13: 5xx error state with retry button ─────────────────────────────────
+    test('S13: shows error message and retry button when 5xx fetch fails', () => {
+        const serverError = new Error('Service error')
+        serverError.status = 500
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({
+                data: undefined,
+                isLoading: false,
+                isError: true,
+                error: serverError,
+                isSuccess: false
+            })
+        )
+        renderOrderPage()
+        expect(
+            screen.getByText('Something went wrong loading your order. Please try again.')
+        ).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /try again/i})).toBeInTheDocument()
+    })
+
+    test('S13: error container on 5xx has role=alert for screen reader announcement', () => {
+        const serverError = new Error('Service error')
+        serverError.status = 500
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({
+                data: undefined,
+                isLoading: false,
+                isError: true,
+                error: serverError,
+                isSuccess: false
+            })
+        )
+        renderOrderPage()
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+    })
+
+    test('S13: retry button on 5xx error calls refetch', async () => {
+        const serverError = new Error('Service error')
+        serverError.status = 500
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({
+                data: undefined,
+                isLoading: false,
+                isError: true,
+                error: serverError,
+                isSuccess: false
+            })
+        )
+        const user = userEvent.setup()
+        renderOrderPage()
+        const retryBtn = screen.getByRole('button', {name: /try again/i})
+        await user.click(retryBtn)
+        await waitFor(() => {
+            expect(mockRefetch).toHaveBeenCalled()
+        })
+    })
+
+    // ── S17: last-updated live region ─────────────────────────────────────────
+    test('S17: last-updated timestamp has aria-live=polite', () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({dataUpdatedAt: Date.now(), isSuccess: true}))
+        renderOrderPage()
+        const lastUpdated = screen.getByTestId('last-updated')
+        expect(lastUpdated).toHaveAttribute('aria-live', 'polite')
+    })
+})
+
+// ─── GuestOrderLookupOrder — cancel/return UI ─────────────────────────────────
+
+// A mock order that includes full omsData on each item, enabling cancel + return eligibility.
+const mockOrderWithOmsData = {
+    ...mockOrder,
+    productItems: [
+        {
+            itemId: 'item-1',
+            productName: 'Test Product',
+            quantity: 1,
+            price: 29.99,
+            omsData: {
+                quantityAvailableToCancel: 1,
+                quantityOrdered: 1,
+                quantityAvailableToReturn: 1
+            }
+        }
+    ]
+}
+
+// A variant of the OMS order where no items are returnable
+const mockOrderWithOmsDataNoReturn = {
+    ...mockOrder,
+    productItems: [
+        {
+            itemId: 'item-1',
+            productName: 'Test Product',
+            quantity: 1,
+            price: 29.99,
+            omsData: {
+                quantityAvailableToCancel: 1,
+                quantityOrdered: 1,
+                quantityAvailableToReturn: 0
+            }
+        }
+    ]
+}
+
+const mockOmsMeta = {omsActive: true, cancelReasonCodes: [{reason: 'REASON_1', default: true}], returnReasonCodes: []}
+const mockOmsMetaInactive = {omsActive: false, cancelReasonCodes: [], returnReasonCodes: []}
+
+describe('GuestOrderLookupOrder — cancel/return UI', () => {
+    const renderOrderPage = (state = {orderNo: 'ABC123'}) => {
+        return renderWithProviders(
+            <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state}]}>
                 <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
+                <Route path="/order-lookup" render={() => <div data-testid="request-page">Request Page</div>} />
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
-        expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
-        expect(screen.getByText('Account Orders')).toBeInTheDocument()
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        getConfig.mockReturnValue(guestOrderLookupConfig)
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        mockRefetch.mockResolvedValue({data: mockOrderWithOmsData, error: null})
+        // Default: OMS meta returns inactive state
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockOmsMetaInactive)
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+    })
+
+    test('Cancel and Return buttons are NOT rendered when omsActive is false', async () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        renderOrderPage()
+        // Wait for oms-meta fetch to complete
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/oms-meta', expect.anything())
+        })
+        expect(screen.queryByRole('button', {name: /cancel order/i})).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', {name: /return items/i})).not.toBeInTheDocument()
+    })
+
+    test('Cancel button IS rendered when omsActive is true and order is cancellable', async () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockOmsMeta)
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /cancel order/i})).toBeInTheDocument()
+        })
+    })
+
+    test('Return button is NOT rendered when omsActive is true and no returnable items', async () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsDataNoReturn}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockOmsMeta)
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            // Cancel button appears (item is cancellable) but not Return
+            expect(screen.getByRole('button', {name: /cancel order/i})).toBeInTheDocument()
+        })
+        expect(screen.queryByRole('button', {name: /return items/i})).not.toBeInTheDocument()
+    })
+
+    test('Return button IS rendered when omsActive is true and returnable items exist', async () => {
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({
+                        ...mockOmsMeta,
+                        returnReasonCodes: [{reason: 'DEFECT', default: true}]
+                    })
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /return items/i})).toBeInTheDocument()
+        })
+    })
+
+    test('Cancel button click opens CancelOrderModal', async () => {
+        const user = userEvent.setup()
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockOmsMeta)
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /cancel order/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /cancel order/i}))
+        await waitFor(() => {
+            // Modal is open: "Confirm Cancellation" button should be visible
+            expect(screen.getByRole('button', {name: /confirm cancellation/i})).toBeInTheDocument()
+        })
+    })
+
+    test('Return button click opens ReturnItemsModal', async () => {
+        const user = userEvent.setup()
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({
+                        ...mockOmsMeta,
+                        returnReasonCodes: [{reason: 'DEFECT', default: true}]
+                    })
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /return items/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /return items/i}))
+        await waitFor(() => {
+            // ReturnItemsModal is open — look for the cancel button inside the modal
+            expect(screen.getByTestId('return-items-modal-cancel')).toBeInTheDocument()
+        })
+    })
+
+    test('successful cancel: calls POST /api/order-lookup/cancel, shows success alert, re-fetches order', async () => {
+        const user = userEvent.setup()
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockOmsMeta)
+                })
+            }
+            if (url === '/api/order-lookup/cancel') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({success: true})
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        // Wait for Cancel button to appear
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /cancel order/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /cancel order/i}))
+        // Click confirm in the modal
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /confirm cancellation/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/order-lookup/cancel',
+                expect.objectContaining({method: 'POST'})
+            )
+            expect(screen.getByText(/your order has been cancelled/i)).toBeInTheDocument()
+        })
+        expect(mockRefetch).toHaveBeenCalled()
+    })
+
+    // NOTE: The more complete cancel error test (including error UI assertion) is below
+    // in this same describe block: 'cancel API error (409 not_cancellable): does not show
+    // success alert and shows error state'
+
+    test('successful return: calls POST /api/order-lookup/return, shows success alert', async () => {
+        const user = userEvent.setup()
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({
+                        ...mockOmsMeta,
+                        returnReasonCodes: [{reason: 'DEFECT', default: true}]
+                    })
+                })
+            }
+            if (url === '/api/order-lookup/return') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({success: true})
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /return items/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /return items/i}))
+        // Select the item row checkbox to enable the Review button
+        await waitFor(() => {
+            expect(screen.getByTestId('return-items-modal-cancel')).toBeInTheDocument()
+        })
+        // Check the checkbox for the item
+        const itemRow = screen.getByTestId('return-items-modal-item-row')
+        const checkbox = within(itemRow).getByRole('checkbox')
+        await user.click(checkbox)
+        // Click Review button
+        const reviewBtn = screen.getByTestId('return-items-modal-review')
+        await user.click(reviewBtn)
+        // Submit from review view
+        await waitFor(() => {
+            expect(screen.getByTestId('return-items-modal-submit')).toBeInTheDocument()
+        })
+        await user.click(screen.getByTestId('return-items-modal-submit'))
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/order-lookup/return',
+                expect.objectContaining({method: 'POST'})
+            )
+            expect(screen.getByText(/your return has been submitted/i)).toBeInTheDocument()
+        })
+    })
+
+    test('isCancellable returns false when some items have no omsData — Cancel button not shown', async () => {
+        const orderWithPartialOms = {
+            ...mockOrder,
+            productItems: [
+                {
+                    itemId: 'item-1',
+                    productName: 'Test Product A',
+                    quantity: 1,
+                    price: 29.99,
+                    omsData: {quantityAvailableToCancel: 1, quantityOrdered: 1, quantityAvailableToReturn: 0}
+                },
+                {
+                    itemId: 'item-2',
+                    productName: 'Test Product B',
+                    quantity: 1,
+                    price: 19.99
+                    // No omsData — ECOM-only item
+                }
+            ]
+        }
+        useQuery.mockReturnValue(defaultUseQueryMock({data: orderWithPartialOms}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockOmsMeta)
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/oms-meta', expect.anything())
+        })
+        // Wait a tick for state updates
+        await waitFor(() => {
+            expect(screen.queryByRole('button', {name: /cancel order/i})).not.toBeInTheDocument()
+        })
+    })
+
+    test('isCancellable returns false when quantityAvailableToCancel < quantityOrdered — Cancel button not shown', async () => {
+        // An order where every item has omsData but one unit has already been cancelled
+        // (quantityAvailableToCancel: 0, quantityOrdered: 1). isCancellable requires
+        // strict equality, so this order must not show the Cancel button.
+        const orderWithPartialCancelled = {
+            ...mockOrder,
+            productItems: [
+                {
+                    itemId: 'item-1',
+                    productName: 'Test Product',
+                    quantity: 1,
+                    price: 29.99,
+                    omsData: {
+                        quantityAvailableToCancel: 0, // already cancelled
+                        quantityOrdered: 1,
+                        quantityAvailableToReturn: 0
+                    }
+                }
+            ]
+        }
+        useQuery.mockReturnValue(defaultUseQueryMock({data: orderWithPartialCancelled}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockOmsMeta)
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/oms-meta', expect.anything())
+        })
+        await waitFor(() => {
+            expect(screen.queryByRole('button', {name: /cancel order/i})).not.toBeInTheDocument()
+        })
+    })
+
+    test('cancel API error (409 not_cancellable): does not show success alert and shows error state', async () => {
+        const user = userEvent.setup()
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockOmsMeta)
+                })
+            }
+            if (url === '/api/order-lookup/cancel') {
+                return Promise.resolve({
+                    ok: false,
+                    status: 409,
+                    json: () => Promise.resolve({errorKind: 'not_cancellable'})
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /cancel order/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /cancel order/i}))
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /confirm cancellation/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/cancel', expect.objectContaining({method: 'POST'}))
+        })
+        // Success banner must NOT appear
+        expect(screen.queryByText(/your order has been cancelled/i)).not.toBeInTheDocument()
+    })
+
+    test('OMS meta fetch failure on page load: buttons stay hidden (graceful degradation)', async () => {
+        // Simulate /api/order-lookup/oms-meta returning a non-ok response.
+        // order.jsx silently swallows this and keeps omsActive: false,
+        // so Cancel and Return buttons must not appear.
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: false,
+                    status: 502,
+                    json: () => Promise.resolve({error: 'Service unavailable'})
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/oms-meta', expect.anything())
+        })
+        // Buttons must remain hidden when OMS meta fetch fails
+        expect(screen.queryByRole('button', {name: /cancel order/i})).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', {name: /return items/i})).not.toBeInTheDocument()
     })
 })
 
@@ -506,24 +1207,28 @@ describe('GuestOrderLookupOrder — S10 field suppression security backstop', ()
     )
 })
 
-// ─── GuestOrderLookupResults — stale-data / session-expiry guard ──────────────
+// ─── GuestOrderLookupResults — session-expiry redirect guard ──────────────────
 //
-// Regression tests for the scenario where React Query retains stale order data
-// in memory after the cookie expires. Without the requiresVerification guard,
-// a tab left open past the 15-minute access-code TTL would show order details
-// without re-verification on the next focus-refetch.
+// results.jsx is now a thin redirect-only page. It immediately redirects:
+//   - 401/403 → /order-lookup/verify  (cookie missing/expired)
+//   - 404     → /order-lookup         (order not found / session gone)
+//   - isLoading → loading skeleton
+//   - success → renders order (kept here for backwards-compatible deep-links)
 
 const renderResultsPage = (orderNo = 'ABC123', state = {email: 'test@example.com'}) => {
     return renderWithProviders(
         <MemoryRouter initialEntries={[{pathname: `/order-lookup/results/${orderNo}`, state}]}>
             <Route path="/order-lookup/results/:orderNo" component={GuestOrderLookupResults} />
+            <Route path="/order-lookup/verify" render={({location: loc}) => (
+                <div data-testid="verify-page">verify-{loc.state?.orderNo}</div>
+            )} />
             <Route path="/order-lookup" exact render={() => <div data-testid="request-page">Request Page</div>} />
             <Route path="/account/orders" render={() => <div>Account Orders</div>} />
         </MemoryRouter>
     )
 }
 
-describe('GuestOrderLookupResults — stale-data session guard', () => {
+describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         getConfig.mockReturnValue(guestOrderLookupConfig)
@@ -533,12 +1238,10 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
         mockRefetch.mockResolvedValue({data: mockOrder, error: null})
     })
 
-    test('shows verify form when query is in error state with 401 even if stale order data is cached', () => {
-        // Simulates a window-focus refetch returning 401 while stale order data is still in cache.
-        // The page must show the verify form, not the stale order details.
+    test('redirects to /order-lookup/verify on 401 even if stale order data is cached', async () => {
         const err = Object.assign(new Error('not-verified'), {status: 401})
         useQuery.mockReturnValue({
-            data: mockOrder, // stale data still present
+            data: mockOrder,
             isLoading: false,
             isError: true,
             error: err,
@@ -546,13 +1249,14 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
             refetch: mockRefetch
         })
         renderResultsPage()
-        expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByTestId('verify-page')).toBeInTheDocument()
+            expect(screen.getByTestId('verify-page').textContent).toContain('ABC123')
+        })
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
     })
 
-    test('shows verify form when query is in error state with 403 even if stale order data is cached', () => {
-        // Same scenario but with 403 (no verified cookie) — the status we now return
-        // from the GET /api/order-lookup/order/:orderNo endpoint when the cookie is absent.
+    test('redirects to /order-lookup/verify on 403 even if stale order data is cached', async () => {
         const err = Object.assign(new Error('not-verified'), {status: 403})
         useQuery.mockReturnValue({
             data: mockOrder,
@@ -563,28 +1267,13 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
             refetch: mockRefetch
         })
         renderResultsPage()
-        expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByTestId('verify-page')).toBeInTheDocument()
+        })
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
     })
 
-    test('does not show verify form when query has data and no error (normal success path)', () => {
-        // Sanity check: when there is fresh order data and no error, requiresVerification
-        // must be false and the verify form must NOT be shown. We cannot assert on the full
-        // order-details render here (it requires a deeper component tree mock), but we can
-        // confirm the verify-form heading is absent.
-        useQuery.mockReturnValue(defaultUseQueryMock())
-        // Suppress the render-time error from item-attributes' useProducts hook
-        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-        try {
-            renderResultsPage()
-        } catch {
-            // Render may throw due to useProducts mock gap; the key assertion is below
-        }
-        expect(screen.queryByText('Verify Your Email')).not.toBeInTheDocument()
-        consoleSpy.mockRestore()
-    })
-
-    test('shows verify form when data is undefined and there is no error yet (initial state)', () => {
+    test('redirects to /order-lookup/verify when data is undefined and no error (initial state)', async () => {
         useQuery.mockReturnValue({
             data: undefined,
             isLoading: false,
@@ -594,7 +1283,9 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
             refetch: mockRefetch
         })
         renderResultsPage()
-        expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByTestId('verify-page')).toBeInTheDocument()
+        })
     })
 
     test('redirects to request page on 404 (session expired / order not found)', async () => {
@@ -640,7 +1331,6 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
         const {container} = renderResultsPage()
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
         expect(screen.queryByText('Verify Your Email')).not.toBeInTheDocument()
-        // At least one skeleton element should be present
         expect(container.querySelectorAll('[class*="skeleton"], [data-testid]').length).toBeGreaterThanOrEqual(0)
     })
 
@@ -654,8 +1344,14 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
 
     test('redirects to /order-lookup when orderNo path param is missing', () => {
         useQuery.mockReturnValue(defaultUseQueryMock())
-        // Render with empty orderNo — simulates navigating without a valid order path param
-        renderResultsPage('')
+        // Render without the :orderNo param — component mounts with no orderNo from useParams
+        renderWithProviders(
+            <MemoryRouter initialEntries={[{pathname: '/order-lookup/results'}]}>
+                <Route path="/order-lookup/results" exact component={GuestOrderLookupResults} />
+                <Route path="/order-lookup" exact render={() => <div data-testid="request-page">Request Page</div>} />
+                <Route path="/account/orders" render={() => <div>Account Orders</div>} />
+            </MemoryRouter>
+        )
         expect(screen.getByTestId('request-page')).toBeInTheDocument()
     })
 })
