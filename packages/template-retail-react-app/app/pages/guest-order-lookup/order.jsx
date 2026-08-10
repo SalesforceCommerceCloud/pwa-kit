@@ -82,7 +82,7 @@ const GuestOrderLookupOrder = () => {
 
     const {
         data: order,
-        status,
+        isLoading,
         isError,
         error,
         isFetching,
@@ -245,7 +245,7 @@ const GuestOrderLookupOrder = () => {
 
     // ─── Loading ───────────────────────────────────────────────────────────────
 
-    if (status === 'pending') {
+    if (isLoading) {
         return (
             <Box layerStyle="page"><Stack spacing={6}>
                 <Skeleton height="20px" width="200px" />
