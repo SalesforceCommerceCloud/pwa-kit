@@ -107,9 +107,9 @@ const mockOrder = {
 }
 
 // Default useQuery mock that returns loaded data
-const defaultUseQueryMock = ({data = mockOrder, isLoading = false, isError = false, error = null, isFetching = false, isSuccess = true, dataUpdatedAt = Date.now()} = {}) => ({
+const defaultUseQueryMock = ({data = mockOrder, status = 'success', isError = false, error = null, isFetching = false, isSuccess = true, dataUpdatedAt = Date.now()} = {}) => ({
     data,
-    isLoading,
+    status,
     isError,
     error,
     isFetching,
@@ -575,7 +575,7 @@ describe('GuestOrderLookupOrder', () => {
     })
 
     test('shows skeleton while loading', () => {
-        useQuery.mockReturnValue(defaultUseQueryMock({data: undefined, isLoading: true, isSuccess: false}))
+        useQuery.mockReturnValue(defaultUseQueryMock({data: undefined, status: 'pending', isSuccess: false}))
         const {container} = renderOrderPage()
         // Skeleton renders via aria roles; check loading state indirectly via absence of content
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
@@ -594,7 +594,7 @@ describe('GuestOrderLookupOrder', () => {
         const expiredError = new Error('Session expired')
         expiredError.status = 404
         useQuery.mockReturnValue(
-            defaultUseQueryMock({data: undefined, isLoading: false, isError: true, error: expiredError, isSuccess: false})
+            defaultUseQueryMock({data: undefined, isError: true, error: expiredError, isSuccess: false})
         )
         renderOrderPage()
         await waitFor(() => {
@@ -609,7 +609,6 @@ describe('GuestOrderLookupOrder', () => {
         useQuery.mockReturnValue(
             defaultUseQueryMock({
                 data: undefined,
-                isLoading: false,
                 isError: true,
                 error: serverError,
                 isSuccess: false
@@ -628,7 +627,6 @@ describe('GuestOrderLookupOrder', () => {
         useQuery.mockReturnValue(
             defaultUseQueryMock({
                 data: undefined,
-                isLoading: false,
                 isError: true,
                 error: serverError,
                 isSuccess: false
@@ -644,7 +642,6 @@ describe('GuestOrderLookupOrder', () => {
         useQuery.mockReturnValue(
             defaultUseQueryMock({
                 data: undefined,
-                isLoading: false,
                 isError: true,
                 error: serverError,
                 isSuccess: false
@@ -1189,7 +1186,6 @@ describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
         const err = Object.assign(new Error('not-verified'), {status: 401})
         useQuery.mockReturnValue({
             data: mockOrder,
-            isLoading: false,
             isError: true,
             error: err,
             isFetching: false,
@@ -1207,7 +1203,6 @@ describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
         const err = Object.assign(new Error('not-verified'), {status: 403})
         useQuery.mockReturnValue({
             data: mockOrder,
-            isLoading: false,
             isError: true,
             error: err,
             isFetching: false,
@@ -1223,7 +1218,6 @@ describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
     test('redirects to /order-lookup/verify when data is undefined and no error (initial state)', async () => {
         useQuery.mockReturnValue({
             data: undefined,
-            isLoading: false,
             isError: false,
             error: null,
             isFetching: false,
@@ -1239,7 +1233,6 @@ describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
         const err = Object.assign(new Error('Session expired'), {status: 404})
         useQuery.mockReturnValue({
             data: undefined,
-            isLoading: false,
             isError: true,
             error: err,
             isFetching: false,
@@ -1255,7 +1248,6 @@ describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
         const err = Object.assign(new Error('Service error'), {status: 500})
         useQuery.mockReturnValue({
             data: undefined,
-            isLoading: false,
             isError: true,
             error: err,
             isFetching: false,
@@ -1269,7 +1261,7 @@ describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
     test('shows loading skeleton when query is in loading state', () => {
         useQuery.mockReturnValue({
             data: undefined,
-            isLoading: true,
+            status: 'pending',
             isError: false,
             error: null,
             isFetching: true,
