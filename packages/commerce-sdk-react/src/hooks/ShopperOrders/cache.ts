@@ -84,7 +84,11 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             })
         }
         return {invalidate}
-    },
-    // SDK 26.8 pending — requestOrderAccessCode is not yet in commerce-sdk-isomorphic 5.4.0
-    requestOrderAccessCode: () => ({})
+    }
 }
+
+// SDK 26.8 pending — requestOrderAccessCode lands in commerce-sdk-isomorphic 5.5.0.
+// We add the no-op entry here (outside the typed const declaration) to avoid a TypeScript
+// excess-property error when compiled against the lockfile version (5.4.0).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+;(cacheUpdateMatrix as any).requestOrderAccessCode = () => ({})
