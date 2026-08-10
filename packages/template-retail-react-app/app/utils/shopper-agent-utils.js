@@ -218,6 +218,35 @@ export const resolveCommerceClientScriptUrl = (commerceAgent) => {
 }
 
 /**
+ * Builds the routing attributes for the Commerce Client widget. Copies
+ * `cc_routingAttributes` and stamps on two backend-gating signals:
+ * `clientVersion` (from `cc_cdnVersion`, omitted when unset) and
+ * `isCartMgmtSupported` (string `'true'`/`'false'`, default `'false'`).
+ *
+ * @param {Object} commerceAgent - Commerce agent configuration object
+ * @param {Object} [commerceAgent.cc_routingAttributes] - Merchant routing attributes
+ * @param {string} [commerceAgent.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.24.0')
+ * @returns {Object} Routing attributes object (never null)
+ */
+export const resolveCommerceClientRoutingAttributes = (commerceAgent) => {
+    const configured =
+        commerceAgent?.cc_routingAttributes &&
+        typeof commerceAgent.cc_routingAttributes === 'object'
+            ? commerceAgent.cc_routingAttributes
+            : {}
+
+    const attrs = {...configured}
+    attrs.isCartMgmtSupported = configured.isCartMgmtSupported === 'true' ? 'true' : 'false'
+
+    const version = commerceAgent?.cc_cdnVersion
+    if (typeof version === 'string' && version.trim() !== '') {
+        attrs.clientVersion = version.trim()
+    }
+
+    return attrs
+}
+
+/**
  * Validates that a URL is served from a trusted Commerce Client domain.
  *
  * @param {string} url - The URL to validate (e.g., 'https://cdn.search.cimulate.ai/.../messaging.umd.js')

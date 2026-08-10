@@ -31,6 +31,7 @@ import {
     getPersistedCommerceClientOpenState,
     persistCommerceClientOpenState,
     resetEmbeddedMessagingForCommerceSessionChange,
+    resolveCommerceClientRoutingAttributes,
     resolveCommerceClientScriptUrl,
     validateCommerceClientAgentSettings
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
@@ -609,7 +610,7 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {string} [props.commerceAgentConfiguration.cc_isOpen] - When 'true', the widget opens automatically on page load (forwarded as `componentConfig.isOpen`); defaults to 'false'
  * @param {string} [props.commerceAgentConfiguration.cc_isDevelopment] - When 'true', logs widget events to the console (forwarded as `isDevelopment`)
  * @param {Object} [props.commerceAgentConfiguration.cc_theme] - Partial theme overrides for the widget
- * @param {Object} [props.commerceAgentConfiguration.cc_routingAttributes] - Optional Agentforce routing attributes forwarded to the widget as `routingAttributes`
+ * @param {Object} [props.commerceAgentConfiguration.cc_routingAttributes] - Optional Agentforce routing attributes forwarded to the widget as `routingAttributes`. Always augmented with `clientVersion` (from `cc_cdnVersion`) and `isCartMgmtSupported` (string `'true'`/`'false'`, default `'false'`) for backend component gating
  * @param {string} [props.commerceAgentConfiguration.cc_overridesUrl] - Optional HTTPS URL of a component override script, forwarded as `overridesUrl`
  * @param {Object} [props.commerceAgentConfiguration.cc_overrides] - Optional inline map of widget override keys (e.g. `ProductTile`) to already-registered custom element tag names, forwarded as `overrides`. Mutually exclusive with `cc_overridesUrl`, which it takes precedence over
  * @returns {JSX.Element} A container element the Commerce Client widget is rendered into
@@ -636,6 +637,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
         cc_enableDownloadTranscript = 'true',
         cc_theme,
         cc_searchConfig,
+        cc_cdnVersion,
         cc_routingAttributes,
         cc_overridesUrl,
         cc_overrides
@@ -680,7 +682,10 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             capabilitiesVersion: cc_capabilitiesVersion,
             enableEscalationToAgent: cc_enableEscalationToAgent !== 'false',
             enableDownloadTranscript: cc_enableDownloadTranscript !== 'false',
-            routingAttributes: cc_routingAttributes,
+            routingAttributes: resolveCommerceClientRoutingAttributes({
+                cc_routingAttributes,
+                cc_cdnVersion
+            }),
             logoUrl: cc_logoUrl,
             headerText: cc_headerText,
             disclaimerMarkdown: cc_disclaimerMarkdown,
@@ -711,6 +716,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
             cc_enableEscalationToAgent,
             cc_enableDownloadTranscript,
             cc_routingAttributes,
+            cc_cdnVersion,
             cc_logoUrl,
             cc_headerText,
             cc_disclaimerMarkdown,
