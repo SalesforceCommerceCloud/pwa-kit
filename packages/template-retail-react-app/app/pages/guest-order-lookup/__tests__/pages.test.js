@@ -1248,17 +1248,15 @@ describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
         getConfig.mockReturnValue(guestOrderLookupConfig)
         useCustomerType.mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
         mockGetTokenWhenReady.mockResolvedValue('test-access-token')
-        global.fetch = jest
-            .fn()
-            .mockResolvedValue({
-                ok: true,
-                json: () =>
-                    Promise.resolve({
-                        omsActive: false,
-                        cancelReasonCodes: [],
-                        returnReasonCodes: []
-                    })
-            })
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: true,
+            json: () =>
+                Promise.resolve({
+                    omsActive: false,
+                    cancelReasonCodes: [],
+                    returnReasonCodes: []
+                })
+        })
         mockRefetch.mockResolvedValue({data: mockOrder, error: null})
     })
 

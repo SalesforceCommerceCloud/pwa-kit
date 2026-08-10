@@ -1033,29 +1033,23 @@ const {handler} = runtime.createHandler(options, (app) => {
                 .json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
 
         if (!Array.isArray(productItems) || productItems.length === 0)
-            return res
-                .status(400)
-                .json({
-                    errorKind: 'invalid_input',
-                    message: 'productItems must be a non-empty array'
-                })
+            return res.status(400).json({
+                errorKind: 'invalid_input',
+                message: 'productItems must be a non-empty array'
+            })
 
         for (const item of productItems) {
             if (!item.itemId || typeof item.itemId !== 'string')
-                return res
-                    .status(400)
-                    .json({
-                        errorKind: 'invalid_input',
-                        message: 'Each productItem must have a string itemId'
-                    })
+                return res.status(400).json({
+                    errorKind: 'invalid_input',
+                    message: 'Each productItem must have a string itemId'
+                })
             const qty = Number(item.quantity)
             if (!Number.isFinite(qty) || qty < 1)
-                return res
-                    .status(400)
-                    .json({
-                        errorKind: 'invalid_input',
-                        message: 'Each productItem must have a positive quantity'
-                    })
+                return res.status(400).json({
+                    errorKind: 'invalid_input',
+                    message: 'Each productItem must have a positive quantity'
+                })
         }
 
         try {
@@ -1071,7 +1065,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                 let errorCode
                 try {
                     errorCode = (await err.response.clone().json())?.errorCode
-                } catch {}
+                } catch {
+                    // Best-effort JSON parse — ignore parse errors
+                }
                 if (errorCode === 'InvalidReasonCode')
                     return res.status(400).json({errorKind: 'invalid_reason'})
                 if (errorCode === 'UnknownProductItemIds')
