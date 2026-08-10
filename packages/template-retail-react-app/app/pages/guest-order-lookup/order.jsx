@@ -248,12 +248,28 @@ const GuestOrderLookupOrder = () => {
     if (isLoading) {
         return (
             <Box layerStyle="page"><Stack spacing={6}>
-                <Skeleton height="20px" width="200px" />
+                {/* Breadcrumb */}
+                <Skeleton height="16px" width="220px" />
+                {/* h1 + status badge row */}
                 <Stack spacing={2}>
-                    <Skeleton height="32px" width="200px" />
-                    <Skeleton height="20px" width="150px" />
+                    <Flex align="center" justify="space-between">
+                        <Skeleton height="32px" width="160px" />
+                        <Skeleton height="22px" width="72px" borderRadius="full" />
+                    </Flex>
+                    {/* Ordered date + order number */}
+                    <Flex gap={4}>
+                        <Skeleton height="16px" width="120px" />
+                        <Skeleton height="16px" width="160px" />
+                    </Flex>
                 </Stack>
-                <Skeleton height="300px" />
+                {/* Billing address + order summary card */}
+                <Skeleton height="140px" width="100%" borderRadius="md" />
+                {/* Item count */}
+                <Skeleton height="16px" width="60px" />
+                {/* Shipment box */}
+                <Skeleton height="220px" width="100%" borderRadius="md" />
+                {/* Tracking card */}
+                <Skeleton height="80px" width="100%" borderRadius="md" />
             </Stack></Box>
         )
     }
