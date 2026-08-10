@@ -168,7 +168,8 @@ const GuestOrderLookupVerify = () => {
                             {formatMessage(
                                 {
                                     id: 'guestOrderLookup.verify.subtext',
-                                    defaultMessage: "We've sent a verification code to {email}. Please enter it below."
+                                    defaultMessage:
+                                        "We've sent a verification code to {email}. Please enter it below."
                                 },
                                 {email}
                             )}

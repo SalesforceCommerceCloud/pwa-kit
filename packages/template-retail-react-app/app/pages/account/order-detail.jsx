@@ -40,7 +40,9 @@ import {useOmsMetaData} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {ChevronLeftIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import OrderProducts, {groupProductItemsByShipmentId} from '@salesforce/retail-react-app/app/components/order-products'
+import OrderProducts, {
+    groupProductItemsByShipmentId
+} from '@salesforce/retail-react-app/app/components/order-products'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 import OrderTracking from '@salesforce/retail-react-app/app/components/order-tracking'
 import ShipmentStatusLabel from '@salesforce/retail-react-app/app/components/order-tracking/shipment-status-label'
