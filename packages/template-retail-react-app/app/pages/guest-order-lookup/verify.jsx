@@ -18,6 +18,7 @@ import {
     HStack,
     Heading,
     Input,
+    Skeleton,
     Stack,
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -40,18 +41,16 @@ const GuestOrderLookupVerify = () => {
     })
 
     // email arrives via router state when navigating from request.jsx; absent on hard refresh.
-    // On hard refresh the subtext degrades gracefully to a generic message.
     const email = location.state?.email || ''
+    // Auth resolves asynchronously — null means not yet known.
+    const authResolved = customerType !== null
 
     const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(''))
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [serverError, setServerError] = useState(null)
     const inputRefs = useRef([])
 
-    // Wait for auth state to resolve before rendering or redirecting (prevents title flash)
-    if (customerType === null) return null
-
-    if (isRegistered) return <Redirect to="/account/orders" />
+    if (authResolved && isRegistered) return <Redirect to="/account/orders" />
 
     if (!orderNo) return <Redirect to="/order-lookup" />
 
@@ -165,20 +164,19 @@ const GuestOrderLookupVerify = () => {
                         })}
                     </Heading>
                     <Text color="gray.600">
-                        {email
-                            ? formatMessage(
-                                  {
-                                      id: 'guestOrderLookup.verify.subtext',
-                                      defaultMessage:
-                                          "We've sent a verification code to {email}. Please enter it below."
-                                  },
-                                  {email}
-                              )
-                            : formatMessage({
-                                  id: 'guestOrderLookup.verify.subtext.noEmail',
-                                  defaultMessage:
-                                      "Enter the verification code we sent to your email address."
-                              })}
+                        {formatMessage(
+                            {
+                                id: 'guestOrderLookup.verify.subtext',
+                                defaultMessage: "We've sent a verification code to {email}. Please enter it below."
+                            },
+                            {
+                                email: email ? (
+                                    <Text as="span" fontWeight="medium">{email}</Text>
+                                ) : (
+                                    <Skeleton as="span" display="inline-block" height="1em" width="160px" verticalAlign="middle" />
+                                )
+                            }
+                        )}
                     </Text>
                 </Box>
 
