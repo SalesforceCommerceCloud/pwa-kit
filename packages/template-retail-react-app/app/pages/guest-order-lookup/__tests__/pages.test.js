@@ -25,7 +25,9 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useAccessToken: jest.fn(() => ({
         token: 'test-token',
         getTokenWhenReady: mockGetTokenWhenReady
-    }))
+    })),
+    useProducts: jest.fn(() => ({data: null, isLoading: false})),
+    useProduct: jest.fn(() => ({data: null, isLoading: false}))
 }))
 
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
@@ -51,13 +53,13 @@ import GuestOrderLookupOrder, {
 } from '@salesforce/retail-react-app/app/pages/guest-order-lookup/order'
 import GuestOrderLookupResults from '@salesforce/retail-react-app/app/pages/guest-order-lookup/results'
 
-// Helper to render verify page with router state
-const renderVerifyWithState = (state = {orderNo: 'ABC123', email: 'test@example.com'}) => {
+// Helper to render verify page with path param + optional router state
+const renderVerifyWithState = ({orderNo = 'ABC123', email = 'test@example.com'} = {}) => {
     return renderWithProviders(
-        <MemoryRouter initialEntries={[{pathname: '/order-lookup/verify', state}]}>
-            <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
+        <MemoryRouter initialEntries={[{pathname: `/order-lookup/verify/${orderNo}`, state: {email}}]}>
+            <Route path="/order-lookup/verify/:orderNo" component={GuestOrderLookupVerify} />
             <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
-            <Route path="/order-lookup/order" render={() => <div>Order Details Page</div>} />
+            <Route path="/order-lookup/order/:orderNo" render={() => <div>Order Details Page</div>} />
         </MemoryRouter>
     )
 }
@@ -196,17 +198,17 @@ describe('GuestOrderLookupRequest', () => {
         })
     })
 
-    test('navigates to /order-lookup/verify on successful mutation (202)', async () => {
+    test('navigates to /order-lookup/verify/:orderNo on successful mutation (202)', async () => {
         mockMutateAsync.mockResolvedValue({})
         const user = userEvent.setup()
         renderWithProviders(
             <MemoryRouter initialEntries={['/order-lookup']}>
                 <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
                 <Route
-                    path="/order-lookup/verify"
-                    render={({location}) => (
+                    path="/order-lookup/verify/:orderNo"
+                    render={({match, location}) => (
                         <div data-testid="verify-page">
-                            verify-{location.state?.orderNo}-{location.state?.email}
+                            verify-{match.params.orderNo}-{location.state?.email}
                         </div>
                     )}
                 />
@@ -229,7 +231,7 @@ describe('GuestOrderLookupRequest', () => {
             <MemoryRouter initialEntries={['/order-lookup']}>
                 <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
                 <Route
-                    path="/order-lookup/verify"
+                    path="/order-lookup/verify/:orderNo"
                     render={() => <div data-testid="verify-page">verify</div>}
                 />
             </MemoryRouter>
@@ -249,7 +251,7 @@ describe('GuestOrderLookupRequest', () => {
             <MemoryRouter initialEntries={['/order-lookup']}>
                 <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
                 <Route
-                    path="/order-lookup/verify"
+                    path="/order-lookup/verify/:orderNo"
                     render={() => <div data-testid="verify-page">verify</div>}
                 />
             </MemoryRouter>
@@ -307,26 +309,24 @@ describe('GuestOrderLookupVerify', () => {
         expect(screen.getByText(/user@test\.com/)).toBeInTheDocument()
     })
 
-    test('redirects to /order-lookup when router state is missing', () => {
+    test('redirects to /order-lookup when orderNo is missing from path', () => {
         renderWithProviders(
-            <MemoryRouter initialEntries={[{pathname: '/order-lookup/verify', state: null}]}>
-                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
+            <MemoryRouter initialEntries={[{pathname: '/order-lookup/verify'}]}>
+                <Route path="/order-lookup/verify" exact component={GuestOrderLookupVerify} />
                 <Route path="/order-lookup" exact render={() => <div>Request Page</div>} />
             </MemoryRouter>
         )
         expect(screen.getByText('Request Page')).toBeInTheDocument()
     })
 
-    test('redirects to /order-lookup when orderNo is missing from state', () => {
+    test('shows generic subtext when email is absent (hard refresh)', () => {
         renderWithProviders(
-            <MemoryRouter
-                initialEntries={[{pathname: '/order-lookup/verify', state: {email: 'a@b.com'}}]}
-            >
-                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
-                <Route path="/order-lookup" exact render={() => <div>Request Page</div>} />
+            <MemoryRouter initialEntries={[{pathname: '/order-lookup/verify/ABC123', state: null}]}>
+                <Route path="/order-lookup/verify/:orderNo" component={GuestOrderLookupVerify} />
             </MemoryRouter>
         )
-        expect(screen.getByText('Request Page')).toBeInTheDocument()
+        expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
+        expect(screen.getByText(/Enter the verification code/)).toBeInTheDocument()
     })
 
     test('redirects to /account/orders when user is registered', () => {
@@ -334,10 +334,10 @@ describe('GuestOrderLookupVerify', () => {
         renderWithProviders(
             <MemoryRouter
                 initialEntries={[
-                    {pathname: '/order-lookup/verify', state: {orderNo: 'ABC', email: 'a@b.com'}}
+                    {pathname: '/order-lookup/verify/ABC', state: {email: 'a@b.com'}}
                 ]}
             >
-                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
+                <Route path="/order-lookup/verify/:orderNo" component={GuestOrderLookupVerify} />
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
@@ -395,13 +395,13 @@ describe('GuestOrderLookupVerify', () => {
             <MemoryRouter
                 initialEntries={[
                     {
-                        pathname: '/order-lookup/verify',
-                        state: {orderNo: 'ABC123', email: 'test@example.com'}
+                        pathname: '/order-lookup/verify/ABC123',
+                        state: {email: 'test@example.com'}
                     }
                 ]}
             >
-                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
-                <Route path="/order-lookup/order" render={() => <div>Order Page</div>} />
+                <Route path="/order-lookup/verify/:orderNo" component={GuestOrderLookupVerify} />
+                <Route path="/order-lookup/order/:orderNo" render={() => <div>Order Page</div>} />
             </MemoryRouter>
         )
         await typeOtpCode(user, '123456')
@@ -539,12 +539,11 @@ describe('GuestOrderLookupOrder', () => {
         useQuery.mockReturnValue(defaultUseQueryMock())
     })
 
-    // Helper to render the order page with optional router state
-    const renderOrderPage = (state = {orderNo: 'ABC123'}, search = '') => {
-        const path = `/order-lookup/order${search}`
+    // Helper to render the order page with orderNo in path param
+    const renderOrderPage = (orderNo = 'ABC123') => {
         return renderWithProviders(
-            <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state, search}]}>
-                <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
+            <MemoryRouter initialEntries={[{pathname: `/order-lookup/order/${orderNo}`}]}>
+                <Route path="/order-lookup/order/:orderNo" component={GuestOrderLookupOrder} />
                 <Route path="/order-lookup" render={() => <div data-testid="request-page">Request Page</div>} />
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
@@ -554,20 +553,18 @@ describe('GuestOrderLookupOrder', () => {
     test('renders order details after successful fetch', () => {
         renderOrderPage()
         expect(screen.getByText('Order Details')).toBeInTheDocument()
-        expect(screen.getByText(/Order #ABC123/)).toBeInTheDocument()
-        expect(screen.getByText(/Status: new/i)).toBeInTheDocument()
+        expect(screen.getByText(/Order Number: ABC123/)).toBeInTheDocument()
     })
 
     test('renders product items', () => {
         renderOrderPage()
         expect(screen.getByText('Blue Sneakers')).toBeInTheDocument()
-        expect(screen.getByText(/Qty: 2/)).toBeInTheDocument()
     })
 
-    test('renders shipping section with postal code', () => {
+    test('renders shipping section', () => {
         renderOrderPage()
-        expect(screen.getByRole('heading', {name: /Shipping/i})).toBeInTheDocument()
-        expect(screen.getByText(/Postal code: 94105/)).toBeInTheDocument()
+        // Restored layout renders shipment box with shipping address
+        expect(screen.getByText(/94105/)).toBeInTheDocument()
     })
 
     test('renders order totals', () => {
@@ -756,10 +753,10 @@ const mockOmsMeta = {omsActive: true, cancelReasonCodes: [{reason: 'REASON_1', d
 const mockOmsMetaInactive = {omsActive: false, cancelReasonCodes: [], returnReasonCodes: []}
 
 describe('GuestOrderLookupOrder — cancel/return UI', () => {
-    const renderOrderPage = (state = {orderNo: 'ABC123'}) => {
+    const renderOrderPage = (orderNo = 'ABC123') => {
         return renderWithProviders(
-            <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state}]}>
-                <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
+            <MemoryRouter initialEntries={[{pathname: `/order-lookup/order/${orderNo}`}]}>
+                <Route path="/order-lookup/order/:orderNo" component={GuestOrderLookupOrder} />
                 <Route path="/order-lookup" render={() => <div data-testid="request-page">Request Page</div>} />
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
@@ -1195,8 +1192,8 @@ describe('GuestOrderLookupOrder — S10 field suppression security backstop', ()
             )
 
             const {container} = renderWithProviders(
-                <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state: {orderNo: 'ABC123'}}]}>
-                    <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
+                <MemoryRouter initialEntries={[{pathname: '/order-lookup/order/ABC123'}]}>
+                    <Route path="/order-lookup/order/:orderNo" component={GuestOrderLookupOrder} />
                     <Route path="/order-lookup" render={() => <div>Request Page</div>} />
                 </MemoryRouter>
             )
@@ -1219,8 +1216,8 @@ const renderResultsPage = (orderNo = 'ABC123', state = {email: 'test@example.com
     return renderWithProviders(
         <MemoryRouter initialEntries={[{pathname: `/order-lookup/results/${orderNo}`, state}]}>
             <Route path="/order-lookup/results/:orderNo" component={GuestOrderLookupResults} />
-            <Route path="/order-lookup/verify" render={({location: loc}) => (
-                <div data-testid="verify-page">verify-{loc.state?.orderNo}</div>
+            <Route path="/order-lookup/verify/:orderNo" render={({match}) => (
+                <div data-testid="verify-page">verify-{match.params.orderNo}</div>
             )} />
             <Route path="/order-lookup" exact render={() => <div data-testid="request-page">Request Page</div>} />
             <Route path="/account/orders" render={() => <div>Account Orders</div>} />

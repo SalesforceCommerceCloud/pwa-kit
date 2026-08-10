@@ -1041,6 +1041,12 @@
   "guestOrderLookup.order.button.cancel": {
     "defaultMessage": "Cancel Order"
   },
+  "guestOrderLookup.order.button.refresh": {
+    "defaultMessage": "Refresh Order Status"
+  },
+  "guestOrderLookup.order.button.refreshing": {
+    "defaultMessage": "Refreshing..."
+  },
   "guestOrderLookup.order.button.retry": {
     "defaultMessage": "Try Again"
   },
@@ -1065,6 +1071,9 @@
   "guestOrderLookup.order.itemCount": {
     "defaultMessage": "{count, plural, one {# item} other {# items}}"
   },
+  "guestOrderLookup.order.lastUpdated": {
+    "defaultMessage": "Last updated at {time}"
+  },
   "guestOrderLookup.order.orderNumber": {
     "defaultMessage": "Order Number: {orderNo}"
   },
@@ -1077,8 +1086,8 @@
   "guestOrderLookup.order.return.success": {
     "defaultMessage": "Your return has been submitted."
   },
-  "guestOrderLookup.order.section.items": {
-    "defaultMessage": "Items Ordered"
+  "guestOrderLookup.order.section.shipping": {
+    "defaultMessage": "Shipping"
   },
   "guestOrderLookup.order.section.tracking": {
     "defaultMessage": "Tracking"

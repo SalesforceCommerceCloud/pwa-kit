@@ -17,15 +17,19 @@ import {
     Flex,
     Grid,
     Heading,
+    SimpleGrid,
     Skeleton,
     Stack,
-    Text
+    Text,
+    useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCustomerType, useAccessToken} from '@salesforce/commerce-sdk-react'
-import {Redirect, useHistory, useLocation, Link as RouterLink} from 'react-router-dom'
+import {Redirect, useHistory, useParams, Link as RouterLink} from 'react-router-dom'
 import {ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
+import OrderProducts, {groupProductItemsByShipmentId} from '@salesforce/retail-react-app/app/components/order-products'
 import OrderStatusBadge from '@salesforce/retail-react-app/app/components/order-status-badge'
+import ShipmentStatusLabel from '@salesforce/retail-react-app/app/components/order-tracking/shipment-status-label'
 import OrderTracking from '@salesforce/retail-react-app/app/components/order-tracking'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
@@ -63,12 +67,10 @@ const isCancellable = (order) => {
 
 const GuestOrderLookupOrder = () => {
     const {formatMessage, formatDate, formatTime} = useIntl()
+    const breadcrumbStyles = useStyleConfig('Breadcrumb')
     const {isRegistered} = useCustomerType()
     const history = useHistory()
-    const location = useLocation()
-    // orderNo comes from verify.jsx via router state; on hard refresh state is gone
-    // and orderNo is '', which triggers the guard redirect below.
-    const orderNo = location.state?.orderNo || ''
+    const {orderNo} = useParams()
     const {getTokenWhenReady} = useAccessToken()
 
     // useAccessToken returns a new getTokenWhenReady on every render — store in ref
@@ -108,10 +110,11 @@ const GuestOrderLookupOrder = () => {
         },
         enabled: !!orderNo,
         retry: false,
-        staleTime: 30_000
+        staleTime: 15 * 60 * 1000,
+        gcTime: 15 * 60 * 1000
     })
 
-    // OMS metadata for cancel/return reason codes
+    // ─── OMS metadata ──────────────────────────────────────────────────────────
     const [omsMeta, setOmsMeta] = useState({
         omsActive: false,
         cancelReasonCodes: [],
@@ -139,12 +142,12 @@ const GuestOrderLookupOrder = () => {
         }
     }, [])
 
-    // Cancel state
+    // ─── Cancel state ──────────────────────────────────────────────────────────
     const [cancelModalOpen, setCancelModalOpen] = useState(false)
     const [cancelSubmitting, setCancelSubmitting] = useState(false)
     const [cancelSuccess, setCancelSuccess] = useState(false)
 
-    // Return state
+    // ─── Return state ──────────────────────────────────────────────────────────
     const [returnModalOpen, setReturnModalOpen] = useState(false)
     const [returnSubmitting, setReturnSubmitting] = useState(false)
     const [returnError, setReturnError] = useState(null)
@@ -239,14 +242,17 @@ const GuestOrderLookupOrder = () => {
     const handleRefresh = async () => {
         const result = await refetch()
         if (result.error?.status === 404) {
-            history.replace('/order-lookup?expired=1')
+            history.replace(`/order-lookup?order=${encodeURIComponent(orderNo)}`)
         }
     }
 
+    // ─── Guards ────────────────────────────────────────────────────────────────
+
     if (isRegistered) return <Redirect to="/account/orders" />
 
-    // Missing orderNo (hard refresh clears router state — redirect to request form)
     if (!orderNo) return <Redirect to="/order-lookup" />
+
+    // ─── Loading ───────────────────────────────────────────────────────────────
 
     if (isLoading) {
         return (
@@ -261,27 +267,41 @@ const GuestOrderLookupOrder = () => {
         )
     }
 
+    // ─── Session expired (404) ─────────────────────────────────────────────────
+
     if (isError && error?.status === 404) {
-        history.replace('/order-lookup?expired=1')
+        history.replace(`/order-lookup?order=${encodeURIComponent(orderNo)}`)
         return null
     }
 
+    // ─── Generic fetch error ───────────────────────────────────────────────────
+
     if (isError) {
+        const is429 = error?.status === 429
         return (
             <Box layerStyle="page"><Stack spacing={4}>
                 <Box p={4} bg="red.50" borderRadius="md" role="alert">
                     <Text color="red.700">
-                        <FormattedMessage
-                            id="guestOrderLookup.order.error.generic"
-                            defaultMessage="Something went wrong loading your order. Please try again."
-                        />
+                        {is429 ? (
+                            <FormattedMessage
+                                id="guestOrderLookup.order.error.tooManyRequests"
+                                defaultMessage="You've refreshed too many times. Please wait a moment before trying again."
+                            />
+                        ) : (
+                            <FormattedMessage
+                                id="guestOrderLookup.order.error.generic"
+                                defaultMessage="Something went wrong loading your order. Please try again."
+                            />
+                        )}
                     </Text>
-                    <Button mt={4} onClick={() => refetch()} isLoading={isFetching}>
-                        <FormattedMessage
-                            id="guestOrderLookup.order.button.retry"
-                            defaultMessage="Try Again"
-                        />
-                    </Button>
+                    {!is429 && (
+                        <Button mt={4} onClick={() => refetch()} isLoading={isFetching}>
+                            <FormattedMessage
+                                id="guestOrderLookup.order.button.retry"
+                                defaultMessage="Try Again"
+                            />
+                        </Button>
+                    )}
                 </Box>
             </Stack></Box>
         )
@@ -289,23 +309,27 @@ const GuestOrderLookupOrder = () => {
 
     if (!order) return null
 
+    // ─── Order details ─────────────────────────────────────────────────────────
+
     const itemCount = order.productItems?.reduce((n, item) => n + item.quantity, 0) || 0
     const canCancel = !cancelSuccess && isCancellable(order)
     const canReturn = returnableItems.length > 0
     const showActions = omsMeta.omsActive && !omsMetaLoading && (canCancel || canReturn)
 
     const shipments = order.shipments || []
+    const isSingleShipment = shipments.length === 1
+    const itemsByShipmentId = groupProductItemsByShipmentId(order.productItems)
 
     return (
         <Box layerStyle="page" data-testid="guest-order-details-page"><Stack spacing={6}>
-            {/* Breadcrumb */}
+            {/* Breadcrumb — styled to match PLP via Breadcrumb theme */}
             <Breadcrumb
-                separator={<ChevronRightIcon color="gray.500" boxSize="12px" />}
-                fontSize="sm"
-                color="gray.600"
+                className="sf-breadcrumb"
+                sx={breadcrumbStyles.container}
+                separator={<ChevronRightIcon {...breadcrumbStyles.icon} aria-hidden="true" />}
             >
                 <BreadcrumbItem>
-                    <BreadcrumbLink as={RouterLink} to="/">
+                    <BreadcrumbLink as={RouterLink} to="/" sx={breadcrumbStyles.link}>
                         <FormattedMessage
                             id="guestOrderLookup.order.breadcrumb.home"
                             defaultMessage="Home"
@@ -313,7 +337,7 @@ const GuestOrderLookupOrder = () => {
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbItem>
-                    <BreadcrumbLink as={RouterLink} to="/order-lookup">
+                    <BreadcrumbLink as={RouterLink} to="/order-lookup" sx={breadcrumbStyles.link}>
                         <FormattedMessage
                             id="guestOrderLookup.order.breadcrumb.orderLookup"
                             defaultMessage="Order Lookup"
@@ -321,35 +345,56 @@ const GuestOrderLookupOrder = () => {
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbItem isCurrentPage>
-                    <BreadcrumbLink>#{order.orderNo}</BreadcrumbLink>
+                    <BreadcrumbLink sx={breadcrumbStyles.link}>#{order.orderNo}</BreadcrumbLink>
                 </BreadcrumbItem>
             </Breadcrumb>
 
-            {/* Heading */}
-            <Stack spacing={2}>
-                <Heading as="h1" fontSize={['lg', '2xl']}>
-                    <FormattedMessage
-                        id="guestOrderLookup.order.heading"
-                        defaultMessage="Order Details"
-                    />
-                </Heading>
-                <Text fontSize={['sm', 'md']}>Order #{order.orderNo}</Text>
-                <Text fontSize={['sm', 'md']}>Status: {order.status}</Text>
-                {order.creationDate && (
+            {/* Heading + status badge */}
+            <Stack spacing={[1, 2]}>
+                <Flex justify="space-between" align="center">
+                    <Heading as="h1" fontSize={['lg', '2xl']}>
+                        <FormattedMessage
+                            id="guestOrderLookup.order.heading"
+                            defaultMessage="Order Details"
+                        />
+                    </Heading>
+                    <OrderStatusBadge order={order} />
+                </Flex>
+                <Stack
+                    direction={['column', 'row']}
+                    alignItems={['flex-start', 'center']}
+                    spacing={[0, 3]}
+                    divider={
+                        <Divider
+                            visibility={{base: 'visible'}}
+                            orientation="vertical"
+                            h={[0, 4]}
+                        />
+                    }
+                >
+                    {order.creationDate && (
+                        <Text fontSize={['sm', 'md']}>
+                            <FormattedMessage
+                                id="guestOrderLookup.order.orderedDate"
+                                defaultMessage="Ordered: {date}"
+                                values={{
+                                    date: formatDate(new Date(order.creationDate), {
+                                        year: 'numeric',
+                                        day: 'numeric',
+                                        month: 'short'
+                                    })
+                                }}
+                            />
+                        </Text>
+                    )}
                     <Text fontSize={['sm', 'md']}>
                         <FormattedMessage
-                            id="guestOrderLookup.order.orderedDate"
-                            defaultMessage="Ordered: {date}"
-                            values={{
-                                date: formatDate(new Date(order.creationDate), {
-                                    year: 'numeric',
-                                    day: 'numeric',
-                                    month: 'short'
-                                })
-                            }}
+                            id="guestOrderLookup.order.orderNumber"
+                            defaultMessage="Order Number: {orderNo}"
+                            values={{orderNo: order.orderNo}}
                         />
                     </Text>
-                )}
+                </Stack>
             </Stack>
 
             {/* Refresh Status button + last-updated */}
@@ -392,7 +437,7 @@ const GuestOrderLookupOrder = () => {
                 ) : null}
             </Flex>
 
-            {/* Cancel / Return buttons */}
+            {/* Cancel / Return buttons — only when OMS is active */}
             {showActions && (
                 <Flex gap={2} direction={{base: 'column', sm: 'row'}} wrap="wrap">
                     {canCancel && (
@@ -449,85 +494,228 @@ const GuestOrderLookupOrder = () => {
                 </Box>
             )}
 
-            {/* Order contents */}
-            <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
-                {/* Products + Shipping */}
-                <Stack spacing={6}>
-                    {/* Product items */}
-                    <Stack spacing={4}>
-                        <Text fontSize="sm" color="gray.600">
-                            <FormattedMessage
-                                id="guestOrderLookup.order.itemCount"
-                                defaultMessage="{count, plural, one {# item} other {# items}}"
-                                values={{count: itemCount}}
-                            />
-                        </Text>
-                        {order.productItems?.map((item) => (
-                            <Flex key={item.itemId} gap={4} align="flex-start">
-                                <Stack spacing={1} flex="1">
-                                    <Text fontWeight="semibold" fontSize="sm">
-                                        {item.productName}
-                                    </Text>
-                                    <Text fontSize="sm" color="gray.600">
-                                        Qty: {item.quantity}
-                                    </Text>
-                                </Stack>
-                            </Flex>
-                        ))}
-                    </Stack>
-
-                    {/* Shipping section */}
-                    {shipments.length > 0 && (
-                        <Stack spacing={3}>
-                            <Heading as="h2" fontSize="md">
-                                <FormattedMessage
-                                    id="guestOrderLookup.order.section.shipping"
-                                    defaultMessage="Shipping"
-                                />
-                            </Heading>
-                            {shipments.map((shipment, i) => (
-                                <Stack key={shipment.shipmentId ?? `ship-${i}`} spacing={1}>
-                                    {shipment.shippingAddress?.postalCode && (
+            {/* Top card: Billing Address (left) + Order Summary (right) — matches account order detail */}
+            <Box layerStyle="cardBordered">
+                <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
+                    <SimpleGrid columns={{base: 1, sm: 2}} columnGap={4} rowGap={5} py={{xl: 6}}>
+                        {/* Billing Address */}
+                        {order.billingAddress && (
+                            <Stack spacing={1}>
+                                <Heading as="h2" fontSize="sm" pt={1}>
+                                    <FormattedMessage
+                                        id="guestOrderLookup.order.heading.billingAddress"
+                                        defaultMessage="Billing Address"
+                                    />
+                                </Heading>
+                                <Box>
+                                    {(order.billingAddress.firstName || order.billingAddress.lastName) && (
                                         <Text fontSize="sm">
-                                            Postal code: {shipment.shippingAddress.postalCode}
+                                            {order.billingAddress.firstName}{' '}
+                                            {order.billingAddress.lastName}
                                         </Text>
                                     )}
-                                    {shipment.shippingAddress?.city && (
+                                    {order.billingAddress.address1 && (
+                                        <Text fontSize="sm">{order.billingAddress.address1}</Text>
+                                    )}
+                                    {(order.billingAddress.city || order.billingAddress.stateCode || order.billingAddress.postalCode) && (
                                         <Text fontSize="sm">
-                                            {[
-                                                shipment.shippingAddress.city,
-                                                shipment.shippingAddress.stateCode
-                                            ]
-                                                .filter(Boolean)
-                                                .join(', ')}
+                                            {order.billingAddress.city},{' '}
+                                            {order.billingAddress.stateCode}{' '}
+                                            {order.billingAddress.postalCode}
                                         </Text>
                                     )}
-                                </Stack>
-                            ))}
-                        </Stack>
-                    )}
+                                </Box>
+                            </Stack>
+                        )}
+                    </SimpleGrid>
 
-                    {/* Tracking */}
-                    {trackingEntries.length > 0 && (
-                        <Stack spacing={3} data-testid="guest-order-detail-tracking">
-                            <Heading as="h2" fontSize="md">
-                                <FormattedMessage
-                                    id="guestOrderLookup.order.section.tracking"
-                                    defaultMessage="Tracking"
-                                />
-                            </Heading>
-                            {trackingEntries.map(({key, ...entry}) => (
-                                <OrderTracking key={key} {...entry} />
-                            ))}
-                        </Stack>
-                    )}
+                    {/* Order Summary (right column on xl) */}
+                    <Box
+                        py={{base: 6}}
+                        px={{base: 6, xl: 8}}
+                        background="gray.50"
+                        borderRadius="base"
+                    >
+                        <OrderSummary basket={order} fontSize="sm" />
+                    </Box>
+                </Grid>
+            </Box>
+
+            {/* Item count */}
+            <Text fontSize="sm" color="gray.600">
+                <FormattedMessage
+                    id="guestOrderLookup.order.itemCount"
+                    defaultMessage="{count, plural, one {# item} other {# items}}"
+                    values={{count: itemCount}}
+                />
+            </Text>
+
+            {/* Per-shipment boxes */}
+            <Stack spacing={4}>
+                {shipments.length === 0 ? (
+                    <OrderProducts
+                        productItems={order.productItems}
+                        currency={order.currency}
+                    />
+                ) : (
+                    (() => {
+                        const renderedBucketIds = new Set()
+                        const boxes = shipments.map((shipment, index) => {
+                            const sid = shipment.shipmentId ?? `ship-${index}`
+                            const items = isSingleShipment
+                                ? order.productItems
+                                : itemsByShipmentId[sid] ?? []
+                            if (isSingleShipment) {
+                                Object.keys(itemsByShipmentId).forEach((k) =>
+                                    renderedBucketIds.add(k)
+                                )
+                            } else if (itemsByShipmentId[sid]) {
+                                renderedBucketIds.add(sid)
+                            }
+                            const address = shipment.shippingAddress
+                            return (
+                                <Box
+                                    key={sid}
+                                    border="1px solid"
+                                    borderColor="gray.100"
+                                    borderRadius="base"
+                                    overflow="hidden"
+                                >
+                                    <Flex
+                                        bg="gray.50"
+                                        px={4}
+                                        py={3}
+                                        justify="space-between"
+                                        align="center"
+                                        gap={2}
+                                    >
+                                        <Heading as="h2" fontSize="sm" fontWeight="semibold">
+                                            {shipments.length > 1 ? (
+                                                <FormattedMessage
+                                                    id="guestOrderLookup.order.shipment.number"
+                                                    defaultMessage="Shipment {number}"
+                                                    values={{number: index + 1}}
+                                                />
+                                            ) : (
+                                                <FormattedMessage
+                                                    id="guestOrderLookup.order.shipment"
+                                                    defaultMessage="Shipment"
+                                                />
+                                            )}
+                                        </Heading>
+                                        {shipment.shippingStatus && (
+                                            <Text
+                                                as="span"
+                                                px={2}
+                                                py={1}
+                                                bg="gray.200"
+                                                color="gray.800"
+                                                fontSize="xs"
+                                                fontWeight="semibold"
+                                                borderRadius="sm"
+                                                textTransform="capitalize"
+                                                whiteSpace="nowrap"
+                                            >
+                                                <ShipmentStatusLabel
+                                                    status={shipment.shippingStatus}
+                                                />
+                                            </Text>
+                                        )}
+                                    </Flex>
+                                    <Stack spacing={4} p={[4, 6]}>
+                                        <OrderProducts
+                                            productItems={items}
+                                            currency={order.currency}
+                                        />
+                                        {address && (
+                                            <Stack
+                                                spacing={1}
+                                                borderTop="1px solid"
+                                                borderColor="gray.100"
+                                                pt={4}
+                                            >
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        id="guestOrderLookup.order.shippingAddress"
+                                                        defaultMessage="Shipping Address"
+                                                    />
+                                                </Heading>
+                                                <Box>
+                                                    {(address.firstName || address.lastName) && (
+                                                        <Text fontSize="sm">
+                                                            {address.firstName} {address.lastName}
+                                                        </Text>
+                                                    )}
+                                                    {address.address1 && (
+                                                        <Text fontSize="sm">{address.address1}</Text>
+                                                    )}
+                                                    {(address.city || address.stateCode || address.postalCode) && (
+                                                        <Text fontSize="sm">
+                                                            {address.city},{' '}
+                                                            {address.stateCode}{' '}
+                                                            {address.postalCode}
+                                                        </Text>
+                                                    )}
+                                                    {shipment.shippingMethod?.name && (
+                                                        <Text fontSize="sm" color="gray.600">
+                                                            {shipment.shippingMethod.name}
+                                                        </Text>
+                                                    )}
+                                                </Box>
+                                            </Stack>
+                                        )}
+                                    </Stack>
+                                </Box>
+                            )
+                        })
+                        const leftoverItems = Object.entries(itemsByShipmentId)
+                            .filter(([k]) => !renderedBucketIds.has(k))
+                            .flatMap(([, items]) => items)
+                        if (leftoverItems.length > 0) {
+                            boxes.push(
+                                <Box
+                                    key="other-items"
+                                    border="1px solid"
+                                    borderColor="gray.100"
+                                    borderRadius="base"
+                                    overflow="hidden"
+                                >
+                                    <Flex bg="gray.50" px={4} py={3} align="center">
+                                        <Heading as="h2" fontSize="sm" fontWeight="semibold">
+                                            <FormattedMessage
+                                                id="guestOrderLookup.order.otherItems"
+                                                defaultMessage="Other items"
+                                            />
+                                        </Heading>
+                                    </Flex>
+                                    <Stack spacing={4} p={[4, 6]}>
+                                        <OrderProducts
+                                            productItems={leftoverItems}
+                                            currency={order.currency}
+                                        />
+                                    </Stack>
+                                </Box>
+                            )
+                        }
+                        return boxes
+                    })()
+                )}
+            </Stack>
+
+            {/* Tracking section */}
+            {trackingEntries.length > 0 && (
+                <Stack spacing={3} data-testid="guest-order-detail-tracking">
+                    <Heading as="h2" fontSize="lg">
+                        <FormattedMessage
+                            id="guestOrderLookup.order.section.tracking"
+                            defaultMessage="Tracking"
+                        />
+                    </Heading>
+                    {trackingEntries.map(({key, ...entry}) => (
+                        <OrderTracking key={key} {...entry} />
+                    ))}
                 </Stack>
-
-                {/* Order Summary */}
-                <Box py={{base: 6}} px={{base: 6, xl: 8}} background="gray.50" borderRadius="base">
-                    <OrderSummary basket={order} fontSize="sm" />
-                </Box>
-            </Grid>
+            )}
 
             {/* Modals */}
             <CancelOrderModal
