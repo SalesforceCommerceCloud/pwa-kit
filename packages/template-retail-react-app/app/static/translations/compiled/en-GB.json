@@ -206,7 +206,7 @@
   "account_order_detail.alert.cancellation_error_conflict": [
     {
       "type": 0,
-      "value": "This order is already being processed and cannot be cancelled. Please reach out to the merchant."
+      "value": "This order is already being processed and cannot be canceled. Please reach out to the merchant."
     }
   ],
   "account_order_detail.alert.cancellation_error_generic": [
@@ -236,13 +236,13 @@
   "account_order_detail.alert.cancellation_success_description": [
     {
       "type": 0,
-      "value": "Your order was cancelled successfully."
+      "value": "Your order was canceled successfully."
     }
   ],
   "account_order_detail.alert.cancellation_success_title": [
     {
       "type": 0,
-      "value": "Order cancelled"
+      "value": "Order canceled"
     }
   ],
   "account_order_detail.alert.return_success_description": [
@@ -416,7 +416,7 @@
   "account_order_detail.hint.cancel_unavailable": [
     {
       "type": 0,
-      "value": "This order can no longer be cancelled."
+      "value": "This order can no longer be canceled."
     }
   ],
   "account_order_detail.hint.no_returnable_items": [
@@ -434,7 +434,7 @@
   "account_order_detail.hint.not_cancellable": [
     {
       "type": 0,
-      "value": "This order is not eligible for cancellation."
+      "value": "This order isn't eligible for cancellation."
     }
   ],
   "account_order_detail.hint.return_unavailable": [
@@ -1290,13 +1290,13 @@
   "checkout.message.payment_confirm_failure": [
     {
       "type": 0,
-      "value": "Payment confirmation failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method."
+      "value": "Payment confirmation failed. Your order has been canceled and your basket has been restored. Please try again or select a different payment method."
     }
   ],
   "checkout.message.payment_processing_failed": [
     {
       "type": 0,
-      "value": "Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method."
+      "value": "Payment processing failed. Your order has been canceled and your basket has been restored. Please try again or select a different payment method."
     }
   ],
   "checkout.message.user_registration": [
@@ -2317,10 +2317,10 @@
       "value": "Contact Us"
     }
   ],
-  "footer.link.find_your_order": [
+  "footer.link.order_lookup": [
     {
       "type": 0,
-      "value": "Find Your Order"
+      "value": "Order Lookup"
     }
   ],
   "footer.link.order_status": [
@@ -2581,10 +2581,168 @@
       "value": "View"
     }
   ],
+  "guestOrderLookup.order.breadcrumb.home": [
+    {
+      "type": 0,
+      "value": "Home"
+    }
+  ],
+  "guestOrderLookup.order.breadcrumb.orderLookup": [
+    {
+      "type": 0,
+      "value": "Order Lookup"
+    }
+  ],
+  "guestOrderLookup.order.button.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel Order"
+    }
+  ],
+  "guestOrderLookup.order.button.retry": [
+    {
+      "type": 0,
+      "value": "Try Again"
+    }
+  ],
+  "guestOrderLookup.order.button.return": [
+    {
+      "type": 0,
+      "value": "Return Items"
+    }
+  ],
+  "guestOrderLookup.order.cancel.success": [
+    {
+      "type": 0,
+      "value": "Your order has been cancelled."
+    }
+  ],
+  "guestOrderLookup.order.error.generic": [
+    {
+      "type": 0,
+      "value": "Something went wrong loading your order. Please try again."
+    }
+  ],
+  "guestOrderLookup.order.error.tooManyRequests": [
+    {
+      "type": 0,
+      "value": "You've refreshed too many times. Please wait a moment before trying again."
+    }
+  ],
+  "guestOrderLookup.order.heading": [
+    {
+      "type": 0,
+      "value": "Order Details"
+    }
+  ],
+  "guestOrderLookup.order.heading.billingAddress": [
+    {
+      "type": 0,
+      "value": "Billing Address"
+    }
+  ],
+  "guestOrderLookup.order.itemCount": [
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "count"
+    }
+  ],
+  "guestOrderLookup.order.orderNumber": [
+    {
+      "type": 0,
+      "value": "Order Number: "
+    },
+    {
+      "type": 1,
+      "value": "orderNo"
+    }
+  ],
+  "guestOrderLookup.order.orderedDate": [
+    {
+      "type": 0,
+      "value": "Ordered: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "guestOrderLookup.order.otherItems": [
+    {
+      "type": 0,
+      "value": "Other items"
+    }
+  ],
+  "guestOrderLookup.order.return.success": [
+    {
+      "type": 0,
+      "value": "Your return has been submitted."
+    }
+  ],
+  "guestOrderLookup.order.section.items": [
+    {
+      "type": 0,
+      "value": "Items Ordered"
+    }
+  ],
+  "guestOrderLookup.order.section.tracking": [
+    {
+      "type": 0,
+      "value": "Tracking"
+    }
+  ],
+  "guestOrderLookup.order.shipment": [
+    {
+      "type": 0,
+      "value": "Shipment"
+    }
+  ],
+  "guestOrderLookup.order.shipment.number": [
+    {
+      "type": 0,
+      "value": "Shipment "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    }
+  ],
+  "guestOrderLookup.order.shippingAddress": [
+    {
+      "type": 0,
+      "value": "Shipping Address"
+    }
+  ],
   "guestOrderLookup.request.button.submit": [
     {
       "type": 0,
-      "value": "Send Access Code"
+      "value": "Find My Order"
     }
   ],
   "guestOrderLookup.request.error.emailInvalid": [
@@ -2614,43 +2772,31 @@
   "guestOrderLookup.request.heading": [
     {
       "type": 0,
-      "value": "Find Your Order"
+      "value": "Look Up Your Order"
     }
   ],
   "guestOrderLookup.request.label.email": [
     {
       "type": 0,
-      "value": "Email Address"
+      "value": "Email address"
     }
   ],
   "guestOrderLookup.request.label.orderNumber": [
     {
       "type": 0,
-      "value": "Order Number"
+      "value": "Order number"
     }
   ],
   "guestOrderLookup.request.subtext": [
     {
       "type": 0,
-      "value": "Enter your order number and email address to receive a one-time access code."
+      "value": "Enter your order details to track your order or view your receipt."
     }
   ],
   "guestOrderLookup.verify.button.submit": [
     {
       "type": 0,
       "value": "Verify Code"
-    }
-  ],
-  "guestOrderLookup.verify.error.codeInvalid": [
-    {
-      "type": 0,
-      "value": "Enter the 6-digit code from your email"
-    }
-  ],
-  "guestOrderLookup.verify.error.codeRequired": [
-    {
-      "type": 0,
-      "value": "Access code is required"
     }
   ],
   "guestOrderLookup.verify.error.generic": [
@@ -2662,7 +2808,7 @@
   "guestOrderLookup.verify.error.invalidCode": [
     {
       "type": 0,
-      "value": "Code invalid or expired. Please try again or request a new code."
+      "value": "The code you entered is invalid or has expired. Please try again."
     }
   ],
   "guestOrderLookup.verify.error.tooManyAttempts": [
@@ -2674,31 +2820,37 @@
   "guestOrderLookup.verify.heading": [
     {
       "type": 0,
-      "value": "Enter Your Access Code"
+      "value": "Verify Your Email"
     }
   ],
   "guestOrderLookup.verify.label.code": [
     {
       "type": 0,
-      "value": "Access Code"
+      "value": "Verification code"
     }
   ],
-  "guestOrderLookup.verify.resend.link": [
+  "guestOrderLookup.verify.label.digitN": [
     {
       "type": 0,
-      "value": "Resend code"
-    }
-  ],
-  "guestOrderLookup.verify.resend.prompt": [
+      "value": "Digit "
+    },
+    {
+      "type": 1,
+      "value": "n"
+    },
     {
       "type": 0,
-      "value": "Didn't receive a code?"
+      "value": " of "
+    },
+    {
+      "type": 1,
+      "value": "total"
     }
   ],
   "guestOrderLookup.verify.subtext": [
     {
       "type": 0,
-      "value": "We've sent a 6-digit code to "
+      "value": "We've sent a verification code to "
     },
     {
       "type": 1,
@@ -2706,13 +2858,7 @@
     },
     {
       "type": 0,
-      "value": ". It may take a moment to arrive."
-    }
-  ],
-  "guestOrderLookup.verify.toast.resent": [
-    {
-      "type": 0,
-      "value": "Check your inbox — it may take a moment."
+      "value": ". Please enter it below."
     }
   ],
   "header.button.assistive_msg.ask_shopping_agent": [
@@ -4744,7 +4890,7 @@
   "return_items_modal.text.quantity_exceeded_affected_generic": [
     {
       "type": 0,
-      "value": "Some items' available return quantities changed. Please review the updated limits below."
+      "value": "The available return quantities for some items changed. Review the updated limits."
     }
   ],
   "return_items_modal.text.review_description": [
@@ -4788,37 +4934,37 @@
   "return_items_modal.text.submit_error_invalid_reason": [
     {
       "type": 0,
-      "value": "The selected reason is no longer available. Please choose another."
+      "value": "The selected reason is no longer available. Choose another reason."
     }
   ],
   "return_items_modal.text.submit_error_network": [
     {
       "type": 0,
-      "value": "We're unable to process your request right now. Please try again in a few minutes."
+      "value": "We're unable to process your request right now. Try again in a few minutes."
     }
   ],
   "return_items_modal.text.submit_error_unknown_items": [
     {
       "type": 0,
-      "value": "One or more items couldn't be found on this order. Please refresh and try again."
+      "value": "We can't find one or more items on this order. Refresh and try again."
     }
   ],
   "return_items_modal.text.terminal_error_conflict": [
     {
       "type": 0,
-      "value": "This order can't be returned at this time. Please reach out to the merchant."
+      "value": "This order can't be returned at this time. Reach out to the merchant."
     }
   ],
   "return_items_modal.text.terminal_error_not_found": [
     {
       "type": 0,
-      "value": "We could not find this order."
+      "value": "We can't find this order."
     }
   ],
   "return_items_modal.text.terminal_error_title": [
     {
       "type": 0,
-      "value": "Unable to submit return"
+      "value": "We're unable to submit this return."
     }
   ],
   "search.action.cancel": [

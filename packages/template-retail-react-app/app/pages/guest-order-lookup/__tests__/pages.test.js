@@ -527,7 +527,7 @@ describe('GuestOrderLookupOrder', () => {
         renderOrderPage()
         expect(screen.getByText('Order Summary')).toBeInTheDocument()
         expect(screen.getByText('Subtotal')).toBeInTheDocument()
-        expect(screen.getByText('Total')).toBeInTheDocument()
+        expect(screen.getByText(/Total/)).toBeInTheDocument()
     })
 
     test('renders Refresh Status button', () => {
@@ -677,24 +677,28 @@ describe('GuestOrderLookupOrder — S10 field suppression security backstop', ()
     )
 })
 
-// ─── GuestOrderLookupResults — stale-data / session-expiry guard ──────────────
+// ─── GuestOrderLookupResults — session-expiry redirect guard ──────────────────
 //
-// Regression tests for the scenario where React Query retains stale order data
-// in memory after the cookie expires. Without the requiresVerification guard,
-// a tab left open past the 15-minute access-code TTL would show order details
-// without re-verification on the next focus-refetch.
+// results.jsx is now a thin redirect-only page. It immediately redirects:
+//   - 401/403 → /order-lookup/verify  (cookie missing/expired)
+//   - 404     → /order-lookup         (order not found / session gone)
+//   - isLoading → loading skeleton
+//   - success → renders order (kept here for backwards-compatible deep-links)
 
 const renderResultsPage = (orderNo = 'ABC123', state = {email: 'test@example.com'}) => {
     return renderWithProviders(
         <MemoryRouter initialEntries={[{pathname: `/order-lookup/results/${orderNo}`, state}]}>
             <Route path="/order-lookup/results/:orderNo" component={GuestOrderLookupResults} />
+            <Route path="/order-lookup/verify" render={({location: loc}) => (
+                <div data-testid="verify-page">verify-{loc.state?.orderNo}</div>
+            )} />
             <Route path="/order-lookup" exact render={() => <div data-testid="request-page">Request Page</div>} />
             <Route path="/account/orders" render={() => <div>Account Orders</div>} />
         </MemoryRouter>
     )
 }
 
-describe('GuestOrderLookupResults — stale-data session guard', () => {
+describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         getConfig.mockReturnValue(guestOrderLookupConfig)
@@ -704,12 +708,10 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
         mockRefetch.mockResolvedValue({data: mockOrder, error: null})
     })
 
-    test('shows verify form when query is in error state with 401 even if stale order data is cached', () => {
-        // Simulates a window-focus refetch returning 401 while stale order data is still in cache.
-        // The page must show the verify form, not the stale order details.
+    test('redirects to /order-lookup/verify on 401 even if stale order data is cached', async () => {
         const err = Object.assign(new Error('not-verified'), {status: 401})
         useQuery.mockReturnValue({
-            data: mockOrder, // stale data still present
+            data: mockOrder,
             isLoading: false,
             isError: true,
             error: err,
@@ -717,13 +719,14 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
             refetch: mockRefetch
         })
         renderResultsPage()
-        expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByTestId('verify-page')).toBeInTheDocument()
+            expect(screen.getByTestId('verify-page').textContent).toContain('ABC123')
+        })
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
     })
 
-    test('shows verify form when query is in error state with 403 even if stale order data is cached', () => {
-        // Same scenario but with 403 (no verified cookie) — the status we now return
-        // from the GET /api/order-lookup/order/:orderNo endpoint when the cookie is absent.
+    test('redirects to /order-lookup/verify on 403 even if stale order data is cached', async () => {
         const err = Object.assign(new Error('not-verified'), {status: 403})
         useQuery.mockReturnValue({
             data: mockOrder,
@@ -734,28 +737,13 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
             refetch: mockRefetch
         })
         renderResultsPage()
-        expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByTestId('verify-page')).toBeInTheDocument()
+        })
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
     })
 
-    test('does not show verify form when query has data and no error (normal success path)', () => {
-        // Sanity check: when there is fresh order data and no error, requiresVerification
-        // must be false and the verify form must NOT be shown. We cannot assert on the full
-        // order-details render here (it requires a deeper component tree mock), but we can
-        // confirm the verify-form heading is absent.
-        useQuery.mockReturnValue(defaultUseQueryMock())
-        // Suppress the render-time error from item-attributes' useProducts hook
-        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-        try {
-            renderResultsPage()
-        } catch {
-            // Render may throw due to useProducts mock gap; the key assertion is below
-        }
-        expect(screen.queryByText('Verify Your Email')).not.toBeInTheDocument()
-        consoleSpy.mockRestore()
-    })
-
-    test('shows verify form when data is undefined and there is no error yet (initial state)', () => {
+    test('redirects to /order-lookup/verify when data is undefined and no error (initial state)', async () => {
         useQuery.mockReturnValue({
             data: undefined,
             isLoading: false,
@@ -765,7 +753,9 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
             refetch: mockRefetch
         })
         renderResultsPage()
-        expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByTestId('verify-page')).toBeInTheDocument()
+        })
     })
 
     test('redirects to request page on 404 (session expired / order not found)', async () => {
@@ -811,7 +801,6 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
         const {container} = renderResultsPage()
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
         expect(screen.queryByText('Verify Your Email')).not.toBeInTheDocument()
-        // At least one skeleton element should be present
         expect(container.querySelectorAll('[class*="skeleton"], [data-testid]').length).toBeGreaterThanOrEqual(0)
     })
 
@@ -825,8 +814,14 @@ describe('GuestOrderLookupResults — stale-data session guard', () => {
 
     test('redirects to /order-lookup when orderNo path param is missing', () => {
         useQuery.mockReturnValue(defaultUseQueryMock())
-        // Render with empty orderNo — simulates navigating without a valid order path param
-        renderResultsPage('')
+        // Render without the :orderNo param — component mounts with no orderNo from useParams
+        renderWithProviders(
+            <MemoryRouter initialEntries={[{pathname: '/order-lookup/results'}]}>
+                <Route path="/order-lookup/results" exact component={GuestOrderLookupResults} />
+                <Route path="/order-lookup" exact render={() => <div data-testid="request-page">Request Page</div>} />
+                <Route path="/account/orders" render={() => <div>Account Orders</div>} />
+            </MemoryRouter>
+        )
         expect(screen.getByTestId('request-page')).toBeInTheDocument()
     })
 })
