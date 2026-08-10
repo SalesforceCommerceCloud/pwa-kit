@@ -28,7 +28,7 @@ const OTP_LENGTH = 6
 
 const GuestOrderLookupVerify = () => {
     const {formatMessage} = useIntl()
-    const {isRegistered} = useCustomerType()
+    const {isRegistered, customerType} = useCustomerType()
     const history = useHistory()
     const location = useLocation()
     const {orderNo} = useParams()
@@ -47,6 +47,9 @@ const GuestOrderLookupVerify = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [serverError, setServerError] = useState(null)
     const inputRefs = useRef([])
+
+    // Wait for auth state to resolve before rendering or redirecting (prevents title flash)
+    if (customerType === null) return null
 
     if (isRegistered) return <Redirect to="/account/orders" />
 
