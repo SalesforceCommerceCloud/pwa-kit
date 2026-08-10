@@ -163,7 +163,7 @@ You open it; the **operator merges it.** The merge triggers CI, which publishes.
 
 1. **Generate from the just-published preview**, and give the operator this same command to paste into a Slack **announcement** so each team tests its own features against the preview — testing is shared across teams, not the operator's alone:
    ```
-   npx @salesforce/pwa-kit-create-app@<version>-preview.N --templateVersion <retail-preview-version> --outputDir ./smoke-test
+   npx @salesforce/pwa-kit-create-app@<version>-preview.N --templateVersion <retail-preview-version> --outputDir /tmp/smoke-test-<version>-preview.N
    ```
 2. In the generated project, **you (the agent) run the automated checks**: `npm ci` (or `npm install`), `npm run lint`, `npm run build`, `npm test`. These must pass before the manual pass is worth anyone's time.
 3. **The operator runs the manual happy-path smoke test** — this is theirs, not yours; you can't drive a browser through checkout. Start the local dev server (`npm start`) and walk the core purchase flow end to end: **homepage → browse/search a product → PDP → add to cart → cart → checkout (shipping, payment) → place order → order confirmation.** Hand the operator this flow and wait for their result; a clean build with a broken checkout is still a blocker. Meanwhile each team exercises its own features and reports back.
