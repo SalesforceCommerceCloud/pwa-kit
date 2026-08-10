@@ -12,6 +12,7 @@ const {
     searchProduct,
     checkoutProduct
 } = require('../../scripts/pageHelpers')
+const {advanceToPayment} = require('../../scripts/checkout')
 const {generateUserCredentials, getCreditCardExpiry} = require('../../scripts/utils.js')
 const {clearCartAndWishlist} = require('../../scripts/cleanup.js')
 
@@ -65,14 +66,7 @@ test('Guest shopper can checkout items as guest', async ({page}) => {
     await expect(step1Card.getByRole('button', {name: /Edit/i})).toBeVisible()
 
     await expect(page.getByRole('heading', {name: /Shipping & Gift Options/i})).toBeVisible()
-    await page.waitForLoadState()
-
-    const continueToPayment = page.getByRole('button', {name: /Continue to Payment/i})
-
-    // If the Continue to Payment button is not visible, the payment details form is already being shown, so we can skip this step.
-    if ((await continueToPayment.count()) > 0 && (await continueToPayment.isEnabled())) {
-        await continueToPayment.click()
-    }
+    await advanceToPayment(page)
 
     await expect(page.getByRole('heading', {name: /Payment/i})).toBeVisible()
 

@@ -6,6 +6,7 @@
  */
 const {expect} = require('@playwright/test')
 const config = require('../config')
+const {advanceToPayment} = require('./checkout')
 const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js')
 /**
  * Note: As a best practice, we should await the network call and assert on the network response rather than waiting for pageLoadState()
@@ -484,20 +485,10 @@ export const checkoutProduct = async ({page, userCredentials, a11y = {checkA11y:
     await expect(step1Card.getByRole('button', {name: /Edit/i})).toBeVisible()
     await expect(page.getByRole('heading', {name: /Shipping & Gift Options/i})).toBeVisible()
 
-    try {
-        // sometimes the shipping & gifts section gets skipped
-        // so there is no 'Continue to payment' button available
-        const continueToPayment = page.getByRole('button', {
-            name: /Continue to Payment/i
-        })
-        await expect(continueToPayment).toBeVisible({timeout: 2000})
-        if (checkA11y) {
-            await runAccessibilityTest(page, [snapShotName, 'checkout-a11y-violations-step-2.json'])
-        }
-        await continueToPayment.click()
-    } catch (error) {
-        // Silently continue - consent form handling should not break tests
+    if (checkA11y) {
+        await runAccessibilityTest(page, [snapShotName, 'checkout-a11y-violations-step-2.json'])
     }
+    await advanceToPayment(page)
 
     await expect(page.getByRole('heading', {name: /Payment/i})).toBeVisible()
     const creditCardExpiry = getCreditCardExpiry()
@@ -595,12 +586,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
         await runAccessibilityTest(page, [snapShotName, 'checkout-a11y-violations-step-2.json'])
     }
 
-    const continueToPayment = page.getByRole('button', {name: /Continue to Payment/i})
-
-    // If the Continue to Payment button is not visible, the payment details form is already being shown, so we can skip this step.
-    if ((await continueToPayment.count()) > 0 && (await continueToPayment.isEnabled())) {
-        await continueToPayment.click()
-    }
+    await advanceToPayment(page)
 
     const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']")
     await expect(step2Card.getByRole('button', {name: /Edit Shipping Options/i})).toBeVisible()
