@@ -701,8 +701,6 @@ const CommerceClientAgentWindow = ({
     const identityRef = useRef({usid, customerType})
     identityRef.current = {usid, customerType}
 
-    // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
-    const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
     const commerceClientStorageScope = `${salesforceOrgId}_${
         cc_esDeveloperName || embeddedServiceName
     }`
