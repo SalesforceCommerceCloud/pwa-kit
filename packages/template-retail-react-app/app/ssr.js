@@ -42,7 +42,9 @@ function getSiteIdFromRequest(req) {
 // go via /mobify/proxy/api (same path the client SDK uses).
 function makeShopperOrders(apiParams, authorization) {
     const {clientId, organizationId, shortCode, siteId} = apiParams
-    const proxy = `${getAppOrigin()}${getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
+    const proxy = `${getAppOrigin()}${
+        getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'
+    }`
     return new ShopperOrders({
         parameters: {clientId, organizationId, shortCode, siteId},
         headers: {authorization},
@@ -493,8 +495,7 @@ export function createVerifyThrottle() {
         // Throttle keyed on x-forwarded-for. In MRT deployments this header is set
         // by the trusted CDN edge. In non-MRT environments (local dev, custom hosting)
         // it may be spoofable — SCAPI rate limiting is the authoritative backstop.
-        const ip =
-            (req.headers['x-forwarded-for']?.split(',')[0]?.trim()) || req.ip || 'unknown'
+        const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || 'unknown'
         const now = Date.now()
         const entry = store.get(ip)
 
@@ -521,7 +522,6 @@ if (_golConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_
 }
 
 const cookieSecureFlag = options.localAllowCookies ? '' : ' Secure;'
-
 
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
@@ -781,8 +781,10 @@ const {handler} = runtime.createHandler(options, (app) => {
             // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
             if (!order?.orderNo) {
                 const title = order?.title || ''
-                const fakeStatus = /unauthorized/i.test(title) ? 401
-                    : /not.found/i.test(title) ? 404
+                const fakeStatus = /unauthorized/i.test(title)
+                    ? 401
+                    : /not.found/i.test(title)
+                    ? 404
                     : 500
                 const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
                 proxyErr.response = {status: fakeStatus}
@@ -799,7 +801,9 @@ const {handler} = runtime.createHandler(options, (app) => {
             const cookieVal = evictIfNeeded(existing)
             res.setHeader(
                 'Set-Cookie',
-                `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
+                `${cookieName}=${encodeURIComponent(
+                    JSON.stringify(cookieVal)
+                )}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
             )
 
             logger.info('guest-order-lookup verify success', {
@@ -825,7 +829,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                     durationMs: Date.now() - start
                 }
             })
-            if (scapiStatus === 404) return res.status(404).json({error: 'Invalid or expired access code'})
+            if (scapiStatus === 404)
+                return res.status(404).json({error: 'Invalid or expired access code'})
             if (scapiStatus === 401) return res.status(401).json({error: 'Missing authorization'})
             if (scapiStatus === 403) return res.status(403).json({error: 'Forbidden'})
             res.status(502).json({error: 'Service error'})
@@ -862,8 +867,10 @@ const {handler} = runtime.createHandler(options, (app) => {
             // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
             if (!order?.orderNo) {
                 const title = order?.title || ''
-                const fakeStatus = /unauthorized/i.test(title) ? 401
-                    : /not.found/i.test(title) ? 404
+                const fakeStatus = /unauthorized/i.test(title)
+                    ? 401
+                    : /not.found/i.test(title)
+                    ? 404
                     : 500
                 const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
                 proxyErr.response = {status: fakeStatus}
@@ -899,7 +906,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                 delete cookieData2[orderNo]
                 res.setHeader(
                     'Set-Cookie',
-                    `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
+                    `${cookieName}=${encodeURIComponent(
+                        JSON.stringify(cookieData2)
+                    )}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
                 )
                 return res.status(404).json({error: 'Session expired'})
             }
@@ -954,18 +963,24 @@ const {handler} = runtime.createHandler(options, (app) => {
         const {orderNo, reason} = req.body ?? {}
         // errorKind: 'invalid_input' for client input errors; SCAPI-classified kinds for downstream errors
         if (!orderNo || typeof orderNo !== 'string')
-            return res.status(400).json({errorKind: 'invalid_input', message: 'orderNo is required'})
+            return res
+                .status(400)
+                .json({errorKind: 'invalid_input', message: 'orderNo is required'})
         if (!cookieData?.[orderNo])
             return res.status(401).json({error: 'No session for this order'})
 
         let regex
         try {
-            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$')
+            regex = new RegExp(
+                appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$'
+            )
         } catch {
             regex = /^[a-zA-Z0-9-]{6,32}$/
         }
         if (!regex.test(orderNo))
-            return res.status(400).json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
+            return res
+                .status(400)
+                .json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
 
         try {
             const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
@@ -998,28 +1013,49 @@ const {handler} = runtime.createHandler(options, (app) => {
         const {orderNo, productItems} = req.body ?? {}
         // errorKind: 'invalid_input' for client input errors; SCAPI-classified kinds for downstream errors
         if (!orderNo || typeof orderNo !== 'string')
-            return res.status(400).json({errorKind: 'invalid_input', message: 'orderNo is required'})
+            return res
+                .status(400)
+                .json({errorKind: 'invalid_input', message: 'orderNo is required'})
         if (!cookieData?.[orderNo])
             return res.status(401).json({error: 'No session for this order'})
 
         let regex
         try {
-            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$')
+            regex = new RegExp(
+                appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$'
+            )
         } catch {
             regex = /^[a-zA-Z0-9-]{6,32}$/
         }
         if (!regex.test(orderNo))
-            return res.status(400).json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
+            return res
+                .status(400)
+                .json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
 
         if (!Array.isArray(productItems) || productItems.length === 0)
-            return res.status(400).json({errorKind: 'invalid_input', message: 'productItems must be a non-empty array'})
+            return res
+                .status(400)
+                .json({
+                    errorKind: 'invalid_input',
+                    message: 'productItems must be a non-empty array'
+                })
 
         for (const item of productItems) {
             if (!item.itemId || typeof item.itemId !== 'string')
-                return res.status(400).json({errorKind: 'invalid_input', message: 'Each productItem must have a string itemId'})
+                return res
+                    .status(400)
+                    .json({
+                        errorKind: 'invalid_input',
+                        message: 'Each productItem must have a string itemId'
+                    })
             const qty = Number(item.quantity)
             if (!Number.isFinite(qty) || qty < 1)
-                return res.status(400).json({errorKind: 'invalid_input', message: 'Each productItem must have a positive quantity'})
+                return res
+                    .status(400)
+                    .json({
+                        errorKind: 'invalid_input',
+                        message: 'Each productItem must have a positive quantity'
+                    })
         }
 
         try {
@@ -1033,10 +1069,15 @@ const {handler} = runtime.createHandler(options, (app) => {
             const status = err?.response?.status
             if (status === 400) {
                 let errorCode
-                try { errorCode = (await err.response.clone().json())?.errorCode } catch {}
-                if (errorCode === 'InvalidReasonCode') return res.status(400).json({errorKind: 'invalid_reason'})
-                if (errorCode === 'UnknownProductItemIds') return res.status(400).json({errorKind: 'unknown_items'})
-                if (errorCode === 'ReturnQuantityExceeded') return res.status(400).json({errorKind: 'quantity_exceeded'})
+                try {
+                    errorCode = (await err.response.clone().json())?.errorCode
+                } catch {}
+                if (errorCode === 'InvalidReasonCode')
+                    return res.status(400).json({errorKind: 'invalid_reason'})
+                if (errorCode === 'UnknownProductItemIds')
+                    return res.status(400).json({errorKind: 'unknown_items'})
+                if (errorCode === 'ReturnQuantityExceeded')
+                    return res.status(400).json({errorKind: 'quantity_exceeded'})
                 return res.status(400).json({errorKind: 'transient'})
             }
             if (status === 404) return res.status(404).json({errorKind: 'not_found'})
