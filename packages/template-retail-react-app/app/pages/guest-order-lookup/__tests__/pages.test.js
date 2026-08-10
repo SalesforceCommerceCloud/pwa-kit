@@ -17,7 +17,7 @@ const mockRefetch = jest.fn()
 
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
-    useCustomerType: jest.fn(() => ({isRegistered: false, isGuest: true})),
+    useCustomerType: jest.fn(() => ({isRegistered: false, isGuest: true, customerType: 'guest'})),
     useShopperOrdersMutation: jest.fn(() => ({
         mutateAsync: mockMutateAsync,
         isLoading: false
@@ -122,7 +122,7 @@ describe('GuestOrderLookupRequest', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockMutateAsync.mockResolvedValue({})
-        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
         getConfig.mockReturnValue(guestOrderLookupConfig)
         useQuery.mockReturnValue(defaultUseQueryMock())
     })
@@ -136,7 +136,7 @@ describe('GuestOrderLookupRequest', () => {
     })
 
     test('redirects to /account/orders when user is registered', () => {
-        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
+        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false, customerType: 'registered'})
         renderWithProviders(
             <MemoryRouter initialEntries={['/order-lookup']}>
                 <Route path="/order-lookup" component={GuestOrderLookupRequest} />
@@ -289,7 +289,7 @@ describe('GuestOrderLookupVerify', () => {
         jest.clearAllMocks()
         mockMutateAsync.mockResolvedValue({})
         mockGetTokenWhenReady.mockResolvedValue('test-access-token')
-        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
         global.fetch = jest.fn().mockResolvedValue({ok: true, status: 200})
         getConfig.mockReturnValue(guestOrderLookupConfig)
         useQuery.mockReturnValue(defaultUseQueryMock())
@@ -330,7 +330,7 @@ describe('GuestOrderLookupVerify', () => {
     })
 
     test('redirects to /account/orders when user is registered', () => {
-        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
+        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false, customerType: 'registered'})
         renderWithProviders(
             <MemoryRouter
                 initialEntries={[
@@ -534,7 +534,7 @@ describe('GuestOrderLookupOrder', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         getConfig.mockReturnValue(guestOrderLookupConfig)
-        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
         mockRefetch.mockResolvedValue({data: mockOrder, error: null})
         useQuery.mockReturnValue(defaultUseQueryMock())
     })
@@ -574,18 +574,6 @@ describe('GuestOrderLookupOrder', () => {
         expect(screen.getByText(/Total/)).toBeInTheDocument()
     })
 
-    test('renders Refresh Status button', () => {
-        renderOrderPage()
-        expect(screen.getByRole('button', {name: /refresh order status/i})).toBeInTheDocument()
-    })
-
-    test('shows last-updated timestamp after successful fetch', () => {
-        useQuery.mockReturnValue(defaultUseQueryMock({dataUpdatedAt: Date.now(), isSuccess: true}))
-        renderOrderPage()
-        expect(screen.getByTestId('last-updated')).toBeInTheDocument()
-        expect(screen.getByTestId('last-updated').textContent).toMatch(/Last updated at/i)
-    })
-
     test('shows skeleton while loading', () => {
         useQuery.mockReturnValue(defaultUseQueryMock({data: undefined, isLoading: true, isSuccess: false}))
         const {container} = renderOrderPage()
@@ -596,7 +584,7 @@ describe('GuestOrderLookupOrder', () => {
     })
 
     test('redirects to /account/orders when user is registered', () => {
-        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
+        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false, customerType: 'registered'})
         renderOrderPage()
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
         expect(screen.getByText('Account Orders')).toBeInTheDocument()
@@ -610,37 +598,6 @@ describe('GuestOrderLookupOrder', () => {
         )
         renderOrderPage()
         await waitFor(() => {
-            expect(screen.getByTestId('request-page')).toBeInTheDocument()
-        })
-    })
-
-    test('Refresh Status button calls refetch', async () => {
-        const user = userEvent.setup()
-        renderOrderPage()
-        const refreshBtn = screen.getByRole('button', {name: /refresh order status/i})
-        await user.click(refreshBtn)
-        await waitFor(() => {
-            expect(mockRefetch).toHaveBeenCalled()
-        })
-    })
-
-    test('Refresh Status button shows loading state while refetching', () => {
-        useQuery.mockReturnValue(defaultUseQueryMock({isFetching: true}))
-        renderOrderPage()
-        // Button should show loading text when isFetching
-        expect(screen.getByText(/Refreshing/i)).toBeInTheDocument()
-    })
-
-    test('mid-session expiry: redirect to /order-lookup?expired=1 when refetch returns 404', async () => {
-        const expiredError = new Error('Session expired')
-        expiredError.status = 404
-        mockRefetch.mockResolvedValue({data: undefined, error: expiredError})
-        const user = userEvent.setup()
-        renderOrderPage()
-        const refreshBtn = screen.getByRole('button', {name: /refresh order status/i})
-        await user.click(refreshBtn)
-        await waitFor(() => {
-            expect(mockRefetch).toHaveBeenCalled()
             expect(screen.getByTestId('request-page')).toBeInTheDocument()
         })
     })
@@ -702,13 +659,6 @@ describe('GuestOrderLookupOrder', () => {
         })
     })
 
-    // ── S17: last-updated live region ─────────────────────────────────────────
-    test('S17: last-updated timestamp has aria-live=polite', () => {
-        useQuery.mockReturnValue(defaultUseQueryMock({dataUpdatedAt: Date.now(), isSuccess: true}))
-        renderOrderPage()
-        const lastUpdated = screen.getByTestId('last-updated')
-        expect(lastUpdated).toHaveAttribute('aria-live', 'polite')
-    })
 })
 
 // ─── GuestOrderLookupOrder — cancel/return UI ─────────────────────────────────
@@ -766,7 +716,7 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         getConfig.mockReturnValue(guestOrderLookupConfig)
-        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
         mockRefetch.mockResolvedValue({data: mockOrderWithOmsData, error: null})
         // Default: OMS meta returns inactive state
         global.fetch = jest.fn().mockImplementation((url) => {
@@ -1148,7 +1098,7 @@ describe('GuestOrderLookupOrder — S10 field suppression security backstop', ()
     beforeEach(() => {
         jest.clearAllMocks()
         getConfig.mockReturnValue(guestOrderLookupConfig)
-        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
         mockRefetch.mockResolvedValue({data: mockOrder, error: null})
     })
 
@@ -1229,7 +1179,7 @@ describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         getConfig.mockReturnValue(guestOrderLookupConfig)
-        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
         mockGetTokenWhenReady.mockResolvedValue('test-access-token')
         global.fetch = jest.fn().mockResolvedValue({ok: true, json: () => Promise.resolve({omsActive: false, cancelReasonCodes: [], returnReasonCodes: []})})
         mockRefetch.mockResolvedValue({data: mockOrder, error: null})
@@ -1332,7 +1282,7 @@ describe('GuestOrderLookupResults — session-expiry redirect guard', () => {
     })
 
     test('redirects to /account/orders when user is registered', () => {
-        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
+        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false, customerType: 'registered'})
         useQuery.mockReturnValue(defaultUseQueryMock())
         renderResultsPage()
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()

@@ -66,7 +66,7 @@ const isCancellable = (order) => {
 }
 
 const GuestOrderLookupOrder = () => {
-    const {formatMessage, formatDate, formatTime} = useIntl()
+    const {formatMessage, formatDate} = useIntl()
     const breadcrumbStyles = useStyleConfig('Breadcrumb')
     const {isRegistered} = useCustomerType()
     const history = useHistory()
@@ -86,8 +86,6 @@ const GuestOrderLookupOrder = () => {
         isError,
         error,
         isFetching,
-        isSuccess,
-        dataUpdatedAt,
         refetch
     } = useQuery({
         queryKey: ['guestOrderLookup', 'order', orderNo],
@@ -238,13 +236,6 @@ const GuestOrderLookupOrder = () => {
             // Swallow — stale reasons remain
         }
     }, [])
-
-    const handleRefresh = async () => {
-        const result = await refetch()
-        if (result.error?.status === 404) {
-            history.replace(`/order-lookup?order=${encodeURIComponent(orderNo)}`)
-        }
-    }
 
     // ─── Guards ────────────────────────────────────────────────────────────────
 
@@ -397,45 +388,7 @@ const GuestOrderLookupOrder = () => {
                 </Stack>
             </Stack>
 
-            {/* Refresh Status button + last-updated */}
-            <Flex align="center" gap={4} wrap="wrap">
-                <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleRefresh}
-                    isLoading={isFetching}
-                    loadingText={formatMessage({
-                        id: 'guestOrderLookup.order.button.refreshing',
-                        defaultMessage: 'Refreshing...'
-                    })}
-                >
-                    {formatMessage({
-                        id: 'guestOrderLookup.order.button.refresh',
-                        defaultMessage: 'Refresh Order Status'
-                    })}
-                </Button>
-                {isSuccess && dataUpdatedAt ? (
-                    <Text
-                        fontSize="xs"
-                        color="gray.500"
-                        data-testid="last-updated"
-                        aria-live="polite"
-                    >
-                        {formatMessage(
-                            {
-                                id: 'guestOrderLookup.order.lastUpdated',
-                                defaultMessage: 'Last updated at {time}'
-                            },
-                            {
-                                time: formatTime(new Date(dataUpdatedAt), {
-                                    hour: 'numeric',
-                                    minute: '2-digit'
-                                })
-                            }
-                        )}
-                    </Text>
-                ) : null}
-            </Flex>
+
 
             {/* Cancel / Return buttons — only when OMS is active */}
             {showActions && (
