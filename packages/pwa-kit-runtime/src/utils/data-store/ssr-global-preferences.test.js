@@ -89,6 +89,31 @@ describe('ssr-global-preferences', () => {
                 })
             })
 
+            test('unwraps SCAPI envelope { data: [...], total: N } into a flat map', async () => {
+                mockSend.mockResolvedValue({
+                    Item: {value: {data: [{c_myFlag: true, id: 'grp'}], total: 1}}
+                })
+                await expect(fetchCustomGlobalPreferencesForSsr()).resolves.toEqual({
+                    c_myFlag: true,
+                    id: 'grp'
+                })
+            })
+
+            test('merges multiple preference groups into a single flat map', async () => {
+                mockSend.mockResolvedValue({
+                    Item: {value: {data: [{c_flagA: true}, {c_flagB: 'hello'}], total: 2}}
+                })
+                await expect(fetchCustomGlobalPreferencesForSsr()).resolves.toEqual({
+                    c_flagA: true,
+                    c_flagB: 'hello'
+                })
+            })
+
+            test('returns {} when SCAPI data array is empty', async () => {
+                mockSend.mockResolvedValue({Item: {value: {data: [], total: 0}}})
+                await expect(fetchCustomGlobalPreferencesForSsr()).resolves.toEqual({})
+            })
+
             test('returns empty object on not found', async () => {
                 mockSend.mockResolvedValue({})
                 await expect(fetchCustomGlobalPreferencesForSsr()).resolves.toEqual({})

@@ -129,6 +129,11 @@ export async function getPlainObjectForDataStoreKey({
         // mrt-utilities returns { key, value } or throws DataStoreNotFoundError
         const value = entry?.value
         if (value && typeof value === 'object' && !Array.isArray(value)) {
+            // Unwrap the SCAPI getSiteCustomPreferenceList envelope { data: [...], total: N }
+            // so callers can access attributes directly (e.g. preferences.c_myFlag).
+            if (Array.isArray(value.data)) {
+                return Object.assign({}, ...value.data)
+            }
             return value
         }
         return {}
