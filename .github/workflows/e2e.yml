@@ -139,6 +139,15 @@ jobs:
       # this will not include a11y tests
       - name: Run Playwright tests
         run: npm run test:e2e
+
+      - name: Upload Playwright test results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-no-ext-node-${{ matrix.node }}-npm-${{ matrix.npm }}
+          path: test-results
+          if-no-files-found: ignore
+          retention-days: 7
   notify-slack-pwa-no-ext:
     needs: [run-generator-retail-app-no-ext]
     if: ${{ always() }}
@@ -251,6 +260,15 @@ jobs:
       # this will not include a11y tests
       - name: Run Playwright tests
         run: npm run test:e2e
+
+      - name: Upload Playwright test results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-ext-node-${{ matrix.node }}-npm-${{ matrix.npm }}
+          path: test-results
+          if-no-files-found: ignore
+          retention-days: 7
   notify-slack-pwa-ext:
     needs: [run-generator-retail-app-ext]
     if: ${{ always() }}
@@ -297,6 +315,7 @@ jobs:
       # The current recommended version for Managed Runtime:
       # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
       IS_MRT_NODE: ${{ matrix.node == 24 && matrix.npm == 11 }}
+      RETAIL_APP_HOME: https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -356,22 +375,28 @@ jobs:
           TARGET: e2e-pwa-kit-private
           FLAGS: --wait
 
-      - name: Set Retail App Private Client Home
-        run: export RETAIL_APP_HOME=https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/
-
-      - name: Set PWA Kit E2E Test User
-        run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
-
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
       # this will not include a11y tests
       - name: Run Playwright tests
-        run: npm run test:e2e
+        run: |-
+          echo "RETAIL_APP_HOME=$RETAIL_APP_HOME"
+          test "$RETAIL_APP_HOME" = "https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com"
+          npm run test:e2e
 
       - name: Run a11y test for Node 24 with npm 11
         if: env.IS_MRT_NODE == 'true'
         run: npm run test:e2e:a11y
+
+      - name: Upload Playwright test results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-private-client-node-${{ matrix.node }}-npm-${{ matrix.npm }}
+          path: test-results
+          if-no-files-found: ignore
+          retention-days: 7
   notify-slack-pwa-private-client:
     needs: [run-generator-private-client]
     if: ${{ always() }}
