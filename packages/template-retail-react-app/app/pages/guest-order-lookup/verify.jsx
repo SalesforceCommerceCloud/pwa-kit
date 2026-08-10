@@ -174,9 +174,9 @@ const GuestOrderLookupVerify = () => {
                             )}
                         </Text>
                     ) : (
-                        <Stack spacing={1}>
-                            <Skeleton height="1em" width="100%" />
-                            <Skeleton height="1em" width="60%" />
+                        <Stack spacing={2} alignItems="center">
+                            <Skeleton height="20px" width="88%" />
+                            <Skeleton height="20px" width="55%" />
                         </Stack>
                     )}
                 </Box>
