@@ -50,10 +50,6 @@ const GuestOrderLookupVerify = () => {
     const [serverError, setServerError] = useState(null)
     const inputRefs = useRef([])
 
-    if (authResolved && isRegistered) return <Redirect to="/account/orders" />
-
-    if (!orderNo) return <Redirect to="/order-lookup" />
-
     const handleDigitChange = useCallback(
         (index, value) => {
             const cleaned = value.replace(/\D/g, '').slice(-1)
@@ -88,6 +84,10 @@ const GuestOrderLookupVerify = () => {
         setDigits(next)
         inputRefs.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus()
     }, [])
+
+    // All hooks declared above — early returns must come after all hook calls
+    if (authResolved && isRegistered) return <Redirect to="/account/orders" />
+    if (!orderNo) return <Redirect to="/order-lookup" />
 
     const enteredCode = digits.join('')
     const isComplete = enteredCode.length === OTP_LENGTH
