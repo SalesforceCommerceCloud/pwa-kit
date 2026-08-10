@@ -37,6 +37,7 @@ describe('auth-link-proxy', () => {
 
     afterEach(() => {
         process.env = originalEnv
+        jest.useRealTimers()
         jest.clearAllMocks()
     })
 
@@ -391,6 +392,32 @@ describe('auth-link-proxy', () => {
                 mockFetch.mockRejectedValue(abortError)
 
                 await handleAuthLinkProxy(req, res)
+
+                expect(res.status).toHaveBeenCalledWith(504)
+                expect(res.json).toHaveBeenCalledWith({error: 'SCRT_TIMEOUT'})
+            })
+
+            it('keeps the timeout active while consuming the SCRT response body', async () => {
+                jest.useFakeTimers()
+                mockFetch.mockImplementation((_url, {signal}) =>
+                    Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        json: () =>
+                            new Promise((_resolve, reject) => {
+                                signal.addEventListener('abort', () => {
+                                    const abortError = new Error('The operation was aborted')
+                                    abortError.name = 'AbortError'
+                                    reject(abortError)
+                                })
+                            })
+                    })
+                )
+
+                const responsePromise = handleAuthLinkProxy(req, res)
+                await Promise.resolve()
+                jest.advanceTimersByTime(10000)
+                await responsePromise
 
                 expect(res.status).toHaveBeenCalledWith(504)
                 expect(res.json).toHaveBeenCalledWith({error: 'SCRT_TIMEOUT'})

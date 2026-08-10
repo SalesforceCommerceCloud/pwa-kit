@@ -215,6 +215,7 @@ export async function handleAuthLinkProxy(req, res) {
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), SCRT_FETCH_TIMEOUT_MS)
         let scrtResponse
+        let body = null
         try {
             scrtResponse = await fetch(scrtRequestUrl, {
                 method: 'GET',
@@ -223,15 +224,16 @@ export async function handleAuthLinkProxy(req, res) {
                 },
                 signal: controller.signal
             })
+            try {
+                body = await scrtResponse.json()
+            } catch (err) {
+                if (err?.name === 'AbortError') {
+                    throw err
+                }
+                body = null
+            }
         } finally {
             clearTimeout(timeoutId)
-        }
-
-        let body = null
-        try {
-            body = await scrtResponse.json()
-        } catch {
-            body = null
         }
 
         // Forward the status and body from SCRT

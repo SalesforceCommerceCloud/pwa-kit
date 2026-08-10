@@ -1649,7 +1649,7 @@ describe('ShopperAgent Component', () => {
         })
 
         test('builds full-height side panel options in the default panel display mode', () => {
-            renderCommerceClient({commerceClientPanelWidth: '500px'})
+            renderCommerceClient({cc_dialogWidth: '500px'})
 
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
                 expect.anything(),
@@ -1689,8 +1689,17 @@ describe('ShopperAgent Component', () => {
             expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'bottom-left'})
         })
 
-        test('sends dialogFullHeight false explicitly so the widget default cannot win', () => {
-            renderCommerceClient({cc_dialogFullHeight: 'false', cc_displayType: 'dialog'})
+        describe('auth-link identity change survives remount', () => {
+            // The global test StorageMock (jest-setup.js) keeps every value under
+            // a single `.store` field. Write each key through setItem and mirror
+            // it as an own property to preserve the browser-like fixtures used by
+            // the wider test block.
+            const trackedKeys = new Set()
+            const seedKey = (key, value) => {
+                window.sessionStorage.setItem(key, value)
+                window.sessionStorage[key] = value
+                trackedKeys.add(key)
+            }
 
             const calls = mockedUseCommerceClientMessaging.mock.calls
             const widgetOptions = calls[calls.length - 1][1]
@@ -1807,23 +1816,254 @@ describe('ShopperAgent Component', () => {
                 await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
             })
 
-            test('re-links on a clear-chat widget-ready even when storage has not rotated', async () => {
-                // Clear-chat starts a NEW conversation and re-fires
-                // onCimulateWidgetReady, but the widget may not have rewritten
-                // cim_af_conv_*/cim_af_ct_* yet — so performAuthLink reads the
-                // SAME conversationId and (same shopper) the SAME dedup key it
-                // linked last time. The new-conversation trigger must force past
-                // the dedup guard so the fresh conversation still links; without
-                // the force flag this second widget-ready silently no-ops.
+            test('waits for the rotated JWT before linking a clear-chat conversation', async () => {
+                seedWidgetStorage()
+
+                renderCommerceClient()
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                // Shopper clears the chat, but the widget-ready event arrives
+                // before Commerce Client rotates the token in storage.
+                await fireWidgetReady()
+                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1)
+
+                seedKey(
+                    'cim_af_ct_test-org-id_My_Embedded_Service',
+                    JSON.stringify({
+                        accessToken: 'rotated.jwt.token',
+                        lastEventId: '2',
+                        storedAt: 2
+                    })
+                )
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+                expect(mockCallAuthLinkProxy).toHaveBeenLastCalledWith({
+                    commerceClientJWT: 'rotated.jwt.token'
+                })
+            })
+
+            test('waits for rotation when clear-chat fires before the first link succeeds', async () => {
+                seedWidgetStorage()
+                const firstBridge = {}
+                firstBridge.promise = new Promise((resolve) => {
+                    firstBridge.resolve = resolve
+                })
+                mockCallTokenBridge
+                    .mockImplementationOnce(() => firstBridge.promise)
+                    .mockResolvedValue({status: 200, body: {ok: true}})
+
+                renderCommerceClient()
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                await fireWidgetReady()
+                seedKey(
+                    'cim_af_ct_test-org-id_My_Embedded_Service',
+                    JSON.stringify({
+                        accessToken: 'rotated.jwt.token',
+                        lastEventId: '2',
+                        storedAt: 2
+                    })
+                )
+                await act(async () => {
+                    firstBridge.resolve({status: 200, body: {ok: true}})
+                    await firstBridge.promise
+                })
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+                expect(mockCallAuthLinkProxy).toHaveBeenLastCalledWith({
+                    commerceClientJWT: 'rotated.jwt.token'
+                })
+            })
+
+            test('waits for rotation when widget-ready fires before the queued first link starts', async () => {
                 seedWidgetStorage()
 
                 renderCommerceClient()
                 await fireWidgetReady()
+
+                seedKey(
+                    'cim_af_ct_test-org-id_My_Embedded_Service',
+                    JSON.stringify({
+                        accessToken: 'rotated.jwt.token',
+                        lastEventId: '2',
+                        storedAt: 2
+                    })
+                )
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1)
+                expect(mockCallAuthLinkProxy).toHaveBeenCalledWith({
+                    commerceClientJWT: 'rotated.jwt.token'
+                })
+            })
+
+            test('ignores a stale WEB_STORAGE JWT when the scoped conversation token rotates', async () => {
+                seedWidgetStorage()
+                const webStorageKey = 'test_WEB_STORAGE'
+                const staleWebStorage = JSON.stringify({JWT: 'jwt.token.here'})
+                window.localStorage.setItem(webStorageKey, staleWebStorage)
+                window.localStorage[webStorageKey] = staleWebStorage
+
+                renderCommerceClient()
                 await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
 
-                // Shopper clears the chat: same identity, storage not yet rotated.
                 await fireWidgetReady()
+                seedKey(
+                    'cim_af_ct_test-org-id_My_Embedded_Service',
+                    JSON.stringify({
+                        accessToken: 'rotated.jwt.token',
+                        lastEventId: '2',
+                        storedAt: 2
+                    })
+                )
+
                 await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+                expect(mockCallAuthLinkProxy).toHaveBeenLastCalledWith({
+                    commerceClientJWT: 'rotated.jwt.token'
+                })
+
+                delete window.localStorage[webStorageKey]
+            })
+
+            test('ignores tokens and conversations from a different Commerce Client deployment', async () => {
+                seedKey(
+                    'cim_af_ct_other-org_Other_Service',
+                    JSON.stringify({accessToken: 'other.jwt.token', storedAt: 2})
+                )
+                seedKey(
+                    'cim_af_conv_other-org_Other_Service',
+                    JSON.stringify({conversationId: 'other-conversation', storedAt: 2})
+                )
+                seedWidgetStorage()
+
+                renderCommerceClient()
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                expect(mockCallAuthLinkProxy).toHaveBeenCalledWith({
+                    commerceClientJWT: 'jwt.token.here'
+                })
+            })
+
+            test('does not let an older auth-link attempt overwrite a newer shopper link', async () => {
+                seedWidgetStorage()
+                const firstBridge = {}
+                firstBridge.promise = new Promise((resolve) => {
+                    firstBridge.resolve = resolve
+                })
+                mockCallTokenBridge
+                    .mockImplementationOnce(() => firstBridge.promise)
+                    .mockResolvedValue({status: 200, body: {ok: true}})
+
+                const {rerender} = renderCommerceClient()
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                mockedUseCustomerType.mockReturnValue({
+                    customerType: 'registered',
+                    isGuest: false,
+                    isRegistered: true,
+                    isExternal: false
+                })
+                mockedUseUsid.mockReturnValue({usid: 'registered-usid'})
+                await act(async () => {
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={true}
+                        />
+                    )
+                })
+
+                expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                await act(async () => {
+                    firstBridge.resolve({status: 200, body: {ok: true}})
+                    await firstBridge.promise
+                })
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+
+                await act(async () => {
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={false}
+                        />
+                    )
+                })
+                await act(async () => {
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={true}
+                        />
+                    )
+                })
+
+                await waitFor(() => {})
+                expect(mockCallTokenBridge).toHaveBeenCalledTimes(2)
+            })
+
+            test('does not let a pre-remount auth-link attempt overwrite the remounted shopper link', async () => {
+                seedWidgetStorage()
+                const firstBridge = {}
+                firstBridge.promise = new Promise((resolve) => {
+                    firstBridge.resolve = resolve
+                })
+                mockCallTokenBridge
+                    .mockImplementationOnce(() => firstBridge.promise)
+                    .mockResolvedValue({status: 200, body: {ok: true}})
+
+                const {rerender} = renderCommerceClient()
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                await act(async () => {
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={false}
+                        />
+                    )
+                })
+                mockedUseCustomerType.mockReturnValue({
+                    customerType: 'registered',
+                    isGuest: false,
+                    isRegistered: true,
+                    isExternal: false
+                })
+                mockedUseUsid.mockReturnValue({usid: 'registered-usid'})
+                await act(async () => {
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={true}
+                        />
+                    )
+                })
+
+                expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                await act(async () => {
+                    firstBridge.resolve({status: 200, body: {ok: true}})
+                    await firstBridge.promise
+                })
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+
+                await act(async () => {
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={false}
+                        />
+                    )
+                })
+                await act(async () => {
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={true}
+                        />
+                    )
+                })
+
+                await waitFor(() => {})
+                expect(mockCallTokenBridge).toHaveBeenCalledTimes(2)
             })
 
             test('re-links on remount when useScript reports not-loaded but the bundle global exists', async () => {

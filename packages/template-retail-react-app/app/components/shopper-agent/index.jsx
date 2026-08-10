@@ -595,6 +595,11 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  *
  * @param {Object} props - Component props
  * @param {Object} props.commerceAgentConfiguration - Commerce agent configuration object
+ * @param {Object} props.lastAuthLinkKeyRef - Last successful conversation/shopper link key
+ * @param {Object} props.lastCommerceClientJWTRef - Last successfully linked Commerce Client JWT
+ * @param {Object} props.authLinkGenerationRef - Monotonic auth-link attempt generation
+ * @param {Object} props.authLinkQueueRef - Serialized auth-link operation queue
+ * @param {Object} props.lastAttemptedCommerceClientJWTRef - JWT used by the latest auth-link attempt
  * @param {string} props.commerceAgentConfiguration.scrt2Url - SCRT2 URL (passed to `messagingConfig.scrt2Url`)
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID (passed to `messagingConfig.orgId`)
  * @param {string} [props.commerceAgentConfiguration.cc_esDeveloperName] - Embedded Service developer name
@@ -622,7 +627,14 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {Object} [props.commerceAgentConfiguration.cc_overrides] - Optional inline map of widget override keys (e.g. `ProductTile`) to already-registered custom element tag names, forwarded as `overrides`. Mutually exclusive with `cc_overridesUrl`, which it takes precedence over
  * @returns {JSX.Element} A container element the Commerce Client widget is rendered into
  */
-const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
+const CommerceClientAgentWindow = ({
+    commerceAgentConfiguration,
+    lastAuthLinkKeyRef,
+    lastCommerceClientJWTRef,
+    authLinkGenerationRef,
+    authLinkQueueRef,
+    lastAttemptedCommerceClientJWTRef
+}) => {
     const {
         scrt2Url,
         salesforceOrgId,
@@ -689,14 +701,20 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
     const identityRef = useRef({usid, customerType})
     identityRef.current = {usid, customerType}
 
-    // Composite dedup key of the last SUCCESSFUL link: `${conversationId}:${slasIdentity}`.
-    // Tracks *whose* identity is linked to *which* conversation, so redundant
-    // re-opens are skipped while a genuine identity change on either side still
-    // re-links.
-    const lastAuthLinkKeyRef = useRef(null)
-
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
     const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
+    const commerceClientStorageScope = `${salesforceOrgId}_${
+        cc_esDeveloperName || embeddedServiceName
+    }`
+    const commerceClientTokenKey = `cim_af_ct_${commerceClientStorageScope}`
+    const commerceClientConversationKey = `cim_af_conv_${commerceClientStorageScope}`
+    const isCommerceClientReady =
+        !scriptLoadStatus?.error &&
+        (scriptLoadStatus?.loaded || (onClient && Boolean(window.CimulateMessaging)))
+    const effectiveScriptLoadStatus = useMemo(
+        () => ({loaded: isCommerceClientReady, error: Boolean(scriptLoadStatus?.error)}),
+        [isCommerceClientReady, scriptLoadStatus?.error]
+    )
 
     // The helpers below feed the two re-link triggers (new conversation, SLAS
     // identity change), which both route through the idempotent performAuthLink().
@@ -715,17 +733,13 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
     }
 
     /**
-     * Read the Commerce Client conversationId from the cim_af_conv_* session
+     * Read the Commerce Client conversationId from this widget's scoped session
      * key (value shape: {"conversationId":"...","storedAt":...}). Returns null
      * if not present yet (e.g. conversation still being created).
      */
     const readConversationId = () => {
         try {
-            const convKey = Object.keys(window.sessionStorage).find((key) =>
-                key.startsWith('cim_af_conv_')
-            )
-            if (!convKey) return null
-            const value = window.sessionStorage.getItem(convKey)
+            const value = window.sessionStorage.getItem(commerceClientConversationKey)
             return value ? JSON.parse(value)?.conversationId || null : null
         } catch (err) {
             console.error('[Commerce Client] Failed to read conversationId', err)
@@ -734,23 +748,17 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
     }
 
     /**
-     * Extract the Commerce Client JWT from storage. Checks, in order:
-     * localStorage *_WEB_STORAGE (.JWT), localStorage cim_af_ct_* (.accessToken),
-     * then the same two in sessionStorage. Returns null if none are present.
+     * Extract this widget's Commerce Client JWT from its scoped cim_af_ct_* key.
+     * The session-scoped value is authoritative; localStorage is a compatibility
+     * fallback for SDK versions that persist the same scoped key there.
      */
-    const extractCommerceClientJWT = () => {
-        const stores = [window.localStorage, window.sessionStorage]
+    const extractCommerceClientJWT = (excludedJWT = null) => {
+        const stores = [window.sessionStorage, window.localStorage]
         for (const store of stores) {
             try {
-                const webKey = Object.keys(store).find((k) => k.endsWith('_WEB_STORAGE'))
-                if (webKey) {
-                    const data = JSON.parse(store.getItem(webKey) || 'null')
-                    if (data?.JWT) return data.JWT
-                }
-                const ctKey = Object.keys(store).find((k) => k.startsWith('cim_af_ct_'))
-                if (ctKey) {
-                    const data = JSON.parse(store.getItem(ctKey) || 'null')
-                    if (data?.accessToken) return data.accessToken
+                const data = JSON.parse(store.getItem(commerceClientTokenKey) || 'null')
+                if (data?.accessToken && data.accessToken !== excludedJWT) {
+                    return data.accessToken
                 }
             } catch (err) {
                 console.error('[Commerce Client] Failed to parse storage for JWT', err)
@@ -770,12 +778,13 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
      * lands within the first second; the cap only affects the give-up path.
      */
     const waitForCommerceClientJWT = async (
+        excludedJWT = null,
         maxRetries = 8,
         initialDelay = 100,
         maxDelay = 1000
     ) => {
         for (let attempt = 0; attempt < maxRetries; attempt++) {
-            const jwt = extractCommerceClientJWT()
+            const jwt = extractCommerceClientJWT(excludedJWT)
             if (jwt) return jwt
             // No point sleeping after the last check — nothing reads the result.
             if (attempt === maxRetries - 1) break
@@ -793,88 +802,116 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
      * @param {Object} opts
      * @param {string} opts.reason - Diagnostic label for the triggering signal.
      */
-    const performAuthLink = async ({reason, force = false}) => {
-        const {organizationId: orgId, configSiteId: sid, myDomain: domain} = configRef.current
-        if (!orgId || !sid) {
-            console.error('[Commerce Client] performAuthLink: missing organizationId or siteId')
-            return
+    const performAuthLink = ({reason, excludedJWT = null}) => {
+        const generation = ++authLinkGenerationRef.current
+        const scheduledJWT = extractCommerceClientJWT()
+        if (scheduledJWT) {
+            lastAttemptedCommerceClientJWTRef.current = scheduledJWT
         }
-
-        // The Token Bridge reaches Core, which needs my_domain resolved. The mount
-        // is already gated on !isConfigurationsLoading, so this is a defensive skip
-        // rather than a call to the bridge with an unresolved domain.
-        if (!domain) {
-            console.warn(`[Commerce Client] performAuthLink(${reason}): my_domain not resolved yet`)
-            return
-        }
-
-        const slasIdentity = getSlasIdentity()
-
-        try {
-            const commerceClientJWT = await waitForCommerceClientJWT()
-            if (!commerceClientJWT) {
-                console.warn(`[Commerce Client] performAuthLink(${reason}): no JWT after polling`)
+        const run = async () => {
+            const {organizationId: orgId, configSiteId: sid, myDomain: domain} = configRef.current
+            if (!orgId || !sid) {
+                console.error('[Commerce Client] performAuthLink: missing organizationId or siteId')
                 return
             }
 
-            // Dedup on (conversation, shopper). conversationId is read here — after
-            // the JWT poll — so a still-creating conversation has time to appear.
-            // `force` (set by the new-conversation trigger) bypasses the guard: a
-            // brand-new conversation must always re-link, even when the freshly
-            // read conversationId still matches the previous link key.
-            const conversationId = readConversationId()
-            const linkKey = `${conversationId || 'unknown'}:${slasIdentity}`
-            if (!force && lastAuthLinkKeyRef.current === linkKey) {
-                // Already linked this exact (conversation, shopper) pair.
+            // The Token Bridge reaches Core, which needs my_domain resolved. The mount
+            // is already gated on !isConfigurationsLoading, so this is a defensive skip
+            // rather than a call to the bridge with an unresolved domain.
+            if (!domain) {
                 console.warn(
-                    `[Commerce Client] performAuthLink(${reason}): already linked, skipping`
+                    `[Commerce Client] performAuthLink(${reason}): my_domain not resolved yet`
                 )
                 return
             }
 
-            const isHttpOnly =
-                typeof window !== 'undefined'
-                    ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
-                    : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+            const slasIdentity = getSlasIdentity()
 
-            const slasAccessToken = isHttpOnly ? undefined : await getTokenWhenReadyRef.current()
+            try {
+                const commerceClientJWT = await waitForCommerceClientJWT(excludedJWT)
+                if (!commerceClientJWT) {
+                    console.warn(
+                        `[Commerce Client] performAuthLink(${reason}): no JWT after polling`
+                    )
+                    return
+                }
+                lastAttemptedCommerceClientJWTRef.current = commerceClientJWT
+                if (generation !== authLinkGenerationRef.current) return
 
-            // Step 1: auth link key from SCRT. The SCRT authlink endpoint
-            // authenticates with the Commerce Client JWT (Bearer) alone — it
-            // needs neither the siteId nor the conversationId.
-            const authLinkResponse = await callAuthLinkProxy({commerceClientJWT})
-            const authLinkKey = authLinkResponse?.auth_link_key || authLinkResponse?.authLinkKey
-            if (!authLinkKey || typeof authLinkKey !== 'string') {
-                console.error(
-                    `[Commerce Client] performAuthLink(${reason}): no auth link key`,
-                    authLinkResponse
-                )
-                return
-            }
+                // Dedup on (conversation, shopper). conversationId is read here — after
+                // the JWT poll — so a still-creating conversation has time to appear.
+                // A new-conversation trigger waits for a different JWT before reaching
+                // this guard, so it can bypass a still-stale conversationId safely.
+                const conversationId = readConversationId()
+                const linkKey = `${conversationId || 'unknown'}:${slasIdentity}`
+                if (!excludedJWT && lastAuthLinkKeyRef.current === linkKey) {
+                    // Already linked this exact (conversation, shopper) pair.
+                    console.warn(
+                        `[Commerce Client] performAuthLink(${reason}): already linked, skipping`
+                    )
+                    return
+                }
 
-            // Step 2: token bridge (links conversation to the SLAS shopper)
-            const result = await callTokenBridge({authLinkKey, slasAccessToken, siteId: sid})
-            if (result.status !== HTTP_OK) {
-                const errorCode = result.body?.error || `HTTP_${result.status}`
-                console.error(`[Commerce Client] performAuthLink(${reason}): token bridge failed`, {
-                    status: result.status,
-                    error: errorCode
-                })
+                const isHttpOnly =
+                    typeof window !== 'undefined'
+                        ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
+                        : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+
+                const slasAccessToken = isHttpOnly
+                    ? undefined
+                    : await getTokenWhenReadyRef.current()
+                if (generation !== authLinkGenerationRef.current) return
+
+                // Step 1: auth link key from SCRT. The SCRT authlink endpoint
+                // authenticates with the Commerce Client JWT (Bearer) alone — it
+                // needs neither the siteId nor the conversationId.
+                const authLinkResponse = await callAuthLinkProxy({commerceClientJWT})
+                if (generation !== authLinkGenerationRef.current) return
+                const authLinkKey = authLinkResponse?.auth_link_key || authLinkResponse?.authLinkKey
+                if (!authLinkKey || typeof authLinkKey !== 'string') {
+                    console.error(
+                        `[Commerce Client] performAuthLink(${reason}): no auth link key`,
+                        authLinkResponse
+                    )
+                    return
+                }
+
+                // Step 2: token bridge (links conversation to the SLAS shopper).
+                // Operations are serialized so the newest identity is the final
+                // server-side mutation even when an older request was already sent.
+                const result = await callTokenBridge({authLinkKey, slasAccessToken, siteId: sid})
+                if (generation !== authLinkGenerationRef.current) return
+                if (result.status !== HTTP_OK) {
+                    const errorCode = result.body?.error || `HTTP_${result.status}`
+                    console.error(
+                        `[Commerce Client] performAuthLink(${reason}): token bridge failed`,
+                        {
+                            status: result.status,
+                            error: errorCode
+                        }
+                    )
+                    toastRef.current({
+                        title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+                        status: 'error'
+                    })
+                    return
+                }
+
+                lastAuthLinkKeyRef.current = linkKey
+                lastCommerceClientJWTRef.current = commerceClientJWT
+            } catch (error) {
+                if (generation !== authLinkGenerationRef.current) return
+                console.error(`[Commerce Client] performAuthLink(${reason}) threw`, error)
                 toastRef.current({
                     title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
                     status: 'error'
                 })
-                return
             }
-
-            lastAuthLinkKeyRef.current = linkKey
-        } catch (error) {
-            console.error(`[Commerce Client] performAuthLink(${reason}) threw`, error)
-            toastRef.current({
-                title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
-                status: 'error'
-            })
         }
+
+        const queued = authLinkQueueRef.current.then(run, run)
+        authLinkQueueRef.current = queued
+        return queued
     }
 
     // Keep a stable ref so window listeners registered once always call the
@@ -892,21 +929,24 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
      * new conversation's token to land.
      */
     useEffect(() => {
-        if (!scriptLoadStatus?.loaded || scriptLoadStatus?.error) {
+        if (!isCommerceClientReady) {
             return
         }
         const handleWidgetReady = () => {
-            // A new conversation (including after the shopper clears the chat)
-            // must always (re)link to the current shopper. Force past the dedup
-            // guard: the previous conversation's link key would otherwise make
-            // performAuthLink treat this as already-linked and silently no-op.
-            performAuthLinkRef.current({reason: 'widget-ready', force: true})
+            // Clear-chat can dispatch this event before storage rotates. Wait for
+            // the new token rather than authenticating the previous conversation.
+            const excludedJWT =
+                lastCommerceClientJWTRef.current || lastAttemptedCommerceClientJWTRef.current
+            performAuthLinkRef.current({
+                reason: 'widget-ready',
+                excludedJWT: excludedJWT || null
+            })
         }
         window.addEventListener('onCimulateWidgetReady', handleWidgetReady)
         return () => {
             window.removeEventListener('onCimulateWidgetReady', handleWidgetReady)
         }
-    }, [scriptLoadStatus])
+    }, [isCommerceClientReady])
 
     /**
      * Trigger 2 — SLAS shopper identity transition.
@@ -918,21 +958,25 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
      */
     const prevSlasIdentityRef = useRef(undefined)
     useEffect(() => {
-        if (!scriptLoadStatus?.loaded || scriptLoadStatus?.error) {
+        if (!isCommerceClientReady) {
             return
         }
         const identity = getSlasIdentity()
         const prev = prevSlasIdentityRef.current
         prevSlasIdentityRef.current = identity
 
-        // Skip initial mount — the widget-ready trigger handles first link.
+        // A resumed conversation does not emit widget-ready, so link it here.
+        // A genuine cold start still waits for the widget-ready trigger.
         if (prev === undefined) {
+            if (readConversationId()) {
+                performAuthLinkRef.current({reason: 'resumed-conversation'})
+            }
             return
         }
         if (prev !== identity) {
             performAuthLinkRef.current({reason: 'slas-identity-change'})
         }
-    }, [customerType, usid, scriptLoadStatus])
+    }, [customerType, usid, isCommerceClientReady])
 
     const isDialog = cc_displayType === 'dialog'
     const isFullHeight = isDialog && cc_dialogFullHeight === 'true'
@@ -1019,7 +1063,7 @@ const CommerceClientAgentWindow = ({commerceAgentConfiguration}) => {
     )
 
     // Inject the widget into the container once the bundle is loaded
-    useCommerceClientMessaging(scriptLoadStatus, widgetOptions)
+    useCommerceClientMessaging(effectiveScriptLoadStatus, widgetOptions)
 
     return (
         <>
@@ -1042,7 +1086,12 @@ CommerceClientAgentWindow.propTypes = {
      * @type {Object}
      * @required
      */
-    commerceAgentConfiguration: PropTypes.object.isRequired
+    commerceAgentConfiguration: PropTypes.object.isRequired,
+    lastAuthLinkKeyRef: PropTypes.shape({current: PropTypes.string}).isRequired,
+    lastCommerceClientJWTRef: PropTypes.shape({current: PropTypes.string}).isRequired,
+    authLinkGenerationRef: PropTypes.shape({current: PropTypes.number}).isRequired,
+    authLinkQueueRef: PropTypes.shape({current: PropTypes.object}).isRequired,
+    lastAttemptedCommerceClientJWTRef: PropTypes.shape({current: PropTypes.string}).isRequired
 }
 
 /**
@@ -1078,6 +1127,14 @@ CommerceClientAgentWindow.propTypes = {
  * @see {@link isEnabled} - Enabled state checker
  */
 const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
+    // Preserve successful-link state while the inner widget unmounts during a
+    // basket refresh so a same-identity remount stays deduped and login re-links.
+    const lastAuthLinkKeyRef = useRef(null)
+    const lastCommerceClientJWTRef = useRef(null)
+    const authLinkGenerationRef = useRef(0)
+    const authLinkQueueRef = useRef(Promise.resolve())
+    const lastAttemptedCommerceClientJWTRef = useRef(null)
+
     // Extract enabled state and provider from configuration.
     // `provider` defaults to 'miaw' to preserve backwards compatibility with the
     // existing Salesforce Embedded Messaging (MIAW) integration.
@@ -1107,6 +1164,11 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
             <div data-testid="shopper-agent">
                 <CommerceClientAgentWindow
                     commerceAgentConfiguration={commerceAgentConfiguration}
+                    lastAuthLinkKeyRef={lastAuthLinkKeyRef}
+                    lastCommerceClientJWTRef={lastCommerceClientJWTRef}
+                    authLinkGenerationRef={authLinkGenerationRef}
+                    authLinkQueueRef={authLinkQueueRef}
+                    lastAttemptedCommerceClientJWTRef={lastAttemptedCommerceClientJWTRef}
                 />
             </div>
         ) : null
