@@ -163,21 +163,22 @@ const GuestOrderLookupVerify = () => {
                             defaultMessage: 'Verify Your Email'
                         })}
                     </Heading>
-                    <Text color="gray.600">
-                        {formatMessage(
-                            {
-                                id: 'guestOrderLookup.verify.subtext',
-                                defaultMessage: "We've sent a verification code to {email}. Please enter it below."
-                            },
-                            {
-                                email: email ? (
-                                    <Text as="span" fontWeight="medium">{email}</Text>
-                                ) : (
-                                    <Skeleton as="span" display="inline-block" height="1em" width="160px" verticalAlign="middle" />
-                                )
-                            }
-                        )}
-                    </Text>
+                    {email ? (
+                        <Text color="gray.600">
+                            {formatMessage(
+                                {
+                                    id: 'guestOrderLookup.verify.subtext',
+                                    defaultMessage: "We've sent a verification code to {email}. Please enter it below."
+                                },
+                                {email}
+                            )}
+                        </Text>
+                    ) : (
+                        <Stack spacing={1}>
+                            <Skeleton height="1em" width="100%" />
+                            <Skeleton height="1em" width="60%" />
+                        </Stack>
+                    )}
                 </Box>
 
                 <Box

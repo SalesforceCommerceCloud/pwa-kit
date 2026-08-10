@@ -326,9 +326,8 @@ describe('GuestOrderLookupVerify', () => {
             </MemoryRouter>
         )
         expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
-        // Skeleton renders in place of the email address
-        const subtextEl = screen.getByText(/We've sent a verification code to/)
-        expect(subtextEl).toBeInTheDocument()
+        // Subtext replaced by two skeleton lines — no prose text rendered
+        expect(screen.queryByText(/We've sent a verification code to/)).not.toBeInTheDocument()
     })
 
     test('redirects to /account/orders when user is registered', () => {
