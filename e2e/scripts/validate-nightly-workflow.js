@@ -8,8 +8,7 @@
 const fs = require('fs')
 const yaml = require('js-yaml')
 
-const PRIVATE_CLIENT_HOME =
-    'https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com'
+const PRIVATE_CLIENT_HOME = 'https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com'
 const MATRIX_JOBS = [
     ['run-generator-retail-app-no-ext', 'no-ext'],
     ['run-generator-retail-app-ext', 'ext'],
@@ -42,9 +41,7 @@ const validateNightlyWorkflow = (workflow) => {
 
     for (const [jobId, flavor] of MATRIX_JOBS) {
         const job = jobs[jobId]
-        const artifactStep = job?.steps?.find(
-            (step) => step.uses === 'actions/upload-artifact@v4'
-        )
+        const artifactStep = job?.steps?.find((step) => step.uses === 'actions/upload-artifact@v4')
         const expectedName = `playwright-results-${flavor}-node-\${{ matrix.node }}-npm-\${{ matrix.npm }}`
 
         requireCondition(artifactStep, `${jobId} must upload Playwright results`)

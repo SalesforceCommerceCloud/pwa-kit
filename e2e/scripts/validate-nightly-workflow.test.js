@@ -10,9 +10,7 @@ const {loadWorkflow, validateNightlyWorkflow} = require('./validate-nightly-work
 
 describe('nightly E2E workflow', () => {
     test('targets private-client and preserves uniquely named failure artifacts', () => {
-        const workflow = loadWorkflow(
-            path.resolve(__dirname, '../../.github/workflows/e2e.yml')
-        )
+        const workflow = loadWorkflow(path.resolve(__dirname, '../../.github/workflows/e2e.yml'))
 
         expect(() => validateNightlyWorkflow(workflow)).not.toThrow()
     })
