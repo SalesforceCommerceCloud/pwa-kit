@@ -54,11 +54,11 @@ const GuestOrderLookupRequest = () => {
         } catch (err) {
             // Route to verify regardless (anti-enumeration — never leak order existence).
             if (err?.response?.status === 400) {
-                history.push('/order-lookup/verify', {orderNo, email})
+                history.push(`/order-lookup/verify/${encodeURIComponent(orderNo)}`, {email})
                 return
             }
         }
-        history.push('/order-lookup/verify', {orderNo, email})
+        history.push(`/order-lookup/verify/${encodeURIComponent(orderNo)}`, {email})
     }
 
     return (
