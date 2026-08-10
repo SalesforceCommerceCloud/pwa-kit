@@ -86,6 +86,7 @@ const GuestOrderLookupOrder = () => {
         isError,
         error,
         isFetching,
+        fetchStatus,
         refetch
     } = useQuery({
         queryKey: ['guestOrderLookup', 'order', orderNo],
@@ -106,7 +107,7 @@ const GuestOrderLookupOrder = () => {
             }
             return res.json()
         },
-        enabled: !!orderNo,
+        enabled: !!orderNo && typeof window !== 'undefined',
         retry: false,
         staleTime: 15 * 60 * 1000,
         gcTime: 15 * 60 * 1000
@@ -245,7 +246,7 @@ const GuestOrderLookupOrder = () => {
 
     // ─── Loading ───────────────────────────────────────────────────────────────
 
-    if (isLoading) {
+    if (isLoading || fetchStatus === 'idle') {
         return (
             <Box layerStyle="page"><Stack spacing={6}>
                 <Skeleton height="20px" width="200px" />
