@@ -106,6 +106,10 @@ const logger = createLogger({packageName: 'pwa-kit-runtime'})
  * Uses the DataStore singleton from mrt-utilities. The conditional export ensures
  * the correct implementation loads (dev-data-store in development, DynamoDB in production).
  *
+ * When the stored value is a SCAPI preference-list envelope `{ data: [...], total: N }`,
+ * the `data` array is automatically flattened into a single map via a shallow merge
+ * (later groups win on key collision). Non-object elements in `data` are skipped.
+ *
  * @param {{
  *   dataStoreKey: string | null,
  *   logNamespace: string,
@@ -129,10 +133,15 @@ export async function getPlainObjectForDataStoreKey({
         // mrt-utilities returns { key, value } or throws DataStoreNotFoundError
         const value = entry?.value
         if (value && typeof value === 'object' && !Array.isArray(value)) {
-            // Unwrap the SCAPI getSiteCustomPreferenceList envelope { data: [...], total: N }
-            // so callers can access attributes directly (e.g. preferences.c_myFlag).
-            if (Array.isArray(value.data)) {
-                return Object.assign({}, ...value.data)
+            // Unwrap SCAPI preference-list envelopes { data: [...], total: N }.
+            // Guarding on `total` being a number prevents false-positives on plain preference
+            // objects that happen to have a `data` array attribute.
+            // Non-object elements in `data` are skipped; later groups win on key collision (shallow merge).
+            if (Array.isArray(value.data) && typeof value.total === 'number') {
+                const groups = value.data.filter(
+                    (item) => item !== null && typeof item === 'object' && !Array.isArray(item)
+                )
+                return Object.assign({}, ...groups)
             }
             return value
         }

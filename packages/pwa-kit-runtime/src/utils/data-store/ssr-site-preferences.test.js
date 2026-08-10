@@ -137,6 +137,34 @@ describe('ssr-site-preferences', () => {
                 ).resolves.toEqual({})
             })
 
+            test('skips non-object elements in envelope data array', async () => {
+                mockSend.mockResolvedValue({
+                    Item: {value: {data: [null, {c_flag: true}, 'bad', 42], total: 4}}
+                })
+                await expect(
+                    fetchCustomSitePreferencesForSsr({siteId: 'RefArch'})
+                ).resolves.toEqual({c_flag: true})
+            })
+
+            test('later group wins on key collision (shallow merge, last-write-wins)', async () => {
+                mockSend.mockResolvedValue({
+                    Item: {value: {data: [{c_x: 1}, {c_x: 2}], total: 2}}
+                })
+                await expect(
+                    fetchCustomSitePreferencesForSsr({siteId: 'RefArch'})
+                ).resolves.toEqual({c_x: 2})
+            })
+
+            test('passes through a plain object with a data array attribute when total is absent', async () => {
+                // A merchant preference stored as a plain object with a `data` key (no `total`)
+                // must NOT be treated as an envelope — it should be returned unchanged.
+                const rawValue = {data: ['a', 'b'], c_otherFlag: true}
+                mockSend.mockResolvedValue({Item: {value: rawValue}})
+                await expect(
+                    fetchCustomSitePreferencesForSsr({siteId: 'RefArch'})
+                ).resolves.toEqual(rawValue)
+            })
+
             test('returns empty object on not found', async () => {
                 mockSend.mockResolvedValue({})
                 await expect(
