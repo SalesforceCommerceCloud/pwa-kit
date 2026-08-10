@@ -52,10 +52,18 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
 })
 const PaymentProcessing = loadable(() => import('./pages/checkout/payment-processing'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
-const GuestOrderLookupRequest = loadable(() => import('./pages/guest-order-lookup/request'), {fallback})
-const GuestOrderLookupVerify = loadable(() => import('./pages/guest-order-lookup/verify'), {fallback})
-const GuestOrderLookupOrder = loadable(() => import('./pages/guest-order-lookup/order'), {fallback})
-const GuestOrderLookupResults = loadable(() => import('./pages/guest-order-lookup/results'), {fallback})
+const GuestOrderLookupRequest = loadable(() => import('./pages/guest-order-lookup/request'), {
+    fallback
+})
+const GuestOrderLookupVerify = loadable(() => import('./pages/guest-order-lookup/verify'), {
+    fallback
+})
+const GuestOrderLookupOrder = loadable(() => import('./pages/guest-order-lookup/order'), {
+    fallback
+})
+const GuestOrderLookupResults = loadable(() => import('./pages/guest-order-lookup/results'), {
+    fallback
+})
 
 export const routes = [
     {
