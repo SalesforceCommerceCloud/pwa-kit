@@ -5,6 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+jest.mock('@playwright/test', () => {
+    throw new Error('checkout helper must not load the Playwright test runner')
+})
+
 const {advanceToPayment} = require('./checkout')
 
 const createSequence = (values) => {
@@ -37,7 +41,8 @@ const createCheckout = ({
     }
     const page = {
         getByRole: jest.fn().mockReturnValue(payment),
-        getByTestId: jest.fn().mockReturnValue(form)
+        getByTestId: jest.fn().mockReturnValue(form),
+        waitForTimeout: jest.fn().mockResolvedValue()
     }
 
     return {page, payment, form, button}
@@ -74,9 +79,10 @@ describe('advanceToPayment', () => {
 
         await advanceToPayment(checkout.page)
 
-        expect(checkout.payment.isVisible).toHaveBeenCalledTimes(4)
+        expect(checkout.payment.isVisible).toHaveBeenCalledTimes(3)
         expect(checkout.button.isVisible).toHaveBeenCalledTimes(1)
         expect(checkout.button.isEnabled).not.toHaveBeenCalled()
+        expect(checkout.page.waitForTimeout).toHaveBeenCalledWith(100)
         expect(checkout.button.click).not.toHaveBeenCalled()
         expect(checkout.payment.waitFor).not.toHaveBeenCalled()
     })

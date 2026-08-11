@@ -5,6 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+jest.mock('./utils', () => {
+    throw new Error('cleanup helper must not load browser-test utilities')
+})
+
 const {ensureOkResponse, verifyEmpty} = require('./cleanup')
 
 describe('cleanup response validation', () => {

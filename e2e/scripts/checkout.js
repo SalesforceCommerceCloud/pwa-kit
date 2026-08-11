@@ -5,7 +5,22 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const {expect} = require('@playwright/test')
+const TRANSITION_TIMEOUT = 30000
+const POLL_INTERVAL = 100
+
+const waitForPaymentOrReadyButton = async (page, paymentHeading, continueToPayment) => {
+    const deadline = Date.now() + TRANSITION_TIMEOUT
+
+    while (Date.now() < deadline) {
+        if (await paymentHeading.isVisible()) return 'payment'
+        if ((await continueToPayment.isVisible()) && (await continueToPayment.isEnabled())) {
+            return 'button'
+        }
+        await page.waitForTimeout(POLL_INTERVAL)
+    }
+
+    throw new Error('Timed out waiting for Payment or a ready Continue to Payment button')
+}
 
 const advanceToPayment = async (page) => {
     const paymentHeading = page.getByRole('heading', {name: /Payment/i})
@@ -16,24 +31,8 @@ const advanceToPayment = async (page) => {
         name: /Continue to Payment/i
     })
 
-    await expect
-        .poll(
-            async () => {
-                if (await paymentHeading.isVisible()) return 'payment'
-                if (
-                    (await continueToPayment.isVisible()) &&
-                    (await continueToPayment.isEnabled())
-                ) {
-                    return 'button'
-                }
-                return 'pending'
-            },
-            {
-                message: 'waiting for Payment or a ready Continue to Payment button',
-                timeout: 30000
-            }
-        )
-        .not.toBe('pending')
+    const transition = await waitForPaymentOrReadyButton(page, paymentHeading, continueToPayment)
+    if (transition === 'payment') return
 
     // Checkout may auto-submit shipping after the button becomes ready.
     if (await paymentHeading.isVisible()) return

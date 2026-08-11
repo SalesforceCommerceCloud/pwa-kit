@@ -6,9 +6,9 @@
  */
 
 const config = require('../config.js')
-const {sleep} = require('./utils')
 
 const SITE_ID = config.RETAIL_APP_HOME_SITE
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // The cleanup helper authenticates SCAPI calls with the active shopper session.
 // Where that session lives depends on whether the target environment has
