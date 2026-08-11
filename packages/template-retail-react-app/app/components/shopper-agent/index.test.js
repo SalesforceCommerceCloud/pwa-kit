@@ -1658,6 +1658,29 @@ describe('ShopperAgent Component', () => {
             )
         })
 
+        test('strips ECV1 prechat fields from static routing attributes', () => {
+            const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+            renderCommerceClient({
+                cc_routingAttributes: {
+                    foo: 'bar',
+                    SiteId: 'stale-site',
+                    organizationid: 'stale-org',
+                    IsCartMgmtSupported: 'false'
+                }
+            })
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({routingAttributes: {foo: 'bar'}})
+            )
+            expect(warnSpy).toHaveBeenCalledWith(
+                '[Commerce Client] Ignoring reserved prechat routing attributes:',
+                ['SiteId', 'organizationid', 'IsCartMgmtSupported']
+            )
+            warnSpy.mockRestore()
+        })
+
         test('forwards cc_overridesUrl to the widget options as overridesUrl', () => {
             renderCommerceClient({cc_overridesUrl: 'https://example.com/overrides.js'})
 
@@ -1946,6 +1969,148 @@ describe('ShopperAgent Component', () => {
                 window.localStorage.removeItem('cim_af_ct_other-org_Other_Service')
                 window.localStorage.removeItem('cim_af_conv_other-org_Other_Service')
                 delete window.CimulateMessaging
+            })
+
+            test('sets the standard ECV1 prechat fields before releasing a new conversation', async () => {
+                const setHiddenPrechatFields = jest.fn()
+                const done = jest.fn()
+                const event = new CustomEvent('onCimulateWidgetReady', {
+                    cancelable: true,
+                    detail: {setHiddenPrechatFields, done}
+                })
+                seedAuthLinkStorage({jwt: 'old.jwt'})
+
+                renderCommerceClient({
+                    siteId: 'RefArchGlobal',
+                    commerceOrgId: 'test-commerce-org-id'
+                })
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                await act(async () => {
+                    window.dispatchEvent(event)
+                })
+                window.sessionStorage.setItem(
+                    tokenKey,
+                    JSON.stringify({accessToken: 'rotated.jwt'})
+                )
+
+                expect(event.defaultPrevented).toBe(true)
+                expect(setHiddenPrechatFields).toHaveBeenCalledWith({
+                    SiteId: 'RefArchGlobal',
+                    Locale: 'en-US',
+                    OrganizationId: 'test-commerce-org-id',
+                    UsId: 'test-usid',
+                    IsCartMgmtSupported: 'true',
+                    Currency: 'USD',
+                    Language: 'en_US',
+                    DomainUrl: 'https://example.com/us/en-US'
+                })
+                expect(done).toHaveBeenCalledTimes(1)
+                expect(setHiddenPrechatFields.mock.invocationCallOrder[0]).toBeLessThan(
+                    done.mock.invocationCallOrder[0]
+                )
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
+            })
+
+            test('releases the widget and continues auth-linking when setting prechat fields fails', async () => {
+                const error = new Error('prechat failed')
+                const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+                const done = jest.fn()
+                const event = new CustomEvent('onCimulateWidgetReady', {
+                    cancelable: true,
+                    detail: {
+                        setHiddenPrechatFields: jest.fn(() => {
+                            throw error
+                        }),
+                        done
+                    }
+                })
+                seedAuthLinkStorage({jwt: 'old.jwt'})
+                renderCommerceClient({
+                    siteId: 'RefArchGlobal',
+                    commerceOrgId: 'test-commerce-org-id'
+                })
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                await act(async () => {
+                    window.dispatchEvent(event)
+                })
+                window.sessionStorage.setItem(
+                    tokenKey,
+                    JSON.stringify({accessToken: 'rotated.jwt'})
+                )
+
+                expect(done).toHaveBeenCalledTimes(1)
+                expect(errorSpy).toHaveBeenCalledWith(
+                    '[Commerce Client] Failed to set prechat fields',
+                    error
+                )
+                await waitFor(() =>
+                    expect(mockCallAuthLinkProxy).toHaveBeenLastCalledWith({
+                        commerceClientJWT: 'rotated.jwt'
+                    })
+                )
+                errorSpy.mockRestore()
+            })
+
+            test('excludes a stored JWT even when no previous auth-link attempt populated the refs', async () => {
+                window.sessionStorage.setItem(tokenKey, JSON.stringify({accessToken: 'old.jwt'}))
+                const event = new CustomEvent('onCimulateWidgetReady', {
+                    cancelable: true,
+                    detail: {setHiddenPrechatFields: jest.fn(), done: jest.fn()}
+                })
+                renderCommerceClient({
+                    siteId: 'RefArchGlobal',
+                    commerceOrgId: 'test-commerce-org-id'
+                })
+
+                await act(async () => {
+                    window.dispatchEvent(event)
+                })
+                expect(mockCallAuthLinkProxy).not.toHaveBeenCalled()
+
+                window.sessionStorage.setItem(
+                    tokenKey,
+                    JSON.stringify({accessToken: 'rotated.jwt'})
+                )
+
+                await waitFor(() =>
+                    expect(mockCallAuthLinkProxy).toHaveBeenCalledWith({
+                        commerceClientJWT: 'rotated.jwt'
+                    })
+                )
+                expect(mockCallAuthLinkProxy).not.toHaveBeenCalledWith({
+                    commerceClientJWT: 'old.jwt'
+                })
+            })
+
+            test('consumes the same widget-ready event only once', async () => {
+                const setHiddenPrechatFields = jest.fn()
+                const done = jest.fn()
+                const event = new CustomEvent('onCimulateWidgetReady', {
+                    cancelable: true,
+                    detail: {setHiddenPrechatFields, done}
+                })
+                seedAuthLinkStorage({jwt: 'old.jwt'})
+                renderCommerceClient({
+                    siteId: 'RefArchGlobal',
+                    commerceOrgId: 'test-commerce-org-id'
+                })
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                await act(async () => {
+                    window.dispatchEvent(event)
+                    window.dispatchEvent(event)
+                })
+                window.sessionStorage.setItem(
+                    tokenKey,
+                    JSON.stringify({accessToken: 'rotated.jwt'})
+                )
+
+                expect(setHiddenPrechatFields).toHaveBeenCalledTimes(1)
+                expect(done).toHaveBeenCalledTimes(1)
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
             })
 
             test('links a resumed conversation with deployment-scoped storage', async () => {
