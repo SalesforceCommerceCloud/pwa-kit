@@ -57,11 +57,19 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
     await expect(
         page.getByRole('heading', {name: /Casual To Dressy Trousers/i}).first()
     ).toBeVisible()
+    const initialPid = new URL(page.url()).searchParams.get('pid')
     await page.getByRole('radio', {name: '30'}).click()
 
-    // Select pickup option immediately after size selection
+    // Pickup state is keyed by product ID. Wait for the selected variant to
+    // replace the master product before choosing pickup so that the selection
+    // is not discarded during the PDP rerender.
+    await page.waitForURL((url) => {
+        const selectedPid = url.searchParams.get('pid')
+        return Boolean(selectedPid && selectedPid !== initialPid)
+    })
+
     const pickupRadio = page.getByRole('radio', {name: /Pick Up in Store/i})
-    await page.getByText('Pick Up in Store', {exact: true}).click()
+    await page.locator('label').filter({has: pickupRadio}).click()
 
     // Verify the pickup radio is selected
     await expect(pickupRadio).toBeChecked()

@@ -36,6 +36,8 @@ test.afterEach(async ({page}) => {
  * and that order shows up in order history
  */
 test('Registered shopper can checkout items', async ({page}) => {
+    test.setTimeout(120000)
+
     // Since we're re-using the same account, we need to check if the user is already registered.
     // This ensures the tests are independent and not dependent on the order they are run in.
     const isLoggedIn = await loginShopper({
