@@ -67,6 +67,10 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
         const selectedPid = url.searchParams.get('pid')
         return Boolean(selectedPid && selectedPid !== initialPid)
     })
+    const selectedPid = new URL(page.url()).searchParams.get('pid')
+    await expect(
+        page.locator(`meta[name="og:url"][content*="/products/${selectedPid}?"]`)
+    ).toHaveCount(1)
 
     const pickupRadio = page.getByRole('radio', {name: /Pick Up in Store/i})
     await page.locator('label').filter({has: pickupRadio}).click()
