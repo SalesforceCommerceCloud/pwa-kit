@@ -816,6 +816,24 @@ describe('shopper-agent-utils', () => {
             ).not.toHaveProperty('clientVersion')
         })
 
+        test('omits clientVersion when a commerceClientScriptSourceUrl override is set', () => {
+            const attrs = resolveCommerceClientRoutingAttributes({
+                cc_cdnVersion: '1.24.0',
+                commerceClientScriptSourceUrl: 'http://localhost:5050/messaging.umd.js'
+            })
+            expect(attrs).not.toHaveProperty('clientVersion')
+            expect(attrs).toEqual({isCartMgmtSupported: 'false'})
+        })
+
+        test('stamps clientVersion when the override is blank (falls back to cc_cdnVersion)', () => {
+            expect(
+                resolveCommerceClientRoutingAttributes({
+                    cc_cdnVersion: '1.24.0',
+                    commerceClientScriptSourceUrl: '   '
+                }).clientVersion
+            ).toBe('1.24.0')
+        })
+
         test('preserves merchant-configured routing attributes', () => {
             expect(
                 resolveCommerceClientRoutingAttributes({
