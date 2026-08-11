@@ -755,8 +755,9 @@ const CommerceClientAgentWindow = ({
         for (const store of stores) {
             try {
                 const data = JSON.parse(store.getItem(commerceClientTokenKey) || 'null')
-                if (data?.accessToken && data.accessToken !== excludedJWT) {
-                    return data.accessToken
+                const accessToken = data?.accessToken
+                if (typeof accessToken === 'string' && accessToken.trim().length > 0) {
+                    return accessToken !== excludedJWT ? accessToken : null
                 }
             } catch (err) {
                 console.error('[Commerce Client] Failed to parse storage for JWT', err)
@@ -934,7 +935,7 @@ const CommerceClientAgentWindow = ({
             // Clear-chat can dispatch this event before storage rotates. Wait for
             // the new token rather than authenticating the previous conversation.
             const excludedJWT =
-                lastCommerceClientJWTRef.current || lastAttemptedCommerceClientJWTRef.current
+                lastAttemptedCommerceClientJWTRef.current || lastCommerceClientJWTRef.current
             performAuthLinkRef.current({
                 reason: 'widget-ready',
                 excludedJWT: excludedJWT || null

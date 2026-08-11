@@ -555,9 +555,11 @@ const {handler} = runtime.createHandler(options, (app) => {
     registerTokenBridgeRoute(app)
 
     // Shopper Agent — Auth Link proxy for Commerce Client.
-    // Browser POSTs the Commerce Client JWT (from the *_WEB_STORAGE localStorage
-    // key) in the request body. Unlike the Token Bridge, no siteId/x-site-id is
-    // sent — the SCRT authlink endpoint authenticates with the JWT (Bearer) alone.
+    // Browser POSTs the Commerce Client JWT from the deployment-scoped
+    // cim_af_ct_<orgId>_<embeddedServiceName> key in the request body. sessionStorage
+    // is authoritative; localStorage is a compatibility fallback. Unlike the Token
+    // Bridge, no siteId/x-site-id is sent — the SCRT authlink endpoint authenticates
+    // with the JWT (Bearer) alone.
     // Server reads the SCRT2 origin from scrt2Url in the COMMERCE_AGENT_SETTINGS
     // environment variable (NOT AGENT_MYDOMAIN — the /iamessage/* auth link API is
     // served by SCRT2 on *.salesforce-scrt.com, a different host from Core's

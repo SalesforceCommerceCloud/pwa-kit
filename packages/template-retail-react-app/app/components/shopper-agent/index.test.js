@@ -1941,6 +1941,10 @@ describe('ShopperAgent Component', () => {
                 window.sessionStorage.removeItem(conversationKey)
                 window.sessionStorage.removeItem('cim_af_ct_other-org_Other_Service')
                 window.sessionStorage.removeItem('cim_af_conv_other-org_Other_Service')
+                window.localStorage.removeItem(tokenKey)
+                window.localStorage.removeItem(conversationKey)
+                window.localStorage.removeItem('cim_af_ct_other-org_Other_Service')
+                window.localStorage.removeItem('cim_af_conv_other-org_Other_Service')
                 delete window.CimulateMessaging
             })
 
@@ -2049,6 +2053,131 @@ describe('ShopperAgent Component', () => {
                     commerceClientJWT: 'rotated.jwt'
                 })
             })
+
+            test('excludes the last attempted JWT after a failed auth-link before widget-ready', async () => {
+                seedAuthLinkStorage({jwt: 'jwt-a'})
+                mockCallAuthLinkProxy
+                    .mockResolvedValueOnce({auth_link_key: 'jwt-a-auth-link-key'})
+                    .mockRejectedValueOnce(new Error('jwt-b auth-link failed'))
+                const {rerender} = renderCommerceClientWithBasket()
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                expect(mockCallAuthLinkProxy).toHaveBeenNthCalledWith(1, {
+                    commerceClientJWT: 'jwt-a'
+                })
+
+                window.sessionStorage.setItem(tokenKey, JSON.stringify({accessToken: 'jwt-b'}))
+                mockedUseCustomerType.mockReturnValue({
+                    customerType: 'registered',
+                    isGuest: false,
+                    isRegistered: true,
+                    isExternal: false
+                })
+                mockedUseUsid.mockReturnValue({usid: 'registered-usid'})
+                rerender(
+                    <ShopperAgent
+                        commerceAgentConfiguration={commerceClientSettings}
+                        basketDoneLoading={true}
+                    />
+                )
+
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
+                expect(mockCallAuthLinkProxy).toHaveBeenNthCalledWith(2, {
+                    commerceClientJWT: 'jwt-b'
+                })
+                await waitFor(() => expect(mockShowToast).toHaveBeenCalledTimes(1))
+
+                await act(async () => {
+                    window.dispatchEvent(new Event('onCimulateWidgetReady'))
+                })
+                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2)
+
+                window.sessionStorage.setItem(tokenKey, JSON.stringify({accessToken: 'jwt-c'}))
+
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(3))
+                expect(mockCallAuthLinkProxy).toHaveBeenNthCalledWith(3, {
+                    commerceClientJWT: 'jwt-c'
+                })
+                expect(
+                    mockCallAuthLinkProxy.mock.calls.filter(
+                        ([{commerceClientJWT}]) => commerceClientJWT === 'jwt-b'
+                    )
+                ).toHaveLength(1)
+            })
+
+            test('does not fall through to a stale local JWT while the excluded session JWT rotates', async () => {
+                seedAuthLinkStorage({jwt: 'current-session.jwt'})
+                window.localStorage.setItem(
+                    tokenKey,
+                    JSON.stringify({accessToken: 'stale-local.jwt'})
+                )
+                renderCommerceClient()
+
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1))
+
+                await act(async () => {
+                    window.dispatchEvent(new Event('onCimulateWidgetReady'))
+                })
+                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1)
+
+                window.sessionStorage.setItem(
+                    tokenKey,
+                    JSON.stringify({accessToken: 'rotated-session.jwt'})
+                )
+
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
+                expect(mockCallAuthLinkProxy).toHaveBeenLastCalledWith({
+                    commerceClientJWT: 'rotated-session.jwt'
+                })
+                expect(mockCallAuthLinkProxy).not.toHaveBeenCalledWith({
+                    commerceClientJWT: 'stale-local.jwt'
+                })
+            })
+
+            test.each([
+                ['absent', undefined, 'fallback-local.jwt'],
+                ['malformed', '{not-json', 'fallback-local.jwt'],
+                ['missing an access token', JSON.stringify({storedAt: 123}), 'fallback-local.jwt'],
+                ['an empty access token', JSON.stringify({accessToken: ''}), 'fallback-local.jwt'],
+                [
+                    'a whitespace-only access token',
+                    JSON.stringify({accessToken: '   '}),
+                    'fallback-local.jwt'
+                ],
+                [
+                    'a non-string access token',
+                    JSON.stringify({accessToken: 123}),
+                    'fallback-local.jwt'
+                ],
+                [
+                    'a valid non-empty string access token',
+                    JSON.stringify({accessToken: 'authoritative-session.jwt'}),
+                    'authoritative-session.jwt'
+                ]
+            ])(
+                'selects the expected JWT when sessionStorage has %s',
+                async (_description, sessionValue, expectedJWT) => {
+                    window.sessionStorage.setItem(
+                        conversationKey,
+                        JSON.stringify({conversationId: 'conv-123'})
+                    )
+                    if (sessionValue !== undefined) {
+                        window.sessionStorage.setItem(tokenKey, sessionValue)
+                    }
+                    window.localStorage.setItem(
+                        tokenKey,
+                        JSON.stringify({accessToken: 'fallback-local.jwt'})
+                    )
+
+                    renderCommerceClient()
+
+                    await waitFor(() =>
+                        expect(mockCallAuthLinkProxy).toHaveBeenCalledWith({
+                            commerceClientJWT: expectedJWT
+                        })
+                    )
+                }
+            )
 
             test('serializes auth-link attempts and ignores the stale generation', async () => {
                 seedAuthLinkStorage()
