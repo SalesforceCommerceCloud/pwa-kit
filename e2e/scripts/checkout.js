@@ -10,22 +10,25 @@ const advanceToPayment = async (page) => {
     if (await paymentHeading.isVisible()) return
 
     const shippingForm = page.getByTestId('sf-checkout-shipping-options-form')
-
-    // Checkout may auto-submit shipping and advance while this helper starts.
-    await Promise.race([
-        paymentHeading.waitFor({state: 'visible'}),
-        shippingForm.waitFor({state: 'visible'})
-    ])
-    if (await paymentHeading.isVisible()) return
-
     const continueToPayment = shippingForm.getByRole('button', {
         name: /Continue to Payment/i
     })
-    await continueToPayment.waitFor({state: 'visible'})
+
+    // Use one locator waiter so the inactive checkout path cannot outlive this
+    // transition. Checkout may auto-submit shipping while the button appears.
+    await paymentHeading.or(continueToPayment).first().waitFor({state: 'visible'})
+    if (await paymentHeading.isVisible()) return
 
     // Locator.click re-resolves after React renders and waits for the button to
     // be stable, enabled, and able to receive pointer events.
-    await continueToPayment.click()
+    try {
+        await continueToPayment.click()
+    } catch (error) {
+        // The button can disappear after winning the transition wait when the
+        // checkout auto-submits. Preserve genuine click failures.
+        if (await paymentHeading.isVisible()) return
+        throw error
+    }
     await paymentHeading.waitFor({state: 'visible'})
 }
 
