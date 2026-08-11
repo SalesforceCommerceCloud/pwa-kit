@@ -29,6 +29,8 @@ import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {registerAuthLinkRoute} from './components/shopper-agent/auth-link-proxy.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
 
 const config = getConfig()
@@ -545,12 +547,27 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Browser POSTs an auth_link_key and siteId (as x-site-id header).
     // In HttpOnly mode, tokens are read from cookies server-side.
     // In non-HttpOnly mode, SLAS access token is sent in request body.
-    // Server extracts my_domain from ANC_MYDOMAIN environment variable,
+    // Server extracts my_domain from AGENT_MYDOMAIN environment variable,
     // validates it's a trusted Salesforce host (SSRF prevention), then
     // forwards the tokens to Core's `/agent/identity/bridge` endpoint with
     // the access token in an `Authorization: SLAS` header and the refresh
     // token in the body.
     registerTokenBridgeRoute(app)
+
+    // Shopper Agent — Auth Link proxy for Commerce Client.
+    // Browser POSTs the Commerce Client JWT from the deployment-scoped
+    // cim_af_ct_<orgId>_<embeddedServiceName> key in the request body. sessionStorage
+    // is authoritative; localStorage is a compatibility fallback. Unlike the Token
+    // Bridge, no siteId/x-site-id is sent — the SCRT authlink endpoint authenticates
+    // with the JWT (Bearer) alone.
+    // Server reads the SCRT2 origin from scrt2Url in the COMMERCE_AGENT_SETTINGS
+    // environment variable (NOT AGENT_MYDOMAIN — the /iamessage/* auth link API is
+    // served by SCRT2 on *.salesforce-scrt.com, a different host from Core's
+    // MyDomain), validates it's a trusted Salesforce host (SSRF prevention), then
+    // calls SCRT's `/iamessage/api/v2/authorization/authlink` endpoint with the
+    // Commerce Client JWT in an `Authorization: Bearer` header.
+    // Returns { auth_link_key: "..." } which is then used with Token Bridge.
+    registerAuthLinkRoute(app)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
