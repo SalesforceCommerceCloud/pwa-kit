@@ -58,15 +58,13 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
         page.getByRole('heading', {name: /Casual To Dressy Trousers/i}).first()
     ).toBeVisible()
     await page.getByRole('radio', {name: '30'}).click()
-    await page.waitForLoadState()
 
     // Select pickup option immediately after size selection
-    const pickupRadio = page.locator('label.chakra-radio:has(input[value="pickup"])')
+    const pickupRadio = page.getByRole('radio', {name: /Pick Up in Store/i})
     await pickupRadio.click()
-    await page.waitForLoadState()
 
     // Verify the pickup radio is selected
-    await expect(pickupRadio).toHaveAttribute('data-checked')
+    await expect(pickupRadio).toBeChecked()
 
     const addToCartButton = page.getByRole('button', {name: /Add to Cart/i})
     await page.waitForLoadState()
