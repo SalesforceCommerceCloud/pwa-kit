@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+const {expect} = require('@playwright/test')
+
 const advanceToPayment = async (page) => {
     const paymentHeading = page.getByRole('heading', {name: /Payment/i})
     if (await paymentHeading.isVisible()) return
@@ -14,9 +16,26 @@ const advanceToPayment = async (page) => {
         name: /Continue to Payment/i
     })
 
-    // Use one locator waiter so the inactive checkout path cannot outlive this
-    // transition. Checkout may auto-submit shipping while the button appears.
-    await paymentHeading.or(continueToPayment).first().waitFor({state: 'visible'})
+    await expect
+        .poll(
+            async () => {
+                if (await paymentHeading.isVisible()) return 'payment'
+                if (
+                    (await continueToPayment.isVisible()) &&
+                    (await continueToPayment.isEnabled())
+                ) {
+                    return 'button'
+                }
+                return 'pending'
+            },
+            {
+                message: 'waiting for Payment or a ready Continue to Payment button',
+                timeout: 30000
+            }
+        )
+        .not.toBe('pending')
+
+    // Checkout may auto-submit shipping after the button becomes ready.
     if (await paymentHeading.isVisible()) return
 
     // Locator.click re-resolves after React renders and waits for the button to

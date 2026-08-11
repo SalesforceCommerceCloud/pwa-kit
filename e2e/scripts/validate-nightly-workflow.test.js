@@ -6,7 +6,7 @@
  */
 
 const path = require('path')
-const {loadWorkflow, validateNightlyWorkflow} = require('./validate-nightly-workflow')
+const {loadWorkflow, validateNightlyWorkflow} = require('../../scripts/validate-nightly-workflow')
 
 const WORKFLOW_PATH = path.resolve(__dirname, '../../.github/workflows/e2e.yml')
 const MATRIX_JOBS = [
