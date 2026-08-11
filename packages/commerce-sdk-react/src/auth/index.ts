@@ -1336,6 +1336,13 @@ class Auth {
         // to finish login. Without it the redirect lands with `code` only, the code is
         // stripped as a standard-login redirect, and the popup hangs. So it must be sent
         // on every trusted agent authorize request.
+        //
+        // NOTE: this is a distinct nonce from the PKCE `codeVerifier` above and must NOT
+        // be collapsed into it. `createCodeVerifier` is reused only as a random
+        // high-entropy string generator; the two values serve different security roles
+        // (PKCE proof-of-possession vs. OAuth CSRF `state`) and are compared/validated on
+        // separate requests. The caller re-verifies the echoed `state` matches this value
+        // before exchanging the code, and SLAS also binds `state`↔`code` on the token request.
         const state = helpers.createCodeVerifier()
 
         const url = `${
