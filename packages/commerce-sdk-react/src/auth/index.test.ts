@@ -1941,4 +1941,24 @@ describe('HttpOnly Session Cookies', () => {
         expect(auth.client.clientConfig.headers[X_PREVIEW_PARENT]).toBeUndefined()
         expect(trustedMock).not.toHaveBeenCalled()
     })
+
+    describe('authorizeTrustedAgent', () => {
+        test('sends a CSRF state on the authorize URL and returns it', async () => {
+            const auth = new Auth(config)
+
+            const {url, codeVerifier, state} = await auth.authorizeTrustedAgent({
+                loginId: 'test@test.com'
+            })
+
+            // The state must be present on the authorize request so SLAS echoes it
+            // back on the /callback redirect; without it the popup callback lands with
+            // `code` only, the code is stripped as a standard-login redirect, and the
+            // trusted agent popup hangs.
+            expect(url).toContain('/oauth2/trusted-agent/authorize?')
+            expect(url).toContain(`state=${state}`)
+            expect(state).toBeTruthy()
+            // Returned so the caller can thread it through to loginTrustedAgent.
+            expect(codeVerifier).toBeTruthy()
+        })
+    })
 })
