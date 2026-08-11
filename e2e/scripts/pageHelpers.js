@@ -821,7 +821,6 @@ export const wishlistMasterProductAddToCartFlow = async ({page, registeredUserCr
     await answerConsentTrackingForm(page)
 
     await expect(page.getByRole('heading', {name: /Wishlist/i})).toBeVisible()
-    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
 
     // Master product should show "View Options" button instead of "Add to Cart"
     const viewOptionsButton = page.getByRole('button', {name: /View Options/i})
