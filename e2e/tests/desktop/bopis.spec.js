@@ -61,7 +61,7 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
 
     // Select pickup option immediately after size selection
     const pickupRadio = page.getByRole('radio', {name: /Pick Up in Store/i})
-    await pickupRadio.click()
+    await page.getByText('Pick Up in Store', {exact: true}).click()
 
     // Verify the pickup radio is selected
     await expect(pickupRadio).toBeChecked()
