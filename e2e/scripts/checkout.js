@@ -12,7 +12,10 @@ const advanceToPayment = async (page) => {
     const shippingForm = page.getByTestId('sf-checkout-shipping-options-form')
 
     // Checkout may auto-submit shipping and advance while this helper starts.
-    await paymentHeading.or(shippingForm).first().waitFor({state: 'visible'})
+    await Promise.race([
+        paymentHeading.waitFor({state: 'visible'}),
+        shippingForm.waitFor({state: 'visible'})
+    ])
     if (await paymentHeading.isVisible()) return
 
     const continueToPayment = shippingForm.getByRole('button', {
