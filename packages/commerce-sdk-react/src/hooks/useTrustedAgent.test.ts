@@ -97,9 +97,13 @@ describe('useTrustedAgent', () => {
                 }
             },
             logout: jest.fn().mockResolvedValue({}),
-            authorizeTrustedAgent: jest
-                .fn()
-                .mockResolvedValue({url: 'test_url', codeVerifier: 'test_verifier'}),
+            authorizeTrustedAgent: jest.fn().mockResolvedValue({
+                url: 'test_url',
+                codeVerifier: 'test_verifier',
+                // Must match the `state` the popup echoes back (see the URL mock in
+                // beforeAll and simulateSuccessfulPopup) or login()'s CSRF check rejects.
+                state: 'state_abc'
+            }),
             registerTrustedAgentRefreshHandler: jest.fn()
         })
     })
@@ -157,6 +161,30 @@ describe('useTrustedAgent', () => {
                 refresh_token: 'mock_refresh_token'
             })
         })
+    })
+
+    test('login rejects when the popup-echoed state does not match the authorize state', async () => {
+        // The popup echoes `state_abc` (see the URL mock / simulateSuccessfulPopup),
+        // but authorizeTrustedAgent minted a different state — a CSRF/mismatched
+        // callback. login() must fail fast before exchanging the code.
+        const authCtx = mockedUseAuthContext() as Record<string, unknown>
+        authCtx.authorizeTrustedAgent = jest.fn().mockResolvedValue({
+            url: 'test_url',
+            codeVerifier: 'test_verifier',
+            state: 'a_different_state'
+        })
+        simulateSuccessfulPopup()
+
+        const {result} = renderHookWithProviders(() => useTrustedAgentModule.default())
+
+        let error: Error | null = null
+        await act(async () => {
+            await result.current.login('test_login_id').catch((e) => {
+                error = e
+            })
+        })
+
+        expect(String(error)).toContain('state mismatch')
     })
 
     test('useTrustedAgent returns initial state correctly', async () => {
