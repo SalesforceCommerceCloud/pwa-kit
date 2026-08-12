@@ -101,6 +101,8 @@ module.exports = {
             // borderColor, fontFamily).
             // Optional: pass `cc_routingAttributes` (object) via COMMERCE_AGENT_SETTINGS to
             // forward Agentforce routing attributes to the widget as `routingAttributes`.
+            // Always augmented with `clientVersion` (from `cc_cdnVersion`) and
+            // `isCartMgmtSupported` (`'true'`/`'false'`, default `'false'`) for backend gating.
             // Optional: pass `cc_overrides` (object) via COMMERCE_AGENT_SETTINGS to map widget
             // override keys (e.g. `ProductTile`) to custom element tag names, such as
             // {"ProductTile": "my-product-tile"}. Forwarded to the widget as `overrides`. The
