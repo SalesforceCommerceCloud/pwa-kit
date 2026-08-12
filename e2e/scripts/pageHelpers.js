@@ -113,56 +113,60 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
     // up — this is more robust than a single click + long wait, and avoids
     // the misleading 60s waitForResponse timeouts we see when a stale modal
     // intercepts a later click in the test.
+    let dismissed = false
     for (let attempt = 0; attempt < 2; attempt++) {
         try {
             await button.first().click()
             await consentForm.waitFor({state: 'hidden', timeout: 5000})
-
-            // onClose() runs before updateDnt() completes, so hidden is only a visual state. Wait
-            // for both the selected cookie and the token claim to reach the requested value before
-            // navigating. This covers public clients (JWT in localStorage) and private/HttpOnly
-            // clients (the cc-at-dnt companion cookie).
-            await page.waitForFunction(
-                (expectedDnt) => {
-                    const cookies = Object.fromEntries(
-                        document.cookie.split(';').map((cookie) => {
-                            const [name, ...value] = cookie.trim().split('=')
-                            return [name, value.join('=')]
-                        })
-                    )
-                    const selectedDnt = cookies.dw_dnt
-                    const accessTokenDntCookie = Object.entries(cookies).find(
-                        ([name]) => name === 'cc-at-dnt' || name.startsWith('cc-at-dnt_')
-                    )?.[1]
-
-                    let accessTokenDnt
-                    const accessTokenKey = Object.keys(localStorage).find(
-                        (name) => name === 'access_token' || name.startsWith('access_token_')
-                    )
-                    const accessToken = accessTokenKey ? localStorage.getItem(accessTokenKey) : null
-                    if (accessToken) {
-                        try {
-                            const payload = accessToken.split('.')[1]
-                            const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
-                            accessTokenDnt = String(JSON.parse(atob(base64)).dnt)
-                        } catch {
-                            return false
-                        }
-                    }
-
-                    return (
-                        selectedDnt === expectedDnt &&
-                        (accessTokenDnt === expectedDnt || accessTokenDntCookie === expectedDnt)
-                    )
-                },
-                dnt ? '1' : '0',
-                {timeout: 15000}
-            )
-            return
+            dismissed = true
+            break
         } catch {
             // fall through and retry
         }
     }
+    if (!dismissed) return
+
+    // onClose() runs before updateDnt() completes, so hidden is only a visual state. Wait
+    // for both the selected cookie and the token claim to reach the requested value before
+    // navigating. This covers public clients (JWT in localStorage) and private/HttpOnly
+    // clients (the cc-at-dnt companion cookie). Keep this outside the dismissal retry so a
+    // synchronization timeout is reported instead of causing another click on a hidden button.
+    await page.waitForFunction(
+        (expectedDnt) => {
+            const cookies = Object.fromEntries(
+                document.cookie.split(';').map((cookie) => {
+                    const [name, ...value] = cookie.trim().split('=')
+                    return [name, value.join('=')]
+                })
+            )
+            const selectedDnt = cookies.dw_dnt
+            const accessTokenDntCookie = Object.entries(cookies).find(
+                ([name]) => name === 'cc-at-dnt' || name.startsWith('cc-at-dnt_')
+            )?.[1]
+
+            let accessTokenDnt
+            const accessTokenKey = Object.keys(localStorage).find(
+                (name) => name === 'access_token' || name.startsWith('access_token_')
+            )
+            const accessToken = accessTokenKey ? localStorage.getItem(accessTokenKey) : null
+            if (accessToken) {
+                try {
+                    const payload = accessToken.split('.')[1]
+                    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+                    accessTokenDnt = String(JSON.parse(atob(base64)).dnt)
+                } catch {
+                    return false
+                }
+            }
+
+            return (
+                selectedDnt === expectedDnt &&
+                (accessTokenDnt === expectedDnt || accessTokenDntCookie === expectedDnt)
+            )
+        },
+        dnt ? '1' : '0',
+        {timeout: 15000}
+    )
 }
 
 /**

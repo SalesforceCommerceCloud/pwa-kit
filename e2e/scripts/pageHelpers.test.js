@@ -165,4 +165,36 @@ describe('answerConsentTrackingForm', () => {
         expect(waitForFunction).toHaveBeenCalledTimes(2)
         expect(waitForFunction.mock.calls[1][1]).toBe('0')
     })
+
+    test('does not retry the dismissal click when DNT synchronization times out', async () => {
+        const synchronizationError = new Error('DNT synchronization timed out')
+        const waitForFunction = jest
+            .fn()
+            .mockResolvedValueOnce(undefined)
+            .mockRejectedValueOnce(synchronizationError)
+            .mockResolvedValueOnce(undefined)
+        const click = jest.fn().mockResolvedValue(undefined)
+        const consentForm = {
+            waitFor: jest.fn().mockResolvedValue(undefined)
+        }
+        const button = {
+            and: jest.fn().mockReturnThis(),
+            first: jest.fn().mockReturnThis(),
+            click
+        }
+        const page = {
+            waitForFunction,
+            locator: jest.fn((selector) => {
+                if (selector === 'text=Tracking Consent') {
+                    return consentForm
+                }
+                return button
+            })
+        }
+
+        await expect(answerConsentTrackingForm(page)).rejects.toBe(synchronizationError)
+
+        expect(click).toHaveBeenCalledTimes(1)
+        expect(waitForFunction).toHaveBeenCalledTimes(2)
+    })
 })
