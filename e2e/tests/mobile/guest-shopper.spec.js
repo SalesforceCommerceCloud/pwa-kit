@@ -10,9 +10,9 @@ const {
     addProductToCart,
     answerConsentTrackingForm,
     searchProduct,
-    checkoutProduct
+    checkoutProduct,
+    advanceToPayment
 } = require('../../scripts/pageHelpers')
-const {advanceToPayment} = require('../../scripts/checkout')
 const {generateUserCredentials, getCreditCardExpiry} = require('../../scripts/utils.js')
 const {clearCartAndWishlist} = require('../../scripts/cleanup.js')
 
