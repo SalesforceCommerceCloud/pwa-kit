@@ -1,4 +1,4 @@
-## v3.20.0-preview.0 (Aug 07, 2026)
+## v3.20.0 (Aug 12, 2026)
 - [Bugfix] Keep the generated `ssr.js.hbs` and `request-processor.js` templates in sync with `template-retail-react-app` for the Trusted Agent (Order on Behalf) callback fix. The request processor now keeps `code` on a `/callback` request when `state` is also present, and the generated `/callback` handler serves that variant with `Cache-Control: no-store` so the callback page can post the result back to the opener, while the standard SLAS redirect stays CDN cacheable.
 
 ## v3.19.0 (Jul 13, 2026)
