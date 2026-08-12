@@ -202,6 +202,7 @@ Same as Step 2, with the clean stable versions (no suffix). Bump `#1`–`#4`, re
 Get the release commits onto `develop` and reset it to the next dev version.
 
 1. Create an **intermediary branch** off the release branch. Merge the latest `develop` *into it* — resolve conflicts here, not on `develop`.
+   - **The merge is a slog — dispatch it to a subagent.** Conflicts span many files (version strings, `package-lock.json`, changelogs) and iterate; keep that churn out of the operator's context. Hand the subagent the intermediary + release + `develop` branch names and this instruction: *merge `develop` into the intermediary branch, resolve every conflict, and return a per-conflict list of what it resolved and how* (especially version-string conflicts: the release branch's shipped versions win over develop's `-dev`). It resolves and pushes the branch; it does **not** open the PR or touch `develop`. **Surface its resolution list to the operator** before moving on — merge-back conflicts are where a wrong pick silently reverts a shipped change.
 2. Bump the monorepo to the next dev version: shipped `X.Y.0` → develop becomes `X.(Y+1).0-dev`.
 3. **GATE — open a PR from the intermediary branch targeting `develop`.** You open it; the **operator merges it**, using a **regular merge, not squash** (squash causes worse conflicts on later releases).
 
