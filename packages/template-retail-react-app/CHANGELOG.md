@@ -1,4 +1,4 @@
-## v10.2.0-preview.0 (Aug 07, 2026)
+## v10.2.0 (Aug 12, 2026)
 - [Bugfix] Fix the Data Cloud recommender catalog event field name: `personalizationContextId` → `personalizationContentId`. The official `@salesforce/cc-datacloud-typescript` SDK type and Salesforce docs both define `personalizationContentId` (Content); the `Context` spelling did not match, so the recommender UUID (`__recoUUID`) was sent under a key Data Cloud does not recognize and is expected to be dropped on ingest.
 - [Feature] Add `cc_showFab` for the Commerce Client shopper-agent widget: when `'true'`, renders a floating action button at `cc_widgetPosition` that opens the agent panel and hides while it is open. Defaults to `'false'`.
 - [Bugfix] Honor `cc_dialogFullHeight: 'false'`, which was previously dropped from the widget options so the bundle's full-height default always won.
