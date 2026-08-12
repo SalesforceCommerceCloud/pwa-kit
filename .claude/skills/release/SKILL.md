@@ -175,7 +175,10 @@ Same as Step 2, with the clean stable versions (no suffix). Bump `#1`–`#4`, re
 
 ## Step 5 — Post-release
 
-1. **GitHub release notes.** Compile every changed `CHANGELOG.md` into a release at https://github.com/SalesforceCommerceCloud/pwa-kit/releases.
+1. **GitHub release notes.** Draft at https://github.com/SalesforceCommerceCloud/pwa-kit/releases. The compiled changelogs are the *bottom* of the notes, not the whole thing — a reader shouldn't have to read seven package changelogs to learn what shipped. Follow the shape of the last two releases ([v3.20.0](https://github.com/SalesforceCommerceCloud/pwa-kit/releases/tag/v3.20.0), [v3.18.0](https://github.com/SalesforceCommerceCloud/pwa-kit/releases/tag/v3.18.0)) — three sections, top to bottom:
+   1. **Intro summary** — one plain-English paragraph naming what this release *does* for someone who won't read further: `PWA Kit <X.Y> ships/fixes <the two or three things that matter>, plus <assorted smaller work>.` Written from the changes, not copied from any one changelog.
+   2. **`## Highlights`** — the handful of user-facing changes worth surfacing, most important first, one bullet each. Not every changelog line — only what a storefront developer would care about. Shape each bullet: `- :emoji: **Short title** — what it is and why it matters, in plain English. ([#PR](url), [#PR](url))`. Pick an emoji that fits the change (`:lock:` security, `:money_with_wings:` cost, `:credit_card:` checkout, etc.). Draft these, then **surface them to the operator to confirm** — the "what matters" judgment is theirs.
+   3. **`---`** then **`## Package Changes`** — the per-package changelog compilation (every changed `CHANGELOG.md`, grouped under `### @salesforce/<pkg>@<version>` headers), and end with `**Full Changelog**: https://github.com/SalesforceCommerceCloud/pwa-kit/compare/v<prev>...v<this>`.
    - **Check "Set as the latest release"** — this fires `deploy_latest_release.yml`, redeploying the demo + bug-bounty sites.
    - Optionally link the Dev Portal changelog anchor (recent releases have often skipped it). It's constructable from the version — strip the dots: `3.17.0` → `#pwa-kit-317-changes`:
      ```
