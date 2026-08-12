@@ -36,6 +36,27 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
         return
     }
 
+    // The consent modal can render before the initial guest session finishes. Clicking it during
+    // that window races setDnt() against the in-flight login: the modal closes immediately, but
+    // the older token can win with a different dnt claim and make the modal reappear on the next
+    // navigation. Wait until either the public-client access token or the HttpOnly companion DNT
+    // cookie proves that auth initialization is complete.
+    await page.waitForFunction(
+        () => {
+            const hasAccessToken = Object.keys(localStorage).some(
+                (name) => name === 'access_token' || name.startsWith('access_token_')
+            )
+            const hasAccessTokenDntCookie = document.cookie
+                .split(';')
+                .map((cookie) => cookie.trim().split('=')[0])
+                .some((name) => name === 'cc-at-dnt' || name.startsWith('cc-at-dnt_'))
+
+            return hasAccessToken || hasAccessTokenDntCookie
+        },
+        undefined,
+        {timeout: 15000}
+    )
+
     const ariaLabel = dnt ? 'Decline tracking' : 'Accept tracking'
     const button = page.locator(`button[aria-label="${ariaLabel}"]`).and(page.locator(':visible'))
 
@@ -51,6 +72,47 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
         try {
             await button.first().click()
             await consentForm.waitFor({state: 'hidden', timeout: 5000})
+
+            // onClose() runs before updateDnt() completes, so hidden is only a visual state. Wait
+            // for both the selected cookie and the token claim to reach the requested value before
+            // navigating. This covers public clients (JWT in localStorage) and private/HttpOnly
+            // clients (the cc-at-dnt companion cookie).
+            await page.waitForFunction(
+                (expectedDnt) => {
+                    const cookies = Object.fromEntries(
+                        document.cookie.split(';').map((cookie) => {
+                            const [name, ...value] = cookie.trim().split('=')
+                            return [name, value.join('=')]
+                        })
+                    )
+                    const selectedDnt = cookies.dw_dnt
+                    const accessTokenDntCookie = Object.entries(cookies).find(
+                        ([name]) => name === 'cc-at-dnt' || name.startsWith('cc-at-dnt_')
+                    )?.[1]
+
+                    let accessTokenDnt
+                    const accessTokenKey = Object.keys(localStorage).find(
+                        (name) => name === 'access_token' || name.startsWith('access_token_')
+                    )
+                    const accessToken = accessTokenKey ? localStorage.getItem(accessTokenKey) : null
+                    if (accessToken) {
+                        try {
+                            const payload = accessToken.split('.')[1]
+                            const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+                            accessTokenDnt = String(JSON.parse(atob(base64)).dnt)
+                        } catch {
+                            return false
+                        }
+                    }
+
+                    return (
+                        selectedDnt === expectedDnt &&
+                        (accessTokenDnt === expectedDnt || accessTokenDntCookie === expectedDnt)
+                    )
+                },
+                dnt ? '1' : '0',
+                {timeout: 15000}
+            )
             return
         } catch {
             // fall through and retry
