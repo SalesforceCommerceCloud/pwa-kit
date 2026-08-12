@@ -1,6 +1,10 @@
-## v3.19.0 (Jul 13, 2026)
+## v3.21.0-dev (Aug 12, 2026)
 - Keep the generated Commerce Client auth-link proxy route and templates in sync with `template-retail-react-app`: the browser reads the deployment-scoped `cim_af_ct_<orgId>_<embeddedServiceName>` storage value and POSTs the Commerce Client JWT to `/api/agent/authlink`, where the route obtains an `auth_link_key` from SCRT2 for Token Bridge use.
+
+## v3.20.0 (Aug 12, 2026)
 - [Bugfix] Keep the generated `ssr.js.hbs` and `request-processor.js` templates in sync with `template-retail-react-app` for the Trusted Agent (Order on Behalf) callback fix. The request processor now keeps `code` on a `/callback` request when `state` is also present, and the generated `/callback` handler serves that variant with `Cache-Control: no-store` so the callback page can post the result back to the opener, while the standard SLAS redirect stays CDN cacheable.
+
+## v3.19.0 (Jul 13, 2026)
 - Add Commerce Client messaging widget CSP entries (`*.cimulate.ai`, `*.sfcc-store-internal.net`) to `script-src`, `connect-src`, and `img-src` in the generated `ssr.js.hbs` templates, keeping the create-app scaffolding in sync with `template-retail-react-app` (PR #3890). [#3921](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3921)
 - Forward the distributed-tracing `traceparent` header in the generated retail-react-app's `_app-config` (`index.jsx.hbs`), keeping the generator template in sync with `template-retail-react-app` so generated projects propagate the SSR trace onto outbound SCAPI/SLAS calls. [#3889](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3889)
 - Add maintenance mode page configuration to generated `config/default.js` templates. Configure `app.pages.maintenancePage.sharedMaintenancePage` (default `true`) to fetch and display a CDN-hosted maintenance page, or set to `false` for the built-in fallback message. Supports CDN URL and forwarded host customization. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
