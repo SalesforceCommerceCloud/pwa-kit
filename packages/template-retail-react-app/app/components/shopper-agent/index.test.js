@@ -1649,12 +1649,41 @@ describe('ShopperAgent Component', () => {
             )
         })
 
-        test('forwards cc_routingAttributes to the widget options as routingAttributes', () => {
+        test('forwards cc_routingAttributes to the widget options, augmented with backend signals', () => {
             renderCommerceClient({cc_routingAttributes: {foo: 'bar'}})
+
+            // cc_cdnVersion is '1.0.0' in the shared commerceClientSettings.
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    routingAttributes: {
+                        foo: 'bar',
+                        isCartMgmtSupported: 'false',
+                        clientVersion: '1.0.0'
+                    }
+                })
+            )
+        })
+
+        test('stamps clientVersion from cc_cdnVersion into routingAttributes', () => {
+            renderCommerceClient({cc_cdnVersion: '1.24.0'})
 
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
                 expect.anything(),
-                expect.objectContaining({routingAttributes: {foo: 'bar'}})
+                expect.objectContaining({
+                    routingAttributes: expect.objectContaining({clientVersion: '1.24.0'})
+                })
+            )
+        })
+
+        test('honors an isCartMgmtSupported override from cc_routingAttributes', () => {
+            renderCommerceClient({cc_routingAttributes: {isCartMgmtSupported: 'true'}})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    routingAttributes: expect.objectContaining({isCartMgmtSupported: 'true'})
+                })
             )
         })
 
