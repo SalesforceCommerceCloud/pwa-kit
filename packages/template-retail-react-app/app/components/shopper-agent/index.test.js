@@ -37,6 +37,12 @@ jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/token-bridg
     callTokenBridge: (...args) => mockCallTokenBridge(...args)
 }))
 
+const mockCallAuthLinkProxy = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/auth-link-proxy', () => ({
+    __esModule: true,
+    callAuthLinkProxy: (...args) => mockCallAuthLinkProxy(...args)
+}))
+
 // Import ShopperAgent after all mocks are set up
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 import {
@@ -1643,12 +1649,41 @@ describe('ShopperAgent Component', () => {
             )
         })
 
-        test('forwards cc_routingAttributes to the widget options as routingAttributes', () => {
+        test('forwards cc_routingAttributes to the widget options, augmented with backend signals', () => {
             renderCommerceClient({cc_routingAttributes: {foo: 'bar'}})
+
+            // cc_cdnVersion is '1.0.0' in the shared commerceClientSettings.
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    routingAttributes: {
+                        foo: 'bar',
+                        isCartMgmtSupported: 'false',
+                        clientVersion: '1.0.0'
+                    }
+                })
+            )
+        })
+
+        test('stamps clientVersion from cc_cdnVersion into routingAttributes', () => {
+            renderCommerceClient({cc_cdnVersion: '1.24.0'})
 
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
                 expect.anything(),
-                expect.objectContaining({routingAttributes: {foo: 'bar'}})
+                expect.objectContaining({
+                    routingAttributes: expect.objectContaining({clientVersion: '1.24.0'})
+                })
+            )
+        })
+
+        test('honors an isCartMgmtSupported override from cc_routingAttributes', () => {
+            renderCommerceClient({cc_routingAttributes: {isCartMgmtSupported: 'true'}})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    routingAttributes: expect.objectContaining({isCartMgmtSupported: 'true'})
+                })
             )
         })
 
@@ -1903,6 +1938,373 @@ describe('ShopperAgent Component', () => {
             const widgetOptions = calls[calls.length - 1][1]
 
             expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'bottom-right'})
+        })
+
+        describe('Commerce Client auth-link lifecycle', () => {
+            const tokenKey = 'cim_af_ct_test-org-id_My_Embedded_Service'
+            const conversationKey = 'cim_af_conv_test-org-id_My_Embedded_Service'
+
+            const seedAuthLinkStorage = ({
+                jwt = 'commerce.jwt',
+                conversationId = 'conv-123'
+            } = {}) => {
+                window.sessionStorage.setItem(tokenKey, JSON.stringify({accessToken: jwt}))
+                window.sessionStorage.setItem(conversationKey, JSON.stringify({conversationId}))
+            }
+
+            const renderCommerceClientWithBasket = (basketDoneLoading = true) =>
+                render(
+                    <ShopperAgent
+                        commerceAgentConfiguration={commerceClientSettings}
+                        basketDoneLoading={basketDoneLoading}
+                    />
+                )
+
+            beforeEach(() => {
+                mockCallAuthLinkProxy.mockReset()
+                mockCallAuthLinkProxy.mockResolvedValue({auth_link_key: 'commerce-auth-link-key'})
+            })
+
+            afterEach(() => {
+                window.sessionStorage.removeItem(tokenKey)
+                window.sessionStorage.removeItem(conversationKey)
+                window.sessionStorage.removeItem('cim_af_ct_other-org_Other_Service')
+                window.sessionStorage.removeItem('cim_af_conv_other-org_Other_Service')
+                window.localStorage.removeItem(tokenKey)
+                window.localStorage.removeItem(conversationKey)
+                window.localStorage.removeItem('cim_af_ct_other-org_Other_Service')
+                window.localStorage.removeItem('cim_af_conv_other-org_Other_Service')
+                delete window.CimulateMessaging
+            })
+
+            test('links a resumed conversation with deployment-scoped storage', async () => {
+                window.sessionStorage.setItem(
+                    'cim_af_ct_other-org_Other_Service',
+                    JSON.stringify({accessToken: 'wrong.jwt'})
+                )
+                window.sessionStorage.setItem(
+                    'cim_af_conv_other-org_Other_Service',
+                    JSON.stringify({conversationId: 'wrong-conversation'})
+                )
+                seedAuthLinkStorage()
+
+                renderCommerceClient()
+
+                await waitFor(() =>
+                    expect(mockCallAuthLinkProxy).toHaveBeenCalledWith({
+                        commerceClientJWT: 'commerce.jwt'
+                    })
+                )
+                expect(mockCallTokenBridge).toHaveBeenCalledWith({
+                    authLinkKey: 'commerce-auth-link-key',
+                    slasAccessToken: 'test-slas-access-token',
+                    siteId: 'RefArchGlobal'
+                })
+            })
+
+            test('re-links a resumed conversation when the shopper identity changes', async () => {
+                seedAuthLinkStorage()
+                const {rerender} = renderCommerceClientWithBasket()
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                mockedUseCustomerType.mockReturnValue({
+                    customerType: 'registered',
+                    isGuest: false,
+                    isRegistered: true,
+                    isExternal: false
+                })
+                mockedUseUsid.mockReturnValue({usid: 'registered-usid'})
+                rerender(
+                    <ShopperAgent
+                        commerceAgentConfiguration={commerceClientSettings}
+                        basketDoneLoading={true}
+                    />
+                )
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+                expect(mockEmbeddedService.userVerificationAPI.clearSession).not.toHaveBeenCalled()
+            })
+
+            test('uses an existing bundle global after a basket-loading remount', async () => {
+                seedAuthLinkStorage()
+                window.CimulateMessaging = {injectMessagingWidget: jest.fn()}
+                mockedUseScript.mockReturnValue({loaded: false, error: false})
+                const {rerender} = renderCommerceClientWithBasket()
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                expect(mockedUseCommerceClientMessaging).toHaveBeenLastCalledWith(
+                    {loaded: true, error: false},
+                    expect.anything()
+                )
+
+                rerender(
+                    <ShopperAgent
+                        commerceAgentConfiguration={commerceClientSettings}
+                        basketDoneLoading={false}
+                    />
+                )
+                mockedUseCustomerType.mockReturnValue({
+                    customerType: 'registered',
+                    isGuest: false,
+                    isRegistered: true,
+                    isExternal: false
+                })
+                mockedUseUsid.mockReturnValue({usid: 'registered-usid'})
+                rerender(
+                    <ShopperAgent
+                        commerceAgentConfiguration={commerceClientSettings}
+                        basketDoneLoading={true}
+                    />
+                )
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+            })
+
+            test('waits for a rotated JWT before linking a new conversation', async () => {
+                seedAuthLinkStorage({jwt: 'old.jwt'})
+                renderCommerceClient()
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                await act(async () => {
+                    window.dispatchEvent(new Event('onCimulateWidgetReady'))
+                })
+                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1)
+
+                window.sessionStorage.setItem(
+                    tokenKey,
+                    JSON.stringify({accessToken: 'rotated.jwt'})
+                )
+
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
+                expect(mockCallAuthLinkProxy).toHaveBeenLastCalledWith({
+                    commerceClientJWT: 'rotated.jwt'
+                })
+            })
+
+            test('excludes the last attempted JWT after a failed auth-link before widget-ready', async () => {
+                seedAuthLinkStorage({jwt: 'jwt-a'})
+                mockCallAuthLinkProxy
+                    .mockResolvedValueOnce({auth_link_key: 'jwt-a-auth-link-key'})
+                    .mockRejectedValueOnce(new Error('jwt-b auth-link failed'))
+                const {rerender} = renderCommerceClientWithBasket()
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                expect(mockCallAuthLinkProxy).toHaveBeenNthCalledWith(1, {
+                    commerceClientJWT: 'jwt-a'
+                })
+
+                window.sessionStorage.setItem(tokenKey, JSON.stringify({accessToken: 'jwt-b'}))
+                mockedUseCustomerType.mockReturnValue({
+                    customerType: 'registered',
+                    isGuest: false,
+                    isRegistered: true,
+                    isExternal: false
+                })
+                mockedUseUsid.mockReturnValue({usid: 'registered-usid'})
+                rerender(
+                    <ShopperAgent
+                        commerceAgentConfiguration={commerceClientSettings}
+                        basketDoneLoading={true}
+                    />
+                )
+
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
+                expect(mockCallAuthLinkProxy).toHaveBeenNthCalledWith(2, {
+                    commerceClientJWT: 'jwt-b'
+                })
+                await waitFor(() => expect(mockShowToast).toHaveBeenCalledTimes(1))
+
+                await act(async () => {
+                    window.dispatchEvent(new Event('onCimulateWidgetReady'))
+                })
+                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2)
+
+                window.sessionStorage.setItem(tokenKey, JSON.stringify({accessToken: 'jwt-c'}))
+
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(3))
+                expect(mockCallAuthLinkProxy).toHaveBeenNthCalledWith(3, {
+                    commerceClientJWT: 'jwt-c'
+                })
+                expect(
+                    mockCallAuthLinkProxy.mock.calls.filter(
+                        ([{commerceClientJWT}]) => commerceClientJWT === 'jwt-b'
+                    )
+                ).toHaveLength(1)
+            })
+
+            test('does not fall through to a stale local JWT while the excluded session JWT rotates', async () => {
+                seedAuthLinkStorage({jwt: 'current-session.jwt'})
+                window.localStorage.setItem(
+                    tokenKey,
+                    JSON.stringify({accessToken: 'stale-local.jwt'})
+                )
+                renderCommerceClient()
+
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1))
+
+                await act(async () => {
+                    window.dispatchEvent(new Event('onCimulateWidgetReady'))
+                })
+                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1)
+
+                window.sessionStorage.setItem(
+                    tokenKey,
+                    JSON.stringify({accessToken: 'rotated-session.jwt'})
+                )
+
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
+                expect(mockCallAuthLinkProxy).toHaveBeenLastCalledWith({
+                    commerceClientJWT: 'rotated-session.jwt'
+                })
+                expect(mockCallAuthLinkProxy).not.toHaveBeenCalledWith({
+                    commerceClientJWT: 'stale-local.jwt'
+                })
+            })
+
+            test.each([
+                ['absent', undefined, 'fallback-local.jwt'],
+                ['malformed', '{not-json', 'fallback-local.jwt'],
+                ['missing an access token', JSON.stringify({storedAt: 123}), 'fallback-local.jwt'],
+                ['an empty access token', JSON.stringify({accessToken: ''}), 'fallback-local.jwt'],
+                [
+                    'a whitespace-only access token',
+                    JSON.stringify({accessToken: '   '}),
+                    'fallback-local.jwt'
+                ],
+                [
+                    'a non-string access token',
+                    JSON.stringify({accessToken: 123}),
+                    'fallback-local.jwt'
+                ],
+                [
+                    'a valid non-empty string access token',
+                    JSON.stringify({accessToken: 'authoritative-session.jwt'}),
+                    'authoritative-session.jwt'
+                ]
+            ])(
+                'selects the expected JWT when sessionStorage has %s',
+                async (_description, sessionValue, expectedJWT) => {
+                    window.sessionStorage.setItem(
+                        conversationKey,
+                        JSON.stringify({conversationId: 'conv-123'})
+                    )
+                    if (sessionValue !== undefined) {
+                        window.sessionStorage.setItem(tokenKey, sessionValue)
+                    }
+                    window.localStorage.setItem(
+                        tokenKey,
+                        JSON.stringify({accessToken: 'fallback-local.jwt'})
+                    )
+
+                    renderCommerceClient()
+
+                    await waitFor(() =>
+                        expect(mockCallAuthLinkProxy).toHaveBeenCalledWith({
+                            commerceClientJWT: expectedJWT
+                        })
+                    )
+                }
+            )
+
+            test('serializes auth-link attempts and ignores the stale generation', async () => {
+                seedAuthLinkStorage()
+                let resolveFirstAuthLink
+                const firstAuthLink = new Promise((resolve) => {
+                    resolveFirstAuthLink = resolve
+                })
+                mockCallAuthLinkProxy
+                    .mockImplementationOnce(() => firstAuthLink)
+                    .mockResolvedValue({auth_link_key: 'registered-auth-link-key'})
+                const {rerender} = renderCommerceClientWithBasket()
+
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1))
+
+                mockedUseCustomerType.mockReturnValue({
+                    customerType: 'registered',
+                    isGuest: false,
+                    isRegistered: true,
+                    isExternal: false
+                })
+                mockedUseUsid.mockReturnValue({usid: 'registered-usid'})
+                rerender(
+                    <ShopperAgent
+                        commerceAgentConfiguration={commerceClientSettings}
+                        basketDoneLoading={true}
+                    />
+                )
+
+                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1)
+                resolveFirstAuthLink({auth_link_key: 'stale-auth-link-key'})
+
+                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                expect(mockCallTokenBridge).toHaveBeenCalledWith(
+                    expect.objectContaining({authLinkKey: 'registered-auth-link-key'})
+                )
+                expect(mockCallTokenBridge).not.toHaveBeenCalledWith(
+                    expect.objectContaining({authLinkKey: 'stale-auth-link-key'})
+                )
+            })
+
+            test('applies the current shopper link last when login remounts during token bridging', async () => {
+                seedAuthLinkStorage()
+                let resolveGuestBridge
+                const guestBridge = new Promise((resolve) => {
+                    resolveGuestBridge = resolve
+                })
+                mockCallTokenBridge
+                    .mockImplementationOnce(() => guestBridge)
+                    .mockResolvedValue({status: 200, body: {ok: true}})
+                const {rerender} = renderCommerceClientWithBasket()
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                rerender(
+                    <ShopperAgent
+                        commerceAgentConfiguration={commerceClientSettings}
+                        basketDoneLoading={false}
+                    />
+                )
+                mockGetTokenWhenReady.mockResolvedValue('registered-slas-access-token')
+                mockedUseCustomerType.mockReturnValue({
+                    customerType: 'registered',
+                    isGuest: false,
+                    isRegistered: true,
+                    isExternal: false
+                })
+                mockedUseUsid.mockReturnValue({usid: 'registered-usid'})
+                rerender(
+                    <ShopperAgent
+                        commerceAgentConfiguration={commerceClientSettings}
+                        basketDoneLoading={true}
+                    />
+                )
+
+                expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                resolveGuestBridge({status: 200, body: {ok: true}})
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+                expect(mockCallTokenBridge).toHaveBeenLastCalledWith({
+                    authLinkKey: 'commerce-auth-link-key',
+                    slasAccessToken: 'registered-slas-access-token',
+                    siteId: 'RefArchGlobal'
+                })
+            })
+
+            test('does not auth-link without my_domain', async () => {
+                const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+                mockedUseConfigurations.mockReturnValue({data: {configurations: []}})
+                seedAuthLinkStorage()
+
+                renderCommerceClient()
+
+                await waitFor(() => expect(warnSpy).toHaveBeenCalled())
+                expect(mockCallAuthLinkProxy).not.toHaveBeenCalled()
+                expect(mockCallTokenBridge).not.toHaveBeenCalled()
+                warnSpy.mockRestore()
+            })
         })
     })
 })
