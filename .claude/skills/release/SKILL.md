@@ -196,6 +196,10 @@ Same as Step 2, with the clean stable versions (no suffix). Bump `#1`–`#4`, re
    ```
    Only tag packages that actually released. `npm login` first if `npm whoami` fails; npm will prompt for a fresh OTP on each write — enter it each time. Confirm with `npm dist-tag ls @salesforce/<pkg>`.
 3. **Snyk.** Point Snyk at the new release branch (follow the team's internal Snyk setup doc for the exact steps). Completion: the Snyk dashboard tracks `release-X.Y.x`.
+4. **Announce the release on Slack.** Once the stable is on `latest` (step 2 confirmed), **remind the operator to notify everyone** that `<version>` is out. Include the generate command so anyone can smoke-test a fresh storefront off the stable — no `--templateVersion` needed, since the matching retail-react-app is now on `latest`:
+   ```
+   npx @salesforce/pwa-kit-create-app@<version> --outputDir /tmp/smoke-test-<version>
+   ```
 
 ## Step 6 — Merge back to develop
 
