@@ -31,18 +31,18 @@ git log --oneline -5
 | Stable version published, no GitHub release yet, or `npm dist-tag ls @salesforce/pwa-kit-react-sdk` shows `next` still on the old preview | **Step 5 — Post-release** |
 | Stable released, GitHub release done, `next` moved to the stable version | **Step 6 — Merge back** |
 
-Tell the operator which step they're on and why. In the same turn — no separate gate — ask if this is their first release. If **yes**, give them the quick overview below to orient them; if **no**, skip it. Either way, then start at their step and keep walking one step at a time.
+Tell the operator which step they're on and why. In the same turn — no separate gate — ask if this is their first release. If **yes**, give them the quick overview below to orient them; if **no**, skip it. Either way, start at their step.
 
-**Quick overview (first-timers only).** A release is a week-plus arc, not a single command. The shape:
+**Quick overview (first-timers only).** A release is a week-plus arc, not a single command. The steps, by name:
 
-1. **Cut** a `release-X.Y.x` branch clean off `develop`.
-2. **Bump** the four version numbers, stamp the changelogs, open a PR into the release branch. **Merging that PR is what publishes to npm** — there's no publish button.
-3. **Smoke test** the published `-preview.N`: you generate a fresh storefront and run the automated checks; the operator and each team test their own features and report blockers. Fix, cut another preview, repeat until clean.
-4. **Ship** the stable version the same way (bump → PR → merge publishes to `latest`).
-5. **Post-release**: publish GitHub release notes, move the `next` dist-tag onto the stable, announce on Slack.
-6. **Merge back** into `develop` and reset it to the next `-dev` version.
+1. **Cut** a `release-X.Y.x` branch off `develop`.
+2. **Bump + PR.** Bump the four versions, stamp changelogs, open a PR into the release branch — **merging that PR is what publishes to npm** (there's no publish button).
+3. **Smoke test** the published `-preview.N`, fix blockers, cut another preview, repeat until clean.
+4. **Ship** the stable version the same way.
+5. **Post-release**: GitHub notes, npm dist-tags, Slack announce.
+6. **Merge back** into `develop` at the next `-dev` version.
 
-You drive each step; the operator says "yes" at each gate and merges the PRs. Don't dump the whole arc again after this — reveal one step at a time from here.
+Each step's own section below carries the detail. You drive; the operator says "yes" at each gate and merges the PRs. Reveal one step at a time from here — don't dump the whole arc again.
 
 ## The one rule that shapes everything: when CI publishes
 
@@ -94,7 +94,7 @@ But `release-3.19.x` is **stale** — the changes you're shipping (e.g. new comm
 
 Goal: the base is clean and all four version numbers are chosen.
 
-**Hotfix / patch to an already-released line?** Same process, one difference at the base: **reuse the existing `release-X.Y.x` branch** — don't cut a new one (a fresh cut off develop would collide with the name and drag in unshipped work). Bump a **patch** (`3.19.0` → `3.19.1`), not a minor. The tricky part is *which commits* land on that branch — the fix lives on `develop` (or a fix branch) mixed with work that must **not** ship in a patch. Don't guess; **work with the operator** to pick the exact commits (usually `git cherry-pick <sha>...` onto the working branch, not a full `develop` merge). Confirm the selected set with them before bumping. Then rejoin the normal flow at Step 2.
+**Hotfix / patch to an already-released line?** Same process, one difference at the base: **reuse the existing `release-X.Y.x` branch** — don't cut a new one (a fresh cut off develop would collide with the name and drag in unshipped work). Bump a **patch** (`3.19.0` → `3.19.1`), not a minor. The tricky part is *which commits* land on that branch — the fix lives on `develop` (or a fix branch) mixed with work that must **not** ship in a patch. **Work with the operator** to pick the exact commits — don't guess (usually `git cherry-pick <sha>...` onto the working branch, not a full `develop` merge). Confirm the selected set with them before bumping. Then rejoin the normal flow at Step 2.
 
 1. **Audit the base** (default `develop`). It may be missing an unmerged feature branch that should ship, or carry commits that should *not* ship yet (extract those to a separate branch first). Completion: operator confirms the base holds exactly the intended changes.
 2. **Preview or final?** Preview carries `-preview.N` and gets a git tag; final has no suffix.
