@@ -94,6 +94,8 @@ But `release-3.19.x` is **stale** — the changes you're shipping (e.g. new comm
 
 Goal: the base is clean and all four version numbers are chosen.
 
+**Hotfix / patch to an already-released line?** Same process, one difference at the base: **reuse the existing `release-X.Y.x` branch** — don't cut a new one (a fresh cut off develop would collide with the name and drag in unshipped work). Bump a **patch** (`3.19.0` → `3.19.1`), not a minor. The tricky part is *which commits* land on that branch — the fix lives on `develop` (or a fix branch) mixed with work that must **not** ship in a patch. Don't guess; **work with the operator** to pick the exact commits (usually `git cherry-pick <sha>...` onto the working branch, not a full `develop` merge). Confirm the selected set with them before bumping. Then rejoin the normal flow at Step 2.
+
 1. **Audit the base** (default `develop`). It may be missing an unmerged feature branch that should ship, or carry commits that should *not* ship yet (extract those to a separate branch first). Completion: operator confirms the base holds exactly the intended changes.
 2. **Preview or final?** Preview carries `-preview.N` and gets a git tag; final has no suffix.
 3. **Choose which packages to release and their versions**, each justified from its `CHANGELOG.md`, following the dependents rule above (releasing the SDK or commerce-sdk-react pulls in retail-react-app). Prompt only for the units that ship:
