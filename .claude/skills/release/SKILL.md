@@ -181,9 +181,9 @@ Same as Step 2, with the clean stable versions (no suffix). Bump `#1`–`#4`, re
    3. **`---`** then **`## Package Changes`** — the per-package changelog compilation (every changed `CHANGELOG.md`, grouped under `### @salesforce/<pkg>@<version>` headers), and end with `**Full Changelog**: https://github.com/SalesforceCommerceCloud/pwa-kit/compare/v<prev>...v<this>`.
    - **GATE — publish it.** Write the drafted notes to a file and publish against the tag pushed in Step 4 (`gh` is on your public account — see Step 2e):
      ```
-     gh release create v<version> --title "v<version>" --notes-file <notes.md> --verify-tag --latest
+     gh release create v<version> --title "v<version>" --notes-file <notes.md> --verify-tag
      ```
-     **Pass `--latest` explicitly** — it fires `deploy_latest_release.yml`, redeploying the demo + bug-bounty sites, and that redeploy is the point. `gh`'s default is *automatic* (GitHub picks latest by semver + date), which silently skips a patch published onto an older line (e.g. `3.19.6` while `3.20.0` exists) — exactly when you still want the redeploy. State the redeploy consequence and wait for the operator's yes before running it. For a **preview**, use `--prerelease --latest=false` instead (no redeploy).
+     Let `gh` decide "latest" (its default: automatic by semver + date). For a normal top-of-line stable that marks it latest, which fires `deploy_latest_release.yml`, redeploying the demo + bug-bounty sites. State that redeploy consequence and wait for the operator's yes before running it.
    - Optionally link the Dev Portal changelog anchor (recent releases have often skipped it). It's constructable from the version — strip the dots: `3.17.0` → `#pwa-kit-317-changes`:
      ```
      https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/references/about-pwa-kit-managed-runtime/about.html#pwa-kit-<XYZ>-changes
