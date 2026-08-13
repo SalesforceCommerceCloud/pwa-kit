@@ -1941,4 +1941,36 @@ describe('HttpOnly Session Cookies', () => {
         expect(auth.client.clientConfig.headers[X_PREVIEW_PARENT]).toBeUndefined()
         expect(trustedMock).not.toHaveBeenCalled()
     })
+
+    describe('authorizeTrustedAgent', () => {
+        test('sends a CSRF state on the authorize URL, distinct from the PKCE code verifier', async () => {
+            const auth = new Auth(config)
+
+            // authorizeTrustedAgent calls createCodeVerifier twice: once for the PKCE
+            // code verifier, once for the CSRF state. Hand back distinct values so the
+            // assertions below can prove the two nonces are NOT collapsed into one.
+            const createCodeVerifierMock = helpers.createCodeVerifier as jest.Mock
+            createCodeVerifierMock
+                .mockReturnValueOnce('pkce-code-verifier')
+                .mockReturnValueOnce('csrf-state-nonce')
+
+            const {url, codeVerifier, state} = await auth.authorizeTrustedAgent({
+                loginId: 'test@test.com'
+            })
+
+            // The state must be present on the authorize request so SLAS echoes it
+            // back on the /callback redirect; without it the popup callback lands with
+            // `code` only, the code is stripped as a standard-login redirect, and the
+            // trusted agent popup hangs.
+            expect(url).toContain('/oauth2/trusted-agent/authorize?')
+            expect(url).toContain(`state=${state}`)
+            expect(state).toBe('csrf-state-nonce')
+            // Returned so the caller can compare it against the popup-echoed state.
+            expect(codeVerifier).toBe('pkce-code-verifier')
+            // Guards the two-nonce invariant: a regression that reuses the code verifier
+            // as the state (e.g. `const state = codeVerifier`) would still pass a `state=`
+            // param but would fail this assertion.
+            expect(state).not.toBe(codeVerifier)
+        })
+    })
 })
