@@ -46,7 +46,7 @@ Each step's own section below carries the detail. You drive; the operator says "
 
 ## The one rule that shapes everything: when CI publishes
 
-There is **no publish button.** Pushing a commit to a `release-X.Y.x` branch runs `.github/workflows/test.yml`, whose "Publish to NPM" step runs `npm run publish-to-npm` (`lerna publish from-package`). It publishes a package when **(a)** the monorepo version does **not** end in `-dev`, and **(b)** that version is **not already on npm**. A merged PR into the release branch is a push — so **merging a bump PR into the release branch is what publishes.**
+There is **no publish button.** Pushing a commit to a `release-X.Y.x` branch runs `.github/workflows/test.yml`, whose "Publish to NPM" step runs the `publish_to_npm` action (`npm run publish-to-npm` → `lerna publish from-package`). It publishes a package when **(a)** the monorepo version does **not** end in `-dev`, and **(b)** that version is **not already on npm**. A merged PR into the release branch is a push — so **merging a bump PR into the release branch is what publishes.**
 
 **Where to watch it.** The publish is one step buried in a large matrix — dozens of legs across `pwa-kit` / `pwa-kit-windows` / `generated` / `lighthouse` jobs, most of which are just tests. Exactly one leg publishes: the **`pwa-kit` job's `ubuntu-latest` leg whose node/npm matches `IS_MRT_NODE`**, step **"Publish to NPM"** — every other leg skips it. Read the current node/npm from `IS_MRT_NODE` in `.github/workflows/test.yml` (it tracks MRT's recommended node and drifts over time — don't trust a version memorized here). So don't wait on the whole run to go green; watch that leg's Publish step. It's also gated on the version not being `-dev`, so a green run whose Publish step was *skipped* published nothing. Don't infer success from a green check either way — **confirm against npm** (`npm view`, Step 3) as the source of truth.
 
@@ -98,7 +98,7 @@ Goal: the base is clean and all four version numbers are chosen.
 
 1. **Audit the base** (default `develop`). It may be missing an unmerged feature branch that should ship, or carry commits that should *not* ship yet (extract those to a separate branch first). Completion: operator confirms the base holds exactly the intended changes.
 2. **Preview or final?** Preview carries `-preview.N` and gets a git tag; final has no suffix.
-3. **Choose which packages to release and their versions**, each justified from its `CHANGELOG.md`, following the dependents rule above (releasing the SDK or commerce-sdk-react pulls in retail-react-app). Prompt only for the units that ship:
+3. **Choose which packages to release and their versions**, each justified from its diff since the last released tag (`git diff v<last-released> -- packages/<pkg>` — the changelog can lie both ways, see above), following the dependents rule above (releasing the SDK or commerce-sdk-react pulls in retail-react-app). Prompt only for the units that ship:
    > 1. Monorepo (sdk): ___  2. commerce-sdk-react: ___  3. retail-react-app: ___  4. mcp: ___
 
    State the resulting `release-<major>.<minor>.x` name back and get a yes.
