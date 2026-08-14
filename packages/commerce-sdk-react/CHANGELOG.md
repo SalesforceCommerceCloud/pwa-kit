@@ -1,3 +1,6 @@
+## v5.5.0-nightly-20260814082538 (Aug 14, 2026)
+## v5.5.0-dev (Aug 14, 2026)
+## v3.21.0-nightly-20260814082538 (Aug 14, 2026)
 ## v5.5.0-dev (Aug 12, 2026)
 ## v5.4.0 (Aug 12, 2026)
 - [Bugfix] Fix Trusted Agent (Order on Behalf) login hanging on a blank popup because `authorizeTrustedAgent` never sent an OAuth `state`. The storefront recognises the trusted agent callback by the presence of `state`: `request-processor.js` only keeps `code` on `/callback` (and `ssr.js` only serves that variant `no-store` and renders it) when `state` is set, and the callback page only hands `code`+`state` back to the opener when both are present. Without a `state` on the authorize request, SLAS redirected the popup to `/callback` with `code` only, the code was stripped as a standard-login redirect, an empty cacheable body was served, and the popup stayed blank with the login spinner never resolving. `authorizeTrustedAgent` now generates a CSRF `state` (a nonce distinct from the PKCE code verifier), sends it on the authorize request (SLAS echoes it back on the redirect), and returns it; `useTrustedAgent` compares the popup-echoed `state` against the one it minted before exchanging the code, and SLAS additionally binds `state`↔`code` on the token request.
