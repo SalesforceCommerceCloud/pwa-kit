@@ -365,8 +365,21 @@ const useTrustedAgent = (): UseTrustedAgent => {
                 )
             }
 
-            const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
+            const {
+                url,
+                codeVerifier,
+                state: expectedState
+            } = await authorizeTrustedAgent.mutateAsync({loginId})
             const {code, state} = await createTrustedAgentPopup(url, refresh)
+            // CSRF check: the `state` echoed back through the popup must match the one we
+            // minted for this authorize request. SLAS also binds `state`↔`code` on the
+            // token request below, but comparing here fails fast and stops a mismatched
+            // code from ever being exchanged.
+            if (state !== expectedState) {
+                throw new Error(
+                    'Trusted agent login failed: state mismatch on authentication callback.'
+                )
+            }
             return await loginTrustedAgent.mutateAsync({
                 loginId,
                 code,

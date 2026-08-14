@@ -1,4 +1,5 @@
-## v3.20.0-dev (Jul 13, 2026)
+## v3.21.0-dev (Aug 12, 2026)
+## v3.20.0 (Aug 12, 2026)
 - Remove the custom per-request CloudWatch metrics emitted by the SSR remote server (`GCTime`, `RequestTime`, `RequestSuccess`, `RequestFailed404`/`RequestFailed400`/`RequestFailed500`, `LambdaCreated`, `LambdaReused`, `RenderTime`, `RenderErrors`) to eliminate the `PutMetricData` cost incurred on every request. This is not a breaking change: `app.sendMetric()` and the `MetricsSender` (`send()`/`flush()`) are retained with their original signatures as no-ops for backwards compatibility.
 - **Bug Fix**: `getCustomGlobalPreferences` and `getCustomSitePreferences` now correctly unwrap the SCAPI `getSiteCustomPreferenceList` response envelope `{ data: [...], total: N }`. Previously, the raw envelope was stored as the preferences value, so attribute access (e.g. `preferences.c_myFlag`) silently returned `undefined`. The envelope is now flattened into a single flat map via shallow merge; non-object elements in `data` are skipped; later groups win on key collision. Port of [commerce-emu/storefront-next#2559](https://github.com/commerce-emu/storefront-next/pull/2559). [#3974](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3974)
 ## v3.19.0 (Jul 13, 2026)
