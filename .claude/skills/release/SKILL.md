@@ -24,7 +24,7 @@ git log --oneline -5
 |---|---|
 | On `develop`, version ends `-dev`, no release branch cut | **Step 1 — Pre-release audit** |
 | Release branch exists, on a working branch, versions still `-dev` | **Step 2 — Bump + changelogs + PR** |
-| On `prepare-release-*`, versions bumped (not `-dev`), no PR open | **Step 2e — Open the PR** |
+| On `prepare-release-*`, versions bumped (not `-dev`), no PR open | **Step 2 — open the PR** (bump-and-PR cycle, at the PR gate) |
 | A `-preview.N` version is published on npm | **Step 3 — Smoke test** |
 | A preview is published but a blocker was found | **Step 2 — next `-preview.(N+1)`** |
 | Preview smoke-tested clean, no blockers left | **Step 4 — Final release** |
@@ -48,7 +48,7 @@ Each step's own section below carries the detail. You drive; the operator says "
 
 There is **no publish button.** Pushing a commit to a `release-X.Y.x` branch runs `.github/workflows/test.yml`, whose "Publish to NPM" step runs the `publish_to_npm` action (`npm run publish-to-npm` → `lerna publish from-package`). It publishes a package when **(a)** the monorepo version does **not** end in `-dev`, and **(b)** that version is **not already on npm**. A merged PR into the release branch is a push — so **merging a bump PR into the release branch is what publishes.**
 
-**Where to watch it.** The publish is one step buried in a large matrix — dozens of legs across `pwa-kit` / `pwa-kit-windows` / `generated` / `lighthouse` jobs, most of which are just tests. Exactly one leg publishes: the **`pwa-kit` job's `ubuntu-latest` leg whose node/npm matches `IS_MRT_NODE`**, step **"Publish to NPM"** — every other leg skips it. Read the current node/npm from `IS_MRT_NODE` in `.github/workflows/test.yml` (it tracks MRT's recommended node and drifts over time — don't trust a version memorized here). So don't wait on the whole run to go green; watch that leg's Publish step. It's also gated on the version not being `-dev`, so a green run whose Publish step was *skipped* published nothing. Don't infer success from a green check either way — **confirm against npm** (`npm view`, Step 3) as the source of truth.
+**Where to watch it.** Exactly one leg in a large matrix publishes — the `pwa-kit` job's `ubuntu-latest` leg matching `IS_MRT_NODE` in `.github/workflows/test.yml`, step "Publish to NPM". A green check proves nothing either way — **confirm against npm** (`npm view`, Step 3) as the source of truth. For the leg-hunting detail, see "Watching the CI publish" in `RELEASE-INTERNALS.md`.
 
 Two consequences the steps depend on:
 
@@ -105,68 +105,7 @@ Goal: the base is clean and all four version numbers are chosen.
 
 ## Step 2 — Bump, stamp changelogs, open the PR
 
-### 2a — Ensure the release branch exists
-
-Derive `release-<major>.<minor>.x` from the monorepo version. Check origin:
-```
-git fetch origin
-git ls-remote --heads origin release-<major>.<minor>.x
-```
-- **Exists** (a patch, an in-flight release cutting another `-preview.N`, or the **unchanged-SDK case** where you're reusing the last SDK line's branch — see "Release a package only if it actually changed" above): do **not** recreate it — it's the released baseline.
-- **Absent** (new minor/major): **GATE** — create it clean from the base while still `-dev` (publishes nothing):
-  ```
-  git checkout -b release-<major>.<minor>.x origin/develop
-  git push -u origin release-<major>.<minor>.x
-  ```
-  If branch protection blocks the push, an admin/UI must create it — flag it, don't force it.
-
-### 2b — Working branch off the release branch
-
-Always branch off `release-<major>.<minor>.x` (not the base), so the PR diff is just bumps + changelogs:
-```
-git fetch origin
-git checkout -b prepare-release-<version> origin/release-<major>.<minor>.x
-```
-
-### 2c — Run the bumps (in order), then verify
-
-Run the four bumps chosen in Step 1, `#1`–`#4` from the table above. For a preview, versions carry `-preview.N`. Then verify: compare the output below against the versions chosen in Step 1 — every package should show its intended version. Flag any mismatch to the operator.
-```
-npx lerna list --long --all
-```
-
-### 2d — Stamp the changelogs
-
-**Invariant: each changed changelog has exactly ONE version header at the top — the version just set — with the accumulated bullets beneath. No stacked `-dev`/`-preview.N` lines.**
-
-- **Four changelogs auto-stamp: `commerce-sdk-react`, `pwa-kit-react-sdk`, `pwa-kit-runtime`, `pwa-kit-dev`.** Each has a `version` lifecycle script (`packages/<pkg>/scripts/version.js`, all functionally identical) that prepends a dated header during the bump. The SDK bump (`#1`) runs `lerna version`, which fires the `version` lifecycle for every package — so all four get stamped with a header.
-- **Only `commerce-sdk-react` is prone to stacked headers.** `pwa-kit-react-sdk/runtime/dev` ride the SDK version, so `lerna version` stamps each exactly **once** — one clean header; just verify it matches the version you set. `commerce-sdk-react` is versioned **independently**, so it gets stamped **twice**: once by the SDK bump's `lerna version` (at the SDK version — wrong), then again by its own bump (`#2`, the correct version). (`scripts/bump-version/index.js` even flags this: `// TODO: is it possible to _not_ trigger the lifecycle scripts? See commerce-sdk-react/CHANGELOG.md`.) So open `commerce-sdk-react/CHANGELOG.md` and **dedupe**: keep the one header matching the version you just set (verified above). If the stale header has bullets that belong in this release, **move those bullets up** under the kept header first — then delete the stale header line. Never delete a header without rehoming its bullets. Confirm no duplicate bullets remain across headers.
-- **The remaining three changelogs need a manual header rewrite** — `pwa-kit-create-app`, `template-retail-react-app`, and `pwa-kit-mcp` have no `version.js`, so the bump only touched their `package.json`/lockfiles. Rewrite the top line:
-  - Final: `## v3.19.0 (Jul 06, 2026)` (today's date).
-  - Preview: `## v3.19.0-preview.0`.
-  - **mcp header has NO `v` prefix** (`## 0.5.0`); every other package DOES (`## v3.19.0`). Match each file's existing style.
-
-While in each file, confirm every shipping change is listed and nothing stale remains — this is the review the process calls for. Two failure modes to catch, both invisible if you only skim: an entry **under the wrong header** (a change for this release stranded beneath an older version's heading, or vice versa — move it under the correct one), and a change **with no entry at all** (cross-check against `git diff v<last-released> -- packages/<pkg>`; every non-trivial diff earns a bullet). **Surface the changelog diffs to the operator**; don't rubber-stamp. Completion: every changed changelog opened, one clean header each, every shipping change filed under it.
-
-### 2e — Commit, (preview) tag, open PR
-
-```
-git add -A
-git commit -m "Bump versions and update changelogs for <version> release"
-```
-Preview only — tag it:
-```
-git tag -a v<version>-preview.<n> -m "v<version>-preview.<n>"
-git push origin v<version>-preview.<n>
-```
-**GATE — open the PR into `release-<major>.<minor>.x`.** State: "Merging this publishes `<the four versions>` to npm tag `<next|latest>`." Lead the title with the GUS work ID. pwa-kit is a public repo — make sure `gh` is on your regular public GitHub account (`gh auth switch --user <your-public-account>`):
-```
-git push -u origin prepare-release-<version>
-gh pr create --base release-<major>.<minor>.x --head prepare-release-<version> \
-  --title "@W-XXXXXXXX@ Release <version>" \
-  --body "<four versions + changelog highlights>"
-```
-You open it; the **operator merges it.** The merge triggers CI, which publishes. Announcing to teams and smoke testing both wait on that publish — they are Step 3, gated on the preview actually being on npm.
+Run **the bump-and-PR cycle** with **preview** versions (`-preview.N`), documented in `RELEASE-INTERNALS.md`: ensure the release branch, working branch off it, run the four bumps and verify, stamp the changelogs, then **GATE** the PR into `release-<major>.<minor>.x`. You open it; the **operator merges it.** The merge triggers CI, which publishes. Announcing to teams and smoke testing both wait on that publish — they are Step 3, gated on the preview actually being on npm.
 
 ## Step 3 — Smoke test the generated project
 
@@ -184,7 +123,7 @@ You open it; the **operator merges it.** The merge triggers CI, which publishes.
 
 ## Step 4 — Final release
 
-Same as Step 2, with the clean stable versions (no suffix). Bump `#1`–`#4`, re-verify every changelog reads final (no `-preview` left, dates correct), commit, tag `v<version>`, **GATE** the final PR into `release-X.Y.x` — state it publishes stable to `latest`. You open it; the **operator merges it.**
+Run **the bump-and-PR cycle** again (`RELEASE-INTERNALS.md`) with the clean stable versions (no suffix). Re-verify every changelog reads final — no `-preview` left, dates correct — tag `v<version>`, and **GATE** the final PR into `release-X.Y.x` stating it publishes stable to `latest`. You open it; the **operator merges it.**
 
 ## Step 5 — Post-release
 
@@ -192,7 +131,7 @@ Same as Step 2, with the clean stable versions (no suffix). Bump `#1`–`#4`, re
    1. **Intro summary** — one plain-English paragraph naming what this release *does* for someone who won't read further: `PWA Kit <X.Y> ships/fixes <the two or three things that matter>, plus <assorted smaller work>.` Written from the changes, not copied from any one changelog.
    2. **`## Highlights`** — the handful of user-facing changes worth surfacing, most important first, one bullet each. Not every changelog line — only what a storefront developer would care about. Shape each bullet: `- :emoji: **Short title** — what it is and why it matters, in plain English. ([#PR](url), [#PR](url))`. Pick an emoji that fits the change (`:lock:` security, `:money_with_wings:` cost, `:credit_card:` checkout, etc.). Draft these, then **surface them to the operator to confirm** — the "what matters" judgment is theirs.
    3. **`---`** then **`## Package Changes`** — the per-package changelog compilation (every changed `CHANGELOG.md`, grouped under `### @salesforce/<pkg>@<version>` headers), and end with `**Full Changelog**: https://github.com/SalesforceCommerceCloud/pwa-kit/compare/v<prev>...v<this>`.
-   - **GATE — publish it.** Write the drafted notes to a file and publish against the tag pushed in Step 4 (`gh` is on your public account — see Step 2e):
+   - **GATE — publish it.** Write the drafted notes to a file and publish against the tag pushed in Step 4 (`gh` is on your public account — see the bump-and-PR cycle in `RELEASE-INTERNALS.md`):
      ```
      gh release create v<version> --title "v<version>" --notes-file <notes.md> --verify-tag
      ```
