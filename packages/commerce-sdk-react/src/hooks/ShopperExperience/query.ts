@@ -162,3 +162,68 @@ export const usePage = (
         requiredParameters
     })
 }
+
+/**
+ * Get a Page Designer component based on a single component ID.
+ *
+ * The results will apply the visibility rules for the component's content, such as personalization or scheduled visibility.
+ * **Important**: Because this resource uses the GET method, you must not pass sensitive data (payment card information, for example) and must not perform any transactional processes within the server-side scripts that are run for the component.
+ * @group ShopperExperience
+ * @category Query
+ * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
+ * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
+ * @returns A TanStack Query query hook with data from the Shopper Experience `getComponent` endpoint.
+ */
+export const useComponent = (
+    apiOptions: NullableParameters<Argument<Client['getComponent']>>,
+    queryOptions: ApiQueryOptions<Client['getComponent']> = {}
+): UseQueryResult<DataType<Client['getComponent']>> => {
+    type Options = Argument<Client['getComponent']>
+    type Data = DataType<Client['getComponent']>
+    const client = useCommerceApi(CLIENT_KEY)
+    const methodName = 'getComponent'
+    const requiredParameters = ShopperExperience.paramKeys[`${methodName}Required`]
+    const {mode, pdToken} = usePageDesignerParams()
+
+    // Determine if we're in Page Designer mode (edit mode or preview with token)
+    // When true, we use rawResponse to preserve all fields like designMetadata
+    const isPageDesignerMode = Boolean(mode || pdToken)
+
+    const apiOptionsWithPDParams = {
+        ...apiOptions,
+        parameters: {
+            ...apiOptions.parameters
+        }
+    }
+
+    // Parameters can be set in `apiOptions` or `client.clientConfig`;
+    // we must merge them in order to generate the correct query key.
+    const netOptions = omitNullableParameters(mergeOptions(client, apiOptionsWithPDParams))
+    const parameters = {
+        ...pickValidParams(netOptions.parameters, ShopperExperience.paramKeys[methodName]),
+        // Add Page Designer params after filtering - these are not officially part of the oas spec, since they are meant to be internal
+        ...(mode && {mode}),
+        ...(pdToken && {pdToken})
+    }
+    const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
+    // We don't use `netOptions` here because we manipulate the options in `useQuery`.
+    // When in Page Designer mode, use rawResponse: true to preserve all response fields that are not exposed at runtime
+    const method = async (options: Options) => {
+        if (isPageDesignerMode) {
+            const response = await client[methodName](options, true)
+            return await response.json()
+        }
+        return await client[methodName](options)
+    }
+
+    queryOptions.meta = {
+        displayName: 'useComponent',
+        ...queryOptions.meta
+    }
+
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    })
+}
