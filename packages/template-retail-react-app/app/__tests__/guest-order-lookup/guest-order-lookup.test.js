@@ -20,12 +20,13 @@
 // it when ssr.js calls runtime.createHandler(options, appFn) at module-load time.
 // Using global ensures the reference is stable across the jest.mock hoisting boundary.
 jest.mock('@salesforce/pwa-kit-runtime/ssr/server/express', () => {
+    // eslint-disable-next-line no-undef
     global._routeHandlers = {}
     return {
         getRuntime: jest.fn(() => ({
             createHandler: jest.fn((opts, cb) => {
                 // Build a minimal fake express app that captures route handlers
-
+                // eslint-disable-next-line no-undef
                 const captured = global._routeHandlers
                 const fakeApp = {
                     use: jest.fn(),

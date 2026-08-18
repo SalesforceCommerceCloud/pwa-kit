@@ -5367,6 +5367,34 @@
       "value": "]"
     }
   ],
+  "guestOrderLookup.order.button.refresh": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗƒřḗḗşħ Ǿřḓḗḗř Şŧȧȧŧŭŭş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "guestOrderLookup.order.button.refreshing": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗƒřḗḗşħīƞɠ..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "guestOrderLookup.order.button.retry": [
     {
       "type": 0,
@@ -5505,6 +5533,24 @@
       "value": "]"
     }
   ],
+  "guestOrderLookup.order.lastUpdated": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŀȧȧşŧ ŭŭƥḓȧȧŧḗḗḓ ȧȧŧ "
+    },
+    {
+      "type": 1,
+      "value": "time"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "guestOrderLookup.order.orderNumber": [
     {
       "type": 0,
@@ -5563,6 +5609,20 @@
     {
       "type": 0,
       "value": "Ẏǿǿŭŭř řḗḗŧŭŭřƞ ħȧȧş ƀḗḗḗḗƞ şŭŭƀḿīŧŧḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "guestOrderLookup.order.section.shipping": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħīƥƥīƞɠ"
     },
     {
       "type": 0,

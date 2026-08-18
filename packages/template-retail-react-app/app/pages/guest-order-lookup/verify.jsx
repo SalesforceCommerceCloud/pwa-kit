@@ -4,93 +4,132 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useRef, useEffect, useCallback} from 'react'
 import {useIntl} from 'react-intl'
-import {useForm} from 'react-hook-form'
+import {useQueryClient} from '@tanstack/react-query'
 import {
+    Alert,
+    AlertIcon,
     Box,
     Button,
     Container,
     FormControl,
-    FormErrorMessage,
     FormLabel,
+    HStack,
     Heading,
     Input,
-    Link,
+    Skeleton,
     Stack,
-    Text,
-    useToast
+    Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {
-    useCustomerType,
-    useShopperOrdersMutation,
-    useAccessToken
-} from '@salesforce/commerce-sdk-react'
-import {Redirect, useHistory, useLocation} from 'react-router-dom'
+import {useCustomerType, useAccessToken} from '@salesforce/commerce-sdk-react'
+import {Redirect, useHistory, useLocation, useParams} from 'react-router-dom'
+
+const OTP_LENGTH = 6
 
 const GuestOrderLookupVerify = () => {
     const {formatMessage} = useIntl()
-    const {isRegistered} = useCustomerType()
+    const {isRegistered, customerType} = useCustomerType()
     const history = useHistory()
     const location = useLocation()
-    const toast = useToast()
+    const {orderNo} = useParams()
     const {getTokenWhenReady} = useAccessToken()
+    const queryClient = useQueryClient()
+    const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    useEffect(() => {
+        getTokenWhenReadyRef.current = getTokenWhenReady
+    })
 
-    const [serverError, setServerError] = useState(null)
-    const [serverErrorType, setServerErrorType] = useState(null) // 'invalidCode' | 'throttle' | 'generic'
+    // email arrives via router state when navigating from request.jsx; absent on hard refresh.
+    const email = location.state?.email || ''
+    // Auth resolves asynchronously — null means not yet known.
+    const authResolved = customerType !== null
+
+    const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(''))
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [resendDisabled, setResendDisabled] = useState(false)
+    const [serverError, setServerError] = useState(null)
+    const inputRefs = useRef([])
 
-    // @ts-expect-error SDK 26.8 pending — requestOrderAccessCode is not yet in commerce-sdk-isomorphic 5.4.0
-    const {mutateAsync: requestOrderAccessCode} = useShopperOrdersMutation('requestOrderAccessCode')
+    if (authResolved && isRegistered) return <Redirect to="/account/orders" />
 
-    const {
-        register,
-        handleSubmit,
-        formState: {errors},
-        setFocus
-    } = useForm({defaultValues: {accessCode: ''}})
+    if (!orderNo) return <Redirect to="/order-lookup" />
 
-    if (isRegistered) return <Redirect to="/account/orders" />
+    const handleDigitChange = useCallback(
+        (index, value) => {
+            const cleaned = value.replace(/\D/g, '').slice(-1)
+            const next = [...digits]
+            next[index] = cleaned
+            setDigits(next)
+            setServerError(null)
+            if (cleaned && index < OTP_LENGTH - 1) {
+                inputRefs.current[index + 1]?.focus()
+            }
+        },
+        [digits]
+    )
 
-    const routeState = location.state
-    if (!routeState?.orderNo || !routeState?.email) {
-        return <Redirect to="/order-lookup" />
-    }
+    const handleKeyDown = useCallback(
+        (index, e) => {
+            if (e.key === 'Backspace' && !digits[index] && index > 0) {
+                inputRefs.current[index - 1]?.focus()
+            }
+        },
+        [digits]
+    )
 
-    const {orderNo, email} = routeState
+    const handlePaste = useCallback((e) => {
+        e.preventDefault()
+        const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH)
+        if (!pasted) return
+        const next = Array(OTP_LENGTH).fill('')
+        for (let i = 0; i < pasted.length; i++) {
+            next[i] = pasted[i]
+        }
+        setDigits(next)
+        inputRefs.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus()
+    }, [])
 
-    const onSubmit = async ({accessCode}) => {
+    // All hooks declared above — early returns must come after all hook calls
+    if (authResolved && isRegistered) return <Redirect to="/account/orders" />
+    if (!orderNo) return <Redirect to="/order-lookup" />
+
+    const enteredCode = digits.join('')
+    const isComplete = enteredCode.length === OTP_LENGTH
+
+    const onSubmit = async (e) => {
+        e.preventDefault()
+        if (!isComplete || isSubmitting) return
         setServerError(null)
-        setServerErrorType(null)
         setIsSubmitting(true)
-        let hadError = false
         try {
-            const token = await getTokenWhenReady()
+            const token = await getTokenWhenReadyRef.current()
             const res = await fetch('/api/order-lookup/verify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({orderNo, email, accessCode})
+                body: JSON.stringify({orderNo, email, accessCode: enteredCode})
             })
             if (res.ok) {
-                history.push('/order-lookup/order', {orderNo})
+                try {
+                    const orderData = await res.json()
+                    queryClient.setQueryData(['guestOrderLookup', 'order', orderNo], orderData)
+                } catch {
+                    // Best-effort cache prime — navigation proceeds regardless
+                }
+                history.push(`/order-lookup/order/${encodeURIComponent(orderNo)}`)
                 return
             }
-            hadError = true
             if (res.status === 404) {
-                setServerErrorType('invalidCode')
                 setServerError(
                     formatMessage({
                         id: 'guestOrderLookup.verify.error.invalidCode',
                         defaultMessage:
-                            'Code invalid or expired. Please try again or request a new code.'
+                            'The code you entered is invalid or has expired. Please try again.'
                     })
                 )
             } else if (res.status === 429) {
-                setServerErrorType('throttle')
                 setServerError(
                     formatMessage({
                         id: 'guestOrderLookup.verify.error.tooManyAttempts',
@@ -98,7 +137,6 @@ const GuestOrderLookupVerify = () => {
                     })
                 )
             } else {
-                setServerErrorType('generic')
                 setServerError(
                     formatMessage({
                         id: 'guestOrderLookup.verify.error.generic',
@@ -106,9 +144,8 @@ const GuestOrderLookupVerify = () => {
                     })
                 )
             }
+            inputRefs.current[0]?.focus()
         } catch {
-            hadError = true
-            setServerErrorType('generic')
             setServerError(
                 formatMessage({
                     id: 'guestOrderLookup.verify.error.generic',
@@ -117,152 +154,111 @@ const GuestOrderLookupVerify = () => {
             )
         } finally {
             setIsSubmitting(false)
-            // S17: return focus to the OTP input after a server error so keyboard users can retry.
-            // Only refocus on error — on success we navigate away and focus management is moot.
-            if (hadError) setTimeout(() => setFocus('accessCode'), 0)
         }
-    }
-
-    const handleResend = async () => {
-        setResendDisabled(true)
-        try {
-            await requestOrderAccessCode({
-                parameters: {orderNo},
-                body: {email}
-            })
-        } catch {
-            // Server-side throttle means resend may be a silent no-op; show confirmation anyway.
-        }
-        toast({
-            title: formatMessage({
-                id: 'guestOrderLookup.verify.toast.resent',
-                defaultMessage: 'Check your inbox — it may take a moment.'
-            }),
-            status: 'info',
-            duration: 5000,
-            isClosable: true
-        })
-        setTimeout(() => setResendDisabled(false), 2000)
     }
 
     return (
-        <Container maxW="md" py={12}>
+        <Container maxW="lg" py={12}>
             <Stack spacing={8}>
-                <Box>
-                    <Heading as="h1" fontSize="2xl" mb={2}>
+                <Box textAlign="center">
+                    <Heading as="h1" fontSize="3xl" fontWeight="bold" mb={2}>
                         {formatMessage({
                             id: 'guestOrderLookup.verify.heading',
-                            defaultMessage: 'Enter Your Access Code'
+                            defaultMessage: 'Verify Your Email'
                         })}
                     </Heading>
-                    <Text color="gray.600">
-                        {formatMessage(
-                            {
-                                id: 'guestOrderLookup.verify.subtext',
-                                defaultMessage:
-                                    "We've sent a 6-digit code to {email}. It may take a moment to arrive."
-                            },
-                            {email}
-                        )}
-                    </Text>
+                    {email ? (
+                        <Text color="gray.600">
+                            {formatMessage(
+                                {
+                                    id: 'guestOrderLookup.verify.subtext',
+                                    defaultMessage:
+                                        "We've sent a verification code to {email}. Please enter it below."
+                                },
+                                {email}
+                            )}
+                        </Text>
+                    ) : (
+                        <Stack spacing={2} alignItems="center">
+                            <Skeleton height="20px" width="88%" />
+                            <Skeleton height="20px" width="55%" />
+                        </Stack>
+                    )}
                 </Box>
-                <Box as="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-                    <Stack spacing={5}>
-                        <FormControl isInvalid={!!errors.accessCode || !!serverError}>
-                            <FormLabel htmlFor="accessCode">
+
+                <Box
+                    as="form"
+                    onSubmit={onSubmit}
+                    noValidate
+                    borderWidth="1px"
+                    borderRadius="lg"
+                    p={8}
+                >
+                    <Stack spacing={6}>
+                        {serverError && (
+                            <Alert id="otp-error" status="error" borderRadius="md">
+                                <AlertIcon />
+                                {serverError}
+                            </Alert>
+                        )}
+
+                        <FormControl isInvalid={!!serverError}>
+                            <FormLabel htmlFor="otp-input-0" textAlign="center">
                                 {formatMessage({
                                     id: 'guestOrderLookup.verify.label.code',
-                                    defaultMessage: 'Access Code'
+                                    defaultMessage: 'Verification code'
                                 })}
                             </FormLabel>
-                            <Input
-                                id="accessCode"
-                                type="text"
-                                inputMode="numeric"
-                                maxLength={6}
-                                autoComplete="one-time-code"
-                                aria-invalid={!!errors.accessCode || !!serverError}
-                                aria-describedby={
-                                    errors.accessCode
-                                        ? 'accessCode-error'
-                                        : serverError
-                                        ? 'accessCode-server-error'
-                                        : undefined
-                                }
-                                {...register('accessCode', {
-                                    required: formatMessage({
-                                        id: 'guestOrderLookup.verify.error.codeRequired',
-                                        defaultMessage: 'Access code is required'
-                                    }),
-                                    pattern: {
-                                        value: /^[0-9]{6}$/,
-                                        message: formatMessage({
-                                            id: 'guestOrderLookup.verify.error.codeInvalid',
-                                            defaultMessage: 'Enter the 6-digit code from your email'
-                                        })
-                                    }
-                                })}
-                            />
-                            {errors.accessCode && (
-                                <FormErrorMessage id="accessCode-error" role="alert">
-                                    {errors.accessCode.message}
-                                </FormErrorMessage>
-                            )}
-                            {serverError && !errors.accessCode && (
-                                <FormErrorMessage id="accessCode-server-error" role="alert">
-                                    {serverError}
-                                    {serverErrorType === 'invalidCode' && (
-                                        <>
-                                            {' '}
-                                            <Link
-                                                as="a"
-                                                href="/order-lookup"
-                                                color="blue.600"
-                                                textDecoration="underline"
-                                            >
-                                                {formatMessage({
-                                                    id: 'guestOrderLookup.verify.error.requestNewCode',
-                                                    defaultMessage: 'Request a new code'
-                                                })}
-                                            </Link>
-                                        </>
-                                    )}
-                                </FormErrorMessage>
-                            )}
+                            <HStack spacing={3} justify="center">
+                                {Array.from({length: OTP_LENGTH}, (_, i) => (
+                                    <Input
+                                        key={i}
+                                        id={i === 0 ? 'otp-input-0' : undefined}
+                                        ref={(el) => {
+                                            inputRefs.current[i] = el
+                                        }}
+                                        type="text"
+                                        inputMode="numeric"
+                                        maxLength={1}
+                                        value={digits[i]}
+                                        onChange={(e) => handleDigitChange(i, e.target.value)}
+                                        onKeyDown={(e) => handleKeyDown(i, e)}
+                                        onPaste={handlePaste}
+                                        isDisabled={isSubmitting}
+                                        autoComplete={i === 0 ? 'one-time-code' : 'off'}
+                                        textAlign="center"
+                                        fontSize="xl"
+                                        fontWeight="bold"
+                                        w="12"
+                                        h="14"
+                                        borderWidth="2px"
+                                        aria-label={formatMessage(
+                                            {
+                                                id: 'guestOrderLookup.verify.label.digitN',
+                                                defaultMessage: 'Digit {n} of {total}'
+                                            },
+                                            {n: i + 1, total: OTP_LENGTH}
+                                        )}
+                                        aria-invalid={!!serverError || undefined}
+                                        aria-describedby={serverError ? 'otp-error' : undefined}
+                                    />
+                                ))}
+                            </HStack>
                         </FormControl>
+
                         <Button
                             type="submit"
                             colorScheme="blue"
                             isLoading={isSubmitting}
-                            isDisabled={isSubmitting}
+                            isDisabled={!isComplete || isSubmitting}
                             width="full"
+                            size="lg"
                         >
                             {formatMessage({
                                 id: 'guestOrderLookup.verify.button.submit',
                                 defaultMessage: 'Verify Code'
                             })}
                         </Button>
-                        <Text fontSize="sm" textAlign="center">
-                            {formatMessage({
-                                id: 'guestOrderLookup.verify.resend.prompt',
-                                defaultMessage: "Didn't receive a code?"
-                            })}{' '}
-                            <Link
-                                as="button"
-                                type="button"
-                                color="blue.500"
-                                onClick={handleResend}
-                                isDisabled={resendDisabled}
-                                aria-disabled={resendDisabled}
-                                opacity={resendDisabled ? 0.5 : 1}
-                                pointerEvents={resendDisabled ? 'none' : 'auto'}
-                            >
-                                {formatMessage({
-                                    id: 'guestOrderLookup.verify.resend.link',
-                                    defaultMessage: 'Resend code'
-                                })}
-                            </Link>
-                        </Text>
                     </Stack>
                 </Box>
             </Stack>
