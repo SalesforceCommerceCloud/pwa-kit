@@ -2599,18 +2599,6 @@
       "value": "Cancel Order"
     }
   ],
-  "guestOrderLookup.order.button.refresh": [
-    {
-      "type": 0,
-      "value": "Refresh Order Status"
-    }
-  ],
-  "guestOrderLookup.order.button.refreshing": [
-    {
-      "type": 0,
-      "value": "Refreshing..."
-    }
-  ],
   "guestOrderLookup.order.button.retry": [
     {
       "type": 0,
@@ -2685,16 +2673,6 @@
       "value": "count"
     }
   ],
-  "guestOrderLookup.order.lastUpdated": [
-    {
-      "type": 0,
-      "value": "Last updated at "
-    },
-    {
-      "type": 1,
-      "value": "time"
-    }
-  ],
   "guestOrderLookup.order.orderNumber": [
     {
       "type": 0,
@@ -2725,12 +2703,6 @@
     {
       "type": 0,
       "value": "Your return has been submitted."
-    }
-  ],
-  "guestOrderLookup.order.section.shipping": [
-    {
-      "type": 0,
-      "value": "Shipping"
     }
   ],
   "guestOrderLookup.order.section.tracking": [

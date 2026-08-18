@@ -361,7 +361,7 @@ export class DataCloudApi {
                     webStoreId: 'pwa',
                     interactionName: 'catalog-object-impression',
                     personalizationId: recommenderDetails.recommenderName, //* The identifier of the personalization (e.g., recommendation), provided by the personalization service provider, that led to the event.
-                    personalizationContextId: recommenderDetails.__recoUUID //* The identifier, provided by the personalization service provider, of the specific content (e.g., product) associated with this event.
+                    personalizationContentId: recommenderDetails.__recoUUID //* The identifier, provided by the personalization service provider, of the specific content (e.g., product) associated with this event.
                 }
             )
         })

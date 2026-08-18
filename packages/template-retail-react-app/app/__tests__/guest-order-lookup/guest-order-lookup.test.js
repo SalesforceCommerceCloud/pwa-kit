@@ -66,8 +66,8 @@ jest.mock('express', () => {
         get: jest.fn(),
         post: jest.fn()
     }))
-    mockExpress.json = jest.fn()
-    mockExpress.urlencoded = jest.fn()
+    mockExpress.json = jest.fn(() => jest.fn())
+    mockExpress.urlencoded = jest.fn(() => jest.fn())
     return mockExpress
 })
 
@@ -103,6 +103,7 @@ jest.mock(
     {virtual: true}
 )
 
+// ─── Config state ─────────────────────────────────────────────────────────────
 // Use a module-level state object; the factory captures the reference, not the value.
 // Initialize with a valid config so ssr.js module-level code (const config = getConfig())
 // does not throw on load.
@@ -145,7 +146,7 @@ import {
     createVerifyThrottle
 } from '@salesforce/retail-react-app/app/ssr.js'
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Shared helpers ───────────────────────────────────────────────────────────
 
 const DEFAULT_COMMERCE_PARAMS = {
     clientId: 'test-client',
@@ -153,8 +154,6 @@ const DEFAULT_COMMERCE_PARAMS = {
     shortCode: 'abc12345',
     siteId: 'TestSite'
 }
-
-const COOKIE_NAME = 'cc-goa_TestSite'
 
 function makeAppConfig(overrides = {}) {
     return {
@@ -168,6 +167,8 @@ function makeAppConfig(overrides = {}) {
         }
     }
 }
+
+const COOKIE_NAME = 'cc-goa_TestSite'
 
 /**
  * Build a cookie header string for cc-goa_TestSite containing the given order map.
@@ -786,7 +787,6 @@ describe('app.guestOrderLookup config block', () => {
         expect(config?.app?.guestOrderLookup?.enabled).toBeUndefined()
     })
 })
-
 
 // ─── S15: createVerifyThrottle ────────────────────────────────────────────────
 
