@@ -26,123 +26,14 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
-import {ShopperOrders} from 'commerce-sdk-isomorphic'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {registerAuthLinkRoute} from './components/shopper-agent/auth-link-proxy.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
 
 const config = getConfig()
-
-// Guest order access helpers
-function getSiteIdFromRequest(req) {
-    return req.headers['x-site-id'] || null
-}
-
-// Route server-side SCAPI calls through the MRT proxy so they work in Lambda.
-// MRT Lambdas have no direct outbound internet; all external API traffic must
-// go via /mobify/proxy/api (same path the client SDK uses).
-function makeShopperOrders(apiParams, authorization) {
-    const {clientId, organizationId, shortCode, siteId} = apiParams
-    const proxy = `${getAppOrigin()}${
-        getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'
-    }`
-    return new ShopperOrders({
-        parameters: {clientId, organizationId, shortCode, siteId},
-        headers: {authorization},
-        proxy
-    })
-}
-
-function parseCookieValue(req, cookieName) {
-    const raw = req.headers?.cookie
-        ?.split(';')
-        .map((c) => c.trim())
-        .find((c) => c.startsWith(cookieName + '='))
-    return raw ? decodeURIComponent(raw.slice(cookieName.length + 1)) : null
-}
-
-export function parseGuestOrderCookie(req, cookieName) {
-    try {
-        const raw = req.headers?.cookie
-            ?.split(';')
-            .map((c) => c.trim())
-            .find((c) => c.startsWith(cookieName + '='))
-        if (!raw) return {}
-        return JSON.parse(decodeURIComponent(raw.slice(cookieName.length + 1)))
-    } catch {
-        return {}
-    }
-}
-
-export function evictIfNeeded(cookieMap) {
-    // FIFO eviction if raw JSON would exceed ~2500 bytes (leaves headroom for URL-encoding expansion)
-    let entries = Object.entries(cookieMap)
-    while (JSON.stringify(Object.fromEntries(entries)).length > 2500 && entries.length > 1) {
-        entries.shift()
-    }
-    return Object.fromEntries(entries)
-}
-
-const GUEST_ORDER_SUPPRESSED_FIELDS = new Set([
-    'paymentCard',
-    'expirationMonth',
-    'expirationYear',
-    'phone',
-    'globalPartyId',
-    'orderToken',
-    'orderViewCode'
-])
-
-export function filterGuestOrderFields(order) {
-    if (!order || typeof order !== 'object') return order
-    const filtered = {}
-    for (const [key, val] of Object.entries(order)) {
-        if (key.startsWith('c_')) continue // suppress all custom attributes
-        if (GUEST_ORDER_SUPPRESSED_FIELDS.has(key)) continue
-        if (key === 'customerInfo') {
-            // Keep only email echo; suppress phone, globalPartyId
-            const {email, customerEmail} = val || {}
-            filtered.customerInfo = {email: email || customerEmail}
-            continue
-        }
-        if (key === 'paymentInstruments') {
-            // Keep card type, last digits, masked number, method id — matches sf-next allowedFields
-            filtered.paymentInstruments = (val || []).map((pi) => ({
-                paymentInstrumentId: pi.paymentInstrumentId,
-                paymentMethodId: pi.paymentMethodId,
-                cardType: pi.cardType,
-                numberLastDigits: pi.numberLastDigits,
-                maskedNumber: pi.maskedNumber
-            }))
-            continue
-        }
-        if (key === 'shipments') {
-            // Full shippingAddress matches sf-next allowedFields; tracking fields are additive
-            filtered.shipments = (val || []).map((s) => ({
-                shipmentId: s.shipmentId,
-                shippingStatus: s.shippingStatus,
-                trackingNumber: s.trackingNumber,
-                trackingUrl: s.trackingUrl,
-                expectedDeliveryDate: s.expectedDeliveryDate,
-                shippingMethod: s.shippingMethod,
-                shippingAddress: s.shippingAddress
-                    ? {
-                          firstName: s.shippingAddress.firstName,
-                          lastName: s.shippingAddress.lastName,
-                          address1: s.shippingAddress.address1,
-                          address2: s.shippingAddress.address2,
-                          city: s.shippingAddress.city,
-                          stateCode: s.shippingAddress.stateCode,
-                          countryCode: s.shippingAddress.countryCode,
-                          postalCode: s.shippingAddress.postalCode
-                      }
-                    : undefined
-            }))
-            continue
-        }
-        filtered[key] = val
-    }
-    return filtered
-}
 
 const options = {
     // The build directory (an absolute path)
@@ -198,7 +89,7 @@ const options = {
     // HYBRID PROXY REQUIREMENT:
     // - Hybrid Proxy requires this to be 'true' for SFCC session management to work properly
     // - Only enable Hybrid Proxy in development environments, never in production
-    localAllowCookies: true,
+    localAllowCookies: false,
 
     // Hybrid Proxy configuration for local development and MRT to ODS connection testing.
     //
@@ -461,57 +352,27 @@ export async function jwksCaching(req, res, options) {
     }
 }
 
-// ─── S15: In-process throttle middleware for /api/order-lookup/verify ────────
-// Keyed on the first IP from X-Forwarded-For (or req.ip). Uses a Map with
-// {count, resetAt} per key. No external library — zero new dependencies.
-// Reads windowMs/max from app.guestOrderLookup.requestCodeThrottle at request
-// time so config hot-reload works without restarting the server.
-export function createVerifyThrottle() {
-    /** @type {Map<string, {count: number, resetAt: number}>} */
-    const store = new Map()
-
-    return function verifyThrottleMiddleware(req, res, next) {
-        const appConfig = getConfig()?.app
-        // No-op when feature is disabled
-        if (!appConfig?.guestOrderLookup?.enabled) return next()
-        // Only throttle the verify endpoint — order fetch and oms-meta must not be throttled
-        // because normal usage (hard refresh, cancel/return polling) would exhaust the budget.
-        if (req.path !== '/api/order-lookup/verify') return next()
-
-        const throttleConfig = appConfig?.guestOrderLookup?.requestCodeThrottle
-        const windowMs = throttleConfig?.windowMs ?? 60000
-        const max = throttleConfig?.max ?? 5
-
-        // Throttle keyed on x-forwarded-for. In MRT deployments this header is set
-        // by the trusted CDN edge. In non-MRT environments (local dev, custom hosting)
-        // it may be spoofable — SCAPI rate limiting is the authoritative backstop.
-        const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || 'unknown'
-        const now = Date.now()
-        const entry = store.get(ip)
-
-        if (!entry || now >= entry.resetAt) {
-            store.set(ip, {count: 1, resetAt: now + windowMs})
-            return next()
-        }
-
-        entry.count += 1
-        if (entry.count > max) {
-            return res.status(429).json({error: 'Too many requests'})
-        }
+/**
+ * Handle the SLAS `/callback` redirect.
+ *
+ * The Trusted Agent (Order on Behalf) popup redirects here with both a `code` and
+ * a `state`. That flow needs the React app to mount so the callback page can hand
+ * the result back to the opener, so let it fall through to the renderer via
+ * `next()`. This URL carries OAuth material, so that variant must never be cached.
+ *
+ * For every other request (including the standard SLAS login redirect, which does
+ * not navigate the top window here and carries no `state`) this endpoint does
+ * nothing and is safe to cache for a long time.
+ */
+export function handleCallback(req, res, next) {
+    if (req.query.code && req.query.state) {
+        res.set('Cache-Control', 'no-store')
         return next()
     }
-}
 
-// Guest order lookup: warn if feature is enabled but cookies are not allowed
-const _golConfig = getConfig()?.app?.guestOrderLookup
-if (_golConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_COOKIES) {
-    logger.warn(
-        'guestOrderLookup.enabled is true but neither localAllowCookies nor MRT_ALLOW_COOKIES is set. The cc-goa_* HttpOnly cookie will not be written. Set localAllowCookies: true for local dev or MRT_ALLOW_COOKIES=true for MRT.',
-        {namespace: 'guest-order-lookup'}
-    )
+    res.set('Cache-Control', `max-age=31536000`)
+    res.send()
 }
-
-const cookieSecureFlag = options.localAllowCookies ? '' : ' Secure;'
 
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
@@ -540,6 +401,11 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.cimulate.ai',
                         // Commerce Client bundle served from the SFCC static CDN
                         '*.sfcc-store-internal.net',
+                        // Origin of the merchant-hosted Commerce Client component-override
+                        // script, added only when cc_overridesUrl holds a valid HTTPS URL.
+                        // Serving that script from a different host than the configured one
+                        // requires adding the host here.
+                        ...getCommerceClientOverridesCspSources(config.app.commerceAgent),
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
                         // Payment gateways
@@ -601,12 +467,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     )
 
     // Handle the redirect from SLAS as to avoid error
-    app.get('/callback', (req, res) => {
-        // This endpoint does nothing and is not expected to change
-        // Thus we cache it for a year to maximize performance
-        res.set('Cache-Control', `max-age=31536000`)
-        res.send()
-    })
+    app.get('/callback', handleCallback)
 
     app.get('/:shortCode/:tenantId/oauth2/jwks', (req, res) => {
         jwksCaching(req, res, {shortCode: req.params.shortCode, tenantId: req.params.tenantId})
@@ -686,12 +547,27 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Browser POSTs an auth_link_key and siteId (as x-site-id header).
     // In HttpOnly mode, tokens are read from cookies server-side.
     // In non-HttpOnly mode, SLAS access token is sent in request body.
-    // Server extracts my_domain from ANC_MYDOMAIN environment variable,
+    // Server extracts my_domain from AGENT_MYDOMAIN environment variable,
     // validates it's a trusted Salesforce host (SSRF prevention), then
     // forwards the tokens to Core's `/agent/identity/bridge` endpoint with
     // the access token in an `Authorization: SLAS` header and the refresh
     // token in the body.
     registerTokenBridgeRoute(app)
+
+    // Shopper Agent — Auth Link proxy for Commerce Client.
+    // Browser POSTs the Commerce Client JWT from the deployment-scoped
+    // cim_af_ct_<orgId>_<embeddedServiceName> key in the request body. sessionStorage
+    // is authoritative; localStorage is a compatibility fallback. Unlike the Token
+    // Bridge, no siteId/x-site-id is sent — the SCRT authlink endpoint authenticates
+    // with the JWT (Bearer) alone.
+    // Server reads the SCRT2 origin from scrt2Url in the COMMERCE_AGENT_SETTINGS
+    // environment variable (NOT AGENT_MYDOMAIN — the /iamessage/* auth link API is
+    // served by SCRT2 on *.salesforce-scrt.com, a different host from Core's
+    // MyDomain), validates it's a trusted Salesforce host (SSRF prevention), then
+    // calls SCRT's `/iamessage/api/v2/authorization/authlink` endpoint with the
+    // Commerce Client JWT in an `Authorization: Bearer` header.
+    // Returns { auth_link_key: "..." } which is then used with Token Bridge.
+    registerAuthLinkRoute(app)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
@@ -735,173 +611,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                 error: 'Failed to fetch metadata',
                 details: error.message
             })
-        }
-    })
-
-    app.post('/api/order-lookup/verify', async (req, res) => {
-        const appConfig = getConfig()?.app
-        if (!appConfig?.guestOrderLookup?.enabled)
-            return res.status(503).json({error: 'Feature not enabled'})
-
-        const {orderNo, email, accessCode} = req.body || {}
-        if (!orderNo || !email || !accessCode)
-            return res.status(400).json({error: 'Missing required fields'})
-
-        // Read the SLAS access token from the HttpOnly cc-at_{siteId} cookie written by
-        // pwa-kit-runtime's SLAS proxy. With enableHttpOnlySessionCookies: true the browser
-        // cannot read the token, so client-forwarded Authorization headers are always empty.
-        const siteIdForToken = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteIdForToken}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
-
-        const correlationId = req.headers['x-correlation-id']
-        const start = Date.now()
-
-        try {
-            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
-
-            const order = await shopperOrders.guestOrderLookup({
-                parameters: {orderNo},
-                body: {orderViewCode: accessCode, email}
-            })
-            // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
-            if (!order?.orderNo) {
-                const title = order?.title || ''
-                const fakeStatus = /unauthorized/i.test(title)
-                    ? 401
-                    : /not.found/i.test(title)
-                    ? 404
-                    : 500
-                const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
-                proxyErr.response = {status: fakeStatus}
-                throw proxyErr
-            }
-
-            // Apply guest field allowlist
-            const filtered = filterGuestOrderFields(order)
-
-            const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-            const cookieName = `cc-goa_${siteId}`
-            const existing = parseGuestOrderCookie(req, cookieName)
-            existing[orderNo] = {email, verifiedCode: accessCode}
-            const cookieVal = evictIfNeeded(existing)
-            res.setHeader(
-                'Set-Cookie',
-                `${cookieName}=${encodeURIComponent(
-                    JSON.stringify(cookieVal)
-                )}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
-            )
-
-            logger.info('guest-order-lookup verify success', {
-                namespace: 'guest-order-lookup',
-                additionalProperties: {
-                    correlationId,
-                    orderNoPrefix: orderNo?.slice(0, 4),
-                    scapiStatus: 200,
-                    durationMs: Date.now() - start
-                }
-            })
-            res.json(filtered)
-        } catch (err) {
-            const scapiStatus = err?.response?.status || 500
-            const errorKind = scapiStatus === 404 ? 'invalid_code' : 'scapi_error'
-            logger.warn('guest-order-lookup verify error', {
-                namespace: 'guest-order-lookup',
-                additionalProperties: {
-                    correlationId,
-                    orderNoPrefix: orderNo?.slice(0, 4),
-                    scapiStatus,
-                    errorKind,
-                    durationMs: Date.now() - start
-                }
-            })
-            if (scapiStatus === 404)
-                return res.status(404).json({error: 'Invalid or expired access code'})
-            if (scapiStatus === 401) return res.status(401).json({error: 'Missing authorization'})
-            if (scapiStatus === 403) return res.status(403).json({error: 'Forbidden'})
-            res.status(502).json({error: 'Service error'})
-        }
-    })
-
-    app.get('/api/order-lookup/order/:orderNo', async (req, res) => {
-        const appConfig = getConfig()?.app
-        if (!appConfig?.guestOrderLookup?.enabled)
-            return res.status(503).json({error: 'Feature not enabled'})
-
-        const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
-
-        const cookieName = `cc-goa_${siteId}`
-        const cookieData = parseGuestOrderCookie(req, cookieName)
-
-        const orderNo = req.params.orderNo
-        if (!orderNo || !cookieData[orderNo])
-            return res.status(403).json({error: 'No verified session for this order'})
-
-        const {email, verifiedCode} = cookieData[orderNo]
-        const correlationId = req.headers['x-correlation-id']
-        const start = Date.now()
-
-        try {
-            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
-            const order = await shopperOrders.guestOrderLookup({
-                parameters: {orderNo},
-                body: {orderViewCode: verifiedCode, email}
-            })
-            // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
-            if (!order?.orderNo) {
-                const title = order?.title || ''
-                const fakeStatus = /unauthorized/i.test(title)
-                    ? 401
-                    : /not.found/i.test(title)
-                    ? 404
-                    : 500
-                const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
-                proxyErr.response = {status: fakeStatus}
-                throw proxyErr
-            }
-            const filtered = filterGuestOrderFields(order)
-            logger.info('guest-order-lookup order fetch success', {
-                namespace: 'guest-order-lookup',
-                additionalProperties: {
-                    correlationId,
-                    orderNoPrefix: orderNo?.slice(0, 4),
-                    scapiStatus: 200,
-                    durationMs: Date.now() - start
-                }
-            })
-            res.json(filtered)
-        } catch (err) {
-            const scapiStatus = err?.response?.status || 500
-            const errorKind = scapiStatus === 404 ? 'expired_code' : 'scapi_error'
-            logger.warn('guest-order-lookup order fetch error', {
-                namespace: 'guest-order-lookup',
-                additionalProperties: {
-                    correlationId,
-                    orderNoPrefix: orderNo?.slice(0, 4),
-                    scapiStatus,
-                    errorKind,
-                    durationMs: Date.now() - start
-                }
-            })
-            if (scapiStatus === 404) {
-                // Clear this order's cookie entry
-                const cookieData2 = parseGuestOrderCookie(req, cookieName)
-                delete cookieData2[orderNo]
-                res.setHeader(
-                    'Set-Cookie',
-                    `${cookieName}=${encodeURIComponent(
-                        JSON.stringify(cookieData2)
-                    )}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
-                )
-                return res.status(404).json({error: 'Session expired'})
-            }
-            if (scapiStatus === 401) return res.status(401).json({error: 'Unauthorized'})
-            if (scapiStatus === 403) return res.status(403).json({error: 'Forbidden'})
-            res.status(502).json({error: 'Service error'})
         }
     })
 

@@ -206,7 +206,7 @@
   "account_order_detail.alert.cancellation_error_conflict": [
     {
       "type": 0,
-      "value": "This order is already being processed and cannot be cancelled. Please reach out to the merchant."
+      "value": "This order is already being processed and cannot be canceled. Please reach out to the merchant."
     }
   ],
   "account_order_detail.alert.cancellation_error_generic": [
@@ -236,13 +236,13 @@
   "account_order_detail.alert.cancellation_success_description": [
     {
       "type": 0,
-      "value": "Your order was cancelled successfully."
+      "value": "Your order was canceled successfully."
     }
   ],
   "account_order_detail.alert.cancellation_success_title": [
     {
       "type": 0,
-      "value": "Order cancelled"
+      "value": "Order canceled"
     }
   ],
   "account_order_detail.alert.return_success_description": [
@@ -416,7 +416,7 @@
   "account_order_detail.hint.cancel_unavailable": [
     {
       "type": 0,
-      "value": "This order can no longer be cancelled."
+      "value": "This order can no longer be canceled."
     }
   ],
   "account_order_detail.hint.no_returnable_items": [
@@ -434,7 +434,7 @@
   "account_order_detail.hint.not_cancellable": [
     {
       "type": 0,
-      "value": "This order is not eligible for cancellation."
+      "value": "This order isn't eligible for cancellation."
     }
   ],
   "account_order_detail.hint.return_unavailable": [
@@ -1290,13 +1290,13 @@
   "checkout.message.payment_confirm_failure": [
     {
       "type": 0,
-      "value": "Payment confirmation failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method."
+      "value": "Payment confirmation failed. Your order has been canceled and your basket has been restored. Please try again or select a different payment method."
     }
   ],
   "checkout.message.payment_processing_failed": [
     {
       "type": 0,
-      "value": "Payment processing failed. Your order has been cancelled and your basket has been restored. Please try again or select a different payment method."
+      "value": "Payment processing failed. Your order has been canceled and your basket has been restored. Please try again or select a different payment method."
     }
   ],
   "checkout.message.user_registration": [
@@ -4884,7 +4884,7 @@
   "return_items_modal.text.quantity_exceeded_affected_generic": [
     {
       "type": 0,
-      "value": "Some items' available return quantities changed. Please review the updated limits below."
+      "value": "The available return quantities for some items changed. Review the updated limits."
     }
   ],
   "return_items_modal.text.review_description": [
@@ -4928,37 +4928,37 @@
   "return_items_modal.text.submit_error_invalid_reason": [
     {
       "type": 0,
-      "value": "The selected reason is no longer available. Please choose another."
+      "value": "The selected reason is no longer available. Choose another reason."
     }
   ],
   "return_items_modal.text.submit_error_network": [
     {
       "type": 0,
-      "value": "We're unable to process your request right now. Please try again in a few minutes."
+      "value": "We're unable to process your request right now. Try again in a few minutes."
     }
   ],
   "return_items_modal.text.submit_error_unknown_items": [
     {
       "type": 0,
-      "value": "One or more items couldn't be found on this order. Please refresh and try again."
+      "value": "We can't find one or more items on this order. Refresh and try again."
     }
   ],
   "return_items_modal.text.terminal_error_conflict": [
     {
       "type": 0,
-      "value": "This order can't be returned at this time. Please reach out to the merchant."
+      "value": "This order can't be returned at this time. Reach out to the merchant."
     }
   ],
   "return_items_modal.text.terminal_error_not_found": [
     {
       "type": 0,
-      "value": "We could not find this order."
+      "value": "We can't find this order."
     }
   ],
   "return_items_modal.text.terminal_error_title": [
     {
       "type": 0,
-      "value": "Unable to submit return"
+      "value": "We're unable to submit this return."
     }
   ],
   "search.action.cancel": [
