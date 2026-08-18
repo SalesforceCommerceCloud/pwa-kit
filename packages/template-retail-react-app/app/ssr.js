@@ -32,6 +32,7 @@ import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.
 import {registerAuthLinkRoute} from './components/shopper-agent/auth-link-proxy.js'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
+import {ShopperOrders} from 'commerce-sdk-isomorphic'
 
 const config = getConfig()
 
@@ -452,8 +453,8 @@ export function createVerifyThrottle() {
         const appConfig = getConfig()?.app
         // No-op when feature is disabled
         if (!appConfig?.guestOrderLookup?.enabled) return next()
-        // Only throttle /api/order-lookup/ requests
-        if (!req.path?.startsWith('/api/order-lookup/')) return next()
+        // Only throttle the verify (OTP submission) endpoint
+        if (req.path !== '/api/order-lookup/verify') return next()
 
         const throttleConfig = appConfig?.guestOrderLookup?.requestCodeThrottle
         const windowMs = throttleConfig?.windowMs ?? 60000
@@ -1083,7 +1084,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                 let errorCode
                 try {
                     errorCode = (await err.response.clone().json())?.errorCode
-                } catch {}
+                } catch {
+                    /* best-effort parse; fall through to generic error if body is unparseable */
+                }
                 if (errorCode === 'InvalidReasonCode')
                     return res.status(400).json({errorKind: 'invalid_reason'})
                 if (errorCode === 'UnknownProductItemIds')

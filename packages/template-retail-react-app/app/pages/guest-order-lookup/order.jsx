@@ -88,6 +88,8 @@ const GuestOrderLookupOrder = () => {
         isError,
         error,
         isFetching,
+        isSuccess,
+        dataUpdatedAt,
         refetch
     } = useQuery({
         queryKey: ['guestOrderLookup', 'order', orderNo],
@@ -414,6 +416,44 @@ const GuestOrderLookupOrder = () => {
                         </Text>
                     </Stack>
                 </Stack>
+
+                {/* Refresh Status button + last-updated timestamp */}
+                <Flex align="center" gap={3} wrap="wrap">
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => refetch()}
+                        isLoading={isFetching}
+                        loadingText={formatMessage({
+                            id: 'guestOrderLookup.order.button.refreshing',
+                            defaultMessage: 'Refreshing'
+                        })}
+                    >
+                        <FormattedMessage
+                            id="guestOrderLookup.order.button.refresh"
+                            defaultMessage="Refresh Status"
+                        />
+                    </Button>
+                    {isSuccess && dataUpdatedAt > 0 && (
+                        <Text
+                            fontSize="xs"
+                            color="gray.500"
+                            data-testid="last-updated"
+                            aria-live="polite"
+                        >
+                            <FormattedMessage
+                                id="guestOrderLookup.order.lastUpdated"
+                                defaultMessage="Last updated at {time}"
+                                values={{
+                                    time: new Intl.DateTimeFormat(undefined, {
+                                        hour: 'numeric',
+                                        minute: '2-digit'
+                                    }).format(new Date(dataUpdatedAt))
+                                }}
+                            />
+                        </Text>
+                    )}
+                </Flex>
 
                 {/* Cancel / Return buttons — only when OMS is active */}
                 {showActions && (

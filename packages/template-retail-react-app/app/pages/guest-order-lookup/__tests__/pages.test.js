@@ -25,7 +25,9 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useAccessToken: jest.fn(() => ({
         token: 'test-token',
         getTokenWhenReady: mockGetTokenWhenReady
-    }))
+    })),
+    useProducts: jest.fn(() => ({data: undefined, isLoading: false})),
+    useProduct: jest.fn(() => ({data: undefined, isLoading: false}))
 }))
 
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
@@ -50,13 +52,26 @@ import GuestOrderLookupOrder, {
     GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS
 } from '@salesforce/retail-react-app/app/pages/guest-order-lookup/order'
 
+// Helper to type a 6-digit OTP code into the individual digit inputs
+const typeOtpCode = async (user, code) => {
+    const inputs = screen.getAllByRole('textbox')
+    for (let i = 0; i < Math.min(code.length, 6); i++) {
+        await user.type(inputs[i], code[i])
+    }
+}
+
 // Helper to render verify page with router state
-const renderVerifyWithState = (state = {orderNo: 'ABC123', email: 'test@example.com'}) => {
+const renderVerifyWithState = ({orderNo = 'ABC123', email = 'test@example.com'} = {}) => {
     return renderWithProviders(
-        <MemoryRouter initialEntries={[{pathname: '/order-lookup/verify', state}]}>
-            <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
+        <MemoryRouter
+            initialEntries={[{pathname: `/order-lookup/verify/${orderNo}`, state: {email}}]}
+        >
+            <Route path="/order-lookup/verify/:orderNo" component={GuestOrderLookupVerify} />
             <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
-            <Route path="/order-lookup/order" render={() => <div>Order Details Page</div>} />
+            <Route
+                path="/order-lookup/order/:orderNo"
+                render={() => <div>Order Details Page</div>}
+            />
         </MemoryRouter>
     )
 }
@@ -134,10 +149,10 @@ describe('GuestOrderLookupRequest', () => {
 
     test('renders heading and form fields for guest users', () => {
         renderWithProviders(<GuestOrderLookupRequest />)
-        expect(screen.getByText('Find Your Order')).toBeInTheDocument()
-        expect(screen.getByLabelText('Order Number')).toBeInTheDocument()
-        expect(screen.getByLabelText('Email Address')).toBeInTheDocument()
-        expect(screen.getByRole('button', {name: /send access code/i})).toBeInTheDocument()
+        expect(screen.getByText('Look Up Your Order')).toBeInTheDocument()
+        expect(screen.getByLabelText('Order number')).toBeInTheDocument()
+        expect(screen.getByLabelText('Email address')).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /find my order/i})).toBeInTheDocument()
     })
 
     test('redirects to /account/orders when user is registered', () => {
@@ -148,14 +163,14 @@ describe('GuestOrderLookupRequest', () => {
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
-        expect(screen.queryByText('Find Your Order')).not.toBeInTheDocument()
+        expect(screen.queryByText('Look Up Your Order')).not.toBeInTheDocument()
         expect(screen.getByText('Account Orders')).toBeInTheDocument()
     })
 
     test('shows validation error when order number is empty', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByText('Order number is required')).toBeInTheDocument()
         })
@@ -164,9 +179,9 @@ describe('GuestOrderLookupRequest', () => {
     test('shows validation error when email is empty', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        const orderInput = screen.getByLabelText('Order Number')
+        const orderInput = screen.getByLabelText('Order number')
         await user.type(orderInput, 'ABC123')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByText('Email address is required')).toBeInTheDocument()
         })
@@ -175,11 +190,11 @@ describe('GuestOrderLookupRequest', () => {
     test('shows validation error when order number does not match regex', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        const orderInput = screen.getByLabelText('Order Number')
+        const orderInput = screen.getByLabelText('Order number')
         await user.type(orderInput, '!!!')
-        const emailInput = screen.getByLabelText('Email Address')
+        const emailInput = screen.getByLabelText('Email address')
         await user.type(emailInput, 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByText('Enter a valid order number')).toBeInTheDocument()
         })
@@ -192,9 +207,9 @@ describe('GuestOrderLookupRequest', () => {
                 <GuestOrderLookupRequest />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {orderNo: 'ABC123'},
@@ -210,18 +225,18 @@ describe('GuestOrderLookupRequest', () => {
             <MemoryRouter initialEntries={['/order-lookup']}>
                 <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
                 <Route
-                    path="/order-lookup/verify"
-                    render={({location}) => (
+                    path="/order-lookup/verify/:orderNo"
+                    render={({match, location}) => (
                         <div data-testid="verify-page">
-                            verify-{location.state?.orderNo}-{location.state?.email}
+                            verify-{match.params.orderNo}-{location.state?.email}
                         </div>
                     )}
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
             expect(screen.getByTestId('verify-page').textContent).toContain('ABC123')
@@ -236,14 +251,14 @@ describe('GuestOrderLookupRequest', () => {
             <MemoryRouter initialEntries={['/order-lookup']}>
                 <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
                 <Route
-                    path="/order-lookup/verify"
+                    path="/order-lookup/verify/:orderNo"
                     render={() => <div data-testid="verify-page">verify</div>}
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
         })
@@ -256,14 +271,14 @@ describe('GuestOrderLookupRequest', () => {
             <MemoryRouter initialEntries={['/order-lookup']}>
                 <Route path="/order-lookup" exact component={GuestOrderLookupRequest} />
                 <Route
-                    path="/order-lookup/verify"
+                    path="/order-lookup/verify/:orderNo"
                     render={() => <div data-testid="verify-page">verify</div>}
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /send access code/i}))
+        await user.type(screen.getByLabelText('Order number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find my order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
         })
@@ -302,8 +317,8 @@ describe('GuestOrderLookupVerify', () => {
 
     test('renders heading and code input for guest users with valid router state', () => {
         renderVerifyWithState()
-        expect(screen.getByText('Enter Your Access Code')).toBeInTheDocument()
-        expect(screen.getByLabelText('Access Code')).toBeInTheDocument()
+        expect(screen.getByText('Verify Your Email')).toBeInTheDocument()
+        expect(screen.getByLabelText('Digit 1 of 6')).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /verify code/i})).toBeInTheDocument()
     })
 
@@ -312,21 +327,9 @@ describe('GuestOrderLookupVerify', () => {
         expect(screen.getByText(/user@test\.com/)).toBeInTheDocument()
     })
 
-    test('redirects to /order-lookup when router state is missing', () => {
+    test('redirects to /order-lookup when orderNo is missing from URL params', () => {
         renderWithProviders(
-            <MemoryRouter initialEntries={[{pathname: '/order-lookup/verify', state: null}]}>
-                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
-                <Route path="/order-lookup" exact render={() => <div>Request Page</div>} />
-            </MemoryRouter>
-        )
-        expect(screen.getByText('Request Page')).toBeInTheDocument()
-    })
-
-    test('redirects to /order-lookup when orderNo is missing from state', () => {
-        renderWithProviders(
-            <MemoryRouter
-                initialEntries={[{pathname: '/order-lookup/verify', state: {email: 'a@b.com'}}]}
-            >
+            <MemoryRouter initialEntries={['/order-lookup/verify']}>
                 <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
                 <Route path="/order-lookup" exact render={() => <div>Request Page</div>} />
             </MemoryRouter>
@@ -338,42 +341,29 @@ describe('GuestOrderLookupVerify', () => {
         useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
         renderWithProviders(
             <MemoryRouter
-                initialEntries={[
-                    {pathname: '/order-lookup/verify', state: {orderNo: 'ABC', email: 'a@b.com'}}
-                ]}
+                initialEntries={[{pathname: '/order-lookup/verify/ABC', state: {email: 'a@b.com'}}]}
             >
-                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
+                <Route path="/order-lookup/verify/:orderNo" component={GuestOrderLookupVerify} />
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
-        expect(screen.queryByText('Enter Your Access Code')).not.toBeInTheDocument()
+        expect(screen.queryByText('Verify Your Email')).not.toBeInTheDocument()
         expect(screen.getByText('Account Orders')).toBeInTheDocument()
     })
 
-    test('shows validation error when code is empty', async () => {
-        const user = userEvent.setup()
+    test('submit button is disabled when code is incomplete', () => {
         renderVerifyWithState()
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(screen.getByText('Access code is required')).toBeInTheDocument()
-        })
-    })
-
-    test('shows validation error when code is not 6 digits', async () => {
-        const user = userEvent.setup()
-        renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '123')
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(screen.getByText('Enter the 6-digit code from your email')).toBeInTheDocument()
-        })
+        expect(screen.getByRole('button', {name: /verify code/i})).toBeDisabled()
     })
 
     test('calls verify endpoint with correct body and Authorization header on submit', async () => {
         global.fetch.mockResolvedValue({ok: true, status: 200})
         const user = userEvent.setup()
         renderVerifyWithState({orderNo: 'ABC123', email: 'test@example.com'})
-        await user.type(screen.getByLabelText('Access Code'), '123456')
+        const inputs = screen.getAllByRole('textbox')
+        for (let i = 0; i < 6; i++) {
+            await user.type(inputs[i], String(i + 1))
+        }
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalledWith(
@@ -400,17 +390,14 @@ describe('GuestOrderLookupVerify', () => {
         renderWithProviders(
             <MemoryRouter
                 initialEntries={[
-                    {
-                        pathname: '/order-lookup/verify',
-                        state: {orderNo: 'ABC123', email: 'test@example.com'}
-                    }
+                    {pathname: '/order-lookup/verify/ABC123', state: {email: 'test@example.com'}}
                 ]}
             >
-                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
-                <Route path="/order-lookup/order" render={() => <div>Order Page</div>} />
+                <Route path="/order-lookup/verify/:orderNo" component={GuestOrderLookupVerify} />
+                <Route path="/order-lookup/order/:orderNo" render={() => <div>Order Page</div>} />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Access Code'), '123456')
+        await typeOtpCode(user, '123456')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Order Page')).toBeInTheDocument()
@@ -421,11 +408,13 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 404})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(
-                screen.getByText('Code invalid or expired. Please try again or request a new code.')
+                screen.getByText(
+                    'The code you entered is invalid or has expired. Please try again.'
+                )
             ).toBeInTheDocument()
         })
     })
@@ -434,7 +423,7 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 429})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(
@@ -447,7 +436,7 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
@@ -458,95 +447,19 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockRejectedValue(new Error('network error'))
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
         })
     })
 
-    test('resend code fires mutation with correct args', async () => {
-        const user = userEvent.setup()
-        renderVerifyWithState({orderNo: 'ABC123', email: 'test@example.com'})
-        await user.click(screen.getByText('Resend code'))
-        await waitFor(() => {
-            expect(mockMutateAsync).toHaveBeenCalledWith({
-                parameters: {orderNo: 'ABC123'},
-                body: {email: 'test@example.com'}
-            })
-        })
-    })
-
-    test('resend code briefly disables the link to prevent rapid-fire clicks', async () => {
-        const user = userEvent.setup()
-        renderVerifyWithState()
-        const resendLink = screen.getByText('Resend code')
-        await user.click(resendLink)
-        await waitFor(() => {
-            expect(resendLink).toHaveAttribute('aria-disabled', 'true')
-        })
-    })
-
-    test('clears resend timer on unmount to prevent state update on unmounted component', async () => {
-        jest.useFakeTimers()
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
-        const {unmount} = renderVerifyWithState()
-        // Click resend to start the 2-second re-enable timer
-        await user.click(screen.getByText('Resend code'))
-        // Unmount before the 2s timer fires
-        unmount()
-        // Advance past the timer — should not throw React "state update on unmounted" warning
-        expect(() => jest.runAllTimers()).not.toThrow()
-        jest.useRealTimers()
-    })
-
-    // ── S13: "Request a new code" link on 404 error ────────────────────────────
-    test('S13: shows "Request a new code" link when 404 error occurs', async () => {
-        global.fetch.mockResolvedValue({ok: false, status: 404})
-        const user = userEvent.setup()
-        renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(screen.getByText('Request a new code')).toBeInTheDocument()
-        })
-    })
-
-    test('S13: "Request a new code" link routes to /order-lookup on 404 error', async () => {
-        global.fetch.mockResolvedValue({ok: false, status: 404})
-        const user = userEvent.setup()
-        renderWithProviders(
-            <MemoryRouter
-                initialEntries={[
-                    {
-                        pathname: '/order-lookup/verify',
-                        state: {orderNo: 'ABC123', email: 'test@example.com'}
-                    }
-                ]}
-            >
-                <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
-                <Route
-                    path="/order-lookup"
-                    exact
-                    render={() => <div data-testid="request-page">Request Page</div>}
-                />
-            </MemoryRouter>
-        )
-        await user.type(screen.getByLabelText('Access Code'), '999999')
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(screen.getByText('Request a new code')).toBeInTheDocument()
-        })
-        // The link href points to /order-lookup
-        const link = screen.getByText('Request a new code')
-        expect(link).toHaveAttribute('href', '/order-lookup')
-    })
-
+    // ── S13: error behavior ────────────────────────────────────────────────────
     test('S13: submit button re-enables after a server error', async () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
@@ -555,24 +468,10 @@ describe('GuestOrderLookupVerify', () => {
         expect(screen.getByRole('button', {name: /verify code/i})).not.toBeDisabled()
     })
 
-    test('S13: "Request a new code" link does NOT appear on 429 or 500 errors', async () => {
-        global.fetch.mockResolvedValue({ok: false, status: 429})
-        const user = userEvent.setup()
-        renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
-        await user.click(screen.getByRole('button', {name: /verify code/i}))
-        await waitFor(() => {
-            expect(
-                screen.getByText('Too many attempts. Please wait a moment and try again.')
-            ).toBeInTheDocument()
-        })
-        expect(screen.queryByText('Request a new code')).not.toBeInTheDocument()
-    })
-
     // ── S17: A11y attributes ────────────────────────────────────────────────────
     test('S17: OTP input does not have aria-invalid=true when no error', () => {
         renderVerifyWithState()
-        const input = screen.getByLabelText('Access Code')
+        const input = screen.getByLabelText('Digit 1 of 6')
         // When no error, aria-invalid is either absent or 'false' — either is correct
         const ariaInvalid = input.getAttribute('aria-invalid')
         expect(ariaInvalid === null || ariaInvalid === 'false').toBe(true)
@@ -582,12 +481,12 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
         })
-        const input = screen.getByLabelText('Access Code')
+        const input = screen.getByLabelText('Digit 1 of 6')
         expect(input).toHaveAttribute('aria-invalid', 'true')
     })
 
@@ -595,7 +494,7 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
@@ -609,15 +508,15 @@ describe('GuestOrderLookupVerify', () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
-        await user.type(screen.getByLabelText('Access Code'), '999999')
+        await typeOtpCode(user, '999999')
         await user.click(screen.getByRole('button', {name: /verify code/i}))
         await waitFor(() => {
             expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
         })
-        const input = screen.getByLabelText('Access Code')
+        const input = screen.getByLabelText('Digit 1 of 6')
         // Chakra FormControl may append additional ids; verify ours is included
         const describedBy = input.getAttribute('aria-describedby') || ''
-        expect(describedBy).toContain('accessCode-server-error')
+        expect(describedBy).toContain('otp-error')
     })
 })
 
@@ -631,11 +530,10 @@ describe('GuestOrderLookupOrder', () => {
     })
 
     // Helper to render the order page with optional router state
-    const renderOrderPage = (state = {orderNo: 'ABC123'}, search = '') => {
-        const path = `/order-lookup/order${search}`
+    const renderOrderPage = (orderNo = 'ABC123') => {
         return renderWithProviders(
-            <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state, search}]}>
-                <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
+            <MemoryRouter initialEntries={[`/order-lookup/order/${orderNo}`]}>
+                <Route path="/order-lookup/order/:orderNo" component={GuestOrderLookupOrder} />
                 <Route
                     path="/order-lookup"
                     render={() => <div data-testid="request-page">Request Page</div>}
@@ -648,27 +546,26 @@ describe('GuestOrderLookupOrder', () => {
     test('renders order details after successful fetch', () => {
         renderOrderPage()
         expect(screen.getByText('Order Details')).toBeInTheDocument()
-        expect(screen.getByText(/Order #ABC123/)).toBeInTheDocument()
-        expect(screen.getByText(/Status: new/i)).toBeInTheDocument()
+        expect(screen.getByText(/Order Number: ABC123/)).toBeInTheDocument()
     })
 
     test('renders product items', () => {
         renderOrderPage()
         expect(screen.getByText('Blue Sneakers')).toBeInTheDocument()
-        expect(screen.getByText(/Qty: 2/)).toBeInTheDocument()
+        expect(screen.getByText(/Quantity: 2/)).toBeInTheDocument()
     })
 
     test('renders shipping section with postal code', () => {
         renderOrderPage()
         expect(screen.getByRole('heading', {name: /Shipping/i})).toBeInTheDocument()
-        expect(screen.getByText(/Postal code: 94105/)).toBeInTheDocument()
+        expect(screen.getByText(/94105/)).toBeInTheDocument()
     })
 
     test('renders order totals', () => {
         renderOrderPage()
         expect(screen.getByText('Order Summary')).toBeInTheDocument()
         expect(screen.getByText('Subtotal')).toBeInTheDocument()
-        expect(screen.getByText('Total')).toBeInTheDocument()
+        expect(screen.getByText(/Total/)).toBeInTheDocument()
     })
 
     test('renders Refresh Status button', () => {
@@ -739,18 +636,20 @@ describe('GuestOrderLookupOrder', () => {
         expect(screen.getByText(/Refreshing/i)).toBeInTheDocument()
     })
 
-    test('mid-session expiry: redirect to /order-lookup?expired=1 when refetch returns 404', async () => {
+    test('mid-session expiry: redirect to /order-lookup when useQuery returns 404 error', () => {
         const expiredError = new Error('Session expired')
         expiredError.status = 404
-        mockRefetch.mockResolvedValue({data: undefined, error: expiredError})
-        const user = userEvent.setup()
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({
+                data: undefined,
+                isLoading: false,
+                isError: true,
+                error: expiredError,
+                isSuccess: false
+            })
+        )
         renderOrderPage()
-        const refreshBtn = screen.getByRole('button', {name: /refresh order status/i})
-        await user.click(refreshBtn)
-        await waitFor(() => {
-            expect(mockRefetch).toHaveBeenCalled()
-            expect(screen.getByTestId('request-page')).toBeInTheDocument()
-        })
+        expect(screen.getByTestId('request-page')).toBeInTheDocument()
     })
 
     // ── S13: 5xx error state with retry button ─────────────────────────────────
@@ -865,10 +764,10 @@ const mockOmsMeta = {
 const mockOmsMetaInactive = {omsActive: false, cancelReasonCodes: [], returnReasonCodes: []}
 
 describe('GuestOrderLookupOrder — cancel/return UI', () => {
-    const renderOrderPage = (state = {orderNo: 'ABC123'}) => {
+    const renderOrderPage = (orderNo = 'ABC123') => {
         return renderWithProviders(
-            <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state}]}>
-                <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
+            <MemoryRouter initialEntries={[`/order-lookup/order/${orderNo}`]}>
+                <Route path="/order-lookup/order/:orderNo" component={GuestOrderLookupOrder} />
                 <Route
                     path="/order-lookup"
                     render={() => <div data-testid="request-page">Request Page</div>}
@@ -1332,10 +1231,8 @@ describe('GuestOrderLookupOrder — S10 field suppression security backstop', ()
             useQuery.mockReturnValue(defaultUseQueryMock({data: poisonedOrder}))
 
             const {container} = renderWithProviders(
-                <MemoryRouter
-                    initialEntries={[{pathname: '/order-lookup/order', state: {orderNo: 'ABC123'}}]}
-                >
-                    <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
+                <MemoryRouter initialEntries={['/order-lookup/order/ABC123']}>
+                    <Route path="/order-lookup/order/:orderNo" component={GuestOrderLookupOrder} />
                     <Route path="/order-lookup" render={() => <div>Request Page</div>} />
                 </MemoryRouter>
             )

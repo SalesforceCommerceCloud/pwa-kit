@@ -8,6 +8,8 @@ import React from 'react'
 import {useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
 import {
+    Alert,
+    AlertIcon,
     Box,
     Button,
     Container,
@@ -36,6 +38,7 @@ const GuestOrderLookupRequest = () => {
     // from order.jsx so the user doesn't have to retype their order number.
     const searchParams = new URLSearchParams(location.search)
     const prefillOrderNo = searchParams.get('order') || ''
+    const isSessionExpired = searchParams.get('expired') === '1'
 
     const {
         control,
@@ -64,6 +67,16 @@ const GuestOrderLookupRequest = () => {
     return (
         <Container maxW="lg" py={12}>
             <Stack spacing={8}>
+                {isSessionExpired && (
+                    <Alert status="warning" borderRadius="md">
+                        <AlertIcon />
+                        {formatMessage({
+                            id: 'guestOrderLookup.request.sessionExpired',
+                            defaultMessage:
+                                'Your session has expired. Please look up your order again.'
+                        })}
+                    </Alert>
+                )}
                 <Box textAlign="center">
                     <Heading as="h1" fontSize="3xl" fontWeight="bold" mb={2}>
                         {formatMessage({

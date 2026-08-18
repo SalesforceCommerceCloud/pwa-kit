@@ -393,7 +393,8 @@ describe('evictIfNeeded', () => {
 
     test('evicts a single oversized entry rather than keeping it when other entries exist', () => {
         // The oversized entry is the OLDEST (first key); a smaller newer entry should survive
-        const bigValue = 'x'.repeat(2600)
+        // Need total JSON > 3000 chars with both entries, < 3000 with just the new one
+        const bigValue = 'x'.repeat(3000)
         const map = {
             ORDER_OLD: {email: 'a@b.com', accessCode: bigValue},
             ORDER_NEW: {email: 'b@c.com', accessCode: '123456'}
