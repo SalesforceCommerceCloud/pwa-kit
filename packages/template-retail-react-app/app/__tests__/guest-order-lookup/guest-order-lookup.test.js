@@ -169,13 +169,16 @@ function makeAppConfig(overrides = {}) {
 }
 
 const COOKIE_NAME = 'cc-goa_TestSite'
+const SLAS_COOKIE_NAME = 'cc-at_TestSite'
+const SLAS_TOKEN = 'test-slas-token'
 
 /**
- * Build a cookie header string for cc-goa_TestSite containing the given order map.
- * orderMap e.g. { ORD123: { email: 'a@b.com', accessCode: 'code' } }
+ * Build a cookie header string containing the cc-goa_TestSite order map AND
+ * the cc-at_TestSite SLAS token so handlers can read auth from the HttpOnly cookie.
+ * orderMap e.g. { ORD123: { email: 'a@b.com', verifiedCode: 'code' } }
  */
 function makeCookieHeader(orderMap) {
-    return `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(orderMap))}`
+    return `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(orderMap))}; ${SLAS_COOKIE_NAME}=${encodeURIComponent(SLAS_TOKEN)}`
 }
 
 function makeMockReq(overrides = {}) {
@@ -283,19 +286,23 @@ describe('filterGuestOrderFields', () => {
         expect(result.paymentInstruments[0].expirationYear).toBeUndefined()
     })
 
-    test('shipments: keeps trackingNumber, postalCode, shippingStatus; suppresses full address', () => {
+    test('shipments: keeps trackingNumber, full shippingAddress, shippingStatus, shipmentId', () => {
         const order = {
             shipments: [
                 {
+                    shipmentId: 'ship-1',
                     trackingNumber: 'TRACK123',
                     trackingUrl: 'https://carrier.com/track',
                     expectedDeliveryDate: '2026-02-01',
                     shippingStatus: 'shipped',
                     shippingAddress: {
-                        address1: '123 Secret St',
+                        firstName: 'Jane',
+                        lastName: 'Doe',
+                        address1: '123 Main St',
                         city: 'Springfield',
                         postalCode: '90210',
-                        stateCode: 'CA'
+                        stateCode: 'CA',
+                        countryCode: 'US'
                     },
                     shippingMethod: {name: 'Standard'}
                 }
@@ -303,10 +310,12 @@ describe('filterGuestOrderFields', () => {
         }
         const result = filterGuestOrderFields(order)
         expect(result.shipments[0].trackingNumber).toBe('TRACK123')
+        expect(result.shipments[0].shipmentId).toBe('ship-1')
         expect(result.shipments[0].shippingAddress.postalCode).toBe('90210')
-        expect(result.shipments[0].shippingAddress.address1).toBeUndefined()
-        expect(result.shipments[0].shippingAddress.city).toBeUndefined()
-        expect(result.shipments[0].shippingAddress.stateCode).toBeUndefined()
+        expect(result.shipments[0].shippingAddress.address1).toBe('123 Main St')
+        expect(result.shipments[0].shippingAddress.city).toBe('Springfield')
+        expect(result.shipments[0].shippingAddress.stateCode).toBe('CA')
+        expect(result.shipments[0].shippingAddress.firstName).toBe('Jane')
     })
 
     test('returns the input unchanged for null/non-object inputs', () => {
@@ -996,61 +1005,50 @@ describe('S15: createVerifyThrottle', () => {
     })
 })
 
-// ─── GET /api/order-lookup/order — expand=oms,oms_shipments param ─────────────
-// These tests drive the REAL captured handler from ssr.js to verify the expand
-// parameter is actually forwarded to shopperOrders.guestOrderLookup.
+// ─── GET /api/order-lookup/order — real handler ──────────────────────────────
 
-describe('GET /api/order-lookup/order — expand=oms,oms_shipments param', () => {
+describe('GET /api/order-lookup/order — real handler', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         configState.current = makeAppConfig()
     })
 
-    test('calls guestOrderLookup with expand: oms,oms_shipments via the real handler', async () => {
+    test('calls guestOrderLookup with orderNo only (no expand param)', async () => {
         const orderNo = 'ORD456'
         const email = 'guest@test.com'
         const accessCode = 'COOKIECODE'
 
-        // Configure the ShopperOrders mock to return a minimal order
         mockShopperOrdersInstance.guestOrderLookup.mockResolvedValue({
             orderNo,
             status: 'open',
             orderTotal: 200
         })
 
-        // Build a request with the cookie and auth header
         const req = makeMockReq({
             headers: {
-                authorization: 'Bearer test-token',
-                cookie: makeCookieHeader({[orderNo]: {email, accessCode}})
+                cookie: makeCookieHeader({[orderNo]: {email, verifiedCode: accessCode}})
             },
             params: {orderNo}
         })
         const res = makeMockRes()
 
-        // Invoke the real handler captured from ssr.js at module load
         const handler = global._routeHandlers['GET /api/order-lookup/order/:orderNo']
         expect(handler).toBeDefined()
         await handler(req, res)
 
-        // Assert guestOrderLookup was called with the expand param
         expect(mockShopperOrdersInstance.guestOrderLookup).toHaveBeenCalledWith(
             expect.objectContaining({
-                parameters: expect.objectContaining({
-                    expand: 'oms,oms_shipments',
-                    orderNo
-                })
+                parameters: expect.objectContaining({orderNo}),
+                body: expect.objectContaining({email, orderViewCode: accessCode})
             })
         )
-        // Handler returned the filtered order
+        // No expand param
+        expect(mockShopperOrdersInstance.guestOrderLookup).not.toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({expand: expect.anything()})
+            })
+        )
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({orderNo}))
-    })
-
-    test('expand param includes both oms and oms_shipments together', () => {
-        // Verify the exact expand string that ssr.js uses
-        const expandParam = 'oms,oms_shipments'
-        expect(expandParam).toContain('oms')
-        expect(expandParam).toContain('oms_shipments')
     })
 })
 
@@ -1076,7 +1074,7 @@ describe('GET /api/order-lookup/oms-meta — real handler', () => {
         const req = makeMockReq({
             headers: {
                 authorization: 'Bearer test-token',
-                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', accessCode: 'code'}})
+                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', verifiedCode: 'code'}})
             }
         })
         const res = makeMockRes()
@@ -1094,10 +1092,12 @@ describe('GET /api/order-lookup/oms-meta — real handler', () => {
         expect(res.status).not.toHaveBeenCalled()
     })
 
-    test('401: no Authorization header', async () => {
+    test('401: no SLAS cookie', async () => {
+        // Only the GOA cookie is present — no cc-at_ token, so authorization fails
+        const goaCookieOnly = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify({ORD123: {email: 'a@b.com', verifiedCode: 'code'}}))}`
         const req = makeMockReq({
             headers: {
-                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', accessCode: 'code'}})
+                cookie: goaCookieOnly
             }
         })
         const res = makeMockRes()
@@ -1112,8 +1112,8 @@ describe('GET /api/order-lookup/oms-meta — real handler', () => {
 
     test('401: no cookie', async () => {
         const req = makeMockReq({
-            headers: {authorization: 'Bearer test-token'}
-            // no cookie
+            headers: {}
+            // no cookie at all — no SLAS token
         })
         const res = makeMockRes()
 
@@ -1121,14 +1121,13 @@ describe('GET /api/order-lookup/oms-meta — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(401)
-        expect(res.json).toHaveBeenCalledWith({error: 'No active session'})
+        expect(res.json).toHaveBeenCalledWith({error: 'Missing authorization'})
         expect(mockShopperOrdersInstance.getOmsMetaData).not.toHaveBeenCalled()
     })
 
-    test('401: empty cookie {}', async () => {
+    test('401: empty GOA cookie {}', async () => {
         const req = makeMockReq({
             headers: {
-                authorization: 'Bearer test-token',
                 cookie: makeCookieHeader({})
             }
         })
@@ -1147,7 +1146,7 @@ describe('GET /api/order-lookup/oms-meta — real handler', () => {
         const req = makeMockReq({
             headers: {
                 authorization: 'Bearer test-token',
-                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', accessCode: 'code'}})
+                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', verifiedCode: 'code'}})
             }
         })
         const res = makeMockRes()
@@ -1166,7 +1165,7 @@ describe('GET /api/order-lookup/oms-meta — real handler', () => {
         const req = makeMockReq({
             headers: {
                 authorization: 'Bearer test-token',
-                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', accessCode: 'code'}})
+                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', verifiedCode: 'code'}})
             }
         })
         const res = makeMockRes()
@@ -1188,7 +1187,7 @@ describe('GET /api/order-lookup/oms-meta — real handler', () => {
         const req = makeMockReq({
             headers: {
                 authorization: 'Bearer test-token',
-                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', accessCode: 'code'}})
+                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', verifiedCode: 'code'}})
             }
         })
         const res = makeMockRes()
@@ -1206,7 +1205,7 @@ describe('GET /api/order-lookup/oms-meta — real handler', () => {
 describe('POST /api/order-lookup/cancel — real handler', () => {
     const VALID_ORDER_NO = 'ORD1234'
     const VALID_COOKIE = makeCookieHeader({
-        [VALID_ORDER_NO]: {email: 'a@b.com', accessCode: 'code'}
+        [VALID_ORDER_NO]: {email: 'a@b.com', verifiedCode: 'code'}
     })
 
     beforeEach(() => {
@@ -1277,9 +1276,11 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
         expect(res.json).toHaveBeenCalledWith({success: true})
     })
 
-    test('401: no Authorization header', async () => {
+    test('401: no SLAS cookie', async () => {
+        // No cc-at_ token — auth fails before reaching the order session check
+        const goaCookieOnly = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify({[VALID_ORDER_NO]: {email: 'a@b.com', verifiedCode: 'code'}}))}`
         const req = makeMockReq({
-            headers: {cookie: VALID_COOKIE},
+            headers: {cookie: goaCookieOnly},
             body: {orderNo: VALID_ORDER_NO}
         })
         const res = makeMockRes()
@@ -1292,27 +1293,10 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
         expect(mockShopperOrdersInstance.cancelOmsOrder).not.toHaveBeenCalled()
     })
 
-    test('401: no cookie', async () => {
-        const req = makeMockReq({
-            headers: {authorization: 'Bearer test-token'},
-            body: {orderNo: VALID_ORDER_NO}
-        })
-        const res = makeMockRes()
-
-        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
-        await handler(req, res)
-
-        expect(res.status).toHaveBeenCalledWith(401)
-        expect(res.json).toHaveBeenCalledWith({error: 'No session for this order'})
-    })
-
     test('401: orderNo not in cookie', async () => {
         const req = makeMockReq({
-            headers: {
-                authorization: 'Bearer test-token',
-                cookie: makeCookieHeader({OTHER_ORDER: {email: 'a@b.com', accessCode: 'code'}})
-            },
-            body: {orderNo: VALID_ORDER_NO}
+            headers: {cookie: VALID_COOKIE},
+            body: {orderNo: 'UNKNOWN_ORDER'}
         })
         const res = makeMockRes()
 
@@ -1325,7 +1309,7 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
 
     test('400: missing orderNo', async () => {
         const req = makeMockReq({
-            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            headers: {cookie: VALID_COOKIE},
             body: {reason: 'SOME_REASON'}
         })
         const res = makeMockRes()
@@ -1343,7 +1327,7 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
     test('400: orderNo fails regex', async () => {
         const badOrderNo = '!@#invalid'
         const cookieWithBad = makeCookieHeader({
-            [badOrderNo]: {email: 'a@b.com', accessCode: 'code'}
+            [badOrderNo]: {email: 'a@b.com', verifiedCode: 'code'}
         })
         const req = makeMockReq({
             headers: {authorization: 'Bearer test-token', cookie: cookieWithBad},
@@ -1448,7 +1432,7 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
 describe('POST /api/order-lookup/return — real handler', () => {
     const VALID_ORDER_NO = 'ORD1234'
     const VALID_COOKIE = makeCookieHeader({
-        [VALID_ORDER_NO]: {email: 'a@b.com', accessCode: 'code'}
+        [VALID_ORDER_NO]: {email: 'a@b.com', verifiedCode: 'code'}
     })
     const VALID_ITEMS = [{itemId: 'item-1', quantity: 1}]
 
@@ -1514,9 +1498,11 @@ describe('POST /api/order-lookup/return — real handler', () => {
         expect(res.json).toHaveBeenCalledWith({success: true})
     })
 
-    test('401: no Authorization header', async () => {
+    test('401: no SLAS cookie', async () => {
+        // Only the GOA cookie present — no cc-at_ token, so authorization fails
+        const goaCookieOnly = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify({[VALID_ORDER_NO]: {email: 'a@b.com', verifiedCode: 'code'}}))}`
         const req = makeMockReq({
-            headers: {cookie: VALID_COOKIE},
+            headers: {cookie: goaCookieOnly},
             body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
         })
         const res = makeMockRes()
@@ -1529,32 +1515,20 @@ describe('POST /api/order-lookup/return — real handler', () => {
         expect(mockShopperOrdersInstance.returnOmsOrder).not.toHaveBeenCalled()
     })
 
-    test('401: no cookie', async () => {
-        const req = makeMockReq({
-            headers: {authorization: 'Bearer test-token'},
-            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
-        })
-        const res = makeMockRes()
-
-        const handler = global._routeHandlers['POST /api/order-lookup/return']
-        await handler(req, res)
-
-        expect(res.status).toHaveBeenCalledWith(401)
-        expect(res.json).toHaveBeenCalledWith({error: 'No session for this order'})
-    })
-
     test('401: orderNo not in cookie', async () => {
         const req = makeMockReq({
-            headers: {
-                authorization: 'Bearer test-token',
-                cookie: makeCookieHeader({OTHER: {email: 'a@b.com', accessCode: 'code'}})
-            },
+            headers: {cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
+        })
+        // VALID_COOKIE only has VALID_ORDER_NO, but we request a different orderNo
+        const req2 = makeMockReq({
+            headers: {cookie: makeCookieHeader({OTHER: {email: 'a@b.com', verifiedCode: 'code'}})},
             body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
         })
         const res = makeMockRes()
 
         const handler = global._routeHandlers['POST /api/order-lookup/return']
-        await handler(req, res)
+        await handler(req2, res)
 
         expect(res.status).toHaveBeenCalledWith(401)
         expect(res.json).toHaveBeenCalledWith({error: 'No session for this order'})

@@ -41,6 +41,27 @@ function getSiteIdFromRequest(req) {
     return req.headers['x-site-id'] || null
 }
 
+// Route server-side SCAPI calls through the MRT proxy so they work in Lambda.
+// MRT Lambdas have no direct outbound internet; all external API traffic must
+// go via /mobify/proxy/api (same path the client SDK uses).
+function makeShopperOrders(apiParams, authorization) {
+    const {clientId, organizationId, shortCode, siteId} = apiParams
+    const proxy = `${getAppOrigin()}${getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
+    return new ShopperOrders({
+        parameters: {clientId, organizationId, shortCode, siteId},
+        headers: {authorization},
+        proxy
+    })
+}
+
+function parseCookieValue(req, cookieName) {
+    const raw = req.headers?.cookie
+        ?.split(';')
+        .map((c) => c.trim())
+        .find((c) => c.startsWith(cookieName + '='))
+    return raw ? decodeURIComponent(raw.slice(cookieName.length + 1)) : null
+}
+
 export function parseGuestOrderCookie(req, cookieName) {
     try {
         const raw = req.headers?.cookie
@@ -55,9 +76,9 @@ export function parseGuestOrderCookie(req, cookieName) {
 }
 
 export function evictIfNeeded(cookieMap) {
-    // FIFO eviction if JSON would exceed ~3KB
+    // FIFO eviction if raw JSON would exceed ~2500 bytes (leaves headroom for URL-encoding expansion)
     let entries = Object.entries(cookieMap)
-    while (JSON.stringify(Object.fromEntries(entries)).length > 3000 && entries.length > 1) {
+    while (JSON.stringify(Object.fromEntries(entries)).length > 2500 && entries.length > 1) {
         entries.shift()
     }
     return Object.fromEntries(entries)
@@ -86,25 +107,37 @@ export function filterGuestOrderFields(order) {
             continue
         }
         if (key === 'paymentInstruments') {
-            // Keep maskedNumber + cardType only
+            // Keep card type, last digits, masked number, method id — matches sf-next allowedFields
             filtered.paymentInstruments = (val || []).map((pi) => ({
-                maskedNumber: pi.maskedNumber,
+                paymentInstrumentId: pi.paymentInstrumentId,
+                paymentMethodId: pi.paymentMethodId,
                 cardType: pi.cardType,
-                paymentMethodId: pi.paymentMethodId
+                numberLastDigits: pi.numberLastDigits,
+                maskedNumber: pi.maskedNumber
             }))
             continue
         }
         if (key === 'shipments') {
-            // Keep shippingAddress (postalCode only), trackingNumber, trackingUrl, expectedDeliveryDate
+            // Full shippingAddress matches sf-next allowedFields; tracking fields are additive
             filtered.shipments = (val || []).map((s) => ({
+                shipmentId: s.shipmentId,
+                shippingStatus: s.shippingStatus,
                 trackingNumber: s.trackingNumber,
                 trackingUrl: s.trackingUrl,
                 expectedDeliveryDate: s.expectedDeliveryDate,
-                shippingStatus: s.shippingStatus,
+                shippingMethod: s.shippingMethod,
                 shippingAddress: s.shippingAddress
-                    ? {postalCode: s.shippingAddress.postalCode}
-                    : undefined,
-                shippingMethod: s.shippingMethod
+                    ? {
+                          firstName: s.shippingAddress.firstName,
+                          lastName: s.shippingAddress.lastName,
+                          address1: s.shippingAddress.address1,
+                          address2: s.shippingAddress.address2,
+                          city: s.shippingAddress.city,
+                          stateCode: s.shippingAddress.stateCode,
+                          countryCode: s.shippingAddress.countryCode,
+                          postalCode: s.shippingAddress.postalCode
+                      }
+                    : undefined
             }))
             continue
         }
@@ -177,7 +210,7 @@ const options = {
     // HYBRID PROXY REQUIREMENT:
     // - Hybrid Proxy requires this to be 'true' for SFCC session management to work properly
     // - Only enable Hybrid Proxy in development environments, never in production
-    localAllowCookies: false,
+    localAllowCookies: true,
 
     // Hybrid Proxy configuration for local development and MRT to ODS connection testing.
     //
@@ -757,7 +790,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.use(createVerifyThrottle())
 
     app.post('/api/order-lookup/verify', async (req, res) => {
-        const {app: appConfig} = getConfig()
+        const appConfig = getConfig()?.app
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
 
@@ -765,38 +798,39 @@ const {handler} = runtime.createHandler(options, (app) => {
         if (!orderNo || !email || !accessCode)
             return res.status(400).json({error: 'Missing required fields'})
 
-        const authorization = req.headers['authorization']
-        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
+        const siteIdForToken = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const slasToken = parseCookieValue(req, `cc-at_${siteIdForToken}`)
+        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
+        const authorization = `Bearer ${slasToken}`
 
         const correlationId = req.headers['x-correlation-id']
         const start = Date.now()
 
         try {
-            // Instantiate ShopperOrders server-side using config params + forwarded SLAS token
-            const {
-                clientId,
-                organizationId,
-                shortCode,
-                siteId: configSiteId
-            } = appConfig.commerceAPI.parameters
-            const shopperOrders = new ShopperOrders({
-                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
-                headers: {authorization}
-            })
-
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             const order = await shopperOrders.guestOrderLookup({
                 parameters: {orderNo},
                 body: {orderViewCode: accessCode, email}
             })
+            // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
+            if (!order?.orderNo) {
+                const title = order?.title || ''
+                const fakeStatus = /unauthorized/i.test(title) ? 401
+                    : /not.found/i.test(title) ? 404
+                    : 500
+                const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
+                proxyErr.response = {status: fakeStatus}
+                throw proxyErr
+            }
 
             // Apply guest field allowlist
             const filtered = filterGuestOrderFields(order)
 
             // Write HttpOnly session cookie
-            const siteId = getSiteIdFromRequest(req) || configSiteId
+            const siteId = siteIdForToken
             const cookieName = `cc-goa_${siteId}`
             const existing = parseGuestOrderCookie(req, cookieName)
-            existing[orderNo] = {email, accessCode}
+            existing[orderNo] = {email, verifiedCode: accessCode}
             const cookieVal = evictIfNeeded(existing)
             res.setHeader(
                 'Set-Cookie',
@@ -835,14 +869,15 @@ const {handler} = runtime.createHandler(options, (app) => {
     })
 
     app.get('/api/order-lookup/order/:orderNo', async (req, res) => {
-        const {app: appConfig} = getConfig()
+        const appConfig = getConfig()?.app
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
 
-        const authorization = req.headers['authorization']
-        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
-
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
+        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
+        const authorization = `Bearer ${slasToken}`
+
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
 
@@ -850,25 +885,26 @@ const {handler} = runtime.createHandler(options, (app) => {
         if (!orderNo || !cookieData[orderNo])
             return res.status(403).json({error: 'No verified session for this order'})
 
-        const {email, accessCode} = cookieData[orderNo]
+        const {email, verifiedCode} = cookieData[orderNo]
         const correlationId = req.headers['x-correlation-id']
         const start = Date.now()
 
         try {
-            const {
-                clientId,
-                organizationId,
-                shortCode,
-                siteId: configSiteId
-            } = appConfig.commerceAPI.parameters
-            const shopperOrders = new ShopperOrders({
-                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
-                headers: {authorization}
-            })
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             const order = await shopperOrders.guestOrderLookup({
-                parameters: {orderNo, expand: 'oms,oms_shipments'},
-                body: {orderViewCode: accessCode, email}
+                parameters: {orderNo},
+                body: {orderViewCode: verifiedCode, email}
             })
+            // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
+            if (!order?.orderNo) {
+                const title = order?.title || ''
+                const fakeStatus = /unauthorized/i.test(title) ? 401
+                    : /not.found/i.test(title) ? 404
+                    : 500
+                const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
+                proxyErr.response = {status: fakeStatus}
+                throw proxyErr
+            }
             const filtered = filterGuestOrderFields(order)
             logger.info('guest-order-lookup order fetch success', {
                 namespace: 'guest-order-lookup',
@@ -905,35 +941,29 @@ const {handler} = runtime.createHandler(options, (app) => {
                 )
                 return res.status(404).json({error: 'Session expired'})
             }
+            if (scapiStatus === 401) return res.status(401).json({error: 'Unauthorized'})
+            if (scapiStatus === 403) return res.status(403).json({error: 'Forbidden'})
             res.status(502).json({error: 'Service error'})
         }
     })
 
     app.get('/api/order-lookup/oms-meta', async (req, res) => {
-        const {app: appConfig} = getConfig()
+        const appConfig = getConfig()?.app
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
 
-        const authorization = req.headers['authorization']
-        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
-
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
+        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
+        const authorization = `Bearer ${slasToken}`
+
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
         if (!cookieData || Object.keys(cookieData).length === 0)
             return res.status(401).json({error: 'No active session'})
 
         try {
-            const {
-                clientId,
-                organizationId,
-                shortCode,
-                siteId: configSiteId
-            } = appConfig.commerceAPI.parameters
-            const shopperOrders = new ShopperOrders({
-                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
-                headers: {authorization}
-            })
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             const meta = await shopperOrders.getOmsMetaData({parameters: {}})
             return res.json({
                 omsActive: meta.omsActive ?? false,
@@ -949,14 +979,15 @@ const {handler} = runtime.createHandler(options, (app) => {
     })
 
     app.post('/api/order-lookup/cancel', async (req, res) => {
-        const {app: appConfig} = getConfig()
+        const appConfig = getConfig()?.app
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
 
-        const authorization = req.headers['authorization']
-        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
-
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
+        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
+        const authorization = `Bearer ${slasToken}`
+
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
 
@@ -983,16 +1014,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 .json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
 
         try {
-            const {
-                clientId,
-                organizationId,
-                shortCode,
-                siteId: configSiteId
-            } = appConfig.commerceAPI.parameters
-            const shopperOrders = new ShopperOrders({
-                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
-                headers: {authorization}
-            })
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             await shopperOrders.cancelOmsOrder({
                 parameters: {orderNo},
                 body: reason && typeof reason === 'string' ? {reason} : {}
@@ -1008,14 +1030,15 @@ const {handler} = runtime.createHandler(options, (app) => {
     })
 
     app.post('/api/order-lookup/return', async (req, res) => {
-        const {app: appConfig} = getConfig()
+        const appConfig = getConfig()?.app
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
 
-        const authorization = req.headers['authorization']
-        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
-
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
+        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
+        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
+        const authorization = `Bearer ${slasToken}`
+
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
 
@@ -1062,16 +1085,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
 
         try {
-            const {
-                clientId,
-                organizationId,
-                shortCode,
-                siteId: configSiteId
-            } = appConfig.commerceAPI.parameters
-            const shopperOrders = new ShopperOrders({
-                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
-                headers: {authorization}
-            })
+            const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             await shopperOrders.returnOmsOrder({
                 parameters: {orderNo},
                 body: {productItems}
