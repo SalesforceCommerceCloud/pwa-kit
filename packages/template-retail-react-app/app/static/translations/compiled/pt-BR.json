@@ -1665,6 +1665,210 @@
       "value": "Ver"
     }
   ],
+  "guestOrderLookup.order.button.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel Order"
+    }
+  ],
+  "guestOrderLookup.order.button.refreshStatus": [
+    {
+      "type": 0,
+      "value": "Refresh Status"
+    }
+  ],
+  "guestOrderLookup.order.button.refreshStatus.aria": [
+    {
+      "type": 0,
+      "value": "Refresh order status"
+    }
+  ],
+  "guestOrderLookup.order.button.refreshing": [
+    {
+      "type": 0,
+      "value": "Refreshing…"
+    }
+  ],
+  "guestOrderLookup.order.button.retry": [
+    {
+      "type": 0,
+      "value": "Try Again"
+    }
+  ],
+  "guestOrderLookup.order.button.return": [
+    {
+      "type": 0,
+      "value": "Return Items"
+    }
+  ],
+  "guestOrderLookup.order.cancel.success": [
+    {
+      "type": 0,
+      "value": "Your order has been cancelled."
+    }
+  ],
+  "guestOrderLookup.order.error.generic": [
+    {
+      "type": 0,
+      "value": "Something went wrong loading your order. Please try again."
+    }
+  ],
+  "guestOrderLookup.order.heading": [
+    {
+      "type": 0,
+      "value": "Order Details"
+    }
+  ],
+  "guestOrderLookup.order.item.qty": [
+    {
+      "type": 0,
+      "value": "Qty: "
+    },
+    {
+      "type": 1,
+      "value": "qty"
+    }
+  ],
+  "guestOrderLookup.order.item.unnamed": [
+    {
+      "type": 0,
+      "value": "Product"
+    }
+  ],
+  "guestOrderLookup.order.lastUpdated": [
+    {
+      "type": 0,
+      "value": "Last updated at "
+    },
+    {
+      "type": 1,
+      "value": "time"
+    }
+  ],
+  "guestOrderLookup.order.orderNumber": [
+    {
+      "type": 0,
+      "value": "Order #"
+    },
+    {
+      "type": 1,
+      "value": "orderNo"
+    }
+  ],
+  "guestOrderLookup.order.placedOn": [
+    {
+      "type": 0,
+      "value": "Placed on "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "guestOrderLookup.order.return.success": [
+    {
+      "type": 0,
+      "value": "Your return has been submitted."
+    }
+  ],
+  "guestOrderLookup.order.section.items": [
+    {
+      "type": 0,
+      "value": "Items"
+    }
+  ],
+  "guestOrderLookup.order.section.shipping": [
+    {
+      "type": 0,
+      "value": "Shipping"
+    }
+  ],
+  "guestOrderLookup.order.section.totals": [
+    {
+      "type": 0,
+      "value": "Order Summary"
+    }
+  ],
+  "guestOrderLookup.order.shipping.expectedDelivery": [
+    {
+      "type": 0,
+      "value": "Expected delivery: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "guestOrderLookup.order.shipping.postalCode": [
+    {
+      "type": 0,
+      "value": "Postal code: "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
+  "guestOrderLookup.order.shipping.status": [
+    {
+      "type": 0,
+      "value": "Shipping status: "
+    },
+    {
+      "type": 1,
+      "value": "status"
+    }
+  ],
+  "guestOrderLookup.order.shipping.tracking": [
+    {
+      "type": 0,
+      "value": "Tracking: "
+    },
+    {
+      "type": 1,
+      "value": "trackingNumber"
+    }
+  ],
+  "guestOrderLookup.order.status": [
+    {
+      "type": 0,
+      "value": "Status: "
+    },
+    {
+      "type": 1,
+      "value": "status"
+    }
+  ],
+  "guestOrderLookup.order.totals.shipping": [
+    {
+      "type": 0,
+      "value": "Shipping"
+    }
+  ],
+  "guestOrderLookup.order.totals.subtotal": [
+    {
+      "type": 0,
+      "value": "Subtotal"
+    }
+  ],
+  "guestOrderLookup.order.totals.tax": [
+    {
+      "type": 0,
+      "value": "Tax"
+    }
+  ],
+  "guestOrderLookup.order.totals.total": [
+    {
+      "type": 0,
+      "value": "Total"
+    }
+  ],
+  "guestOrderLookup.request.alert.sessionExpired": [
+    {
+      "type": 0,
+      "value": "Your session has expired. Please request a new access code."
+    }
+  ],
   "guestOrderLookup.request.button.submit": [
     {
       "type": 0,
