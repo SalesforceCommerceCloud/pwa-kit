@@ -104,7 +104,15 @@ const mockOrder = {
 }
 
 // Default useQuery mock that returns loaded data
-const defaultUseQueryMock = ({data = mockOrder, isLoading = false, isError = false, error = null, isFetching = false, isSuccess = true, dataUpdatedAt = Date.now()} = {}) => ({
+const defaultUseQueryMock = ({
+    data = mockOrder,
+    isLoading = false,
+    isError = false,
+    error = null,
+    isFetching = false,
+    isSuccess = true,
+    dataUpdatedAt = Date.now()
+} = {}) => ({
     data,
     isLoading,
     isError,
@@ -268,9 +276,7 @@ describe('GuestOrderLookupRequest', () => {
                 <Route path="/order-lookup" component={GuestOrderLookupRequest} />
             </MemoryRouter>
         )
-        expect(
-            screen.getByText(/your session has expired/i)
-        ).toBeInTheDocument()
+        expect(screen.getByText(/your session has expired/i)).toBeInTheDocument()
     })
 
     test('does not show expired alert when ?expired=1 is absent', () => {
@@ -512,11 +518,18 @@ describe('GuestOrderLookupVerify', () => {
         renderWithProviders(
             <MemoryRouter
                 initialEntries={[
-                    {pathname: '/order-lookup/verify', state: {orderNo: 'ABC123', email: 'test@example.com'}}
+                    {
+                        pathname: '/order-lookup/verify',
+                        state: {orderNo: 'ABC123', email: 'test@example.com'}
+                    }
                 ]}
             >
                 <Route path="/order-lookup/verify" component={GuestOrderLookupVerify} />
-                <Route path="/order-lookup" exact render={() => <div data-testid="request-page">Request Page</div>} />
+                <Route
+                    path="/order-lookup"
+                    exact
+                    render={() => <div data-testid="request-page">Request Page</div>}
+                />
             </MemoryRouter>
         )
         await user.type(screen.getByLabelText('Access Code'), '999999')
@@ -623,7 +636,10 @@ describe('GuestOrderLookupOrder', () => {
         return renderWithProviders(
             <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state, search}]}>
                 <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
-                <Route path="/order-lookup" render={() => <div data-testid="request-page">Request Page</div>} />
+                <Route
+                    path="/order-lookup"
+                    render={() => <div data-testid="request-page">Request Page</div>}
+                />
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
@@ -668,12 +684,17 @@ describe('GuestOrderLookupOrder', () => {
     })
 
     test('shows skeleton while loading', () => {
-        useQuery.mockReturnValue(defaultUseQueryMock({data: undefined, isLoading: true, isSuccess: false}))
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({data: undefined, isLoading: true, isSuccess: false})
+        )
         const {container} = renderOrderPage()
         // Skeleton renders via aria roles; check loading state indirectly via absence of content
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
         // Skeleton elements exist
-        expect(container.querySelectorAll('[class*="skeleton"]').length + container.querySelectorAll('[data-testid]').length).toBeGreaterThanOrEqual(0)
+        expect(
+            container.querySelectorAll('[class*="skeleton"]').length +
+                container.querySelectorAll('[data-testid]').length
+        ).toBeGreaterThanOrEqual(0)
     })
 
     test('redirects to /account/orders when user is registered', () => {
@@ -687,7 +708,13 @@ describe('GuestOrderLookupOrder', () => {
         const expiredError = new Error('Session expired')
         expiredError.status = 404
         useQuery.mockReturnValue(
-            defaultUseQueryMock({data: undefined, isLoading: false, isError: true, error: expiredError, isSuccess: false})
+            defaultUseQueryMock({
+                data: undefined,
+                isLoading: false,
+                isError: true,
+                error: expiredError,
+                isSuccess: false
+            })
         )
         renderOrderPage()
         await waitFor(() => {
@@ -830,7 +857,11 @@ const mockOrderWithOmsDataNoReturn = {
     ]
 }
 
-const mockOmsMeta = {omsActive: true, cancelReasonCodes: [{reason: 'REASON_1', default: true}], returnReasonCodes: []}
+const mockOmsMeta = {
+    omsActive: true,
+    cancelReasonCodes: [{reason: 'REASON_1', default: true}],
+    returnReasonCodes: []
+}
 const mockOmsMetaInactive = {omsActive: false, cancelReasonCodes: [], returnReasonCodes: []}
 
 describe('GuestOrderLookupOrder — cancel/return UI', () => {
@@ -838,7 +869,10 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
         return renderWithProviders(
             <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state}]}>
                 <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
-                <Route path="/order-lookup" render={() => <div data-testid="request-page">Request Page</div>} />
+                <Route
+                    path="/order-lookup"
+                    render={() => <div data-testid="request-page">Request Page</div>}
+                />
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
@@ -866,7 +900,10 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
         renderOrderPage()
         // Wait for oms-meta fetch to complete
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/oms-meta', expect.anything())
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/order-lookup/oms-meta',
+                expect.anything()
+            )
         })
         expect(screen.queryByRole('button', {name: /cancel order/i})).not.toBeInTheDocument()
         expect(screen.queryByRole('button', {name: /return items/i})).not.toBeInTheDocument()
@@ -914,10 +951,11 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
             if (url === '/api/order-lookup/oms-meta') {
                 return Promise.resolve({
                     ok: true,
-                    json: () => Promise.resolve({
-                        ...mockOmsMeta,
-                        returnReasonCodes: [{reason: 'DEFECT', default: true}]
-                    })
+                    json: () =>
+                        Promise.resolve({
+                            ...mockOmsMeta,
+                            returnReasonCodes: [{reason: 'DEFECT', default: true}]
+                        })
                 })
             }
             return Promise.resolve({ok: true, json: () => Promise.resolve({})})
@@ -958,10 +996,11 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
             if (url === '/api/order-lookup/oms-meta') {
                 return Promise.resolve({
                     ok: true,
-                    json: () => Promise.resolve({
-                        ...mockOmsMeta,
-                        returnReasonCodes: [{reason: 'DEFECT', default: true}]
-                    })
+                    json: () =>
+                        Promise.resolve({
+                            ...mockOmsMeta,
+                            returnReasonCodes: [{reason: 'DEFECT', default: true}]
+                        })
                 })
             }
             return Promise.resolve({ok: true, json: () => Promise.resolve({})})
@@ -1027,10 +1066,11 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
             if (url === '/api/order-lookup/oms-meta') {
                 return Promise.resolve({
                     ok: true,
-                    json: () => Promise.resolve({
-                        ...mockOmsMeta,
-                        returnReasonCodes: [{reason: 'DEFECT', default: true}]
-                    })
+                    json: () =>
+                        Promise.resolve({
+                            ...mockOmsMeta,
+                            returnReasonCodes: [{reason: 'DEFECT', default: true}]
+                        })
                 })
             }
             if (url === '/api/order-lookup/return') {
@@ -1080,7 +1120,11 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
                     productName: 'Test Product A',
                     quantity: 1,
                     price: 29.99,
-                    omsData: {quantityAvailableToCancel: 1, quantityOrdered: 1, quantityAvailableToReturn: 0}
+                    omsData: {
+                        quantityAvailableToCancel: 1,
+                        quantityOrdered: 1,
+                        quantityAvailableToReturn: 0
+                    }
                 },
                 {
                     itemId: 'item-2',
@@ -1103,7 +1147,10 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
         })
         renderOrderPage()
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/oms-meta', expect.anything())
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/order-lookup/oms-meta',
+                expect.anything()
+            )
         })
         // Wait a tick for state updates
         await waitFor(() => {
@@ -1143,7 +1190,10 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
         })
         renderOrderPage()
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/oms-meta', expect.anything())
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/order-lookup/oms-meta',
+                expect.anything()
+            )
         })
         await waitFor(() => {
             expect(screen.queryByRole('button', {name: /cancel order/i})).not.toBeInTheDocument()
@@ -1179,7 +1229,10 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
         })
         await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/cancel', expect.objectContaining({method: 'POST'}))
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/order-lookup/cancel',
+                expect.objectContaining({method: 'POST'})
+            )
         })
         // Success banner must NOT appear
         expect(screen.queryByText(/your order has been cancelled/i)).not.toBeInTheDocument()
@@ -1207,7 +1260,10 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
         })
         renderOrderPage()
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/order-lookup/oms-meta', expect.anything())
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/order-lookup/oms-meta',
+                expect.anything()
+            )
         })
         // Buttons must remain hidden when OMS meta fetch fails
         expect(screen.queryByRole('button', {name: /cancel order/i})).not.toBeInTheDocument()
@@ -1273,12 +1329,12 @@ describe('GuestOrderLookupOrder — S10 field suppression security backstop', ()
                 ]
             }
 
-            useQuery.mockReturnValue(
-                defaultUseQueryMock({data: poisonedOrder})
-            )
+            useQuery.mockReturnValue(defaultUseQueryMock({data: poisonedOrder}))
 
             const {container} = renderWithProviders(
-                <MemoryRouter initialEntries={[{pathname: '/order-lookup/order', state: {orderNo: 'ABC123'}}]}>
+                <MemoryRouter
+                    initialEntries={[{pathname: '/order-lookup/order', state: {orderNo: 'ABC123'}}]}
+                >
                     <Route path="/order-lookup/order" component={GuestOrderLookupOrder} />
                     <Route path="/order-lookup" render={() => <div>Request Page</div>} />
                 </MemoryRouter>

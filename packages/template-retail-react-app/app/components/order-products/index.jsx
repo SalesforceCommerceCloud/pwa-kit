@@ -6,11 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Box,
-    Flex,
-    Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Flex, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
