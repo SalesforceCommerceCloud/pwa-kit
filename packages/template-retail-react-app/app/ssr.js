@@ -35,6 +35,93 @@ import {getCommerceClientOverridesCspSources} from './utils/commerce-client-over
 
 const config = getConfig()
 
+// Guest order access helpers
+function getSiteIdFromRequest(req) {
+    return req.headers['x-site-id'] || null
+}
+
+export function parseGuestOrderCookie(req, cookieName) {
+    try {
+        const raw = req.headers?.cookie
+            ?.split(';')
+            .map((c) => c.trim())
+            .find((c) => c.startsWith(cookieName + '='))
+        if (!raw) return {}
+        return JSON.parse(decodeURIComponent(raw.slice(cookieName.length + 1)))
+    } catch {
+        return {}
+    }
+}
+
+export function evictIfNeeded(cookieMap) {
+    // FIFO eviction if JSON would exceed ~3KB
+    let entries = Object.entries(cookieMap)
+    while (JSON.stringify(Object.fromEntries(entries)).length > 3000 && entries.length > 1) {
+        entries.shift()
+    }
+    return Object.fromEntries(entries)
+}
+
+const GUEST_ORDER_SUPPRESSED_FIELDS = new Set([
+    'paymentCard',
+    'expirationMonth',
+    'expirationYear',
+    'phone',
+    'globalPartyId',
+    'orderToken',
+    'orderViewCode'
+])
+
+export function filterGuestOrderFields(order) {
+    if (!order || typeof order !== 'object') return order
+    const filtered = {}
+    for (const [key, val] of Object.entries(order)) {
+        if (key.startsWith('c_')) continue // suppress all custom attributes
+        if (GUEST_ORDER_SUPPRESSED_FIELDS.has(key)) continue
+        if (key === 'customerInfo') {
+            // Keep only email echo; suppress phone, globalPartyId
+            const {email, customerEmail} = val || {}
+            filtered.customerInfo = {email: email || customerEmail}
+            continue
+        }
+        if (key === 'paymentInstruments') {
+            // Keep maskedNumber + cardType only
+            filtered.paymentInstruments = (val || []).map((pi) => ({
+                maskedNumber: pi.maskedNumber,
+                cardType: pi.cardType,
+                paymentMethodId: pi.paymentMethodId
+            }))
+            continue
+        }
+        if (key === 'shipments') {
+            // Keep shippingAddress (postalCode only), trackingNumber, trackingUrl, expectedDeliveryDate
+            filtered.shipments = (val || []).map((s) => ({
+                trackingNumber: s.trackingNumber,
+                trackingUrl: s.trackingUrl,
+                expectedDeliveryDate: s.expectedDeliveryDate,
+                shippingStatus: s.shippingStatus,
+                shippingAddress: s.shippingAddress
+                    ? {postalCode: s.shippingAddress.postalCode}
+                    : undefined,
+                shippingMethod: s.shippingMethod
+            }))
+            continue
+        }
+        filtered[key] = val
+    }
+    // Strip c_* custom attributes from individual productItems (server-side security)
+    if (filtered.productItems) {
+        filtered.productItems = filtered.productItems.map((item) => {
+            const filteredItem = {...item}
+            Object.keys(filteredItem).forEach((key) => {
+                if (key.startsWith('c_')) delete filteredItem[key]
+            })
+            return filteredItem
+        })
+    }
+    return filtered
+}
+
 const options = {
     // The build directory (an absolute path)
     buildDir: path.resolve(process.cwd(), 'build'),

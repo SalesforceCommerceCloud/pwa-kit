@@ -1875,5 +1875,77 @@
   },
   "guestOrderLookup.verify.toast.resent": {
     "defaultMessage": "Check your inbox — it may take a moment."
+  },
+  "guestOrderLookup.request.alert.sessionExpired": {
+    "defaultMessage": "Your session has expired. Please request a new access code."
+  },
+  "guestOrderLookup.order.heading": {
+    "defaultMessage": "Order Details"
+  },
+  "guestOrderLookup.order.orderNumber": {
+    "defaultMessage": "Order #{orderNo}"
+  },
+  "guestOrderLookup.order.placedOn": {
+    "defaultMessage": "Placed on {date}"
+  },
+  "guestOrderLookup.order.status": {
+    "defaultMessage": "Status: {status}"
+  },
+  "guestOrderLookup.order.button.refreshStatus": {
+    "defaultMessage": "Refresh Status"
+  },
+  "guestOrderLookup.order.button.refreshStatus.aria": {
+    "defaultMessage": "Refresh order status"
+  },
+  "guestOrderLookup.order.button.refreshing": {
+    "defaultMessage": "Refreshing…"
+  },
+  "guestOrderLookup.order.button.retry": {
+    "defaultMessage": "Try Again"
+  },
+  "guestOrderLookup.order.lastUpdated": {
+    "defaultMessage": "Last updated at {time}"
+  },
+  "guestOrderLookup.order.error.generic": {
+    "defaultMessage": "Something went wrong loading your order. Please try again."
+  },
+  "guestOrderLookup.order.section.items": {
+    "defaultMessage": "Items"
+  },
+  "guestOrderLookup.order.item.unnamed": {
+    "defaultMessage": "Product"
+  },
+  "guestOrderLookup.order.item.qty": {
+    "defaultMessage": "Qty: {qty}"
+  },
+  "guestOrderLookup.order.section.shipping": {
+    "defaultMessage": "Shipping"
+  },
+  "guestOrderLookup.order.shipping.status": {
+    "defaultMessage": "Shipping status: {status}"
+  },
+  "guestOrderLookup.order.shipping.postalCode": {
+    "defaultMessage": "Postal code: {postalCode}"
+  },
+  "guestOrderLookup.order.shipping.expectedDelivery": {
+    "defaultMessage": "Expected delivery: {date}"
+  },
+  "guestOrderLookup.order.shipping.tracking": {
+    "defaultMessage": "Tracking: {trackingNumber}"
+  },
+  "guestOrderLookup.order.section.totals": {
+    "defaultMessage": "Order Summary"
+  },
+  "guestOrderLookup.order.totals.subtotal": {
+    "defaultMessage": "Subtotal"
+  },
+  "guestOrderLookup.order.totals.shipping": {
+    "defaultMessage": "Shipping"
+  },
+  "guestOrderLookup.order.totals.tax": {
+    "defaultMessage": "Tax"
+  },
+  "guestOrderLookup.order.totals.total": {
+    "defaultMessage": "Total"
   }
 }
