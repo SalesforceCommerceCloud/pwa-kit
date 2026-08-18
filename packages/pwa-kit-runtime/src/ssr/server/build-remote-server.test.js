@@ -2299,17 +2299,20 @@ describe('SLAS public proxy', () => {
 })
 
 describe('errorHandlerMiddleware logic', () => {
-    it('calls sendMetric and sendStatus(500) when error is handled', () => {
+    it('logs the error and sends status 500 without emitting a metric', () => {
+        // Custom RenderErrors metric emission was removed (W-22715301); the
+        // handler should still log the error and respond with a 500, and must
+        // not call sendMetric.
         catchAndLog.mockImplementation(() => {})
         const req = {app: {sendMetric: jest.fn()}}
         const res = {sendStatus: jest.fn()}
         const err = new Error('fail')
         // Inlined errorHandlerMiddleware logic
         catchAndLog(err)
-        req.app.sendMetric('RenderErrors')
         res.sendStatus(500)
-        expect(req.app.sendMetric).toHaveBeenCalledWith('RenderErrors')
+        expect(catchAndLog).toHaveBeenCalledWith(err)
         expect(res.sendStatus).toHaveBeenCalledWith(500)
+        expect(req.app.sendMetric).not.toHaveBeenCalled()
     })
 })
 

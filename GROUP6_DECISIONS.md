@@ -16,15 +16,15 @@ The root `playwright.config.js` already configures `testDir: './e2e'` with
 
 - **Feature-on tests** (happy path, error paths, a11y): require a deployment with
   `guestOrderAccess.enabled: true` and `MRT_ALLOW_COOKIES=true`. Set
-  `GUEST_ORDER_ACCESS_E2E_BASE_URL` to point to this deployment. Until that environment
+  `GUEST_ORDER_LOOKUP_E2E_BASE_URL` to point to this deployment. Until that environment
   exists in CI, these tests will run against `config.RETAIL_APP_HOME` (feature-off), which
   means the feature-on test suites will fail at the "heading visible" assertions and be
   skipped implicitly by the CI timeout.
 
   **Action required (post ECOM 26.8):** Add a CI job that deploys the template with
-  `guestOrderAccess.enabled: true` and runs:
+  `guestOrderLookup.enabled: true` and runs:
   ```
-  GUEST_ORDER_ACCESS_E2E_BASE_URL=<url> npx playwright test e2e/tests/desktop/guest-order-access.spec.js e2e/tests/desktop/guest-order-access-errors.spec.js --project=chromium
+  GUEST_ORDER_LOOKUP_E2E_BASE_URL=<url> npx playwright test e2e/tests/desktop/guest-order-lookup.spec.js e2e/tests/desktop/guest-order-lookup-errors.spec.js --project=chromium
   ```
 
 - **Flag-off tests**: run against `config.RETAIL_APP_HOME` (default, feature-off). These

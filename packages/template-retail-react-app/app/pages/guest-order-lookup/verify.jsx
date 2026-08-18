@@ -64,6 +64,7 @@ const GuestOrderLookupVerify = () => {
         setServerError(null)
         setServerErrorType(null)
         setIsSubmitting(true)
+        let hadError = false
         try {
             const token = await getTokenWhenReady()
             const res = await fetch('/api/order-lookup/verify', {
@@ -78,6 +79,7 @@ const GuestOrderLookupVerify = () => {
                 history.push('/order-lookup/order', {orderNo})
                 return
             }
+            hadError = true
             if (res.status === 404) {
                 setServerErrorType('invalidCode')
                 setServerError(
@@ -105,6 +107,7 @@ const GuestOrderLookupVerify = () => {
                 )
             }
         } catch {
+            hadError = true
             setServerErrorType('generic')
             setServerError(
                 formatMessage({
@@ -114,8 +117,9 @@ const GuestOrderLookupVerify = () => {
             )
         } finally {
             setIsSubmitting(false)
-            // S17: return focus to the OTP input after a server error so keyboard users can retry
-            setTimeout(() => setFocus('accessCode'), 0)
+            // S17: return focus to the OTP input after a server error so keyboard users can retry.
+            // Only refocus on error — on success we navigate away and focus management is moot.
+            if (hadError) setTimeout(() => setFocus('accessCode'), 0)
         }
     }
 

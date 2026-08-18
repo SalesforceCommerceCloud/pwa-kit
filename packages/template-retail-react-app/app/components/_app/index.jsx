@@ -97,6 +97,7 @@ initializeRegistry()
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import {useShopperAgent} from '@salesforce/retail-react-app/app/hooks/use-shopper-agent'
+import {useCommerceClientPagePush} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-push'
 
 // Code-split the optional, client-only Shopper Agent so the component and its messaging
 // integrations (MIAW / Commerce Client) ship in a separate async chunk instead of the
@@ -251,6 +252,10 @@ const App = (props) => {
         return getCommerceAgentConfig()
     }, [config.app.commerceAgent])
 
+    // Shifts page content aside for the Commerce Client side panel when page-push
+    // is configured; empty (no shift) otherwise.
+    const pagePushProps = useCommerceClientPagePush(commerceAgentConfiguration)
+
     useEffect(() => {
         // update the basket customer email
         if (
@@ -399,7 +404,13 @@ const App = (props) => {
 
                         <ScrollToTop />
 
-                        <Box id="app" display="flex" flexDirection="column" flex={1}>
+                        <Box
+                            id="app"
+                            display="flex"
+                            flexDirection="column"
+                            flex={1}
+                            {...pagePushProps}
+                        >
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
                             {storeLocatorEnabled && (
                                 <StoreLocatorModal
