@@ -26,9 +26,12 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
-import {ShopperOrders} from 'commerce-sdk-isomorphic'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {registerAuthLinkRoute} from './components/shopper-agent/auth-link-proxy.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
 
 const config = getConfig()
 
@@ -105,6 +108,16 @@ export function filterGuestOrderFields(order) {
             continue
         }
         filtered[key] = val
+    }
+    // Strip c_* custom attributes from individual productItems (server-side security)
+    if (filtered.productItems) {
+        filtered.productItems = filtered.productItems.map((item) => {
+            const filteredItem = {...item}
+            Object.keys(filteredItem).forEach((key) => {
+                if (key.startsWith('c_')) delete filteredItem[key]
+            })
+            return filteredItem
+        })
     }
     return filtered
 }
@@ -467,14 +480,38 @@ export function createVerifyThrottle() {
     }
 }
 
-// Guest order access: warn if feature is enabled but cookies are not allowed
-const _goaConfig = getConfig()?.app?.guestOrderLookup
-if (_goaConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_COOKIES) {
+// Guest order lookup: warn if feature is enabled but cookies are not allowed
+const _golConfig = getConfig()?.app?.guestOrderLookup
+if (_golConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_COOKIES) {
     logger.warn(
         'guestOrderLookup.enabled is true but neither localAllowCookies nor MRT_ALLOW_COOKIES is set. The cc-goa_* HttpOnly cookie will not be written. Set localAllowCookies: true for local dev or MRT_ALLOW_COOKIES=true for MRT.',
         {namespace: 'guest-order-lookup'}
     )
 }
+
+/**
+ * Handle the SLAS `/callback` redirect.
+ *
+ * The Trusted Agent (Order on Behalf) popup redirects here with both a `code` and
+ * a `state`. That flow needs the React app to mount so the callback page can hand
+ * the result back to the opener, so let it fall through to the renderer via
+ * `next()`. This URL carries OAuth material, so that variant must never be cached.
+ *
+ * For every other request (including the standard SLAS login redirect, which does
+ * not navigate the top window here and carries no `state`) this endpoint does
+ * nothing and is safe to cache for a long time.
+ */
+export function handleCallback(req, res, next) {
+    if (req.query.code && req.query.state) {
+        res.set('Cache-Control', 'no-store')
+        return next()
+    }
+
+    res.set('Cache-Control', `max-age=31536000`)
+    res.send()
+}
+
+const cookieSecureFlag = options.localAllowCookies ? '' : ' Secure;'
 
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
@@ -503,6 +540,11 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.cimulate.ai',
                         // Commerce Client bundle served from the SFCC static CDN
                         '*.sfcc-store-internal.net',
+                        // Origin of the merchant-hosted Commerce Client component-override
+                        // script, added only when cc_overridesUrl holds a valid HTTPS URL.
+                        // Serving that script from a different host than the configured one
+                        // requires adding the host here.
+                        ...getCommerceClientOverridesCspSources(config.app.commerceAgent),
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
                         // Payment gateways
@@ -564,12 +606,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     )
 
     // Handle the redirect from SLAS as to avoid error
-    app.get('/callback', (req, res) => {
-        // This endpoint does nothing and is not expected to change
-        // Thus we cache it for a year to maximize performance
-        res.set('Cache-Control', `max-age=31536000`)
-        res.send()
-    })
+    app.get('/callback', handleCallback)
 
     app.get('/:shortCode/:tenantId/oauth2/jwks', (req, res) => {
         jwksCaching(req, res, {shortCode: req.params.shortCode, tenantId: req.params.tenantId})
@@ -649,12 +686,27 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Browser POSTs an auth_link_key and siteId (as x-site-id header).
     // In HttpOnly mode, tokens are read from cookies server-side.
     // In non-HttpOnly mode, SLAS access token is sent in request body.
-    // Server extracts my_domain from ANC_MYDOMAIN environment variable,
+    // Server extracts my_domain from AGENT_MYDOMAIN environment variable,
     // validates it's a trusted Salesforce host (SSRF prevention), then
     // forwards the tokens to Core's `/agent/identity/bridge` endpoint with
     // the access token in an `Authorization: SLAS` header and the refresh
     // token in the body.
     registerTokenBridgeRoute(app)
+
+    // Shopper Agent — Auth Link proxy for Commerce Client.
+    // Browser POSTs the Commerce Client JWT from the deployment-scoped
+    // cim_af_ct_<orgId>_<embeddedServiceName> key in the request body. sessionStorage
+    // is authoritative; localStorage is a compatibility fallback. Unlike the Token
+    // Bridge, no siteId/x-site-id is sent — the SCRT authlink endpoint authenticates
+    // with the JWT (Bearer) alone.
+    // Server reads the SCRT2 origin from scrt2Url in the COMMERCE_AGENT_SETTINGS
+    // environment variable (NOT AGENT_MYDOMAIN — the /iamessage/* auth link API is
+    // served by SCRT2 on *.salesforce-scrt.com, a different host from Core's
+    // MyDomain), validates it's a trusted Salesforce host (SSRF prevention), then
+    // calls SCRT's `/iamessage/api/v2/authorization/authlink` endpoint with the
+    // Commerce Client JWT in an `Authorization: Bearer` header.
+    // Returns { auth_link_key: "..." } which is then used with Token Bridge.
+    registerAuthLinkRoute(app)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
@@ -747,7 +799,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             const cookieVal = evictIfNeeded(existing)
             res.setHeader(
                 'Set-Cookie',
-                `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+                `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
             )
 
             logger.info('guest-order-lookup verify success', {
@@ -793,7 +845,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         // orderNo passed as query param (never in path — security constraint)
         const orderNo = req.query?.orderNo
         if (!orderNo || !cookieData[orderNo])
-            return res.status(404).json({error: 'No session for this order'})
+            return res.status(403).json({error: 'No verified session for this order'})
 
         const {email, accessCode} = cookieData[orderNo]
         const correlationId = req.headers['x-correlation-id']
@@ -843,7 +895,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 delete cookieData2[orderNo]
                 res.setHeader(
                     'Set-Cookie',
-                    `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+                    `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
                 )
                 return res.status(404).json({error: 'Session expired'})
             }

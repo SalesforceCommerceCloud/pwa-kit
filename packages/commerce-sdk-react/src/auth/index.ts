@@ -1329,6 +1329,21 @@ class Auth {
         const loginId = credentials.loginId || 'guest'
         const isGuest = loginId === 'guest'
         const idpOrigin = isGuest ? 'slas' : 'ecom'
+        // CSRF `state` for the OAuth authorize request. SLAS echoes it back on the
+        // final redirect to `/callback`, and the storefront relies on its presence:
+        // request-processor keeps `code` (and serves that variant no-store) only when
+        // `state` is set, and the callback page hands `code`+`state` back to the opener
+        // to finish login. Without it the redirect lands with `code` only, the code is
+        // stripped as a standard-login redirect, and the popup hangs. So it must be sent
+        // on every trusted agent authorize request.
+        //
+        // NOTE: this is a distinct nonce from the PKCE `codeVerifier` above and must NOT
+        // be collapsed into it. `createCodeVerifier` is reused only as a random
+        // high-entropy string generator; the two values serve different security roles
+        // (PKCE proof-of-possession vs. OAuth CSRF `state`) and are compared/validated on
+        // separate requests. The caller re-verifies the echoed `state` matches this value
+        // before exchanging the code, and SLAS also binds `state`↔`code` on the token request.
+        const state = helpers.createCodeVerifier()
 
         const url = `${
             slasClient.clientConfig.proxy || ''
@@ -1339,12 +1354,13 @@ class Auth {
                 `login_id=${loginId}`,
                 `redirect_uri=${this.redirectURI}`,
                 `idp_origin=${idpOrigin}`,
-                `response_type=code`
+                `response_type=code`,
+                `state=${state}`
             ],
             ...(!this.clientSecret ? [`code_challenge=${codeChallenge}`] : [])
         ].join('&')}`
 
-        return {url, codeVerifier}
+        return {url, codeVerifier, state}
     }
 
     /**

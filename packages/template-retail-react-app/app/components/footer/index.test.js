@@ -43,8 +43,8 @@ test('renders SubscribeForm within Footer', () => {
     expect(signUpButtons.length).toBeGreaterThanOrEqual(1)
 })
 
-describe('Guest Order Access footer link', () => {
-    test('does not render "Find Your Order" link when flag is off', () => {
+describe('Guest Order Lookup footer link', () => {
+    test('does not render "Order Lookup" link when flag is off', () => {
         getConfig.mockReturnValue({
             ...mockConfig,
             app: {
@@ -53,10 +53,10 @@ describe('Guest Order Access footer link', () => {
             }
         })
         renderWithProviders(<Footer />)
-        expect(screen.queryByRole('link', {name: 'Find Your Order', hidden: true})).toBeNull()
+        expect(screen.queryByRole('link', {name: 'Order Lookup', hidden: true})).toBeNull()
     })
 
-    test('does not render "Find Your Order" link when flag is absent', () => {
+    test('does not render "Order Lookup" link when flag is absent', () => {
         getConfig.mockReturnValue({
             ...mockConfig,
             app: {
@@ -64,10 +64,10 @@ describe('Guest Order Access footer link', () => {
             }
         })
         renderWithProviders(<Footer />)
-        expect(screen.queryByRole('link', {name: 'Find Your Order', hidden: true})).toBeNull()
+        expect(screen.queryByRole('link', {name: 'Order Lookup', hidden: true})).toBeNull()
     })
 
-    test('renders "Find Your Order" link when flag is on', () => {
+    test('renders "Order Lookup" link when flag is on', () => {
         getConfig.mockReturnValue({
             ...mockConfig,
             app: {
@@ -76,7 +76,7 @@ describe('Guest Order Access footer link', () => {
             }
         })
         renderWithProviders(<Footer />)
-        const links = screen.getAllByRole('link', {name: 'Find Your Order', hidden: true})
+        const links = screen.getAllByRole('link', {name: 'Order Lookup', hidden: true})
         expect(links.length).toBeGreaterThanOrEqual(1)
         // href includes locale prefix (e.g. /uk/en-GB/order-lookup) depending on multi-site config
         expect(links[0].getAttribute('href')).toMatch(/\/order-lookup$/)
