@@ -452,9 +452,8 @@ export function createVerifyThrottle() {
         const appConfig = getConfig()?.app
         // No-op when feature is disabled
         if (!appConfig?.guestOrderLookup?.enabled) return next()
-        // Only throttle the verify endpoint — order fetch and oms-meta must not be throttled
-        // because normal usage (hard refresh, cancel/return polling) would exhaust the budget.
-        if (req.path !== '/api/order-lookup/verify') return next()
+        // Only throttle /api/order-lookup/ requests
+        if (!req.path?.startsWith('/api/order-lookup/')) return next()
 
         const throttleConfig = appConfig?.guestOrderLookup?.requestCodeThrottle
         const windowMs = throttleConfig?.windowMs ?? 60000
@@ -752,6 +751,9 @@ const {handler} = runtime.createHandler(options, (app) => {
             })
         }
     })
+
+    // S15: defense-in-depth throttle on /api/order-lookup/* endpoints
+    app.use(createVerifyThrottle())
 
     app.post('/api/order-lookup/verify', async (req, res) => {
         const {app: appConfig} = getConfig()
