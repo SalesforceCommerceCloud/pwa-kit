@@ -38,7 +38,7 @@ import {
 import {resolveCommerceClientOverrideOptions} from '@salesforce/retail-react-app/app/utils/commerce-client-overrides'
 import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
 import CommerceClientFab from '@salesforce/retail-react-app/app/components/shopper-agent/commerce-client-fab'
-import {callAuthLinkProxy} from '@salesforce/retail-react-app/app/components/shopper-agent/auth-link-proxy'
+import {callAuthLink} from '@salesforce/retail-react-app/app/components/shopper-agent/auth-link-client'
 
 const onClient = typeof window !== 'undefined'
 
@@ -864,10 +864,11 @@ const CommerceClientAgentWindow = ({
                     : await getTokenWhenReadyRef.current()
                 if (generation !== authLinkGenerationRef.current) return
 
-                // Step 1: auth link key from SCRT. The SCRT authlink endpoint
-                // authenticates with the Commerce Client JWT (Bearer) alone — it
-                // needs neither the siteId nor the conversationId.
-                const authLinkResponse = await callAuthLinkProxy({commerceClientJWT})
+                // Step 1: auth link key from SCRT. Called directly from the
+                // browser against the configured SCRT2 origin — the authlink
+                // endpoint authenticates with the Commerce Client JWT (Bearer)
+                // alone, needing neither the siteId nor the conversationId.
+                const authLinkResponse = await callAuthLink({commerceClientJWT, scrt2Url})
                 if (generation !== authLinkGenerationRef.current) return
                 const authLinkKey = authLinkResponse?.auth_link_key || authLinkResponse?.authLinkKey
                 if (!authLinkKey || typeof authLinkKey !== 'string') {

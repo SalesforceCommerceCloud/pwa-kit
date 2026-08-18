@@ -85,10 +85,10 @@ export function resolveAgentforceMyDomain(myDomain) {
     return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
 }
 
-// isTrustedSalesforceDomain (Core `*.salesforce.com` allowlist) is shared with
-// auth-link-proxy.js via ./salesforce-domain-allowlist.js — the Token Bridge only
-// ever talks to Core's My Domain (AGENT_MYDOMAIN), so it uses the Core list for both
-// its upstream SSRF check and the CSRF Origin check.
+// isTrustedSalesforceDomain (Core `*.salesforce.com` allowlist) lives in
+// ./salesforce-domain-allowlist.js — the Token Bridge only ever talks to Core's
+// My Domain (AGENT_MYDOMAIN), so it uses the Core list for both its upstream SSRF
+// check and the CSRF Origin check.
 
 /** Express handler for POST /api/agent/identity/bridge. */
 export async function handleTokenBridge(req, res) {
