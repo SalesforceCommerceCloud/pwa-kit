@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useIntl} from 'react-intl'
 import {useQuery} from '@tanstack/react-query'
 import {
@@ -25,6 +25,11 @@ import {Redirect, useHistory, useLocation} from 'react-router-dom'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
 import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
+
+// Convert snake_case errorKind from the API response to camelCase for component comparisons.
+// The server sends e.g. 'invalid_reason'; ReturnErrorKind constants use 'invalidReason'.
+const snakeToCamel = (s) =>
+    typeof s === 'string' ? s.replace(/_([a-z])/g, (_, c) => c.toUpperCase()) : s
 
 // Fields suppressed by the server — asserted here as a client-side security backstop (S10).
 // Any value from this set must never appear rendered in the DOM.
@@ -119,11 +124,21 @@ const GuestOrderLookupOrder = () => {
     })
     const [omsMetaLoading, setOmsMetaLoading] = useState(true)
 
+    // useAccessToken returns a new getTokenWhenReady function on every render (not
+    // memoized). Using it directly in a useEffect dep array would cause an infinite
+    // re-render loop: state update → re-render → new function ref → effect fires again.
+    // We store it in a ref so the effect can always call the latest version while
+    // keeping the dep array empty (runs once on mount).
+    const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    useEffect(() => {
+        getTokenWhenReadyRef.current = getTokenWhenReady
+    })
+
     useEffect(() => {
         let cancelled = false
         const fetchMeta = async () => {
             try {
-                const token = await getTokenWhenReady()
+                const token = await getTokenWhenReadyRef.current()
                 const res = await fetch('/api/order-lookup/oms-meta', {
                     headers: {Authorization: `Bearer ${token}`}
                 })
@@ -139,7 +154,7 @@ const GuestOrderLookupOrder = () => {
         return () => {
             cancelled = true
         }
-    }, [getTokenWhenReady])
+    }, []) // empty deps — fires once on mount; getTokenWhenReady accessed via ref above
 
     // Cancel state
     const [cancelModalOpen, setCancelModalOpen] = useState(false)
@@ -187,7 +202,7 @@ const GuestOrderLookupOrder = () => {
                 setCancelSuccess(true)
                 refetch()
             } else {
-                setCancelError(data.errorKind ?? 'transient')
+                setCancelError(snakeToCamel(data.errorKind) ?? 'transient')
             }
         } catch {
             setCancelError('transient')
@@ -215,7 +230,7 @@ const GuestOrderLookupOrder = () => {
                 setReturnSuccess(true)
                 refetch()
             } else {
-                setReturnError({kind: data.errorKind ?? 'transient'})
+                setReturnError({kind: snakeToCamel(data.errorKind) ?? 'transient'})
             }
         } catch {
             setReturnError({kind: 'transient'})
@@ -224,9 +239,9 @@ const GuestOrderLookupOrder = () => {
         }
     }
 
-    const handleRefetchReasons = async () => {
+    const handleRefetchReasons = useCallback(async () => {
         try {
-            const token = await getTokenWhenReady()
+            const token = await getTokenWhenReadyRef.current()
             const res = await fetch('/api/order-lookup/oms-meta', {
                 headers: {Authorization: `Bearer ${token}`}
             })
@@ -234,7 +249,7 @@ const GuestOrderLookupOrder = () => {
         } catch {
             // Swallow — stale reasons remain; the modal handles it gracefully
         }
-    }
+    }, []) // getTokenWhenReady accessed via ref — stable dep array
 
     if (isRegistered) return <Redirect to="/account/orders" />
 
@@ -612,6 +627,14 @@ const GuestOrderLookupOrder = () => {
                     </Stack>
                 </Box>
 
+                {/* Skeleton placeholder while OMS metadata is loading — prevents layout shift */}
+                {omsMetaLoading && (
+                    <Stack direction="row" spacing={3}>
+                        <Skeleton height="40px" width="120px" borderRadius="md" />
+                        <Skeleton height="40px" width="120px" borderRadius="md" />
+                    </Stack>
+                )}
+
                 {/* Cancel / Return action buttons — only shown when OMS is active */}
                 {showActions && (
                     <Stack direction="row" spacing={3}>
@@ -619,6 +642,7 @@ const GuestOrderLookupOrder = () => {
                             <Button
                                 variant="outline"
                                 colorScheme="red"
+                                isDisabled={cancelSubmitting || isFetching}
                                 onClick={() => {
                                     setCancelError(null)
                                     setCancelModalOpen(true)
@@ -633,6 +657,7 @@ const GuestOrderLookupOrder = () => {
                         {canReturn && (
                             <Button
                                 variant="outline"
+                                isDisabled={returnSubmitting}
                                 onClick={() => {
                                     setReturnError(null)
                                     setReturnModalOpen(true)
@@ -680,7 +705,10 @@ const GuestOrderLookupOrder = () => {
 
             <ReturnItemsModal
                 isOpen={returnModalOpen}
-                onClose={() => setReturnModalOpen(false)}
+                onClose={() => {
+                    setReturnModalOpen(false)
+                    setReturnSelection({})
+                }}
                 order={order}
                 returnableItems={returnableItems}
                 reasonCodes={omsMeta.returnReasonCodes}

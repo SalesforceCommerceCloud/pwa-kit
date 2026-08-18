@@ -30,8 +30,9 @@ const onClient = typeof window !== 'undefined'
  * @param {string} options.orgId - Salesforce organization ID
  * @param {string} options.esDeveloperName - Embedded Service developer name
  * @param {string} [options.capabilitiesVersion] - Embedded Messaging capabilities version (defaults to '65')
+ * @param {boolean} [options.enableEscalationToAgent=true] - Whether shoppers can escalate to a human agent
+ * @param {boolean} [options.enableDownloadTranscript=true] - Whether shoppers can download the chat transcript
  * @param {Object} [options.routingAttributes] - Optional Agentforce routing attributes
- * @param {string} [options.mode] - Widget mode forwarded to the bundle (defaults to 'messaging')
  * @param {string} [options.logoUrl] - URL of the logo shown in the widget
  * @param {string} [options.headerText] - Header text shown at the top of the widget
  * @param {string} [options.disclaimerMarkdown] - Markdown disclaimer shown in the widget (supports links/basic markdown)
@@ -44,6 +45,8 @@ const onClient = typeof window !== 'undefined'
  * @param {boolean} [options.isDevelopment] - When true, logs widget events to the console
  * @param {Object} [options.componentConfig] - Partial component config merged over the defaults
  * @param {Object} [options.theme] - Partial theme merged over the defaults
+ * @param {string} [options.overridesUrl] - URL to customer's component override script (sets window.CimulateOverrides)
+ * @param {Object} [options.overrides] - Inline map of override keys (e.g. `ProductTile`) to registered custom element tag names. The widget takes a single override source, so callers should pass this or `overridesUrl`, not both
  * @returns {boolean} True when the widget injection was invoked, false otherwise
  */
 const injectCommerceClientWidget = ({
@@ -52,8 +55,9 @@ const injectCommerceClientWidget = ({
     orgId,
     esDeveloperName,
     capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
+    enableEscalationToAgent = true,
+    enableDownloadTranscript = true,
     routingAttributes,
-    mode = 'messaging',
     logoUrl,
     headerText,
     disclaimerMarkdown,
@@ -61,7 +65,9 @@ const injectCommerceClientWidget = ({
     globalClassName,
     isDevelopment = false,
     componentConfig,
-    theme
+    theme,
+    overridesUrl,
+    overrides
 } = {}) => {
     if (!onClient) return false
 
@@ -74,14 +80,21 @@ const injectCommerceClientWidget = ({
             return false
         }
 
-        const messagingConfig = {scrt2Url, orgId, esDeveloperName, capabilitiesVersion}
+        const messagingConfig = {
+            scrt2Url,
+            orgId,
+            esDeveloperName,
+            capabilitiesVersion,
+            enableEscalationToAgent,
+            enableDownloadTranscript
+        }
         if (routingAttributes && typeof routingAttributes === 'object') {
             messagingConfig.routingAttributes = routingAttributes
         }
 
         commerceClient.injectMessagingWidget({
             elementId,
-            ...(mode ? {mode} : {}),
+            mode: 'messaging',
             messagingConfig,
             ...(logoUrl ? {logoUrl} : {}),
             ...(headerText ? {headerText} : {}),
@@ -97,7 +110,9 @@ const injectCommerceClientWidget = ({
                     ...componentConfig?.options
                 }
             },
-            theme: {...DEFAULT_COMMERCE_CLIENT_THEME, ...theme}
+            theme: {...DEFAULT_COMMERCE_CLIENT_THEME, ...theme},
+            ...(overridesUrl ? {overridesUrl} : {}),
+            ...(overrides && typeof overrides === 'object' ? {overrides} : {})
         })
         return true
     } catch (err) {

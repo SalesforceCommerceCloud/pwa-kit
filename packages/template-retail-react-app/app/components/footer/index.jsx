@@ -63,8 +63,8 @@ const Footer = ({...otherProps}) => {
             links.push({
                 href: '/order-lookup',
                 text: intl.formatMessage({
-                    id: 'footer.link.find_your_order',
-                    defaultMessage: 'Find Your Order'
+                    id: 'footer.link.order_lookup',
+                    defaultMessage: 'Order Lookup'
                 })
             })
         links.push({

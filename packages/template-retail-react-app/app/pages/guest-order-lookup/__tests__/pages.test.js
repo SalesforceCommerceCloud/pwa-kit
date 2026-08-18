@@ -481,6 +481,19 @@ describe('GuestOrderLookupVerify', () => {
         })
     })
 
+    test('clears resend timer on unmount to prevent state update on unmounted component', async () => {
+        jest.useFakeTimers()
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
+        const {unmount} = renderVerifyWithState()
+        // Click resend to start the 2-second re-enable timer
+        await user.click(screen.getByText('Resend code'))
+        // Unmount before the 2s timer fires
+        unmount()
+        // Advance past the timer — should not throw React "state update on unmounted" warning
+        expect(() => jest.runAllTimers()).not.toThrow()
+        jest.useRealTimers()
+    })
+
     // ── S13: "Request a new code" link on 404 error ────────────────────────────
     test('S13: shows "Request a new code" link when 404 error occurs', async () => {
         global.fetch.mockResolvedValue({ok: false, status: 404})
@@ -1170,6 +1183,11 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
         })
         // Success banner must NOT appear
         expect(screen.queryByText(/your order has been cancelled/i)).not.toBeInTheDocument()
+        // Error state IS shown: the cancel modal stays open (not dismissed on failure)
+        // and the confirm button remains accessible for a retry
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /confirm cancellation/i})).toBeInTheDocument()
+        })
     })
 
     test('OMS meta fetch failure on page load: buttons stay hidden (graceful degradation)', async () => {

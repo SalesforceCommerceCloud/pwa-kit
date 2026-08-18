@@ -138,6 +138,20 @@ describe('DevServer startup', () => {
     test(`_createApp validates missing or invalid field "protocol"`, () => {
         expect(() => NoWebpackDevServerFactory._createApp(opts({protocol: 'ssl'}))).toThrow()
     })
+
+    test('app.sendMetric is a backwards-compatible no-op that never queues metrics', () => {
+        // Custom per-request CloudWatch metrics were removed (W-22715301), but
+        // sendMetric is retained on the app for backwards compatibility with
+        // customer code that may still call it. It must accept the old
+        // signature, return undefined, and never enqueue anything on the
+        // underlying MetricsSender.
+        const app = NoWebpackDevServerFactory._createApp(opts())
+        expect(typeof app.sendMetric).toBe('function')
+        const queueLengthBefore = app.metrics.queueLength
+        expect(app.sendMetric('SomeCustomMetric', 42, 'Milliseconds', {foo: 'bar'})).toBeUndefined()
+        expect(app.sendMetric('AnotherMetric')).toBeUndefined()
+        expect(app.metrics.queueLength).toBe(queueLengthBefore)
+    })
 })
 
 describe('DevServer loading page', () => {
