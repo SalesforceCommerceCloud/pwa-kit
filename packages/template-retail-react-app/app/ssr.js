@@ -721,10 +721,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             const {clientId, organizationId, shortCode, siteId: configSiteId} =
                 appConfig.commerceAPI.parameters
             const shopperOrders = new ShopperOrders({
-                clientId,
-                organizationId,
-                shortCode,
-                siteId: configSiteId,
+                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
                 headers: {authorization}
             })
 
@@ -800,10 +797,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             const {clientId, organizationId, shortCode, siteId: configSiteId} =
                 appConfig.commerceAPI.parameters
             const shopperOrders = new ShopperOrders({
-                clientId,
-                organizationId,
-                shortCode,
-                siteId: configSiteId,
+                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
                 headers: {authorization}
             })
             const order = await shopperOrders.guestOrderLookup({
@@ -866,10 +860,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             const {clientId, organizationId, shortCode, siteId: configSiteId} =
                 appConfig.commerceAPI.parameters
             const shopperOrders = new ShopperOrders({
-                clientId,
-                organizationId,
-                shortCode,
-                siteId: configSiteId,
+                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
                 headers: {authorization}
             })
             const meta = await shopperOrders.getOmsMetaData({parameters: {}})
@@ -918,10 +909,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             const {clientId, organizationId, shortCode, siteId: configSiteId} =
                 appConfig.commerceAPI.parameters
             const shopperOrders = new ShopperOrders({
-                clientId,
-                organizationId,
-                shortCode,
-                siteId: configSiteId,
+                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
                 headers: {authorization}
             })
             await shopperOrders.cancelOmsOrder({
@@ -981,10 +969,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             const {clientId, organizationId, shortCode, siteId: configSiteId} =
                 appConfig.commerceAPI.parameters
             const shopperOrders = new ShopperOrders({
-                clientId,
-                organizationId,
-                shortCode,
-                siteId: configSiteId,
+                parameters: {clientId, organizationId, shortCode, siteId: configSiteId},
                 headers: {authorization}
             })
             await shopperOrders.returnOmsOrder({
