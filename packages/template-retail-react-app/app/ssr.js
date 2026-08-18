@@ -376,8 +376,7 @@ export function createVerifyThrottle() {
         // Throttle keyed on x-forwarded-for. In MRT deployments this header is set
         // by the trusted CDN edge. In non-MRT environments (local dev, custom hosting)
         // it may be spoofable — SCAPI rate limiting is the authoritative backstop.
-        const ip =
-            (req.headers['x-forwarded-for']?.split(',')[0]?.trim()) || req.ip || 'unknown'
+        const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || 'unknown'
         const now = Date.now()
         const entry = store.get(ip)
 
@@ -684,8 +683,12 @@ const {handler} = runtime.createHandler(options, (app) => {
 
         try {
             // Instantiate ShopperOrders server-side using config params + forwarded SLAS token
-            const {clientId, organizationId, shortCode, siteId: configSiteId} =
-                appConfig.commerceAPI.parameters
+            const {
+                clientId,
+                organizationId,
+                shortCode,
+                siteId: configSiteId
+            } = appConfig.commerceAPI.parameters
             const shopperOrders = new ShopperOrders({
                 clientId,
                 organizationId,
@@ -710,7 +713,9 @@ const {handler} = runtime.createHandler(options, (app) => {
             const cookieVal = evictIfNeeded(existing)
             res.setHeader(
                 'Set-Cookie',
-                `${cookieName}=${encodeURIComponent(JSON.stringify(cookieVal))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
+                `${cookieName}=${encodeURIComponent(
+                    JSON.stringify(cookieVal)
+                )}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
             )
 
             logger.info('guest-order-lookup verify success', {
@@ -736,7 +741,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                     durationMs: Date.now() - start
                 }
             })
-            if (scapiStatus === 404) return res.status(404).json({error: 'Invalid or expired access code'})
+            if (scapiStatus === 404)
+                return res.status(404).json({error: 'Invalid or expired access code'})
             res.status(502).json({error: 'Service error'})
         }
     })
@@ -763,8 +769,12 @@ const {handler} = runtime.createHandler(options, (app) => {
         const start = Date.now()
 
         try {
-            const {clientId, organizationId, shortCode, siteId: configSiteId} =
-                appConfig.commerceAPI.parameters
+            const {
+                clientId,
+                organizationId,
+                shortCode,
+                siteId: configSiteId
+            } = appConfig.commerceAPI.parameters
             const shopperOrders = new ShopperOrders({
                 clientId,
                 organizationId,
@@ -806,7 +816,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                 delete cookieData2[orderNo]
                 res.setHeader(
                     'Set-Cookie',
-                    `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
+                    `${cookieName}=${encodeURIComponent(
+                        JSON.stringify(cookieData2)
+                    )}; HttpOnly;${cookieSecureFlag} SameSite=Strict; Path=/; Max-Age=900`
                 )
                 return res.status(404).json({error: 'Session expired'})
             }

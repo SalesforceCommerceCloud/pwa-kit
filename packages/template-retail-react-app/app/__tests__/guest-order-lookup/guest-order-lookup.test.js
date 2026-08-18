@@ -20,13 +20,12 @@
 // it when ssr.js calls runtime.createHandler(options, appFn) at module-load time.
 // Using global ensures the reference is stable across the jest.mock hoisting boundary.
 jest.mock('@salesforce/pwa-kit-runtime/ssr/server/express', () => {
-    // eslint-disable-next-line no-undef
     global._routeHandlers = {}
     return {
         getRuntime: jest.fn(() => ({
             createHandler: jest.fn((opts, cb) => {
                 // Build a minimal fake express app that captures route handlers
-                // eslint-disable-next-line no-undef
+
                 const captured = global._routeHandlers
                 const fakeApp = {
                     use: jest.fn(),
@@ -460,7 +459,7 @@ describe('structured logging: no full sensitive data in log output', () => {
         const orderNo = 'ABCDEF123'
         const prefix = orderNo?.slice(0, 4)
         expect(prefix).toBe('ABCD')
-        expect(prefix.length).toBe(4)
+        expect(prefix).toHaveLength(4)
     })
 
     test('logged orderNoPrefix is never the full orderNo', () => {
@@ -496,7 +495,9 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         orderTotal: 100,
         status: 'created',
         customerInfo: {email: 'guest@test.com'},
-        paymentInstruments: [{maskedNumber: '****4242', cardType: 'Visa', paymentMethodId: 'CREDIT_CARD'}],
+        paymentInstruments: [
+            {maskedNumber: '****4242', cardType: 'Visa', paymentMethodId: 'CREDIT_CARD'}
+        ],
         phone: 'should-be-stripped',
         orderViewCode: 'should-be-stripped',
         c_customAttr: 'should-be-stripped'
@@ -563,8 +564,12 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         const email = 'guest@test.com'
         const accessCode = 'VALIDCODE'
         const appConfig = makeAppConfig().app
-        const {clientId, organizationId, shortCode, siteId: configSiteId} =
-            appConfig.commerceAPI.parameters
+        const {
+            clientId,
+            organizationId,
+            shortCode,
+            siteId: configSiteId
+        } = appConfig.commerceAPI.parameters
 
         // Simulate the lookup
         const order = await mockGuestOrderLookup({
@@ -582,7 +587,9 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         // Check cookie construction
         const cookieName = `cc-goa_${configSiteId}`
         const cookieData = {[orderNo]: {email, accessCode}}
-        const cookieHeaderValue = `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+        const cookieHeaderValue = `${cookieName}=${encodeURIComponent(
+            JSON.stringify(cookieData)
+        )}; HttpOnly; Secure; SameSite=Strict; Path=/`
         expect(cookieHeaderValue).toContain('HttpOnly')
         expect(cookieHeaderValue).toContain('Secure')
         expect(cookieHeaderValue).toContain('SameSite=Strict')
@@ -638,7 +645,7 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         expect(JSON.stringify(loggedPayload)).not.toContain(fullOrderNo)
         expect(JSON.stringify(loggedPayload)).not.toContain(fullEmail)
         expect(JSON.stringify(loggedPayload)).not.toContain(fullAccessCode)
-        expect(orderNoPrefix.length).toBe(4)
+        expect(orderNoPrefix).toHaveLength(4)
     })
 })
 
@@ -720,16 +727,27 @@ describe('GET /api/order-lookup/order handler logic', () => {
         const orderNo = 'ORD456'
 
         // Simulate cookie clearing
-        const cookieData2 = {ORD456: {email: 'a@b.com', accessCode: 'code'}, ORD789: {email: 'b@c.com', accessCode: 'code2'}}
+        const cookieData2 = {
+            ORD456: {email: 'a@b.com', accessCode: 'code'},
+            ORD789: {email: 'b@c.com', accessCode: 'code2'}
+        }
         delete cookieData2[orderNo]
 
         const res = makeMockRes()
         if (scapiStatus === 404) {
-            res.setHeader('Set-Cookie', `cc-goa_TestSite=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly; Secure; SameSite=Strict; Path=/`)
+            res.setHeader(
+                'Set-Cookie',
+                `cc-goa_TestSite=${encodeURIComponent(
+                    JSON.stringify(cookieData2)
+                )}; HttpOnly; Secure; SameSite=Strict; Path=/`
+            )
             res.status(404).json({error: 'Session expired'})
         }
 
-        expect(res.setHeader).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('HttpOnly'))
+        expect(res.setHeader).toHaveBeenCalledWith(
+            'Set-Cookie',
+            expect.stringContaining('HttpOnly')
+        )
         expect(res.status).toHaveBeenCalledWith(404)
         expect(res.json).toHaveBeenCalledWith({error: 'Session expired'})
         // The deleted orderNo should not be in the cookie
@@ -756,7 +774,9 @@ describe('cookie security flags', () => {
     test('cookie header contains all required security flags', () => {
         const cookieName = 'cc-goa_TestSite'
         const cookieData = {ORD123: {email: 'a@b.com', accessCode: 'code'}}
-        const cookieHeader = `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+        const cookieHeader = `${cookieName}=${encodeURIComponent(
+            JSON.stringify(cookieData)
+        )}; HttpOnly; Secure; SameSite=Strict; Path=/`
 
         expect(cookieHeader).toContain('HttpOnly')
         expect(cookieHeader).toContain('Secure')
@@ -921,17 +941,41 @@ describe('S15: createVerifyThrottle', () => {
         const throttle = createVerifyThrottle()
         // IP 'a' exhausts its quota
         for (let i = 0; i < 3; i++) {
-            throttle({path: '/api/order-lookup/verify', ip: 'fallback', headers: {'x-forwarded-for': '1.1.1.1'}}, makeThrottleRes(), makeNext())
+            throttle(
+                {
+                    path: '/api/order-lookup/verify',
+                    ip: 'fallback',
+                    headers: {'x-forwarded-for': '1.1.1.1'}
+                },
+                makeThrottleRes(),
+                makeNext()
+            )
         }
         // IP 'a' is now throttled
         const resA = makeThrottleRes()
-        throttle({path: '/api/order-lookup/verify', ip: 'fallback', headers: {'x-forwarded-for': '1.1.1.1'}}, resA, makeNext())
+        throttle(
+            {
+                path: '/api/order-lookup/verify',
+                ip: 'fallback',
+                headers: {'x-forwarded-for': '1.1.1.1'}
+            },
+            resA,
+            makeNext()
+        )
         expect(resA.status).toHaveBeenCalledWith(429)
 
         // IP 'b' (different x-forwarded-for) should still be allowed
         const resB = makeThrottleRes()
         const nextB = makeNext()
-        throttle({path: '/api/order-lookup/verify', ip: 'fallback', headers: {'x-forwarded-for': '2.2.2.2'}}, resB, nextB)
+        throttle(
+            {
+                path: '/api/order-lookup/verify',
+                ip: 'fallback',
+                headers: {'x-forwarded-for': '2.2.2.2'}
+            },
+            resB,
+            nextB
+        )
         expect(nextB).toHaveBeenCalled()
         expect(resB.status).not.toHaveBeenCalled()
     })
@@ -1146,7 +1190,9 @@ describe('GET /api/order-lookup/oms-meta — real handler', () => {
 
 describe('POST /api/order-lookup/cancel — real handler', () => {
     const VALID_ORDER_NO = 'ORD1234'
-    const VALID_COOKIE = makeCookieHeader({[VALID_ORDER_NO]: {email: 'a@b.com', accessCode: 'code'}})
+    const VALID_COOKIE = makeCookieHeader({
+        [VALID_ORDER_NO]: {email: 'a@b.com', accessCode: 'code'}
+    })
 
     beforeEach(() => {
         jest.clearAllMocks()
@@ -1273,12 +1319,17 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'orderNo is required'})
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'orderNo is required'
+        })
     })
 
     test('400: orderNo fails regex', async () => {
         const badOrderNo = '!@#invalid'
-        const cookieWithBad = makeCookieHeader({[badOrderNo]: {email: 'a@b.com', accessCode: 'code'}})
+        const cookieWithBad = makeCookieHeader({
+            [badOrderNo]: {email: 'a@b.com', accessCode: 'code'}
+        })
         const req = makeMockReq({
             headers: {authorization: 'Bearer test-token', cookie: cookieWithBad},
             body: {orderNo: badOrderNo}
@@ -1289,7 +1340,10 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'Invalid orderNo format'
+        })
     })
 
     test('503: feature flag off', async () => {
@@ -1378,7 +1432,9 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
 
 describe('POST /api/order-lookup/return — real handler', () => {
     const VALID_ORDER_NO = 'ORD1234'
-    const VALID_COOKIE = makeCookieHeader({[VALID_ORDER_NO]: {email: 'a@b.com', accessCode: 'code'}})
+    const VALID_COOKIE = makeCookieHeader({
+        [VALID_ORDER_NO]: {email: 'a@b.com', accessCode: 'code'}
+    })
     const VALID_ITEMS = [{itemId: 'item-1', quantity: 1}]
 
     // Helper for SCAPI 400 errors with a cloneable response body (RFC 7807).
@@ -1500,7 +1556,10 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'productItems must be a non-empty array'})
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'productItems must be a non-empty array'
+        })
     })
 
     test('400: empty productItems array', async () => {
@@ -1514,7 +1573,10 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'productItems must be a non-empty array'})
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'productItems must be a non-empty array'
+        })
     })
 
     test('400: productItem with no itemId', async () => {
@@ -1528,7 +1590,10 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'Each productItem must have a string itemId'})
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'Each productItem must have a string itemId'
+        })
     })
 
     test('400: productItem with non-positive quantity', async () => {
@@ -1542,7 +1607,10 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_input', message: 'Each productItem must have a positive quantity'})
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'Each productItem must have a positive quantity'
+        })
     })
 
     test('503: feature flag off', async () => {
