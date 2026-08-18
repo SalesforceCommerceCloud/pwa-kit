@@ -12,6 +12,9 @@ import * as useTrustedAgentModule from './useTrustedAgent'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
 
+// `jsdom` is a global provided by the jest jsdom environment; its type is
+// declared once in the test suite (see StorefrontPreview/utils.test.ts).
+
 jest.mock('./useAuthContext')
 
 const mockedUseAuthContext = useAuthContext as jest.MockedFunction<typeof Object>
@@ -94,9 +97,13 @@ describe('useTrustedAgent', () => {
                 }
             },
             logout: jest.fn().mockResolvedValue({}),
-            authorizeTrustedAgent: jest
-                .fn()
-                .mockResolvedValue({url: 'test_url', codeVerifier: 'test_verifier'}),
+            authorizeTrustedAgent: jest.fn().mockResolvedValue({
+                url: 'test_url',
+                codeVerifier: 'test_verifier',
+                // Must match the `state` the popup echoes back (see the URL mock in
+                // beforeAll and simulateSuccessfulPopup) or login()'s CSRF check rejects.
+                state: 'state_abc'
+            }),
             registerTrustedAgentRefreshHandler: jest.fn()
         })
     })
@@ -154,6 +161,30 @@ describe('useTrustedAgent', () => {
                 refresh_token: 'mock_refresh_token'
             })
         })
+    })
+
+    test('login rejects when the popup-echoed state does not match the authorize state', async () => {
+        // The popup echoes `state_abc` (see the URL mock / simulateSuccessfulPopup),
+        // but authorizeTrustedAgent minted a different state — a CSRF/mismatched
+        // callback. login() must fail fast before exchanging the code.
+        const authCtx = mockedUseAuthContext() as Record<string, unknown>
+        authCtx.authorizeTrustedAgent = jest.fn().mockResolvedValue({
+            url: 'test_url',
+            codeVerifier: 'test_verifier',
+            state: 'a_different_state'
+        })
+        simulateSuccessfulPopup()
+
+        const {result} = renderHookWithProviders(() => useTrustedAgentModule.default())
+
+        let error: Error | null = null
+        await act(async () => {
+            await result.current.login('test_login_id').catch((e) => {
+                error = e
+            })
+        })
+
+        expect(String(error)).toContain('state mismatch')
     })
 
     test('useTrustedAgent returns initial state correctly', async () => {
@@ -299,5 +330,149 @@ describe('useTrustedAgent', () => {
 
         mockParseSlasJwtVals = origMockParseSlasJwtVals
         mockAuthGetters = origMockAuthGetters
+    })
+})
+
+describe('deliverTrustedAgentResult', () => {
+    const originalOpener = window.opener
+    const originalUrl = window.location.href
+    let broadcastPosts: Array<unknown>
+    let broadcastClosed: boolean
+    let closeSpy: jest.SpyInstance
+
+    // jsdom's window.location is read-only, and redefining it with
+    // Object.defineProperty does not reliably reset between tests on older
+    // jsdom (Node 18). Reconfigure the whole document URL instead so both
+    // `search` and `origin` are driven from a single source of truth.
+    const setLocation = (search: string, origin = 'http://localhost') => {
+        jsdom.reconfigure({url: `${origin}/${search}`})
+    }
+
+    beforeEach(() => {
+        jest.useFakeTimers()
+        broadcastPosts = []
+        broadcastClosed = false
+        // Route through the spec setter so the property stays writable across
+        // Node versions (a plain Object.defineProperty data prop breaks Node 18).
+        window.opener = undefined
+        // jsdom does not implement window.close; spy on it so the callback page's
+        // deferred self-close is observable rather than throwing "Not implemented".
+        closeSpy = jest.spyOn(window, 'close').mockImplementation(() => undefined)
+        ;(global as any).BroadcastChannel = jest.fn().mockImplementation(() => ({
+            postMessage: (msg: unknown) => broadcastPosts.push(msg),
+            close: () => {
+                broadcastClosed = true
+            }
+        }))
+    })
+
+    afterEach(() => {
+        window.opener = originalOpener
+        jsdom.reconfigure({url: originalUrl})
+        delete (global as any).BroadcastChannel
+        closeSpy.mockRestore()
+        jest.clearAllTimers()
+        jest.useRealTimers()
+    })
+
+    test('posts {type, code, state} to window.opener scoped to origin', () => {
+        const postMessage = jest.fn()
+        window.opener = {postMessage}
+        setLocation('?code=abc&state=xyz')
+
+        useTrustedAgentModule.deliverTrustedAgentResult()
+
+        expect(postMessage).toHaveBeenCalledWith(
+            {
+                type: useTrustedAgentModule.TRUSTED_AGENT_POPUP_MESSAGE_TYPE,
+                code: 'abc',
+                state: 'xyz'
+            },
+            'http://localhost'
+        )
+    })
+
+    test('broadcasts on the fallback channel and closes it', () => {
+        setLocation('?code=abc&state=xyz')
+
+        useTrustedAgentModule.deliverTrustedAgentResult()
+
+        expect((global as any).BroadcastChannel).toHaveBeenCalledWith(
+            useTrustedAgentModule.TRUSTED_AGENT_POPUP_CHANNEL
+        )
+        expect(broadcastPosts).toEqual([
+            {
+                type: useTrustedAgentModule.TRUSTED_AGENT_POPUP_MESSAGE_TYPE,
+                code: 'abc',
+                state: 'xyz'
+            }
+        ])
+        expect(broadcastClosed).toBe(true)
+    })
+
+    test('is a no-op when code or state is absent', () => {
+        const postMessage = jest.fn()
+        window.opener = {postMessage}
+        setLocation('?code=abc')
+
+        useTrustedAgentModule.deliverTrustedAgentResult()
+
+        expect(postMessage).not.toHaveBeenCalled()
+        expect(broadcastPosts).toEqual([])
+    })
+
+    test('does not throw when the opener reference is severed', () => {
+        window.opener = {
+            postMessage: () => {
+                throw new Error('severed by COOP context switch')
+            }
+        }
+        setLocation('?code=abc&state=xyz')
+
+        expect(() => useTrustedAgentModule.deliverTrustedAgentResult()).not.toThrow()
+        // The broadcast fallback still delivers the result.
+        expect(broadcastPosts).toHaveLength(1)
+    })
+
+    test('closes its own window after delivering the result', () => {
+        const postMessage = jest.fn()
+        window.opener = {postMessage}
+        setLocation('?code=abc&state=xyz')
+
+        useTrustedAgentModule.deliverTrustedAgentResult()
+
+        // Deferred so the queued postMessage/broadcast flushes first; it must not
+        // rely on the opener's COOP-severed `popup.close()` to shut the popup.
+        expect(closeSpy).not.toHaveBeenCalled()
+        jest.runOnlyPendingTimers()
+        expect(closeSpy).toHaveBeenCalledTimes(1)
+    })
+
+    test('does not close the window when there is nothing to deliver', () => {
+        setLocation('?code=abc')
+
+        useTrustedAgentModule.deliverTrustedAgentResult()
+        jest.runOnlyPendingTimers()
+
+        expect(closeSpy).not.toHaveBeenCalled()
+    })
+
+    test('warns and does not close when neither delivery path is available', () => {
+        // Valid code+state, but no opener and no BroadcastChannel: both delivery
+        // paths fail, so the opener is left to fall back to its timeout. The page
+        // must surface why and must NOT close itself (nothing was delivered).
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+        window.opener = undefined
+        delete (global as any).BroadcastChannel
+        setLocation('?code=abc&state=xyz')
+
+        useTrustedAgentModule.deliverTrustedAgentResult()
+        jest.runOnlyPendingTimers()
+
+        expect(warn).toHaveBeenCalledWith(
+            'Trusted agent callback could not deliver the OAuth result to the opener.'
+        )
+        expect(closeSpy).not.toHaveBeenCalled()
+        warn.mockRestore()
     })
 })

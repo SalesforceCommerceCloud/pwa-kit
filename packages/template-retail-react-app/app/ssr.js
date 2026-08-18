@@ -26,88 +26,14 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
-import {ShopperOrders} from 'commerce-sdk-isomorphic'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {registerAuthLinkRoute} from './components/shopper-agent/auth-link-proxy.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
 
 const config = getConfig()
-
-// Guest order access helpers
-function getSiteIdFromRequest(req) {
-    return req.headers['x-site-id'] || null
-}
-
-export function parseGuestOrderCookie(req, cookieName) {
-    try {
-        const raw = req.headers?.cookie
-            ?.split(';')
-            .map((c) => c.trim())
-            .find((c) => c.startsWith(cookieName + '='))
-        if (!raw) return {}
-        return JSON.parse(decodeURIComponent(raw.slice(cookieName.length + 1)))
-    } catch {
-        return {}
-    }
-}
-
-export function evictIfNeeded(cookieMap) {
-    // FIFO eviction if JSON would exceed ~3KB
-    let entries = Object.entries(cookieMap)
-    while (JSON.stringify(Object.fromEntries(entries)).length > 3000 && entries.length > 1) {
-        entries.shift()
-    }
-    return Object.fromEntries(entries)
-}
-
-const GUEST_ORDER_SUPPRESSED_FIELDS = new Set([
-    'paymentCard',
-    'expirationMonth',
-    'expirationYear',
-    'phone',
-    'globalPartyId',
-    'orderToken',
-    'orderViewCode'
-])
-
-export function filterGuestOrderFields(order) {
-    if (!order || typeof order !== 'object') return order
-    const filtered = {}
-    for (const [key, val] of Object.entries(order)) {
-        if (key.startsWith('c_')) continue // suppress all custom attributes
-        if (GUEST_ORDER_SUPPRESSED_FIELDS.has(key)) continue
-        if (key === 'customerInfo') {
-            // Keep only email echo; suppress phone, globalPartyId
-            const {email, customerEmail} = val || {}
-            filtered.customerInfo = {email: email || customerEmail}
-            continue
-        }
-        if (key === 'paymentInstruments') {
-            // Keep maskedNumber + cardType only
-            filtered.paymentInstruments = (val || []).map((pi) => ({
-                maskedNumber: pi.maskedNumber,
-                cardType: pi.cardType,
-                paymentMethodId: pi.paymentMethodId
-            }))
-            continue
-        }
-        if (key === 'shipments') {
-            // Keep shippingAddress (postalCode only), trackingNumber, trackingUrl, expectedDeliveryDate
-            filtered.shipments = (val || []).map((s) => ({
-                trackingNumber: s.trackingNumber,
-                trackingUrl: s.trackingUrl,
-                expectedDeliveryDate: s.expectedDeliveryDate,
-                shippingStatus: s.shippingStatus,
-                shippingAddress: s.shippingAddress
-                    ? {postalCode: s.shippingAddress.postalCode}
-                    : undefined,
-                shippingMethod: s.shippingMethod
-            }))
-            continue
-        }
-        filtered[key] = val
-    }
-    return filtered
-}
 
 const options = {
     // The build directory (an absolute path)
@@ -477,6 +403,28 @@ if (_golConfig?.enabled && !options.localAllowCookies && !process.env.MRT_ALLOW_
     )
 }
 
+/**
+ * Handle the SLAS `/callback` redirect.
+ *
+ * The Trusted Agent (Order on Behalf) popup redirects here with both a `code` and
+ * a `state`. That flow needs the React app to mount so the callback page can hand
+ * the result back to the opener, so let it fall through to the renderer via
+ * `next()`. This URL carries OAuth material, so that variant must never be cached.
+ *
+ * For every other request (including the standard SLAS login redirect, which does
+ * not navigate the top window here and carries no `state`) this endpoint does
+ * nothing and is safe to cache for a long time.
+ */
+export function handleCallback(req, res, next) {
+    if (req.query.code && req.query.state) {
+        res.set('Cache-Control', 'no-store')
+        return next()
+    }
+
+    res.set('Cache-Control', `max-age=31536000`)
+    res.send()
+}
+
 const cookieSecureFlag = options.localAllowCookies ? '' : ' Secure;'
 
 const {handler} = runtime.createHandler(options, (app) => {
@@ -506,6 +454,11 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.cimulate.ai',
                         // Commerce Client bundle served from the SFCC static CDN
                         '*.sfcc-store-internal.net',
+                        // Origin of the merchant-hosted Commerce Client component-override
+                        // script, added only when cc_overridesUrl holds a valid HTTPS URL.
+                        // Serving that script from a different host than the configured one
+                        // requires adding the host here.
+                        ...getCommerceClientOverridesCspSources(config.app.commerceAgent),
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
                         // Payment gateways
@@ -567,12 +520,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     )
 
     // Handle the redirect from SLAS as to avoid error
-    app.get('/callback', (req, res) => {
-        // This endpoint does nothing and is not expected to change
-        // Thus we cache it for a year to maximize performance
-        res.set('Cache-Control', `max-age=31536000`)
-        res.send()
-    })
+    app.get('/callback', handleCallback)
 
     app.get('/:shortCode/:tenantId/oauth2/jwks', (req, res) => {
         jwksCaching(req, res, {shortCode: req.params.shortCode, tenantId: req.params.tenantId})
@@ -652,12 +600,27 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Browser POSTs an auth_link_key and siteId (as x-site-id header).
     // In HttpOnly mode, tokens are read from cookies server-side.
     // In non-HttpOnly mode, SLAS access token is sent in request body.
-    // Server extracts my_domain from ANC_MYDOMAIN environment variable,
+    // Server extracts my_domain from AGENT_MYDOMAIN environment variable,
     // validates it's a trusted Salesforce host (SSRF prevention), then
     // forwards the tokens to Core's `/agent/identity/bridge` endpoint with
     // the access token in an `Authorization: SLAS` header and the refresh
     // token in the body.
     registerTokenBridgeRoute(app)
+
+    // Shopper Agent — Auth Link proxy for Commerce Client.
+    // Browser POSTs the Commerce Client JWT from the deployment-scoped
+    // cim_af_ct_<orgId>_<embeddedServiceName> key in the request body. sessionStorage
+    // is authoritative; localStorage is a compatibility fallback. Unlike the Token
+    // Bridge, no siteId/x-site-id is sent — the SCRT authlink endpoint authenticates
+    // with the JWT (Bearer) alone.
+    // Server reads the SCRT2 origin from scrt2Url in the COMMERCE_AGENT_SETTINGS
+    // environment variable (NOT AGENT_MYDOMAIN — the /iamessage/* auth link API is
+    // served by SCRT2 on *.salesforce-scrt.com, a different host from Core's
+    // MyDomain), validates it's a trusted Salesforce host (SSRF prevention), then
+    // calls SCRT's `/iamessage/api/v2/authorization/authlink` endpoint with the
+    // Commerce Client JWT in an `Authorization: Bearer` header.
+    // Returns { auth_link_key: "..." } which is then used with Token Bridge.
+    registerAuthLinkRoute(app)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))

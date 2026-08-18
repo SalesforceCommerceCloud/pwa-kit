@@ -40,7 +40,9 @@ import {useOmsMetaData} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {ChevronLeftIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import OrderProducts, {groupProductItemsByShipmentId} from '@salesforce/retail-react-app/app/components/order-products'
+import OrderProducts, {
+    groupProductItemsByShipmentId
+} from '@salesforce/retail-react-app/app/components/order-products'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 import OrderTracking from '@salesforce/retail-react-app/app/components/order-tracking'
 import ShipmentStatusLabel from '@salesforce/retail-react-app/app/components/order-tracking/shipment-status-label'
@@ -347,12 +349,12 @@ const AccountOrderDetail = () => {
     // from the adjacent Cancelled badge, so it intentionally carries no hint.
     const cancelDisabledHint = cancelTerminal
         ? formatMessage({
-              defaultMessage: 'This order can no longer be cancelled.',
+              defaultMessage: 'This order can no longer be canceled.',
               id: 'account_order_detail.hint.cancel_unavailable'
           })
         : !canCancel
         ? formatMessage({
-              defaultMessage: 'This order is not eligible for cancellation.',
+              defaultMessage: "This order isn't eligible for cancellation.",
               id: 'account_order_detail.hint.not_cancellable'
           })
         : null
@@ -361,11 +363,11 @@ const AccountOrderDetail = () => {
         setCancelFeedback({
             status: 'success',
             title: formatMessage({
-                defaultMessage: 'Order cancelled',
+                defaultMessage: 'Order canceled',
                 id: 'account_order_detail.alert.cancellation_success_title'
             }),
             description: formatMessage({
-                defaultMessage: 'Your order was cancelled successfully.',
+                defaultMessage: 'Your order was canceled successfully.',
                 id: 'account_order_detail.alert.cancellation_success_description'
             })
         })
@@ -383,7 +385,7 @@ const AccountOrderDetail = () => {
             } else if (status === 409) {
                 description = formatMessage({
                     defaultMessage:
-                        'This order is already being processed and cannot be cancelled. Please reach out to the merchant.',
+                        'This order is already being processed and cannot be canceled. Please reach out to the merchant.',
                     id: 'account_order_detail.alert.cancellation_error_conflict'
                 })
             } else {
