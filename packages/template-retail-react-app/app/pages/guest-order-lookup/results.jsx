@@ -124,7 +124,7 @@ const GuestOrderLookupResults = () => {
         queryKey: ['guestOrderLookup', 'order', orderNo],
         queryFn: async () => {
             const token = await getTokenWhenReadyRef.current()
-            const res = await fetch(`/api/order-lookup/order?orderNo=${encodeURIComponent(orderNo)}`, {
+            const res = await fetch(`/api/order-lookup/order/${encodeURIComponent(orderNo)}`, {
                 headers: {Authorization: `Bearer ${token}`}
             })
             if (res.status === 401 || res.status === 403) {

@@ -95,10 +95,9 @@ const GuestOrderLookupOrder = () => {
         queryKey: ['guestOrderLookup', 'order', orderNo],
         queryFn: async () => {
             const token = await getTokenWhenReadyRef.current()
-            const res = await fetch(
-                `/api/order-lookup/order?orderNo=${encodeURIComponent(orderNo)}`,
-                {headers: {Authorization: `Bearer ${token}`}}
-            )
+            const res = await fetch(`/api/order-lookup/order/${encodeURIComponent(orderNo)}`, {
+                headers: {Authorization: `Bearer ${token}`}
+            })
             if (res.status === 404) {
                 const err = new Error('Session expired or order not found')
                 err.status = 404

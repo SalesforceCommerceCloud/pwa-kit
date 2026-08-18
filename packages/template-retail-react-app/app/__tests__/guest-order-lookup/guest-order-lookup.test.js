@@ -1024,12 +1024,12 @@ describe('GET /api/order-lookup/order — expand=oms,oms_shipments param', () =>
                 authorization: 'Bearer test-token',
                 cookie: makeCookieHeader({[orderNo]: {email, accessCode}})
             },
-            query: {orderNo}
+            params: {orderNo}
         })
         const res = makeMockRes()
 
         // Invoke the real handler captured from ssr.js at module load
-        const handler = global._routeHandlers['GET /api/order-lookup/order']
+        const handler = global._routeHandlers['GET /api/order-lookup/order/:orderNo']
         expect(handler).toBeDefined()
         await handler(req, res)
 

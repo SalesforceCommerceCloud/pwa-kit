@@ -834,7 +834,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
     })
 
-    app.get('/api/order-lookup/order', async (req, res) => {
+    app.get('/api/order-lookup/order/:orderNo', async (req, res) => {
         const {app: appConfig} = getConfig()
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
@@ -846,8 +846,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
 
-        // orderNo passed as query param (never in path — security constraint)
-        const orderNo = req.query?.orderNo
+        const orderNo = req.params.orderNo
         if (!orderNo || !cookieData[orderNo])
             return res.status(403).json({error: 'No verified session for this order'})
 
