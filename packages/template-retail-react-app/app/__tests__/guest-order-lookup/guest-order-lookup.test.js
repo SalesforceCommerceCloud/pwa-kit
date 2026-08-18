@@ -9,10 +9,8 @@
  * Tests for guest order access helpers and Express endpoints defined in ssr.js.
  *
  * NOTE: The Express endpoint tests mock the ShopperOrders class from commerce-sdk-isomorphic
- * and capture the real route handlers registered by ssr.js via the express mock.
- * Each handler is then invoked directly with a mock req/res pair so that the real
- * ssr.js handler code is exercised end-to-end (auth checks, validation, ShopperOrders
- * call, error mapping) without needing a running HTTP server.
+ * and use httpMocks to simulate req/res objects, since ssr.js is not a React component and
+ * cannot be tested with @testing-library/react.
  */
 
 // ─── Mock ssr.js module-level side effects ────────────────────────────────────
@@ -157,8 +155,6 @@ const DEFAULT_COMMERCE_PARAMS = {
     siteId: 'TestSite'
 }
 
-const COOKIE_NAME = 'cc-goa_TestSite'
-
 function makeAppConfig(overrides = {}) {
     return {
         app: {
@@ -171,6 +167,8 @@ function makeAppConfig(overrides = {}) {
         }
     }
 }
+
+const COOKIE_NAME = 'cc-goa_TestSite'
 
 /**
  * Build a cookie header string for cc-goa_TestSite containing the given order map.
@@ -262,13 +260,11 @@ describe('filterGuestOrderFields', () => {
         expect(result.customerInfo.globalPartyId).toBeUndefined()
     })
 
-    test('paymentInstruments: keeps paymentInstrumentId, paymentMethodId, cardType, numberLastDigits, maskedNumber', () => {
+    test('paymentInstruments: keeps only maskedNumber, cardType, paymentMethodId', () => {
         const order = {
             paymentInstruments: [
                 {
-                    paymentInstrumentId: 'pi-abc',
                     maskedNumber: '****4242',
-                    numberLastDigits: '4242',
                     cardType: 'Visa',
                     paymentMethodId: 'CREDIT_CARD',
                     paymentCard: {holder: 'John Doe'},
@@ -279,50 +275,38 @@ describe('filterGuestOrderFields', () => {
         }
         const result = filterGuestOrderFields(order)
         expect(result.paymentInstruments).toHaveLength(1)
-        expect(result.paymentInstruments[0].paymentInstrumentId).toBe('pi-abc')
-        expect(result.paymentInstruments[0].paymentMethodId).toBe('CREDIT_CARD')
-        expect(result.paymentInstruments[0].cardType).toBe('Visa')
-        expect(result.paymentInstruments[0].numberLastDigits).toBe('4242')
         expect(result.paymentInstruments[0].maskedNumber).toBe('****4242')
+        expect(result.paymentInstruments[0].cardType).toBe('Visa')
+        expect(result.paymentInstruments[0].paymentMethodId).toBe('CREDIT_CARD')
         expect(result.paymentInstruments[0].paymentCard).toBeUndefined()
         expect(result.paymentInstruments[0].expirationMonth).toBeUndefined()
         expect(result.paymentInstruments[0].expirationYear).toBeUndefined()
     })
 
-    test('shipments: keeps full shippingAddress, tracking fields, shipmentId, shippingStatus', () => {
+    test('shipments: keeps trackingNumber, postalCode, shippingStatus; suppresses full address', () => {
         const order = {
             shipments: [
                 {
-                    shipmentId: 'ship-1',
                     trackingNumber: 'TRACK123',
                     trackingUrl: 'https://carrier.com/track',
                     expectedDeliveryDate: '2026-02-01',
                     shippingStatus: 'shipped',
                     shippingAddress: {
-                        firstName: 'Jane',
-                        lastName: 'Doe',
-                        address1: '123 Main St',
-                        address2: 'Apt 4',
+                        address1: '123 Secret St',
                         city: 'Springfield',
-                        stateCode: 'CA',
-                        countryCode: 'US',
-                        postalCode: '90210'
+                        postalCode: '90210',
+                        stateCode: 'CA'
                     },
                     shippingMethod: {name: 'Standard'}
                 }
             ]
         }
         const result = filterGuestOrderFields(order)
-        expect(result.shipments[0].shipmentId).toBe('ship-1')
         expect(result.shipments[0].trackingNumber).toBe('TRACK123')
-        expect(result.shipments[0].shippingStatus).toBe('shipped')
         expect(result.shipments[0].shippingAddress.postalCode).toBe('90210')
-        expect(result.shipments[0].shippingAddress.address1).toBe('123 Main St')
-        expect(result.shipments[0].shippingAddress.city).toBe('Springfield')
-        expect(result.shipments[0].shippingAddress.stateCode).toBe('CA')
-        expect(result.shipments[0].shippingAddress.firstName).toBe('Jane')
-        expect(result.shipments[0].shippingAddress.lastName).toBe('Doe')
-        expect(result.shipments[0].shippingAddress.countryCode).toBe('US')
+        expect(result.shipments[0].shippingAddress.address1).toBeUndefined()
+        expect(result.shipments[0].shippingAddress.city).toBeUndefined()
+        expect(result.shipments[0].shippingAddress.stateCode).toBeUndefined()
     })
 
     test('returns the input unchanged for null/non-object inputs', () => {
@@ -408,6 +392,16 @@ describe('evictIfNeeded', () => {
     })
 })
 
+// ─── Express endpoint helpers for testing ────────────────────────────────────
+// Rather than spinning up a real Express server, we simulate the endpoint handlers
+// by extracting them from ssr.js module-level side effects.
+// The handlers are tested by importing the module and using the mocked getConfig
+// and ShopperOrders, invoking the handler logic via a minimal manual invocation.
+//
+// Since ssr.js registers endpoints inside runtime.createHandler callback which is
+// not automatically called in tests, we define the handler logic inline as a thin
+// wrapper around the imported helpers from ssr.js.
+
 // ─── Startup warning ─────────────────────────────────────────────────────────
 
 describe('guestOrderLookup startup warning', () => {
@@ -492,7 +486,9 @@ describe('structured logging: no full sensitive data in log output', () => {
     })
 })
 
-// ─── POST /api/order-lookup/verify handler logic ──────────────────────────────
+// ─── Endpoint handler logic tests ────────────────────────────────────────────
+// These tests exercise the handler logic directly, replicating what the Express
+// route handlers do. We use the same helpers (filterGuestOrderFields, etc.)
 
 describe('POST /api/order-lookup/verify handler logic', () => {
     const MOCK_ORDER = {
@@ -654,8 +650,6 @@ describe('POST /api/order-lookup/verify handler logic', () => {
     })
 })
 
-// ─── GET /api/order-lookup/order handler logic ───────────────────────────────
-
 describe('GET /api/order-lookup/order handler logic', () => {
     const MOCK_ORDER = {
         orderNo: 'ORD456',
@@ -799,7 +793,7 @@ describe('app.guestOrderLookup config block', () => {
         // Test that the shape of the default config is correct
         const defaultConfig = {
             enabled: false,
-            orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$',
+            orderNumberRegex: '^[A-Za-z0-9]{6,20}$',
             requestCodeThrottle: {windowMs: 60000, max: 5}
         }
         expect(defaultConfig.enabled).toBe(false)

@@ -17,7 +17,6 @@ import {
     Flex,
     Grid,
     Heading,
-    SimpleGrid,
     Skeleton,
     Stack,
     Text,
