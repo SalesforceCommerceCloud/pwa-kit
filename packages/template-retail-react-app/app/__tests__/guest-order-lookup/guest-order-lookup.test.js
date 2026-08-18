@@ -15,17 +15,39 @@
 
 // ─── Mock ssr.js module-level side effects ────────────────────────────────────
 
-jest.mock('@salesforce/pwa-kit-runtime/ssr/server/express', () => ({
-    getRuntime: jest.fn(() => ({
-        createHandler: jest.fn((opts, cb) => {
-            // Capture the callback but don't call it — endpoints are tested directly
-            return {handler: jest.fn()}
-        }),
-        serveStaticFile: jest.fn(),
-        serveServiceWorker: jest.fn(),
-        render: jest.fn()
-    }))
-}))
+// Capture handlers registered by ssr.js so tests can invoke them directly.
+// The mock factory initialises global._routeHandlers to a plain object and populates
+// it when ssr.js calls runtime.createHandler(options, appFn) at module-load time.
+// Using global ensures the reference is stable across the jest.mock hoisting boundary.
+jest.mock('@salesforce/pwa-kit-runtime/ssr/server/express', () => {
+    global._routeHandlers = {}
+    return {
+        getRuntime: jest.fn(() => ({
+            createHandler: jest.fn((opts, cb) => {
+                // Build a minimal fake express app that captures route handlers
+
+                const captured = global._routeHandlers
+                const fakeApp = {
+                    use: jest.fn(),
+                    get: jest.fn((path, ...fns) => {
+                        // Store the last handler (the async route handler, not middleware)
+                        const handler = fns[fns.length - 1]
+                        if (typeof path === 'string') captured[`GET ${path}`] = handler
+                    }),
+                    post: jest.fn((path, ...fns) => {
+                        const handler = fns[fns.length - 1]
+                        if (typeof path === 'string') captured[`POST ${path}`] = handler
+                    })
+                }
+                cb(fakeApp)
+                return {handler: jest.fn()}
+            }),
+            serveStaticFile: jest.fn(() => jest.fn()),
+            serveServiceWorker: jest.fn(),
+            render: jest.fn()
+        }))
+    }
+})
 
 jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => ({
     getAppOrigin: jest.fn(() => 'https://test-app.com')
@@ -43,8 +65,8 @@ jest.mock('express', () => {
         get: jest.fn(),
         post: jest.fn()
     }))
-    mockExpress.json = jest.fn()
-    mockExpress.urlencoded = jest.fn()
+    mockExpress.json = jest.fn(() => jest.fn())
+    mockExpress.urlencoded = jest.fn(() => jest.fn())
     return mockExpress
 })
 
@@ -61,19 +83,26 @@ jest.mock(
     {virtual: true}
 )
 
-// Mock commerce-sdk-isomorphic so ssr.js can import ShopperOrders without the real SDK.
-// {virtual: true} is required because the package is not installed in the test environment.
-// The test exercises ssr.js helper functions directly — ShopperOrders is never instantiated.
+// ─── ShopperOrders mock ───────────────────────────────────────────────────────
+// Must include all methods called by ssr.js endpoints under test.
+// The factory returns a fresh set of jest.fn()s each time; tests can configure
+// return values via mockShopperOrdersInstance.
+const mockShopperOrdersInstance = {
+    guestOrderLookup: jest.fn(),
+    getOmsMetaData: jest.fn(),
+    cancelOmsOrder: jest.fn(),
+    returnOmsOrder: jest.fn()
+}
+
 jest.mock(
     'commerce-sdk-isomorphic',
     () => ({
-        ShopperOrders: jest.fn().mockImplementation(() => ({
-            guestOrderLookup: jest.fn()
-        }))
+        ShopperOrders: jest.fn().mockImplementation(() => mockShopperOrdersInstance)
     }),
     {virtual: true}
 )
 
+// ─── Config state ─────────────────────────────────────────────────────────────
 // Use a module-level state object; the factory captures the reference, not the value.
 // Initialize with a valid config so ssr.js module-level code (const config = getConfig())
 // does not throw on load.
@@ -116,7 +145,7 @@ import {
     createVerifyThrottle
 } from '@salesforce/retail-react-app/app/ssr.js'
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Shared helpers ───────────────────────────────────────────────────────────
 
 const DEFAULT_COMMERCE_PARAMS = {
     clientId: 'test-client',
@@ -136,6 +165,16 @@ function makeAppConfig(overrides = {}) {
             }
         }
     }
+}
+
+const COOKIE_NAME = 'cc-goa_TestSite'
+
+/**
+ * Build a cookie header string for cc-goa_TestSite containing the given order map.
+ * orderMap e.g. { ORD123: { email: 'a@b.com', accessCode: 'code' } }
+ */
+function makeCookieHeader(orderMap) {
+    return `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(orderMap))}`
 }
 
 function makeMockReq(overrides = {}) {
@@ -433,7 +472,7 @@ describe('structured logging: no full sensitive data in log output', () => {
         const orderNo = 'ABCDEF123'
         const prefix = orderNo?.slice(0, 4)
         expect(prefix).toBe('ABCD')
-        expect(prefix.length).toBe(4)
+        expect(prefix).toHaveLength(4)
     })
 
     test('logged orderNoPrefix is never the full orderNo', () => {
@@ -469,7 +508,9 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         orderTotal: 100,
         status: 'created',
         customerInfo: {email: 'guest@test.com'},
-        paymentInstruments: [{maskedNumber: '****4242', cardType: 'Visa', paymentMethodId: 'CREDIT_CARD'}],
+        paymentInstruments: [
+            {maskedNumber: '****4242', cardType: 'Visa', paymentMethodId: 'CREDIT_CARD'}
+        ],
         phone: 'should-be-stripped',
         orderViewCode: 'should-be-stripped',
         c_customAttr: 'should-be-stripped'
@@ -536,8 +577,12 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         const email = 'guest@test.com'
         const accessCode = 'VALIDCODE'
         const appConfig = makeAppConfig().app
-        const {clientId, organizationId, shortCode, siteId: configSiteId} =
-            appConfig.commerceAPI.parameters
+        const {
+            clientId,
+            organizationId,
+            shortCode,
+            siteId: configSiteId
+        } = appConfig.commerceAPI.parameters
 
         // Simulate the lookup
         const order = await mockGuestOrderLookup({
@@ -555,7 +600,9 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         // Check cookie construction
         const cookieName = `cc-goa_${configSiteId}`
         const cookieData = {[orderNo]: {email, accessCode}}
-        const cookieHeaderValue = `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+        const cookieHeaderValue = `${cookieName}=${encodeURIComponent(
+            JSON.stringify(cookieData)
+        )}; HttpOnly; Secure; SameSite=Strict; Path=/`
         expect(cookieHeaderValue).toContain('HttpOnly')
         expect(cookieHeaderValue).toContain('Secure')
         expect(cookieHeaderValue).toContain('SameSite=Strict')
@@ -611,7 +658,7 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         expect(JSON.stringify(loggedPayload)).not.toContain(fullOrderNo)
         expect(JSON.stringify(loggedPayload)).not.toContain(fullEmail)
         expect(JSON.stringify(loggedPayload)).not.toContain(fullAccessCode)
-        expect(orderNoPrefix.length).toBe(4)
+        expect(orderNoPrefix).toHaveLength(4)
     })
 })
 
@@ -693,16 +740,27 @@ describe('GET /api/order-lookup/order handler logic', () => {
         const orderNo = 'ORD456'
 
         // Simulate cookie clearing
-        const cookieData2 = {ORD456: {email: 'a@b.com', accessCode: 'code'}, ORD789: {email: 'b@c.com', accessCode: 'code2'}}
+        const cookieData2 = {
+            ORD456: {email: 'a@b.com', accessCode: 'code'},
+            ORD789: {email: 'b@c.com', accessCode: 'code2'}
+        }
         delete cookieData2[orderNo]
 
         const res = makeMockRes()
         if (scapiStatus === 404) {
-            res.setHeader('Set-Cookie', `cc-goa_TestSite=${encodeURIComponent(JSON.stringify(cookieData2))}; HttpOnly; Secure; SameSite=Strict; Path=/`)
+            res.setHeader(
+                'Set-Cookie',
+                `cc-goa_TestSite=${encodeURIComponent(
+                    JSON.stringify(cookieData2)
+                )}; HttpOnly; Secure; SameSite=Strict; Path=/`
+            )
             res.status(404).json({error: 'Session expired'})
         }
 
-        expect(res.setHeader).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('HttpOnly'))
+        expect(res.setHeader).toHaveBeenCalledWith(
+            'Set-Cookie',
+            expect.stringContaining('HttpOnly')
+        )
         expect(res.status).toHaveBeenCalledWith(404)
         expect(res.json).toHaveBeenCalledWith({error: 'Session expired'})
         // The deleted orderNo should not be in the cookie
@@ -729,7 +787,9 @@ describe('cookie security flags', () => {
     test('cookie header contains all required security flags', () => {
         const cookieName = 'cc-goa_TestSite'
         const cookieData = {ORD123: {email: 'a@b.com', accessCode: 'code'}}
-        const cookieHeader = `${cookieName}=${encodeURIComponent(JSON.stringify(cookieData))}; HttpOnly; Secure; SameSite=Strict; Path=/`
+        const cookieHeader = `${cookieName}=${encodeURIComponent(
+            JSON.stringify(cookieData)
+        )}; HttpOnly; Secure; SameSite=Strict; Path=/`
 
         expect(cookieHeader).toContain('HttpOnly')
         expect(cookieHeader).toContain('Secure')
@@ -837,14 +897,21 @@ describe('S15: createVerifyThrottle', () => {
         }
     })
 
-    test('does not throttle requests outside /api/order-lookup/ prefix', () => {
+    test('does not throttle requests to paths other than /api/order-lookup/verify', () => {
         const throttle = createVerifyThrottle()
         const ip = '5.5.5.5'
-        // Exhaust the window for the IP first on the verify path
+        // Exhaust the verify window for this IP
         for (let i = 0; i < 3; i++) {
             throttle(makeThrottleReq(ip, '/api/order-lookup/verify'), makeThrottleRes(), makeNext())
         }
-        // A request to a different path should not be throttled
+        // Order fetch (hard refresh) must not be throttled even when verify is exhausted
+        const nextOrder = makeNext()
+        const resOrder = makeThrottleRes()
+        throttle(makeThrottleReq(ip, '/api/order-lookup/order/12345678'), resOrder, nextOrder)
+        expect(nextOrder).toHaveBeenCalled()
+        expect(resOrder.status).not.toHaveBeenCalled()
+
+        // Unrelated paths also unaffected
         const next = makeNext()
         const res = makeThrottleRes()
         throttle(makeThrottleReq(ip, '/api/payment-metadata'), res, next)
@@ -887,18 +954,778 @@ describe('S15: createVerifyThrottle', () => {
         const throttle = createVerifyThrottle()
         // IP 'a' exhausts its quota
         for (let i = 0; i < 3; i++) {
-            throttle({path: '/api/order-lookup/verify', ip: 'fallback', headers: {'x-forwarded-for': '1.1.1.1'}}, makeThrottleRes(), makeNext())
+            throttle(
+                {
+                    path: '/api/order-lookup/verify',
+                    ip: 'fallback',
+                    headers: {'x-forwarded-for': '1.1.1.1'}
+                },
+                makeThrottleRes(),
+                makeNext()
+            )
         }
         // IP 'a' is now throttled
         const resA = makeThrottleRes()
-        throttle({path: '/api/order-lookup/verify', ip: 'fallback', headers: {'x-forwarded-for': '1.1.1.1'}}, resA, makeNext())
+        throttle(
+            {
+                path: '/api/order-lookup/verify',
+                ip: 'fallback',
+                headers: {'x-forwarded-for': '1.1.1.1'}
+            },
+            resA,
+            makeNext()
+        )
         expect(resA.status).toHaveBeenCalledWith(429)
 
         // IP 'b' (different x-forwarded-for) should still be allowed
         const resB = makeThrottleRes()
         const nextB = makeNext()
-        throttle({path: '/api/order-lookup/verify', ip: 'fallback', headers: {'x-forwarded-for': '2.2.2.2'}}, resB, nextB)
+        throttle(
+            {
+                path: '/api/order-lookup/verify',
+                ip: 'fallback',
+                headers: {'x-forwarded-for': '2.2.2.2'}
+            },
+            resB,
+            nextB
+        )
         expect(nextB).toHaveBeenCalled()
         expect(resB.status).not.toHaveBeenCalled()
+    })
+})
+
+// ─── GET /api/order-lookup/order — expand=oms,oms_shipments param ─────────────
+// These tests drive the REAL captured handler from ssr.js to verify the expand
+// parameter is actually forwarded to shopperOrders.guestOrderLookup.
+
+describe('GET /api/order-lookup/order — expand=oms,oms_shipments param', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+        configState.current = makeAppConfig()
+    })
+
+    test('calls guestOrderLookup with expand: oms,oms_shipments via the real handler', async () => {
+        const orderNo = 'ORD456'
+        const email = 'guest@test.com'
+        const accessCode = 'COOKIECODE'
+
+        // Configure the ShopperOrders mock to return a minimal order
+        mockShopperOrdersInstance.guestOrderLookup.mockResolvedValue({
+            orderNo,
+            status: 'open',
+            orderTotal: 200
+        })
+
+        // Build a request with the cookie and auth header
+        const req = makeMockReq({
+            headers: {
+                authorization: 'Bearer test-token',
+                cookie: makeCookieHeader({[orderNo]: {email, accessCode}})
+            },
+            query: {orderNo}
+        })
+        const res = makeMockRes()
+
+        // Invoke the real handler captured from ssr.js at module load
+        const handler = global._routeHandlers['GET /api/order-lookup/order']
+        expect(handler).toBeDefined()
+        await handler(req, res)
+
+        // Assert guestOrderLookup was called with the expand param
+        expect(mockShopperOrdersInstance.guestOrderLookup).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({
+                    expand: 'oms,oms_shipments',
+                    orderNo
+                })
+            })
+        )
+        // Handler returned the filtered order
+        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({orderNo}))
+    })
+
+    test('expand param includes both oms and oms_shipments together', () => {
+        // Verify the exact expand string that ssr.js uses
+        const expandParam = 'oms,oms_shipments'
+        expect(expandParam).toContain('oms')
+        expect(expandParam).toContain('oms_shipments')
+    })
+})
+
+// ─── GET /api/order-lookup/oms-meta — real handler tests ─────────────────────
+// All tests drive the real Express handler captured from ssr.js via the
+// routeHandlers map, so they will fail if the handler doesn't exist or if the
+// ShopperOrders method name / response shape changes.
+
+describe('GET /api/order-lookup/oms-meta — real handler', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+        configState.current = makeAppConfig()
+    })
+
+    test('200: valid cookie + token → returns omsActive, cancelReasonCodes, returnReasonCodes; asserts getOmsMetaData called', async () => {
+        const meta = {
+            omsActive: true,
+            cancelReasonCodes: [{reason: 'REASON_1', default: true}],
+            returnReasonCodes: [{reason: 'DEFECT', default: false}]
+        }
+        mockShopperOrdersInstance.getOmsMetaData.mockResolvedValue(meta)
+
+        const req = makeMockReq({
+            headers: {
+                authorization: 'Bearer test-token',
+                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', accessCode: 'code'}})
+            }
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['GET /api/order-lookup/oms-meta']
+        expect(handler).toBeDefined()
+        await handler(req, res)
+
+        expect(mockShopperOrdersInstance.getOmsMetaData).toHaveBeenCalledWith({parameters: {}})
+        expect(res.json).toHaveBeenCalledWith({
+            omsActive: true,
+            cancelReasonCodes: [{reason: 'REASON_1', default: true}],
+            returnReasonCodes: [{reason: 'DEFECT', default: false}]
+        })
+        expect(res.status).not.toHaveBeenCalled()
+    })
+
+    test('401: no Authorization header', async () => {
+        const req = makeMockReq({
+            headers: {
+                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', accessCode: 'code'}})
+            }
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['GET /api/order-lookup/oms-meta']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'Missing authorization'})
+        expect(mockShopperOrdersInstance.getOmsMetaData).not.toHaveBeenCalled()
+    })
+
+    test('401: no cookie', async () => {
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token'}
+            // no cookie
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['GET /api/order-lookup/oms-meta']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'No active session'})
+        expect(mockShopperOrdersInstance.getOmsMetaData).not.toHaveBeenCalled()
+    })
+
+    test('401: empty cookie {}', async () => {
+        const req = makeMockReq({
+            headers: {
+                authorization: 'Bearer test-token',
+                cookie: makeCookieHeader({})
+            }
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['GET /api/order-lookup/oms-meta']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'No active session'})
+    })
+
+    test('503: feature flag off', async () => {
+        configState.current = makeAppConfig({guestOrderLookup: {enabled: false}})
+
+        const req = makeMockReq({
+            headers: {
+                authorization: 'Bearer test-token',
+                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', accessCode: 'code'}})
+            }
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['GET /api/order-lookup/oms-meta']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(503)
+        expect(res.json).toHaveBeenCalledWith({error: 'Feature not enabled'})
+        expect(mockShopperOrdersInstance.getOmsMetaData).not.toHaveBeenCalled()
+    })
+
+    test('200 with omsActive:false when SCAPI returns 409', async () => {
+        mockShopperOrdersInstance.getOmsMetaData.mockRejectedValue({response: {status: 409}})
+
+        const req = makeMockReq({
+            headers: {
+                authorization: 'Bearer test-token',
+                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', accessCode: 'code'}})
+            }
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['GET /api/order-lookup/oms-meta']
+        await handler(req, res)
+
+        expect(res.json).toHaveBeenCalledWith({
+            omsActive: false,
+            cancelReasonCodes: [],
+            returnReasonCodes: []
+        })
+        expect(res.status).not.toHaveBeenCalled()
+    })
+
+    test('502: on other SCAPI errors', async () => {
+        mockShopperOrdersInstance.getOmsMetaData.mockRejectedValue({response: {status: 500}})
+
+        const req = makeMockReq({
+            headers: {
+                authorization: 'Bearer test-token',
+                cookie: makeCookieHeader({ORD123: {email: 'a@b.com', accessCode: 'code'}})
+            }
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['GET /api/order-lookup/oms-meta']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(502)
+        expect(res.json).toHaveBeenCalledWith({error: 'Failed to fetch OMS metadata'})
+    })
+})
+
+// ─── POST /api/order-lookup/cancel — real handler tests ──────────────────────
+
+describe('POST /api/order-lookup/cancel — real handler', () => {
+    const VALID_ORDER_NO = 'ORD1234'
+    const VALID_COOKIE = makeCookieHeader({
+        [VALID_ORDER_NO]: {email: 'a@b.com', accessCode: 'code'}
+    })
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        configState.current = makeAppConfig()
+    })
+
+    test('200: valid cancel → { success: true }; asserts cancelOmsOrder called with orderNo', async () => {
+        mockShopperOrdersInstance.cancelOmsOrder.mockResolvedValue({})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        expect(handler).toBeDefined()
+        await handler(req, res)
+
+        expect(mockShopperOrdersInstance.cancelOmsOrder).toHaveBeenCalledWith(
+            expect.objectContaining({parameters: {orderNo: VALID_ORDER_NO}})
+        )
+        expect(res.json).toHaveBeenCalledWith({success: true})
+        expect(res.status).not.toHaveBeenCalled()
+    })
+
+    test('200 with reason: cancelOmsOrder called with reason in body', async () => {
+        mockShopperOrdersInstance.cancelOmsOrder.mockResolvedValue({})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, reason: 'REASON_1'}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(mockShopperOrdersInstance.cancelOmsOrder).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: {orderNo: VALID_ORDER_NO},
+                body: {reason: 'REASON_1'}
+            })
+        )
+        expect(res.json).toHaveBeenCalledWith({success: true})
+    })
+
+    test('200 without reason: cancelOmsOrder called with empty body', async () => {
+        mockShopperOrdersInstance.cancelOmsOrder.mockResolvedValue({})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO}
+            // no reason field
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(mockShopperOrdersInstance.cancelOmsOrder).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: {orderNo: VALID_ORDER_NO},
+                body: {}
+            })
+        )
+        expect(res.json).toHaveBeenCalledWith({success: true})
+    })
+
+    test('401: no Authorization header', async () => {
+        const req = makeMockReq({
+            headers: {cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'Missing authorization'})
+        expect(mockShopperOrdersInstance.cancelOmsOrder).not.toHaveBeenCalled()
+    })
+
+    test('401: no cookie', async () => {
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token'},
+            body: {orderNo: VALID_ORDER_NO}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'No session for this order'})
+    })
+
+    test('401: orderNo not in cookie', async () => {
+        const req = makeMockReq({
+            headers: {
+                authorization: 'Bearer test-token',
+                cookie: makeCookieHeader({OTHER_ORDER: {email: 'a@b.com', accessCode: 'code'}})
+            },
+            body: {orderNo: VALID_ORDER_NO}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'No session for this order'})
+    })
+
+    test('400: missing orderNo', async () => {
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {reason: 'SOME_REASON'}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'orderNo is required'
+        })
+    })
+
+    test('400: orderNo fails regex', async () => {
+        const badOrderNo = '!@#invalid'
+        const cookieWithBad = makeCookieHeader({
+            [badOrderNo]: {email: 'a@b.com', accessCode: 'code'}
+        })
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: cookieWithBad},
+            body: {orderNo: badOrderNo}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'Invalid orderNo format'
+        })
+    })
+
+    test('503: feature flag off', async () => {
+        configState.current = makeAppConfig({guestOrderLookup: {enabled: false}})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(503)
+        expect(res.json).toHaveBeenCalledWith({error: 'Feature not enabled'})
+        expect(mockShopperOrdersInstance.cancelOmsOrder).not.toHaveBeenCalled()
+    })
+
+    test('400 errorKind:invalid_reason on SCAPI 400', async () => {
+        mockShopperOrdersInstance.cancelOmsOrder.mockRejectedValue({response: {status: 400}})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, reason: 'BAD_REASON'}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_reason'})
+    })
+
+    test('404 errorKind:not_found on SCAPI 404', async () => {
+        mockShopperOrdersInstance.cancelOmsOrder.mockRejectedValue({response: {status: 404}})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'not_found'})
+    })
+
+    test('409 errorKind:not_cancellable on SCAPI 409', async () => {
+        mockShopperOrdersInstance.cancelOmsOrder.mockRejectedValue({response: {status: 409}})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(409)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'not_cancellable'})
+    })
+
+    test('500 errorKind:transient on SCAPI 5xx', async () => {
+        mockShopperOrdersInstance.cancelOmsOrder.mockRejectedValue({response: {status: 503}})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/cancel']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'transient'})
+    })
+})
+
+// ─── POST /api/order-lookup/return — real handler tests ──────────────────────
+
+describe('POST /api/order-lookup/return — real handler', () => {
+    const VALID_ORDER_NO = 'ORD1234'
+    const VALID_COOKIE = makeCookieHeader({
+        [VALID_ORDER_NO]: {email: 'a@b.com', accessCode: 'code'}
+    })
+    const VALID_ITEMS = [{itemId: 'item-1', quantity: 1}]
+
+    // Helper for SCAPI 400 errors with a cloneable response body (RFC 7807).
+    // ssr.js catch block does: (await err.response.json())?.errorCode
+    const makeApiError = (status, errorCode) => {
+        const jsonFn = async () => ({errorCode})
+        return {
+            response: {
+                status,
+                json: jsonFn,
+                clone: () => ({json: jsonFn})
+            }
+        }
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        configState.current = makeAppConfig()
+    })
+
+    test('200: valid return → { success: true }; asserts returnOmsOrder called with correct payload', async () => {
+        mockShopperOrdersInstance.returnOmsOrder.mockResolvedValue({})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        expect(handler).toBeDefined()
+        await handler(req, res)
+
+        expect(mockShopperOrdersInstance.returnOmsOrder).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: {orderNo: VALID_ORDER_NO},
+                body: {productItems: VALID_ITEMS}
+            })
+        )
+        expect(res.json).toHaveBeenCalledWith({success: true})
+        expect(res.status).not.toHaveBeenCalled()
+    })
+
+    test('200 with item reason: returnOmsOrder called with item reason field forwarded', async () => {
+        mockShopperOrdersInstance.returnOmsOrder.mockResolvedValue({})
+
+        const itemsWithReason = [{itemId: 'item-1', quantity: 1, reason: 'DEFECT'}]
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: itemsWithReason}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(mockShopperOrdersInstance.returnOmsOrder).toHaveBeenCalledWith(
+            expect.objectContaining({
+                body: {productItems: [{itemId: 'item-1', quantity: 1, reason: 'DEFECT'}]}
+            })
+        )
+        expect(res.json).toHaveBeenCalledWith({success: true})
+    })
+
+    test('401: no Authorization header', async () => {
+        const req = makeMockReq({
+            headers: {cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'Missing authorization'})
+        expect(mockShopperOrdersInstance.returnOmsOrder).not.toHaveBeenCalled()
+    })
+
+    test('401: no cookie', async () => {
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token'},
+            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'No session for this order'})
+    })
+
+    test('401: orderNo not in cookie', async () => {
+        const req = makeMockReq({
+            headers: {
+                authorization: 'Bearer test-token',
+                cookie: makeCookieHeader({OTHER: {email: 'a@b.com', accessCode: 'code'}})
+            },
+            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({error: 'No session for this order'})
+    })
+
+    test('400: missing productItems', async () => {
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'productItems must be a non-empty array'
+        })
+    })
+
+    test('400: empty productItems array', async () => {
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: []}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'productItems must be a non-empty array'
+        })
+    })
+
+    test('400: productItem with no itemId', async () => {
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: [{quantity: 1}]}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'Each productItem must have a string itemId'
+        })
+    })
+
+    test('400: productItem with non-positive quantity', async () => {
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: [{itemId: 'item-1', quantity: 0}]}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({
+            errorKind: 'invalid_input',
+            message: 'Each productItem must have a positive quantity'
+        })
+    })
+
+    test('503: feature flag off', async () => {
+        configState.current = makeAppConfig({guestOrderLookup: {enabled: false}})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(503)
+        expect(res.json).toHaveBeenCalledWith({error: 'Feature not enabled'})
+        expect(mockShopperOrdersInstance.returnOmsOrder).not.toHaveBeenCalled()
+    })
+
+    test('400 errorKind:invalid_reason on SCAPI 400 + InvalidReasonCode', async () => {
+        mockShopperOrdersInstance.returnOmsOrder.mockRejectedValue(
+            makeApiError(400, 'InvalidReasonCode')
+        )
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_reason'})
+    })
+
+    test('400 errorKind:unknown_items on SCAPI 400 + UnknownProductItemIds', async () => {
+        mockShopperOrdersInstance.returnOmsOrder.mockRejectedValue(
+            makeApiError(400, 'UnknownProductItemIds')
+        )
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'unknown_items'})
+    })
+
+    test('400 errorKind:quantity_exceeded on SCAPI 400 + ReturnQuantityExceeded', async () => {
+        mockShopperOrdersInstance.returnOmsOrder.mockRejectedValue(
+            makeApiError(400, 'ReturnQuantityExceeded')
+        )
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'quantity_exceeded'})
+    })
+
+    test('404 errorKind:not_found on SCAPI 404', async () => {
+        mockShopperOrdersInstance.returnOmsOrder.mockRejectedValue({response: {status: 404}})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'not_found'})
+    })
+
+    test('409 errorKind:not_returnable on SCAPI 409', async () => {
+        mockShopperOrdersInstance.returnOmsOrder.mockRejectedValue({response: {status: 409}})
+
+        const req = makeMockReq({
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
+            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
+        })
+        const res = makeMockRes()
+
+        const handler = global._routeHandlers['POST /api/order-lookup/return']
+        await handler(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(409)
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'not_returnable'})
     })
 })
