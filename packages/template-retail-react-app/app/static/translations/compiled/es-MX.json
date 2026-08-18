@@ -1485,6 +1485,12 @@
       "value": "Contáctanos"
     }
   ],
+  "footer.link.find_your_order": [
+    {
+      "type": 0,
+      "value": "Find Your Order"
+    }
+  ],
   "footer.link.order_status": [
     {
       "type": 0,

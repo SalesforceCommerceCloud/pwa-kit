@@ -145,9 +145,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                clientId: '85beaadb-b42c-4bbf-a197-54f52efa8152',
+                organizationId: 'f_ecom_zysg_001',
+                shortCode: 'sandbox-001',
                 siteId: 'RefArchGlobal'
             }
             // Optional: Set the domain for auth cookies to share them across subdomains.
@@ -188,6 +188,14 @@ module.exports = {
             }
         },
         storeLocatorEnabled: true,
+        guestOrderLookup: {
+            enabled: true,
+            orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$',
+            requestCodeThrottle: {
+                windowMs: 60000,
+                max: 5
+            }
+        },
         multishipEnabled: true,
         // Salesforce Payments configuration
         // Set enabled to true to enable Salesforce Payments (requires the Salesforce Payments feature toggle to be enabled on the Commerce Cloud instance).
@@ -219,14 +227,14 @@ module.exports = {
         ssrFunctionNodeVersion: '24.x',
         // Store the session cookies as HttpOnly for enhanced security.
         // WIP: Do not enable. This feature is in-progress.
-        enableHttpOnlySessionCookies: false,
+        enableHttpOnlySessionCookies: true,
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'zysg-001.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]

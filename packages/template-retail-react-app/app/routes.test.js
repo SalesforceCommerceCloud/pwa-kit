@@ -189,7 +189,7 @@ describe('Routes', () => {
             })
         })
 
-        describe('Guest order access routes', () => {
+        describe('Guest order lookup routes', () => {
             test('does not add routes when flag is disabled', () => {
                 getConfig.mockReturnValue({
                     ...mockConfig,
