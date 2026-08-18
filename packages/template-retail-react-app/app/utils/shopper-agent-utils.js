@@ -4,6 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {
+    COMMERCE_CLIENT_CDN_BASE_URL,
+    COMMERCE_CLIENT_OPEN_STATE_KEY
+} from '@salesforce/retail-react-app/app/constants'
+import {validateOverridesUrl} from '@salesforce/retail-react-app/app/utils/commerce-client-overrides'
+
 const onClient = typeof window !== 'undefined'
 
 /**
@@ -118,6 +124,47 @@ export function openCommerceClientWidget(show = true) {
 }
 
 /**
+ * Persist whether the Commerce Client panel is open to `sessionStorage`, so it
+ * survives page navigation and resets to the configured default in a fresh tab.
+ *
+ * @function persistCommerceClientOpenState
+ * @param {boolean} isOpen - Whether the panel is currently open
+ * @returns {void}
+ */
+export function persistCommerceClientOpenState(isOpen) {
+    if (!onClient) return
+
+    try {
+        window.sessionStorage.setItem(
+            COMMERCE_CLIENT_OPEN_STATE_KEY,
+            JSON.stringify(Boolean(isOpen))
+        )
+    } catch (error) {
+        console.error('Shopper Agent: Error persisting Commerce Client open state', error)
+    }
+}
+
+/**
+ * Read the persisted Commerce Client panel open-state. Returns `undefined` when
+ * nothing is stored so callers can fall back to the configured `cc_isOpen` default.
+ *
+ * @function getPersistedCommerceClientOpenState
+ * @returns {boolean|undefined} The stored open-state, or `undefined` when unset
+ */
+export function getPersistedCommerceClientOpenState() {
+    if (!onClient) return undefined
+
+    try {
+        const stored = window.sessionStorage.getItem(COMMERCE_CLIENT_OPEN_STATE_KEY)
+        if (stored === null) return undefined
+        return JSON.parse(stored) === true
+    } catch (error) {
+        console.error('Shopper Agent: Error reading Commerce Client open state', error)
+        return undefined
+    }
+}
+
+/**
  * Open whichever shopper agent widget is active on the page.
  *
  * Detects the provider at runtime so callers (e.g. the header agent button)
@@ -142,6 +189,69 @@ export function openShopperAgentWidget() {
     } catch (error) {
         console.error('Shopper Agent: Error opening agent', error)
     }
+}
+
+/**
+ * Resolves the Commerce Client messaging bundle URL from the agent configuration.
+ *
+ * `cc_cdnVersion` (e.g. '1.18.0') is the common path: it is interpolated into the
+ * Cimulate CDN URL. An explicit `commerceClientScriptSourceUrl` takes precedence
+ * when set, which supports local dev (localhost) and SFCC self-hosted bundles.
+ *
+ * @param {Object} commerceAgent - Commerce agent configuration object
+ * @param {string} [commerceAgent.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0')
+ * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override
+ * @returns {string} The resolved bundle URL, or '' when neither field is set
+ */
+export const resolveCommerceClientScriptUrl = (commerceAgent) => {
+    const override = commerceAgent?.commerceClientScriptSourceUrl
+    if (typeof override === 'string' && override.trim() !== '') {
+        return override.trim()
+    }
+
+    const version = commerceAgent?.cc_cdnVersion
+    if (typeof version === 'string' && version.trim() !== '') {
+        return `${COMMERCE_CLIENT_CDN_BASE_URL}/${version.trim()}/messaging.umd.js`
+    }
+
+    return ''
+}
+
+/**
+ * Builds the routing attributes for the Commerce Client widget. Copies
+ * `cc_routingAttributes` and stamps on two backend-gating signals:
+ * `clientVersion` and `isCartMgmtSupported` (string `'true'`/`'false'`, default `'false'`).
+ *
+ * `clientVersion` comes from `cc_cdnVersion`, but is omitted when a `commerceClientScriptSourceUrl`
+ * override is set (that URL, not `cc_cdnVersion`, defines the running bundle) or when `cc_cdnVersion`
+ * is unset, so the backend never gates against a version that doesn't match the running code.
+ *
+ * @param {Object} commerceAgent - Commerce agent configuration object
+ * @param {Object} [commerceAgent.cc_routingAttributes] - Merchant routing attributes
+ * @param {string} [commerceAgent.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.24.0')
+ * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override; when set, `clientVersion` is omitted
+ * @returns {Object} Routing attributes object (never null)
+ */
+export const resolveCommerceClientRoutingAttributes = (commerceAgent) => {
+    const configured =
+        commerceAgent?.cc_routingAttributes &&
+        typeof commerceAgent.cc_routingAttributes === 'object'
+            ? commerceAgent.cc_routingAttributes
+            : {}
+
+    const attrs = {...configured}
+    attrs.isCartMgmtSupported = configured.isCartMgmtSupported === 'true' ? 'true' : 'false'
+
+    // Skip clientVersion under an override URL: cc_cdnVersion wouldn't describe the running bundle.
+    const override = commerceAgent?.commerceClientScriptSourceUrl
+    const hasScriptSourceOverride = typeof override === 'string' && override.trim() !== ''
+
+    const version = commerceAgent?.cc_cdnVersion
+    if (!hasScriptSourceOverride && typeof version === 'string' && version.trim() !== '') {
+        attrs.clientVersion = version.trim()
+    }
+
+    return attrs
 }
 
 /**
@@ -172,9 +282,12 @@ export const validateCommerceClientDomain = (url) => {
  * @param {Object} commerceAgent - Commerce agent configuration object
  * @param {string} commerceAgent.scrt2Url - SCRT2 instance URL
  * @param {string} commerceAgent.salesforceOrgId - Salesforce organization ID (passed as `orgId`)
- * @param {string} [commerceAgent.esDeveloperName] - Embedded Service developer name
- * @param {string} [commerceAgent.embeddedServiceName] - Fallback for `esDeveloperName`
- * @param {string} commerceAgent.commerceClientScriptSourceUrl - URL of the Commerce Client messaging bundle
+ * @param {string} [commerceAgent.cc_esDeveloperName] - Embedded Service developer name
+ * @param {string} [commerceAgent.embeddedServiceName] - Fallback for `cc_esDeveloperName`
+ * @param {string} [commerceAgent.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.18.0')
+ * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting)
+ * @param {string} [commerceAgent.cc_overridesUrl] - Optional URL to customer's component override script
+ * @param {Object} [commerceAgent.cc_overrides] - Optional inline override map, mutually exclusive with `cc_overridesUrl`
  * @returns {boolean} True if configuration is valid, false otherwise
  */
 export const validateCommerceClientAgentSettings = (commerceAgent) => {
@@ -183,11 +296,12 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
         return false
     }
 
+    const scriptSourceUrl = resolveCommerceClientScriptUrl(commerceAgent)
     const requiredValues = {
         scrt2Url: commerceAgent.scrt2Url,
         salesforceOrgId: commerceAgent.salesforceOrgId,
-        esDeveloperName: commerceAgent.esDeveloperName || commerceAgent.embeddedServiceName,
-        commerceClientScriptSourceUrl: commerceAgent.commerceClientScriptSourceUrl
+        esDeveloperName: commerceAgent.cc_esDeveloperName || commerceAgent.embeddedServiceName,
+        scriptSourceUrl
     }
 
     const isValid = Object.values(requiredValues).every(
@@ -196,16 +310,37 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
 
     if (!isValid) {
         console.error(
-            'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, esDeveloperName (or embeddedServiceName), and commerceClientScriptSourceUrl.'
+            'Invalid Commerce Client agent settings. Required: scrt2Url, salesforceOrgId, cc_esDeveloperName (or embeddedServiceName), and cc_cdnVersion (or commerceClientScriptSourceUrl).'
         )
         return false
     }
 
-    if (!validateCommerceClientDomain(commerceAgent.commerceClientScriptSourceUrl)) {
+    if (!validateCommerceClientDomain(scriptSourceUrl)) {
         console.error(
             'Commerce Client script URL must be served from a trusted cimulate.ai or sfcc-store-internal.net domain.'
         )
         return false
+    }
+
+    const hasInlineOverrides =
+        Boolean(commerceAgent.cc_overrides) && Object.keys(commerceAgent.cc_overrides).length > 0
+
+    // Non-fatal: resolveCommerceClientOverrideOptions drops the URL and keeps the inline map.
+    if (hasInlineOverrides && commerceAgent.cc_overridesUrl) {
+        console.warn(
+            'Commerce Client cc_overrides and cc_overridesUrl are mutually exclusive. Using cc_overrides and ignoring cc_overridesUrl.'
+        )
+    }
+
+    // Validate optional overrides URL (must be HTTPS, any domain allowed). Skipped when an
+    // inline map wins, so we do not warn about a URL that is already being dropped.
+    if (!hasInlineOverrides && commerceAgent.cc_overridesUrl) {
+        if (!validateOverridesUrl(commerceAgent.cc_overridesUrl)) {
+            console.warn(
+                'Commerce Client overrides URL must use HTTPS. Overrides will not be loaded.'
+            )
+            // Non-fatal: widget still works without overrides
+        }
     }
 
     return true
