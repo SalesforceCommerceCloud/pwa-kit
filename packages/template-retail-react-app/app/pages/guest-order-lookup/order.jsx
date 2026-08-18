@@ -26,6 +26,11 @@ import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel
 import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
 import {getReturnableItems} from '@salesforce/retail-react-app/app/utils/return-utils'
 
+// Convert snake_case errorKind from the API response to camelCase for component comparisons.
+// The server sends e.g. 'invalid_reason'; ReturnErrorKind constants use 'invalidReason'.
+const snakeToCamel = (s) =>
+    typeof s === 'string' ? s.replace(/_([a-z])/g, (_, c) => c.toUpperCase()) : s
+
 // Fields suppressed by the server — asserted here as a client-side security backstop (S10).
 // Any value from this set must never appear rendered in the DOM.
 export const GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS = new Set([
@@ -197,7 +202,7 @@ const GuestOrderLookupOrder = () => {
                 setCancelSuccess(true)
                 refetch()
             } else {
-                setCancelError(data.errorKind ?? 'transient')
+                setCancelError(snakeToCamel(data.errorKind) ?? 'transient')
             }
         } catch {
             setCancelError('transient')
@@ -225,7 +230,7 @@ const GuestOrderLookupOrder = () => {
                 setReturnSuccess(true)
                 refetch()
             } else {
-                setReturnError({kind: data.errorKind ?? 'transient'})
+                setReturnError({kind: snakeToCamel(data.errorKind) ?? 'transient'})
             }
         } catch {
             setReturnError({kind: 'transient'})
