@@ -85,12 +85,12 @@ const GuestOrderLookupVerify = () => {
         inputRefs.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus()
     }, [])
 
+    // All hooks declared above — early returns must come after all hook calls
+    if (authResolved && isRegistered) return <Redirect to="/account/orders" />
+    if (!orderNo) return <Redirect to="/order-lookup" />
+
     const enteredCode = digits.join('')
     const isComplete = enteredCode.length === OTP_LENGTH
-
-    if (authResolved && isRegistered) return <Redirect to="/account/orders" />
-
-    if (!orderNo) return <Redirect to="/order-lookup" />
 
     const onSubmit = async (e) => {
         e.preventDefault()
