@@ -30,7 +30,6 @@ import {
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import {
     useOrder,
-    useProducts,
     useStores,
     useCustomerType,
     useCustomerId,
@@ -41,11 +40,9 @@ import {useOmsMetaData} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {ChevronLeftIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
-import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
-import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
-import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
-import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
+import OrderProducts, {
+    groupProductItemsByShipmentId
+} from '@salesforce/retail-react-app/app/components/order-products'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 import OrderTracking from '@salesforce/retail-react-app/app/components/order-tracking'
 import ShipmentStatusLabel from '@salesforce/retail-react-app/app/components/order-tracking/shipment-status-label'
@@ -60,10 +57,8 @@ import {
 } from '@salesforce/retail-react-app/app/utils/return-error-utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {consolidateDuplicateBonusProducts} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import ReturnItemsModal from '@salesforce/retail-react-app/app/components/return-items-modal'
-import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
 // Delay before surfacing a cancel/return feedback alert, so screen readers finish
@@ -81,91 +76,6 @@ const CANCEL_DISABLED_HINT_ID = 'cancel-order-disabled-hint'
 // Static id linking the disabled Track Shipment button to its VisuallyHidden
 // disabled-reason hint (only one such button exists per page, so a constant is safe).
 const TRACK_DISABLED_HINT_ID = 'track-shipment-disabled-hint'
-
-// Group productItems by their shipmentId so each shipment box can render its own
-// items. Items with no shipmentId fall under 'default'.
-const groupProductItemsByShipmentId = (productItems) =>
-    (productItems || []).reduce((itemsByShipmentId, item) => {
-        const shipmentId = item.shipmentId ?? 'default'
-        if (!itemsByShipmentId[shipmentId]) itemsByShipmentId[shipmentId] = []
-        itemsByShipmentId[shipmentId].push(item)
-        return itemsByShipmentId
-    }, {})
-
-const OrderProducts = ({productItems, currency}) => {
-    // Guard the map: a per-shipment box can pass an empty/undefined items list, and
-    // the consolidate call below is already `|| []`-guarded — keep this symmetric so
-    // a missing list never throws before that.
-    const orderProductIds = (productItems || []).map((product) => product.productId)
-    const {data: products, isLoading} = useProducts(
-        {
-            parameters: {
-                ids: orderProductIds
-            }
-        },
-        {
-            enabled: !!orderProductIds && onClient,
-            select: (result) => {
-                return result?.data?.reduce((result, item) => {
-                    const key = item.id
-                    result[key] = item
-                    return result
-                }, {})
-            }
-        }
-    )
-    const consolidatedItems = consolidateDuplicateBonusProducts(productItems || [])
-    const variants = consolidatedItems?.map((item) => {
-        const product = products?.[item.productId]
-        return {
-            ...(product ? product : {}),
-            isProductUnavailable: !product,
-            ...item
-        }
-    })
-
-    return (
-        <>
-            {!isLoading &&
-                variants?.map((variant, index) => {
-                    return (
-                        <Box
-                            p={[4, 6]}
-                            key={index}
-                            border="1px solid"
-                            borderColor="gray.100"
-                            borderRadius="base"
-                        >
-                            <ItemVariantProvider variant={variant} currency={currency}>
-                                <Flex width="full" alignItems="flex-start">
-                                    <CartItemVariantImage width={['88px', 36]} mr={4} />
-                                    <Stack spacing={1} marginTop="-3px" flex={1}>
-                                        <CartItemVariantName />
-                                        <Flex
-                                            width="full"
-                                            justifyContent="space-between"
-                                            alignItems="flex-end"
-                                        >
-                                            <CartItemVariantAttributes
-                                                includeQuantity
-                                                currency={currency}
-                                            />
-                                            <CartItemVariantPrice currency={currency} />
-                                        </Flex>
-                                    </Stack>
-                                </Flex>
-                            </ItemVariantProvider>
-                        </Box>
-                    )
-                })}
-        </>
-    )
-}
-
-OrderProducts.propTypes = {
-    productItems: PropTypes.array.isRequired,
-    currency: PropTypes.string
-}
 
 const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
