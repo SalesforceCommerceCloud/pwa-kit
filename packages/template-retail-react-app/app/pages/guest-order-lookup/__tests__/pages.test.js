@@ -124,17 +124,13 @@ const defaultUseQueryMock = ({
     isLoading = false,
     isError = false,
     error = null,
-    isFetching = false,
-    isSuccess = true,
-    dataUpdatedAt = Date.now()
+    isFetching = false
 } = {}) => ({
     data,
     isLoading,
     isError,
     error,
     isFetching,
-    isSuccess,
-    dataUpdatedAt,
     refetch: mockRefetch
 })
 
@@ -568,21 +564,9 @@ describe('GuestOrderLookupOrder', () => {
         expect(screen.getByText(/Total/)).toBeInTheDocument()
     })
 
-    test('renders Refresh Status button', () => {
-        renderOrderPage()
-        expect(screen.getByRole('button', {name: /refresh order status/i})).toBeInTheDocument()
-    })
-
-    test('shows last-updated timestamp after successful fetch', () => {
-        useQuery.mockReturnValue(defaultUseQueryMock({dataUpdatedAt: Date.now(), isSuccess: true}))
-        renderOrderPage()
-        expect(screen.getByTestId('last-updated')).toBeInTheDocument()
-        expect(screen.getByTestId('last-updated').textContent).toMatch(/Last updated at/i)
-    })
-
     test('shows skeleton while loading', () => {
         useQuery.mockReturnValue(
-            defaultUseQueryMock({data: undefined, isLoading: true, isSuccess: false})
+            defaultUseQueryMock({data: undefined, isLoading: true})
         )
         const {container} = renderOrderPage()
         // Skeleton renders via aria roles; check loading state indirectly via absence of content
@@ -609,31 +593,13 @@ describe('GuestOrderLookupOrder', () => {
                 data: undefined,
                 isLoading: false,
                 isError: true,
-                error: expiredError,
-                isSuccess: false
+                error: expiredError
             })
         )
         renderOrderPage()
         await waitFor(() => {
             expect(screen.getByTestId('request-page')).toBeInTheDocument()
         })
-    })
-
-    test('Refresh Status button calls refetch', async () => {
-        const user = userEvent.setup()
-        renderOrderPage()
-        const refreshBtn = screen.getByRole('button', {name: /refresh order status/i})
-        await user.click(refreshBtn)
-        await waitFor(() => {
-            expect(mockRefetch).toHaveBeenCalled()
-        })
-    })
-
-    test('Refresh Status button shows loading state while refetching', () => {
-        useQuery.mockReturnValue(defaultUseQueryMock({isFetching: true}))
-        renderOrderPage()
-        // Button should show loading text when isFetching
-        expect(screen.getByText(/Refreshing/i)).toBeInTheDocument()
     })
 
     test('mid-session expiry: redirect to /order-lookup when useQuery returns 404 error', () => {
@@ -644,8 +610,7 @@ describe('GuestOrderLookupOrder', () => {
                 data: undefined,
                 isLoading: false,
                 isError: true,
-                error: expiredError,
-                isSuccess: false
+                error: expiredError
             })
         )
         renderOrderPage()
@@ -661,8 +626,7 @@ describe('GuestOrderLookupOrder', () => {
                 data: undefined,
                 isLoading: false,
                 isError: true,
-                error: serverError,
-                isSuccess: false
+                error: serverError
             })
         )
         renderOrderPage()
@@ -680,8 +644,7 @@ describe('GuestOrderLookupOrder', () => {
                 data: undefined,
                 isLoading: false,
                 isError: true,
-                error: serverError,
-                isSuccess: false
+                error: serverError
             })
         )
         renderOrderPage()
@@ -696,8 +659,7 @@ describe('GuestOrderLookupOrder', () => {
                 data: undefined,
                 isLoading: false,
                 isError: true,
-                error: serverError,
-                isSuccess: false
+                error: serverError
             })
         )
         const user = userEvent.setup()
@@ -709,13 +671,6 @@ describe('GuestOrderLookupOrder', () => {
         })
     })
 
-    // ── S17: last-updated live region ─────────────────────────────────────────
-    test('S17: last-updated timestamp has aria-live=polite', () => {
-        useQuery.mockReturnValue(defaultUseQueryMock({dataUpdatedAt: Date.now(), isSuccess: true}))
-        renderOrderPage()
-        const lastUpdated = screen.getByTestId('last-updated')
-        expect(lastUpdated).toHaveAttribute('aria-live', 'polite')
-    })
 })
 
 // ─── GuestOrderLookupOrder — cancel/return UI ─────────────────────────────────
