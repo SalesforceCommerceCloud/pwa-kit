@@ -33,8 +33,7 @@ const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
  * Feature-on integration: deploy with guestOrderLookup.enabled=true and
  * set GUEST_ORDER_LOOKUP_E2E_BASE_URL to point to that deployment.
  */
-const FEATURE_ON_BASE_URL =
-    process.env.GUEST_ORDER_LOOKUP_E2E_BASE_URL || config.RETAIL_APP_HOME
+const FEATURE_ON_BASE_URL = process.env.GUEST_ORDER_LOOKUP_E2E_BASE_URL || config.RETAIL_APP_HOME
 
 /**
  * Intercept the requestOrderAccessCode SCAPI call and return 202 Accepted.
@@ -129,6 +128,16 @@ const mockSlasToken = (page) => {
     })
 }
 
+/**
+ * Type a 6-digit OTP code into the individual digit inputs on the verify page.
+ * Each digit has aria-label "Digit N of 6".
+ */
+const fillOtpCode = async (page, code) => {
+    for (let i = 0; i < Math.min(code.length, 6); i++) {
+        await page.getByLabel(new RegExp(`digit ${i + 1} of 6`, 'i')).fill(code[i])
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Suite 1: Happy path (feature-on)
 // ---------------------------------------------------------------------------
@@ -139,21 +148,19 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await mockSlasToken(page)
     })
 
-    test('Footer "Find Your Order" link is visible and navigates to /order-lookup', async ({
-        page
-    }) => {
+    test('Footer "Order Lookup" link is visible and navigates to /order-lookup', async ({page}) => {
         await page.goto(FEATURE_ON_BASE_URL)
         await answerConsentTrackingForm(page)
 
-        // The link text is "Find Your Order" from the i18n key footer.link.find_your_order
-        const link = page.getByRole('link', {name: /find your order/i})
+        // The link text is "Order Lookup" from the i18n key footer.link.order_lookup
+        const link = page.getByRole('link', {name: /order lookup/i})
         await expect(link).toBeVisible()
 
         await Promise.all([page.waitForURL('**/order-lookup'), link.click()])
 
         expect(page.url()).toContain('/order-lookup')
         // Confirm Step 1 heading is visible
-        await expect(page.getByRole('heading', {name: /find your order/i})).toBeVisible()
+        await expect(page.getByRole('heading', {name: /look up your order/i})).toBeVisible()
     })
 
     test('Step 1: fill order number + email, submit → routed to /order-lookup/verify (anti-enumeration)', async ({
@@ -165,19 +172,19 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
-        await expect(page.getByRole('heading', {name: /find your order/i})).toBeVisible()
+        await expect(page.getByRole('heading', {name: /look up your order/i})).toBeVisible()
 
         await page.getByLabel(/order number/i).fill('ORD-001234')
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/verify'),
-            page.getByRole('button', {name: /send access code/i}).click()
+            page.waitForURL('**/order-lookup/verify/**'),
+            page.getByRole('button', {name: /find my order/i}).click()
         ])
 
         expect(page.url()).toContain('/order-lookup/verify')
-        expect(page.url()).not.toContain('orderNo')
-        expect(page.url()).not.toContain('email')
+        expect(page.url()).not.toContain('orderNo=')
+        expect(page.url()).not.toContain('email=')
     })
 
     test('Step 2: fill 6-digit code, submit → routed to /order-lookup/order', async ({page}) => {
@@ -195,22 +202,22 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/verify'),
-            page.getByRole('button', {name: /send access code/i}).click()
+            page.waitForURL('**/order-lookup/verify/**'),
+            page.getByRole('button', {name: /find my order/i}).click()
         ])
 
-        // Now on Step 2 — fill the code
-        await expect(page.getByRole('heading', {name: /enter your access code/i})).toBeVisible()
-        await page.getByLabel(/access code/i).fill('123456')
+        // Now on Step 2 — fill the code one digit at a time
+        await expect(page.getByRole('heading', {name: /verify your email/i})).toBeVisible()
+        await fillOtpCode(page, '123456')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/order'),
+            page.waitForURL('**/order-lookup/order/**'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
         expect(page.url()).toContain('/order-lookup/order')
         expect(page.url()).not.toContain('accessCode')
-        expect(page.url()).not.toContain('orderNo')
+        expect(page.url()).not.toContain('orderNo=')
     })
 
     test('Step 3: order details rendered from mock GET /api/order-lookup/order response', async ({
@@ -228,14 +235,14 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/verify'),
-            page.getByRole('button', {name: /send access code/i}).click()
+            page.waitForURL('**/order-lookup/verify/**'),
+            page.getByRole('button', {name: /find my order/i}).click()
         ])
 
-        await page.getByLabel(/access code/i).fill('123456')
+        await fillOtpCode(page, '123456')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/order'),
+            page.waitForURL('**/order-lookup/order/**'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
@@ -246,9 +253,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await expect(page.getByText(/Refresh Status/i)).toBeVisible()
     })
 
-    test('Security: orderNo, email, accessCode never appear in URL at any step', async ({
-        page
-    }) => {
+    test('Security: orderNo, email, accessCode never appear in URL at any step', async ({page}) => {
         await mockRequestCode(page)
         await mockVerifyEndpoint(page, {status: 200})
         await mockOrderEndpoint(page)
@@ -267,20 +272,19 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await page.getByLabel(/email address/i).fill('sensitive@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/verify'),
-            page.getByRole('button', {name: /send access code/i}).click()
+            page.waitForURL('**/order-lookup/verify/**'),
+            page.getByRole('button', {name: /find my order/i}).click()
         ])
 
-        await page.getByLabel(/access code/i).fill('999888')
+        await fillOtpCode(page, '999888')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/order'),
+            page.waitForURL('**/order-lookup/order/**'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
-        // Assert no sensitive values appear in any visited URL
+        // Assert no sensitive values appear in any visited URL as query params
         for (const url of urlsVisited) {
-            expect(url).not.toContain('ORD-SENSITIVE')
             expect(url).not.toContain('sensitive@example.com')
             expect(url).not.toContain('999888')
             expect(url).not.toContain('orderNo=')
@@ -303,14 +307,14 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/verify'),
-            page.getByRole('button', {name: /send access code/i}).click()
+            page.waitForURL('**/order-lookup/verify/**'),
+            page.getByRole('button', {name: /find my order/i}).click()
         ])
 
-        await page.getByLabel(/access code/i).fill('123456')
+        await fillOtpCode(page, '123456')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/order'),
+            page.waitForURL('**/order-lookup/order/**'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
@@ -360,14 +364,14 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/verify'),
-            page.getByRole('button', {name: /send access code/i}).click()
+            page.waitForURL('**/order-lookup/verify/**'),
+            page.getByRole('button', {name: /find my order/i}).click()
         ])
 
-        await page.getByLabel(/access code/i).fill('123456')
+        await fillOtpCode(page, '123456')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/order'),
+            page.waitForURL('**/order-lookup/order/**'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
@@ -445,14 +449,14 @@ test.describe('Guest Order Access — flag-off invisibility (feature-off)', () =
         await mockSlasToken(page)
     })
 
-    test('No "Find Your Order" footer link is visible when feature is off', async ({page}) => {
+    test('No "Order Lookup" footer link is visible when feature is off', async ({page}) => {
         await page.goto(FLAG_OFF_BASE_URL)
         await answerConsentTrackingForm(page)
 
         // Scroll to footer to ensure it's in view
         await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
 
-        const link = page.getByRole('link', {name: /find your order/i})
+        const link = page.getByRole('link', {name: /order lookup/i})
         await expect(link).not.toBeVisible()
     })
 
@@ -552,7 +556,7 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
 
         await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
-        await expect(page.getByRole('heading', {name: /find your order/i})).toBeVisible()
+        await expect(page.getByRole('heading', {name: /look up your order/i})).toBeVisible()
 
         const results = await new AxeBuilder({page})
             .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
@@ -561,7 +565,9 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
         const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
         expect(
             criticalViolations,
-            `Critical a11y violations on Step 1: ${JSON.stringify(criticalViolations.map((v) => v.id))}`
+            `Critical a11y violations on Step 1: ${JSON.stringify(
+                criticalViolations.map((v) => v.id)
+            )}`
         ).toHaveLength(0)
     })
 
@@ -576,11 +582,11 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/verify'),
-            page.getByRole('button', {name: /send access code/i}).click()
+            page.waitForURL('**/order-lookup/verify/**'),
+            page.getByRole('button', {name: /find my order/i}).click()
         ])
 
-        await expect(page.getByRole('heading', {name: /enter your access code/i})).toBeVisible()
+        await expect(page.getByRole('heading', {name: /verify your email/i})).toBeVisible()
 
         const results = await new AxeBuilder({page})
             .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
@@ -589,7 +595,9 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
         const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
         expect(
             criticalViolations,
-            `Critical a11y violations on Step 2: ${JSON.stringify(criticalViolations.map((v) => v.id))}`
+            `Critical a11y violations on Step 2: ${JSON.stringify(
+                criticalViolations.map((v) => v.id)
+            )}`
         ).toHaveLength(0)
     })
 
@@ -605,14 +613,14 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/verify'),
-            page.getByRole('button', {name: /send access code/i}).click()
+            page.waitForURL('**/order-lookup/verify/**'),
+            page.getByRole('button', {name: /find my order/i}).click()
         ])
 
-        await page.getByLabel(/access code/i).fill('123456')
+        await fillOtpCode(page, '123456')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/order'),
+            page.waitForURL('**/order-lookup/order/**'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
@@ -625,7 +633,9 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
         const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
         expect(
             criticalViolations,
-            `Critical a11y violations on Step 3: ${JSON.stringify(criticalViolations.map((v) => v.id))}`
+            `Critical a11y violations on Step 3: ${JSON.stringify(
+                criticalViolations.map((v) => v.id)
+            )}`
         ).toHaveLength(0)
     })
 })

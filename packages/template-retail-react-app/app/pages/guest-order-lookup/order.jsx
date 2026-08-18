@@ -283,7 +283,7 @@ const GuestOrderLookupOrder = () => {
     // ─── Session expired (404) ─────────────────────────────────────────────────
 
     if (isError && error?.status === 404) {
-        history.replace(`/order-lookup?order=${encodeURIComponent(orderNo)}`)
+        history.replace(`/order-lookup?order=${encodeURIComponent(orderNo)}&expired=1`)
         return null
     }
 

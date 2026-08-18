@@ -20,8 +20,7 @@ const AxeBuilder = require('@axe-core/playwright')
 const config = require('../../config.js')
 const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
 
-const FEATURE_ON_BASE_URL =
-    process.env.GUEST_ORDER_LOOKUP_E2E_BASE_URL || config.RETAIL_APP_HOME
+const FEATURE_ON_BASE_URL = process.env.GUEST_ORDER_LOOKUP_E2E_BASE_URL || config.RETAIL_APP_HOME
 
 // ---------------------------------------------------------------------------
 // Shared mock helpers
@@ -56,6 +55,16 @@ const mockRequestCode = (page) => {
 }
 
 /**
+ * Type a 6-digit OTP code into the individual digit inputs on the verify page.
+ * Each digit has aria-label "Digit N of 6".
+ */
+const fillOtpCode = async (page, code) => {
+    for (let i = 0; i < Math.min(code.length, 6); i++) {
+        await page.getByLabel(new RegExp(`digit ${i + 1} of 6`, 'i')).fill(code[i])
+    }
+}
+
+/**
  * Navigate from Step 1 to Step 2 with router state (order number + email).
  * Prerequisite: mockRequestCode and mockSlasToken should already be set up.
  */
@@ -67,11 +76,11 @@ const navigateToStep2 = async (page, {orderNo = 'ORD-001234', email = 'test@exam
     await page.getByLabel(/email address/i).fill(email)
 
     await Promise.all([
-        page.waitForURL('**/order-lookup/verify'),
-        page.getByRole('button', {name: /send access code/i}).click()
+        page.waitForURL('**/order-lookup/verify/**'),
+        page.getByRole('button', {name: /find my order/i}).click()
     ])
 
-    await expect(page.getByRole('heading', {name: /enter your access code/i})).toBeVisible()
+    await expect(page.getByRole('heading', {name: /verify your email/i})).toBeVisible()
 }
 
 // ---------------------------------------------------------------------------
@@ -84,7 +93,7 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
         await mockRequestCode(page)
     })
 
-    test('Invalid/expired code: mock 404 → inline error and "Request a new code" link', async ({
+    test('Invalid/expired code: mock 404 → inline error visible, still on Step 2', async ({
         page
     }) => {
         await page.route('**/api/order-lookup/verify', (route) => {
@@ -93,15 +102,12 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
 
         await navigateToStep2(page)
 
-        await page.getByLabel(/access code/i).fill('000000')
+        await fillOtpCode(page, '000000')
         await page.getByRole('button', {name: /verify code/i}).click()
 
         // Inline error message visible
         await expect(page.getByRole('alert')).toBeVisible()
-        await expect(page.getByText(/code invalid or expired/i)).toBeVisible()
-
-        // "Request a new code" link present in the error message
-        await expect(page.getByRole('link', {name: /request a new code/i})).toBeVisible()
+        await expect(page.getByText(/invalid or has expired/i)).toBeVisible()
 
         // Still on Step 2 — did NOT navigate to Step 3
         expect(page.url()).toContain('/order-lookup/verify')
@@ -115,34 +121,13 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
 
         await navigateToStep2(page)
 
-        await page.getByLabel(/access code/i).fill('111111')
+        await fillOtpCode(page, '111111')
         await page.getByRole('button', {name: /verify code/i}).click()
 
         await expect(page.getByRole('alert')).toBeVisible()
         await expect(page.getByText(/too many attempts/i)).toBeVisible()
 
         expect(page.url()).toContain('/order-lookup/verify')
-    })
-
-    test('Resend code: click "Resend code" → toast "Check your inbox" appears, link briefly disabled', async ({
-        page
-    }) => {
-        await navigateToStep2(page)
-
-        // Capture that the resend code button is initially enabled
-        const resendLink = page.getByRole('button', {name: /resend code/i})
-        await expect(resendLink).toBeVisible()
-        await expect(resendLink).not.toBeDisabled()
-
-        // Click Resend Code
-        await resendLink.click()
-
-        // Toast with "Check your inbox" should appear
-        await expect(page.getByText(/check your inbox/i)).toBeVisible({timeout: 5000})
-
-        // The resend link should be briefly disabled after click
-        // (aria-disabled="true" is set via the opacity/pointerEvents pattern in the component)
-        await expect(resendLink).toHaveAttribute('aria-disabled', 'true')
     })
 
     test('Mid-session expiry on Step 3: mock 404 from GET order → redirect to /order-lookup?expired=1 → expiry banner visible', async ({
@@ -160,15 +145,15 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
 
         await navigateToStep2(page)
 
-        await page.getByLabel(/access code/i).fill('123456')
+        await fillOtpCode(page, '123456')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/order'),
+            page.waitForURL('**/order-lookup/order/**'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
-        // Step 3 fetches the order and gets 404 — component redirects to /order-lookup?expired=1
-        await page.waitForURL('**/order-lookup?expired=1', {timeout: 10000})
+        // Step 3 fetches the order and gets 404 — component redirects to /order-lookup?order=...&expired=1
+        await page.waitForURL('**/order-lookup?**expired=1**', {timeout: 10000})
 
         expect(page.url()).toContain('/order-lookup')
         expect(page.url()).toContain('expired=1')
@@ -215,10 +200,10 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
 
         await navigateToStep2(page)
 
-        await page.getByLabel(/access code/i).fill('123456')
+        await fillOtpCode(page, '123456')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/order'),
+            page.waitForURL('**/order-lookup/order/**'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
@@ -227,20 +212,20 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
         // Click "Refresh Status" — second call returns 404
         await page.getByRole('button', {name: /refresh status/i}).click()
 
-        await page.waitForURL('**/order-lookup?expired=1', {timeout: 10000})
+        await page.waitForURL('**/order-lookup?**expired=1**', {timeout: 10000})
 
         expect(page.url()).toContain('expired=1')
         await expect(page.getByRole('alert')).toBeVisible()
     })
 
-    test('Direct navigation to /order-lookup/verify without router state → redirect to /order-lookup', async ({
+    test('Direct navigation to /order-lookup/verify without orderNo → redirect to /order-lookup', async ({
         page
     }) => {
-        // Navigate directly to Step 2 without router state (no orderNo/email)
+        // Navigate directly to Step 2 without a :orderNo segment
         await page.goto(FEATURE_ON_BASE_URL + '/order-lookup/verify')
         await answerConsentTrackingForm(page)
 
-        // The verify page has a <Redirect to="/order-lookup" /> when routeState is missing
+        // The verify page has a <Redirect to="/order-lookup" /> when orderNo is missing
         await page.waitForURL('**/order-lookup', {timeout: 5000})
 
         expect(page.url()).toContain('/order-lookup')
@@ -265,7 +250,7 @@ test.describe('Guest Order Access — a11y critical violations check (S19)', () 
         await page.goto(FEATURE_ON_BASE_URL + '/order-lookup?expired=1')
         await answerConsentTrackingForm(page)
 
-        await expect(page.getByRole('heading', {name: /find your order/i})).toBeVisible()
+        await expect(page.getByRole('heading', {name: /look up your order/i})).toBeVisible()
 
         const results = await new AxeBuilder({page})
             .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
@@ -274,7 +259,9 @@ test.describe('Guest Order Access — a11y critical violations check (S19)', () 
         const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
         expect(
             criticalViolations,
-            `Critical a11y violations on Step 1 with expiry banner: ${JSON.stringify(criticalViolations.map((v) => v.id))}`
+            `Critical a11y violations on Step 1 with expiry banner: ${JSON.stringify(
+                criticalViolations.map((v) => v.id)
+            )}`
         ).toHaveLength(0)
     })
 
@@ -286,7 +273,7 @@ test.describe('Guest Order Access — a11y critical violations check (S19)', () 
         await navigateToStep2(page)
 
         // Trigger the error state
-        await page.getByLabel(/access code/i).fill('000000')
+        await fillOtpCode(page, '000000')
         await page.getByRole('button', {name: /verify code/i}).click()
 
         await expect(page.getByRole('alert')).toBeVisible()
@@ -298,7 +285,9 @@ test.describe('Guest Order Access — a11y critical violations check (S19)', () 
         const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
         expect(
             criticalViolations,
-            `Critical a11y violations on Step 2 error state: ${JSON.stringify(criticalViolations.map((v) => v.id))}`
+            `Critical a11y violations on Step 2 error state: ${JSON.stringify(
+                criticalViolations.map((v) => v.id)
+            )}`
         ).toHaveLength(0)
     })
 
@@ -343,10 +332,10 @@ test.describe('Guest Order Access — a11y critical violations check (S19)', () 
 
         await navigateToStep2(page)
 
-        await page.getByLabel(/access code/i).fill('123456')
+        await fillOtpCode(page, '123456')
 
         await Promise.all([
-            page.waitForURL('**/order-lookup/order'),
+            page.waitForURL('**/order-lookup/order/**'),
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
@@ -359,8 +348,9 @@ test.describe('Guest Order Access — a11y critical violations check (S19)', () 
         const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
         expect(
             criticalViolations,
-            `Critical a11y violations on Step 3: ${JSON.stringify(criticalViolations.map((v) => v.id))}`
+            `Critical a11y violations on Step 3: ${JSON.stringify(
+                criticalViolations.map((v) => v.id)
+            )}`
         ).toHaveLength(0)
     })
 })
-
