@@ -26,15 +26,22 @@ export const getCommerceAgentConfig = () => {
         enableAgentFromSearchSuggestions: 'false',
         // Widget provider: 'miaw' (default) or 'commerce-client'. See config/default.js.
         provider: 'miaw',
+        cc_cdnVersion: '',
         commerceClientScriptSourceUrl: '',
-        esDeveloperName: '',
-        capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
-        headerText: '',
-        disclaimerMarkdown: '',
-        commerceClientDisplayMode: 'panel',
-        commerceClientPanelWidth: '420px',
-        commerceClientMode: 'messaging',
-        commerceClientLogoUrl: ''
+        cc_esDeveloperName: '',
+        cc_capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
+        cc_headerText: '',
+        cc_disclaimerMarkdown: '',
+        cc_dialogFullHeight: 'true',
+        cc_dialogWidth: '420px',
+        cc_widgetPosition: 'bottom-right',
+        cc_showFab: 'false',
+        cc_pagePush: 'false',
+        cc_logoUrl: '',
+        cc_isOpen: 'false',
+        cc_isDevelopment: 'false',
+        cc_enableEscalationToAgent: 'false',
+        cc_enableDownloadTranscript: 'true'
     }
     return getConfig().app.commerceAgent ?? defaults
 }

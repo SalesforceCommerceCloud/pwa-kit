@@ -189,7 +189,7 @@ describe('Routes', () => {
             })
         })
 
-        describe('Guest order access routes', () => {
+        describe('Guest order lookup routes', () => {
             test('does not add routes when flag is disabled', () => {
                 getConfig.mockReturnValue({
                     ...mockConfig,
@@ -203,8 +203,12 @@ describe('Routes', () => {
 
                 const allRoutes = routes()
                 expect(allRoutes.find((r) => r.path === '/order-lookup')).toBeUndefined()
-                expect(allRoutes.find((r) => r.path === '/order-lookup/verify')).toBeUndefined()
-                expect(allRoutes.find((r) => r.path === '/order-lookup/order')).toBeUndefined()
+                expect(
+                    allRoutes.find((r) => r.path === '/order-lookup/verify/:orderNo')
+                ).toBeUndefined()
+                expect(
+                    allRoutes.find((r) => r.path === '/order-lookup/order/:orderNo')
+                ).toBeUndefined()
             })
 
             test('does not add routes when flag is absent', () => {
@@ -217,11 +221,15 @@ describe('Routes', () => {
 
                 const allRoutes = routes()
                 expect(allRoutes.find((r) => r.path === '/order-lookup')).toBeUndefined()
-                expect(allRoutes.find((r) => r.path === '/order-lookup/verify')).toBeUndefined()
-                expect(allRoutes.find((r) => r.path === '/order-lookup/order')).toBeUndefined()
+                expect(
+                    allRoutes.find((r) => r.path === '/order-lookup/verify/:orderNo')
+                ).toBeUndefined()
+                expect(
+                    allRoutes.find((r) => r.path === '/order-lookup/order/:orderNo')
+                ).toBeUndefined()
             })
 
-            test('adds all three routes when flag is enabled', () => {
+            test('adds all routes when flag is enabled', () => {
                 getConfig.mockReturnValue({
                     ...mockConfig,
                     app: {
@@ -234,8 +242,10 @@ describe('Routes', () => {
 
                 const allRoutes = routes()
                 const requestRoute = allRoutes.find((r) => r.path === '/order-lookup')
-                const verifyRoute = allRoutes.find((r) => r.path === '/order-lookup/verify')
-                const orderRoute = allRoutes.find((r) => r.path === '/order-lookup/order')
+                const verifyRoute = allRoutes.find(
+                    (r) => r.path === '/order-lookup/verify/:orderNo'
+                )
+                const orderRoute = allRoutes.find((r) => r.path === '/order-lookup/order/:orderNo')
 
                 expect(requestRoute).toBeDefined()
                 expect(requestRoute.exact).toBe(true)

@@ -1,453 +1,478 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e
 on:
-  workflow_dispatch:
-  schedule:
-    # Run every day at 12am (PST) - cron uses UTC times
-    - cron: "0 8 * * *"
+    workflow_dispatch:
+    schedule:
+        # Run every day at 12am (PST) - cron uses UTC times
+        - cron: '0 8 * * *'
 
 jobs:
-  run-generator-demo:
-    strategy:
-      fail-fast: false
-      matrix:
-        # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [20, 22, 24]
-        npm: [10, 11]
-    runs-on: ubuntu-latest
-    env:
-      # The "default" npm is the one that ships with a given version of node.
-      # For more: https://nodejs.org/en/download/releases/
-      # (We also use this env var for making sure a step runs once for the current node version)
-      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          # Pinned to 22.22.1 for node 22 + npm 11 due to https://github.com/nodejs/node/issues/62425
-          node-version: ${{ (matrix.node == 22 && matrix.npm == 11) && '22.22.1' || matrix.node }}
-          cache: npm
-
-      - name: Update NPM version
-        if: env.IS_DEFAULT_NPM == 'false'
-        run: |-
-          npm install -g npm@${{ matrix.npm }}
-
-      - name: Install Monorepo Dependencies
-        run: |-
-          # Install node dependencies
-          node ./scripts/gtime.js monorepo_install npm ci
-
-      - name: Check Playwright Versions
-        run: |-
-          # Check the installed version of playwright
-          echo "Playwright version: $(npm list playwright --depth=0)"
-          
-          # Check the installed version of @playwright/test
-          echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
-
-      - name: Generate Retail App Demo
-        uses: ./.github/actions/e2e_generate_app
-        with:
-          PROJECT_KEY: "retail-app-demo"
-
-      - name: Validate Generated Retail App Demo
-        uses: ./.github/actions/e2e_validate_generated_app
-        with:
-          PROJECT_KEY: "retail-app-demo"
-  run-generator-retail-app-no-ext:
-    strategy:
-      fail-fast: false
-      # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
-      max-parallel: 1
-      matrix:
-        # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [20, 22, 24]
-        npm: [10, 11]
-    runs-on: ubuntu-latest
-    env:
-      # The "default" npm is the one that ships with a given version of node.
-      # For more: https://nodejs.org/en/download/releases/
-      # (We also use this env var for making sure a step runs once for the current node version)
-      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          # Pinned to 22.22.1 for node 22 + npm 11 due to https://github.com/nodejs/node/issues/62425
-          node-version: ${{ (matrix.node == 22 && matrix.npm == 11) && '22.22.1' || matrix.node }}
-          cache: npm
-
-      - name: Update NPM version
-        if: env.IS_DEFAULT_NPM == 'false'
-        run: |-
-          npm install -g npm@${{ matrix.npm }}
-
-      - name: Install Monorepo Dependencies
-        run: |-
-          # Install node dependencies
-          node ./scripts/gtime.js monorepo_install npm ci
-
-      - name: Check Playwright Versions
-        run: |-
-          # Check the installed version of playwright
-          echo "Playwright version: $(npm list playwright --depth=0)"
-          
-          # Check the installed version of @playwright/test
-          echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
-
-      - name: Get Template Version
-        run: |-
-          version=`jq -r ".version" packages/template-retail-react-app/package.json`
-          echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
-
-      - name: Generate Retail App Without Extensibility
-        id: generate_app_no_ext
-        uses: ./.github/actions/e2e_generate_app
-        with:
-          PROJECT_KEY: "retail-app-no-ext"
-          TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
-
-      - name: Validate Retail App Without Extensibility
-        uses: ./.github/actions/e2e_validate_generated_app
-        with:
-          PROJECT_KEY: "retail-app-no-ext"
-          TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
-
-      - name: Create MRT credentials file
-        uses: "./.github/actions/create_mrt"
-        with:
-          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
-      - name: Push Bundle to MRT (E2E Test PWA Kit)
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: ${{ steps.generate_app_no_ext.outputs.project_path }}
-          TARGET: e2e-tests-pwa-kit
-          FLAGS: --wait
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
-      # this will not include a11y tests
-      - name: Run Playwright tests
-        run: npm run test:e2e
-  notify-slack-pwa-no-ext:
-    needs: [run-generator-retail-app-no-ext]
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result == 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "✅ All PWA Kit no-ext E2E tests passed!"
-            }
+    run-generator-demo:
+        strategy:
+            fail-fast: false
+            matrix:
+                # Run all matrix env at once because we will not deploy demo app to MRT.
+                node: [20, 22, 24]
+                npm: [10, 11]
+        runs-on: ubuntu-latest
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+            # The "default" npm is the one that ships with a given version of node.
+            # For more: https://nodejs.org/en/download/releases/
+            # (We also use this env var for making sure a step runs once for the current node version)
+            IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result != 'success'  }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "❌ One or more PWA Kit no-ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  # Pinned to 22.22.1 for node 22 + npm 11 due to https://github.com/nodejs/node/issues/62425
+                  node-version: ${{ (matrix.node == 22 && matrix.npm == 11) && '22.22.1' || matrix.node }}
+                  cache: npm
+
+            - name: Update NPM version
+              if: env.IS_DEFAULT_NPM == 'false'
+              run: |-
+                  npm install -g npm@${{ matrix.npm }}
+
+            - name: Install Monorepo Dependencies
+              run: |-
+                  # Install node dependencies
+                  node ./scripts/gtime.js monorepo_install npm ci
+
+            - name: Check Playwright Versions
+              run: |-
+                  # Check the installed version of playwright
+                  echo "Playwright version: $(npm list playwright --depth=0)"
+
+                  # Check the installed version of @playwright/test
+                  echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
+
+            - name: Generate Retail App Demo
+              uses: ./.github/actions/e2e_generate_app
+              with:
+                  PROJECT_KEY: 'retail-app-demo'
+
+            - name: Validate Generated Retail App Demo
+              uses: ./.github/actions/e2e_validate_generated_app
+              with:
+                  PROJECT_KEY: 'retail-app-demo'
+    run-generator-retail-app-no-ext:
+        strategy:
+            fail-fast: false
+            # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
+            max-parallel: 1
+            matrix:
+                # Run all matrix env at once because we will not deploy demo app to MRT.
+                node: [20, 22, 24]
+                npm: [10, 11]
+        runs-on: ubuntu-latest
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  run-generator-retail-app-ext:
-    # Run after the previous job completes irrespective of its result
-    if: ${{ always() }}
-    needs: [run-generator-retail-app-no-ext]
-    strategy:
-      fail-fast: false
-      # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
-      max-parallel: 1
-      matrix:
-        # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [20, 22, 24]
-        npm: [10, 11]
-    runs-on: ubuntu-latest
-    env:
-      # The "default" npm is the one that ships with a given version of node.
-      # For more: https://nodejs.org/en/download/releases/
-      # (We also use this env var for making sure a step runs once for the current node version)
-      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+            # The "default" npm is the one that ships with a given version of node.
+            # For more: https://nodejs.org/en/download/releases/
+            # (We also use this env var for making sure a step runs once for the current node version)
+            IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          # Pinned to 22.22.1 for node 22 + npm 11 due to https://github.com/nodejs/node/issues/62425
-          node-version: ${{ (matrix.node == 22 && matrix.npm == 11) && '22.22.1' || matrix.node }}
-          cache: npm
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Update NPM version
-        if: env.IS_DEFAULT_NPM == 'false'
-        run: |-
-          npm install -g npm@${{ matrix.npm }}
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  # Pinned to 22.22.1 for node 22 + npm 11 due to https://github.com/nodejs/node/issues/62425
+                  node-version: ${{ (matrix.node == 22 && matrix.npm == 11) && '22.22.1' || matrix.node }}
+                  cache: npm
 
-      - name: Install Monorepo Dependencies
-        run: |-
-          # Install node dependencies
-          node ./scripts/gtime.js monorepo_install npm ci
+            - name: Update NPM version
+              if: env.IS_DEFAULT_NPM == 'false'
+              run: |-
+                  npm install -g npm@${{ matrix.npm }}
 
-      - name: Check Playwright Versions
-        run: |-
-          # Check the installed version of playwright
-          echo "Playwright version: $(npm list playwright --depth=0)"
-          
-          # Check the installed version of @playwright/test
-          echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
+            - name: Install Monorepo Dependencies
+              run: |-
+                  # Install node dependencies
+                  node ./scripts/gtime.js monorepo_install npm ci
 
-      - name: Get Template Version
-        run: |-
-          version=`jq -r ".version" packages/template-retail-react-app/package.json`
-          echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
+            - name: Check Playwright Versions
+              run: |-
+                  # Check the installed version of playwright
+                  echo "Playwright version: $(npm list playwright --depth=0)"
 
-      - name: Generate Retail App With Extensibility
-        id: generate_app_ext
-        uses: ./.github/actions/e2e_generate_app
-        with:
-          PROJECT_KEY: "retail-app-ext"
-          TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+                  # Check the installed version of @playwright/test
+                  echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
 
-      - name: Validated Generated Retail App Demo
-        uses: ./.github/actions/e2e_validate_generated_app
-        with:
-          PROJECT_KEY: "retail-app-ext"
-          TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+            - name: Get Template Version
+              run: |-
+                  version=`jq -r ".version" packages/template-retail-react-app/package.json`
+                  echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
-      - name: Create MRT credentials file
-        uses: "./.github/actions/create_mrt"
-        with:
-          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+            - name: Generate Retail App Without Extensibility
+              id: generate_app_no_ext
+              uses: ./.github/actions/e2e_generate_app
+              with:
+                  PROJECT_KEY: 'retail-app-no-ext'
+                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
-      - name: Push Bundle to MRT (E2E Test PWA Kit)
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: ${{ steps.generate_app_ext.outputs.project_path }}
-          TARGET: e2e-tests-pwa-kit
-          FLAGS: --wait
+            - name: Validate Retail App Without Extensibility
+              uses: ./.github/actions/e2e_validate_generated_app
+              with:
+                  PROJECT_KEY: 'retail-app-no-ext'
+                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+            - name: Create MRT credentials file
+              uses: './.github/actions/create_mrt'
+              with:
+                  mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+                  mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      # this will not include a11y tests
-      - name: Run Playwright tests
-        run: npm run test:e2e
-  notify-slack-pwa-ext:
-    needs: [run-generator-retail-app-ext]
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result == 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "✅ All PWA Kit ext E2E tests passed!"
-            }
+            - name: Push Bundle to MRT (E2E Test PWA Kit)
+              uses: './.github/actions/push_to_mrt'
+              with:
+                  CWD: ${{ steps.generate_app_no_ext.outputs.project_path }}
+                  TARGET: e2e-tests-pwa-kit
+                  FLAGS: --wait
+
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps
+
+            # this will not include a11y tests
+            - name: Run Playwright tests
+              run: npm run test:e2e
+
+            - name: Upload Playwright test results
+              if: ${{ failure() }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: playwright-results-no-ext-node-${{ matrix.node }}-npm-${{ matrix.npm }}
+                  path: test-results
+                  if-no-files-found: ignore
+                  retention-days: 7
+    notify-slack-pwa-no-ext:
+        needs: [run-generator-retail-app-no-ext]
+        if: ${{ always() }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Send GitHub Action data to Slack workflow (Generated)
+              id: slack-success
+              if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result == 'success' }}
+              uses: slackapi/slack-github-action@v1.23.0
+              with:
+                  payload: |
+                      {
+                        "message": "✅ All PWA Kit no-ext E2E tests passed!"
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+            - name: Send GitHub Action data to Slack workflow (Generated)
+              id: slack-failure
+              if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result != 'success'  }}
+              uses: slackapi/slack-github-action@v1.23.0
+              with:
+                  payload: |
+                      {
+                        "message": "❌ One or more PWA Kit no-ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    run-generator-retail-app-ext:
+        # Run after the previous job completes irrespective of its result
+        if: ${{ always() }}
+        needs: [run-generator-retail-app-no-ext]
+        strategy:
+            fail-fast: false
+            # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
+            max-parallel: 1
+            matrix:
+                # Run all matrix env at once because we will not deploy demo app to MRT.
+                node: [20, 22, 24]
+                npm: [10, 11]
+        runs-on: ubuntu-latest
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+            # The "default" npm is the one that ships with a given version of node.
+            # For more: https://nodejs.org/en/download/releases/
+            # (We also use this env var for making sure a step runs once for the current node version)
+            IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result != 'success'  }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "❌ One or more PWA Kit ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  # Pinned to 22.22.1 for node 22 + npm 11 due to https://github.com/nodejs/node/issues/62425
+                  node-version: ${{ (matrix.node == 22 && matrix.npm == 11) && '22.22.1' || matrix.node }}
+                  cache: npm
+
+            - name: Update NPM version
+              if: env.IS_DEFAULT_NPM == 'false'
+              run: |-
+                  npm install -g npm@${{ matrix.npm }}
+
+            - name: Install Monorepo Dependencies
+              run: |-
+                  # Install node dependencies
+                  node ./scripts/gtime.js monorepo_install npm ci
+
+            - name: Check Playwright Versions
+              run: |-
+                  # Check the installed version of playwright
+                  echo "Playwright version: $(npm list playwright --depth=0)"
+
+                  # Check the installed version of @playwright/test
+                  echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
+
+            - name: Get Template Version
+              run: |-
+                  version=`jq -r ".version" packages/template-retail-react-app/package.json`
+                  echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
+
+            - name: Generate Retail App With Extensibility
+              id: generate_app_ext
+              uses: ./.github/actions/e2e_generate_app
+              with:
+                  PROJECT_KEY: 'retail-app-ext'
+                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+
+            - name: Validated Generated Retail App Demo
+              uses: ./.github/actions/e2e_validate_generated_app
+              with:
+                  PROJECT_KEY: 'retail-app-ext'
+                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+
+            - name: Create MRT credentials file
+              uses: './.github/actions/create_mrt'
+              with:
+                  mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+                  mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+
+            - name: Push Bundle to MRT (E2E Test PWA Kit)
+              uses: './.github/actions/push_to_mrt'
+              with:
+                  CWD: ${{ steps.generate_app_ext.outputs.project_path }}
+                  TARGET: e2e-tests-pwa-kit
+                  FLAGS: --wait
+
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps
+
+            # this will not include a11y tests
+            - name: Run Playwright tests
+              run: npm run test:e2e
+
+            - name: Upload Playwright test results
+              if: ${{ failure() }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: playwright-results-ext-node-${{ matrix.node }}-npm-${{ matrix.npm }}
+                  path: test-results
+                  if-no-files-found: ignore
+                  retention-days: 7
+    notify-slack-pwa-ext:
+        needs: [run-generator-retail-app-ext]
+        if: ${{ always() }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Send GitHub Action data to Slack workflow (Generated)
+              id: slack-success
+              if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result == 'success' }}
+              uses: slackapi/slack-github-action@v1.23.0
+              with:
+                  payload: |
+                      {
+                        "message": "✅ All PWA Kit ext E2E tests passed!"
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+            - name: Send GitHub Action data to Slack workflow (Generated)
+              id: slack-failure
+              if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result != 'success'  }}
+              uses: slackapi/slack-github-action@v1.23.0
+              with:
+                  payload: |
+                      {
+                        "message": "❌ One or more PWA Kit ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    run-generator-private-client:
+        strategy:
+            fail-fast: false
+            # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
+            max-parallel: 1
+            matrix:
+                # Run all matrix env at once because we will not deploy demo app to MRT.
+                node: [20, 22, 24]
+                npm: [10, 11]
+        runs-on: ubuntu-latest
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  run-generator-private-client:
-    strategy:
-      fail-fast: false
-      # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
-      max-parallel: 1
-      matrix:
-          # Run all matrix env at once because we will not deploy demo app to MRT.
-          node: [20, 22, 24]
-          npm: [10, 11]
-    runs-on: ubuntu-latest
-    env:
-      # The "default" npm is the one that ships with a given version of node.
-      # For more: https://nodejs.org/en/download/releases/
-      # (We also use this env var for making sure a step runs once for the current node version)
-      IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
-      # The current recommended version for Managed Runtime:
-      # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
-      IS_MRT_NODE: ${{ matrix.node == 24 && matrix.npm == 11 }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+            # The "default" npm is the one that ships with a given version of node.
+            # For more: https://nodejs.org/en/download/releases/
+            # (We also use this env var for making sure a step runs once for the current node version)
+            IS_DEFAULT_NPM: ${{ (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) || (matrix.node == 24 && matrix.npm == 11) }}
+            # The current recommended version for Managed Runtime:
+            # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
+            IS_MRT_NODE: ${{ matrix.node == 24 && matrix.npm == 11 }}
+            RETAIL_APP_HOME: https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          # Pinned to 22.22.1 for node 22 + npm 11 due to https://github.com/nodejs/node/issues/62425
-          node-version: ${{ (matrix.node == 22 && matrix.npm == 11) && '22.22.1' || matrix.node }}
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  # Pinned to 22.22.1 for node 22 + npm 11 due to https://github.com/nodejs/node/issues/62425
+                  node-version: ${{ (matrix.node == 22 && matrix.npm == 11) && '22.22.1' || matrix.node }}
 
-      - name: Update NPM version
-        if: env.IS_DEFAULT_NPM == 'false'
-        run: |-
-          npm install -g npm@${{ matrix.npm }}
+            - name: Update NPM version
+              if: env.IS_DEFAULT_NPM == 'false'
+              run: |-
+                  npm install -g npm@${{ matrix.npm }}
 
-      - name: Install Monorepo Dependencies
-        run: |-
-          # Install node dependencies
-          node ./scripts/gtime.js monorepo_install npm ci
+            - name: Install Monorepo Dependencies
+              run: |-
+                  # Install node dependencies
+                  node ./scripts/gtime.js monorepo_install npm ci
 
-      - name: Check Playwright Versions
-        run: |-
-          # Check the installed version of playwright
-          echo "Playwright version: $(npm list playwright --depth=0)"
-          
-          # Check the installed version of @playwright/test
-          echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
+            - name: Check Playwright Versions
+              run: |-
+                  # Check the installed version of playwright
+                  echo "Playwright version: $(npm list playwright --depth=0)"
 
-      - name: Get Template Version
-        run: |-
-          version=`jq -r ".version" packages/template-retail-react-app/package.json`
-          echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
+                  # Check the installed version of @playwright/test
+                  echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
 
-      - name: Generate Retail App Private Client
-        id: generate_app_private_client
-        uses: ./.github/actions/e2e_generate_app
-        with:
-          PROJECT_KEY: "retail-app-private-client"
-          TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+            - name: Get Template Version
+              run: |-
+                  version=`jq -r ".version" packages/template-retail-react-app/package.json`
+                  echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
-      - name: Validate Generated Retail App Private Client
-        uses: ./.github/actions/e2e_validate_generated_app
-        with:
-          PROJECT_KEY: "retail-app-private-client"
-          TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+            - name: Generate Retail App Private Client
+              id: generate_app_private_client
+              uses: ./.github/actions/e2e_generate_app
+              with:
+                  PROJECT_KEY: 'retail-app-private-client'
+                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
-      - name: Create MRT credentials file
-        uses: "./.github/actions/create_mrt"
-        with:
-          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+            - name: Validate Generated Retail App Private Client
+              uses: ./.github/actions/e2e_validate_generated_app
+              with:
+                  PROJECT_KEY: 'retail-app-private-client'
+                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
-      - name: Push Bundle to MRT
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: ${{ steps.generate_app_private_client.outputs.project_path }}
-          TARGET: e2e-pwa-kit-private
-          FLAGS: --wait
+            - name: Create MRT credentials file
+              uses: './.github/actions/create_mrt'
+              with:
+                  mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+                  mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      - name: Set Retail App Private Client Home
-        run: export RETAIL_APP_HOME=https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/
+            - name: Push Bundle to MRT
+              uses: './.github/actions/push_to_mrt'
+              with:
+                  CWD: ${{ steps.generate_app_private_client.outputs.project_path }}
+                  TARGET: e2e-pwa-kit-private
+                  FLAGS: --wait
 
-      - name: Set PWA Kit E2E Test User
-        run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+            # this will not include a11y tests
+            - name: Run Playwright tests
+              run: |-
+                  echo "RETAIL_APP_HOME=$RETAIL_APP_HOME"
+                  test "$RETAIL_APP_HOME" = "https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com"
+                  npm run test:e2e
 
-      # this will not include a11y tests
-      - name: Run Playwright tests
-        run: npm run test:e2e
+            - name: Run a11y test for Node 24 with npm 11
+              if: env.IS_MRT_NODE == 'true'
+              run: npm run test:e2e:a11y
 
-      - name: Run a11y test for Node 24 with npm 11
-        if: env.IS_MRT_NODE == 'true'
-        run: npm run test:e2e:a11y
-  notify-slack-pwa-private-client:
-    needs: [run-generator-private-client]
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-private-client.result == 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "✅ All PWA Kit Private Client E2E tests passed!"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+            - name: Upload Playwright test results
+              if: ${{ failure() }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: playwright-results-private-client-node-${{ matrix.node }}-npm-${{ matrix.npm }}
+                  path: test-results
+                  if-no-files-found: ignore
+                  retention-days: 7
+    notify-slack-pwa-private-client:
+        needs: [run-generator-private-client]
+        if: ${{ always() }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Send GitHub Action data to Slack workflow (Generated)
+              id: slack-success
+              if: ${{ github.event_name == 'schedule' && needs.run-generator-private-client.result == 'success' }}
+              uses: slackapi/slack-github-action@v1.23.0
+              with:
+                  payload: |
+                      {
+                        "message": "✅ All PWA Kit Private Client E2E tests passed!"
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-private-client.result != 'success'  }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "❌ One or more PWA Kit Private Client E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+            - name: Send GitHub Action data to Slack workflow (Generated)
+              id: slack-failure
+              if: ${{ github.event_name == 'schedule' && needs.run-generator-private-client.result != 'success'  }}
+              uses: slackapi/slack-github-action@v1.23.0
+              with:
+                  payload: |
+                      {
+                        "message": "❌ One or more PWA Kit Private Client E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  test-extra-features:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-      - name: Install Monorepo Dependencies
-        run: node ./scripts/gtime.js monorepo_install npm ci
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-      - name: Set PWA Kit E2E Test User
-        run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
-      - name: Run extra features tests
-        env:
-          PWA_E2E_USER_EMAIL: e2e.pwa.kit@gmail.com
-          PWA_E2E_USER_PASSWORD: hpv_pek-JZK_xkz0wzf
-        run: npm run test:e2e:extra_features
+    test-extra-features:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+                  cache: npm
+            - name: Install Monorepo Dependencies
+              run: node ./scripts/gtime.js monorepo_install npm ci
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps
+            - name: Set PWA Kit E2E Test User
+              run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
+            - name: Run extra features tests
+              env:
+                  PWA_E2E_USER_EMAIL: e2e.pwa.kit@gmail.com
+                  PWA_E2E_USER_PASSWORD: hpv_pek-JZK_xkz0wzf
+              run: npm run test:e2e:extra_features
 
-  notify-slack-extra-features:
-    needs: [test-extra-features]
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send GitHub Action data to Slack workflow (Success)
-        id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.test-extra-features.result == 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "✅ All PWA Kit extra features E2E tests passed!"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    notify-slack-extra-features:
+        needs: [test-extra-features]
+        if: ${{ always() }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Send GitHub Action data to Slack workflow (Success)
+              id: slack-success
+              if: ${{ github.event_name == 'schedule' && needs.test-extra-features.result == 'success' }}
+              uses: slackapi/slack-github-action@v1.23.0
+              with:
+                  payload: |
+                      {
+                        "message": "✅ All PWA Kit extra features E2E tests passed!"
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: Send GitHub Action data to Slack workflow (Failure)
-        id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.test-extra-features.result != 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "❌ One or more PWA Kit extra features E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+            - name: Send GitHub Action data to Slack workflow (Failure)
+              id: slack-failure
+              if: ${{ github.event_name == 'schedule' && needs.test-extra-features.result != 'success' }}
+              uses: slackapi/slack-github-action@v1.23.0
+              with:
+                  payload: |
+                      {
+                        "message": "❌ One or more PWA Kit extra features E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
