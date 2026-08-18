@@ -87,7 +87,4 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     }
 }
 
-// SDK 26.8 pending — requestOrderAccessCode lands in commerce-sdk-isomorphic 5.5.0.
-// We add the no-op entry outside the typed const declaration to avoid a TypeScript
-// excess-property error when compiled against the lockfile version (5.4.0).
-Object.assign(cacheUpdateMatrix, {requestOrderAccessCode: () => ({})})
+cacheUpdateMatrix['requestOrderAccessCode'] = () => ({})

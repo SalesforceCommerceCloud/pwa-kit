@@ -63,14 +63,13 @@ The payment instrument is added with the provided details. The payment method mu
      * Initiates the return of one or more items of an order that is integrated with Order Management (OMS).
      * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `returnOmsOrder` endpoint.
      */
-    ReturnOmsOrder: 'returnOmsOrder'
+    ReturnOmsOrder: 'returnOmsOrder',
+    /**
+     * Sends a guest order access code (OTP) to the shopper's email address.
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `requestOrderAccessCode` endpoint.
+     */
+    RequestOrderAccessCode: 'requestOrderAccessCode'
 } as const
-
-// SDK 26.8 pending — requestOrderAccessCode lands in commerce-sdk-isomorphic 5.5.0.
-// We extend the enum outside the typed const so that request.jsx can call
-// useShopperOrdersMutation('requestOrderAccessCode') without TypeScript errors when
-// compiled against the lockfile version (5.4.0) which does not yet have this method.
-Object.assign(ShopperOrdersMutations, {RequestOrderAccessCode: 'requestOrderAccessCode'})
 
 /**
  * Mutation for Shopper Orders.
