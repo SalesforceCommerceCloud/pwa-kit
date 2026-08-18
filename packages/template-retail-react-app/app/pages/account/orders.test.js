@@ -987,9 +987,9 @@ describe('Item-level return error states', () => {
         const banner = await screen.findByTestId('return-items-modal-select-error')
         expect(banner).toBeInTheDocument()
         // Generic "quantities changed" copy (the API does not name specific items).
-        expect(banner).toHaveTextContent(/available return quantities changed/i)
+        expect(banner).toHaveTextContent(/available return quantities for some items changed/i)
         // Still on the select view (item checkboxes visible), not the terminal banner.
-        expect(screen.queryByText(/unable to submit return/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/unable to submit this return/i)).not.toBeInTheDocument()
     })
 
     test('prunes a checked row that is no longer returnable after the post-error refetch', async () => {
@@ -1087,7 +1087,7 @@ describe('Item-level return error states', () => {
         await user.click(submit)
 
         const banner = await screen.findByTestId('return-items-modal-terminal-error')
-        expect(banner).toHaveTextContent(/we could not find this order/i)
+        expect(banner).toHaveTextContent(/we can't find this order/i)
         // No recovery link — the shopper closes the modal to dismiss the banner.
         expect(screen.queryByTestId('return-items-modal-terminal-link')).not.toBeInTheDocument()
     })
@@ -2778,7 +2778,7 @@ describe('Cancel order — eligibility and full flow', () => {
 
         // Success feedback appears
         await waitFor(() => {
-            expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
+            expect(screen.getByText(/order canceled/i)).toBeInTheDocument()
         })
     })
 
@@ -2800,7 +2800,7 @@ describe('Cancel order — eligibility and full flow', () => {
         expect(mockMutateAsync.mock.calls[0][0].body).toEqual({})
 
         await waitFor(() => {
-            expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
+            expect(screen.getByText(/order canceled/i)).toBeInTheDocument()
         })
     })
 
@@ -2818,7 +2818,7 @@ describe('Cancel order — eligibility and full flow', () => {
         await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
 
         await waitFor(() => {
-            expect(screen.getByText(/order cancelled/i)).toBeInTheDocument()
+            expect(screen.getByText(/order canceled/i)).toBeInTheDocument()
         })
 
         // Button should now be disabled (aria-disabled, stays focusable)

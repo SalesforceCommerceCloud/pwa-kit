@@ -350,6 +350,19 @@ describe('evictIfNeeded', () => {
         expect(Object.keys(result)).toHaveLength(1)
         expect(result.ORD1).toBeDefined()
     })
+
+    test('evicts a single oversized entry rather than keeping it when other entries exist', () => {
+        // The oversized entry is the OLDEST (first key); a smaller newer entry should survive
+        const bigValue = 'x'.repeat(2600)
+        const map = {
+            ORDER_OLD: {email: 'a@b.com', accessCode: bigValue},
+            ORDER_NEW: {email: 'b@c.com', accessCode: '123456'}
+        }
+        const result = evictIfNeeded(map)
+        // The oversized first entry should have been evicted, the newer entry kept
+        expect(result.ORDER_OLD).toBeUndefined()
+        expect(result.ORDER_NEW).toBeDefined()
+    })
 })
 
 // ─── Express endpoint helpers for testing ────────────────────────────────────
