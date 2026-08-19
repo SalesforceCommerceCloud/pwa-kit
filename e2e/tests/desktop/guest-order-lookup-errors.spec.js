@@ -21,6 +21,9 @@ const config = require('../../config.js')
 const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
 
 const FEATURE_ON_BASE_URL = process.env.GUEST_ORDER_LOOKUP_E2E_BASE_URL || config.RETAIL_APP_HOME
+// Feature-on suites require a dedicated deployment with guestOrderLookup.enabled=true.
+// Skip them in standard CI where GUEST_ORDER_LOOKUP_E2E_BASE_URL is not set.
+const FEATURE_ON = !!process.env.GUEST_ORDER_LOOKUP_E2E_BASE_URL
 
 // ---------------------------------------------------------------------------
 // Shared mock helpers
@@ -87,7 +90,7 @@ const navigateToStep2 = async (page, {orderNo = 'ORD-001234', email = 'test@exam
 // Error path tests
 // ---------------------------------------------------------------------------
 
-test.describe('Guest Order Access — error paths (feature-on)', () => {
+test.describe.skip(!FEATURE_ON, 'Guest Order Access — error paths (feature-on)', () => {
     test.beforeEach(async ({page}) => {
         await mockSlasToken(page)
         await mockRequestCode(page)
@@ -218,7 +221,7 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
 // dedicated S19 error-path file; the checks complement each other.)
 // ---------------------------------------------------------------------------
 
-test.describe('Guest Order Access — a11y critical violations check (S19)', () => {
+test.describe.skip(!FEATURE_ON, 'Guest Order Access — a11y critical violations check (S19)', () => {
     test.beforeEach(async ({page}) => {
         await mockSlasToken(page)
         await mockRequestCode(page)

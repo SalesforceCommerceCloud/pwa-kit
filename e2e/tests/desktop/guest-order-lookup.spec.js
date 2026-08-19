@@ -34,6 +34,9 @@ const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
  * set GUEST_ORDER_LOOKUP_E2E_BASE_URL to point to that deployment.
  */
 const FEATURE_ON_BASE_URL = process.env.GUEST_ORDER_LOOKUP_E2E_BASE_URL || config.RETAIL_APP_HOME
+// Feature-on suites require a dedicated deployment with guestOrderLookup.enabled=true.
+// Skip them in standard CI where GUEST_ORDER_LOOKUP_E2E_BASE_URL is not set.
+const FEATURE_ON = !!process.env.GUEST_ORDER_LOOKUP_E2E_BASE_URL
 
 /**
  * Intercept the requestOrderAccessCode SCAPI call and return 202 Accepted.
@@ -142,7 +145,7 @@ const fillOtpCode = async (page, code) => {
 // Suite 1: Happy path (feature-on)
 // ---------------------------------------------------------------------------
 
-test.describe('Guest Order Access — happy path (feature-on)', () => {
+test.describe.skip(!FEATURE_ON, 'Guest Order Access — happy path (feature-on)', () => {
     test.beforeEach(async ({page}) => {
         // Mock auth so the app can boot without a live SLAS instance
         await mockSlasToken(page)
@@ -545,7 +548,7 @@ test.describe('Guest Order Access — flag-off invisibility (feature-off)', () =
 // snapshot suite can be added once the feature ships to a stable environment.
 // ---------------------------------------------------------------------------
 
-test.describe('Guest Order Access — a11y (zero critical violations, feature-on)', () => {
+test.describe.skip(!FEATURE_ON, 'Guest Order Access — a11y (zero critical violations, feature-on)', () => {
     test.beforeEach(async ({page}) => {
         await mockSlasToken(page)
     })
