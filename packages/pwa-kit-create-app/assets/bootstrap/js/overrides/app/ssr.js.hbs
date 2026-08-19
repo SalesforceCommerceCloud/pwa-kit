@@ -816,25 +816,36 @@ const {handler} = runtime.createHandler(options, (app) => {
         const appConfig = getConfig()?.app
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
+
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
         const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
         if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
         const authorization = `Bearer ${slasToken}`
+
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
+
         const {orderNo, reason} = req.body ?? {}
         if (!orderNo || typeof orderNo !== 'string')
-            return res.status(400).json({errorKind: 'invalid_input', message: 'orderNo is required'})
+            return res
+                .status(400)
+                .json({errorKind: 'invalid_input', message: 'orderNo is required'})
         if (!cookieData?.[orderNo])
             return res.status(401).json({error: 'No session for this order'})
+
         let regex
         try {
-            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$')
+            regex = new RegExp(
+                appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$'
+            )
         } catch {
             regex = /^[a-zA-Z0-9-]{6,32}$/
         }
         if (!regex.test(orderNo))
-            return res.status(400).json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
+            return res
+                .status(400)
+                .json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
+
         try {
             const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             await shopperOrders.cancelOmsOrder({
@@ -855,46 +866,78 @@ const {handler} = runtime.createHandler(options, (app) => {
         const appConfig = getConfig()?.app
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
+
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
         const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
         if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
         const authorization = `Bearer ${slasToken}`
+
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
+
         const {orderNo, productItems} = req.body ?? {}
         if (!orderNo || typeof orderNo !== 'string')
-            return res.status(400).json({errorKind: 'invalid_input', message: 'orderNo is required'})
+            return res
+                .status(400)
+                .json({errorKind: 'invalid_input', message: 'orderNo is required'})
         if (!cookieData?.[orderNo])
             return res.status(401).json({error: 'No session for this order'})
+
         let regex
         try {
-            regex = new RegExp(appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$')
+            regex = new RegExp(
+                appConfig.guestOrderLookup?.orderNumberRegex ?? '^[a-zA-Z0-9-]{6,32}$'
+            )
         } catch {
             regex = /^[a-zA-Z0-9-]{6,32}$/
         }
         if (!regex.test(orderNo))
-            return res.status(400).json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
+            return res
+                .status(400)
+                .json({errorKind: 'invalid_input', message: 'Invalid orderNo format'})
+
         if (!Array.isArray(productItems) || productItems.length === 0)
-            return res.status(400).json({errorKind: 'invalid_input', message: 'productItems must be a non-empty array'})
+            return res.status(400).json({
+                errorKind: 'invalid_input',
+                message: 'productItems must be a non-empty array'
+            })
+
         for (const item of productItems) {
             if (!item.itemId || typeof item.itemId !== 'string')
-                return res.status(400).json({errorKind: 'invalid_input', message: 'Each productItem must have a string itemId'})
+                return res.status(400).json({
+                    errorKind: 'invalid_input',
+                    message: 'Each productItem must have a string itemId'
+                })
             const qty = Number(item.quantity)
             if (!Number.isFinite(qty) || qty < 1)
-                return res.status(400).json({errorKind: 'invalid_input', message: 'Each productItem must have a positive quantity'})
+                return res.status(400).json({
+                    errorKind: 'invalid_input',
+                    message: 'Each productItem must have a positive quantity'
+                })
         }
+
         try {
             const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
-            await shopperOrders.returnOmsOrder({parameters: {orderNo}, body: {productItems}})
+            await shopperOrders.returnOmsOrder({
+                parameters: {orderNo},
+                body: {productItems}
+            })
             return res.json({success: true})
         } catch (err) {
             const status = err?.response?.status
             if (status === 400) {
                 let errorCode
-                try { errorCode = (await err.response.clone().json())?.errorCode } catch { /* ignore */ }
-                if (errorCode === 'InvalidReasonCode') return res.status(400).json({errorKind: 'invalidReason'})
-                if (errorCode === 'UnknownProductItemIds') return res.status(400).json({errorKind: 'unknownItems'})
-                if (errorCode === 'ReturnQuantityExceeded') return res.status(400).json({errorKind: 'quantityExceeded'})
+                try {
+                    errorCode = (await err.response.clone().json())?.errorCode
+                } catch {
+                    /* best-effort parse; fall through to generic error if body is unparseable */
+                }
+                if (errorCode === 'InvalidReasonCode')
+                    return res.status(400).json({errorKind: 'invalidReason'})
+                if (errorCode === 'UnknownProductItemIds')
+                    return res.status(400).json({errorKind: 'unknownItems'})
+                if (errorCode === 'ReturnQuantityExceeded')
+                    return res.status(400).json({errorKind: 'quantityExceeded'})
                 return res.status(400).json({errorKind: 'unknown'})
             }
             if (status === 404) return res.status(404).json({errorKind: 'notFound'})
