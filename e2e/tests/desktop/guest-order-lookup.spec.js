@@ -250,7 +250,6 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await expect(page.getByRole('heading', {name: /order details/i})).toBeVisible()
         await expect(page.getByText(/ORD-001234/)).toBeVisible()
         await expect(page.getByText(/Cotton Turtleneck Sweater/i)).toBeVisible()
-        await expect(page.getByText(/Refresh Status/i)).toBeVisible()
     })
 
     test('Security: orderNo, email, accessCode never appear in URL at any step', async ({page}) => {

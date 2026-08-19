@@ -811,7 +811,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         try {
             const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             const order = await shopperOrders.guestOrderLookup({
-                parameters: {orderNo},
+                parameters: {orderNo, expand: ['oms', 'oms_shipments']},
                 body: {orderViewCode: accessCode, email}
             })
             // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
@@ -896,7 +896,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         try {
             const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             const order = await shopperOrders.guestOrderLookup({
-                parameters: {orderNo},
+                parameters: {orderNo, expand: ['oms', 'oms_shipments']},
                 body: {orderViewCode: verifiedCode, email}
             })
             // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
@@ -971,10 +971,13 @@ const {handler} = runtime.createHandler(options, (app) => {
         try {
             const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             const meta = await shopperOrders.getOmsMetaData({parameters: {}})
+            const cancelReasonCodes = meta.cancelReasonCodes ?? []
+            const returnReasonCodes = meta.returnReasonCodes ?? []
             return res.json({
-                omsActive: meta.omsActive ?? false,
-                cancelReasonCodes: meta.cancelReasonCodes ?? [],
-                returnReasonCodes: meta.returnReasonCodes ?? []
+                // OmsMetaData has no omsActive field; derive from cancelReasonCodes presence
+                omsActive: cancelReasonCodes.length > 0,
+                cancelReasonCodes,
+                returnReasonCodes
             })
         } catch (err) {
             if (err?.response?.status === 409) {
@@ -1107,15 +1110,15 @@ const {handler} = runtime.createHandler(options, (app) => {
                     /* best-effort parse; fall through to generic error if body is unparseable */
                 }
                 if (errorCode === 'InvalidReasonCode')
-                    return res.status(400).json({errorKind: 'invalid_reason'})
+                    return res.status(400).json({errorKind: 'invalidReason'})
                 if (errorCode === 'UnknownProductItemIds')
-                    return res.status(400).json({errorKind: 'unknown_items'})
+                    return res.status(400).json({errorKind: 'unknownItems'})
                 if (errorCode === 'ReturnQuantityExceeded')
-                    return res.status(400).json({errorKind: 'quantity_exceeded'})
-                return res.status(400).json({errorKind: 'transient'})
+                    return res.status(400).json({errorKind: 'quantityExceeded'})
+                return res.status(400).json({errorKind: 'unknown'})
             }
-            if (status === 404) return res.status(404).json({errorKind: 'not_found'})
-            if (status === 409) return res.status(409).json({errorKind: 'not_returnable'})
+            if (status === 404) return res.status(404).json({errorKind: 'notFound'})
+            if (status === 409) return res.status(409).json({errorKind: 'conflict'})
             return res.status(500).json({errorKind: 'transient'})
         }
     })

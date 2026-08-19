@@ -1014,7 +1014,7 @@ describe('GET /api/order-lookup/order — real handler', () => {
         configState.current = makeAppConfig()
     })
 
-    test('calls guestOrderLookup with orderNo only (no expand param)', async () => {
+    test('calls guestOrderLookup with expand=[oms,oms_shipments]', async () => {
         const orderNo = 'ORD456'
         const email = 'guest@test.com'
         const accessCode = 'COOKIECODE'
@@ -1039,14 +1039,11 @@ describe('GET /api/order-lookup/order — real handler', () => {
 
         expect(mockShopperOrdersInstance.guestOrderLookup).toHaveBeenCalledWith(
             expect.objectContaining({
-                parameters: expect.objectContaining({orderNo}),
+                parameters: expect.objectContaining({
+                    orderNo,
+                    expand: ['oms', 'oms_shipments']
+                }),
                 body: expect.objectContaining({email, orderViewCode: accessCode})
-            })
-        )
-        // No expand param
-        expect(mockShopperOrdersInstance.guestOrderLookup).not.toHaveBeenCalledWith(
-            expect.objectContaining({
-                parameters: expect.objectContaining({expand: expect.anything()})
             })
         )
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({orderNo}))
@@ -1626,7 +1623,7 @@ describe('POST /api/order-lookup/return — real handler', () => {
         expect(mockShopperOrdersInstance.returnOmsOrder).not.toHaveBeenCalled()
     })
 
-    test('400 errorKind:invalid_reason on SCAPI 400 + InvalidReasonCode', async () => {
+    test('400 errorKind:invalidReason on SCAPI 400 + InvalidReasonCode', async () => {
         mockShopperOrdersInstance.returnOmsOrder.mockRejectedValue(
             makeApiError(400, 'InvalidReasonCode')
         )
@@ -1641,10 +1638,10 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalid_reason'})
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'invalidReason'})
     })
 
-    test('400 errorKind:unknown_items on SCAPI 400 + UnknownProductItemIds', async () => {
+    test('400 errorKind:unknownItems on SCAPI 400 + UnknownProductItemIds', async () => {
         mockShopperOrdersInstance.returnOmsOrder.mockRejectedValue(
             makeApiError(400, 'UnknownProductItemIds')
         )
@@ -1659,10 +1656,10 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({errorKind: 'unknown_items'})
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'unknownItems'})
     })
 
-    test('400 errorKind:quantity_exceeded on SCAPI 400 + ReturnQuantityExceeded', async () => {
+    test('400 errorKind:quantityExceeded on SCAPI 400 + ReturnQuantityExceeded', async () => {
         mockShopperOrdersInstance.returnOmsOrder.mockRejectedValue(
             makeApiError(400, 'ReturnQuantityExceeded')
         )
@@ -1677,10 +1674,10 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(400)
-        expect(res.json).toHaveBeenCalledWith({errorKind: 'quantity_exceeded'})
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'quantityExceeded'})
     })
 
-    test('404 errorKind:not_found on SCAPI 404', async () => {
+    test('404 errorKind:notFound on SCAPI 404', async () => {
         mockShopperOrdersInstance.returnOmsOrder.mockRejectedValue({response: {status: 404}})
 
         const req = makeMockReq({
@@ -1693,10 +1690,10 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(404)
-        expect(res.json).toHaveBeenCalledWith({errorKind: 'not_found'})
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'notFound'})
     })
 
-    test('409 errorKind:not_returnable on SCAPI 409', async () => {
+    test('409 errorKind:conflict on SCAPI 409', async () => {
         mockShopperOrdersInstance.returnOmsOrder.mockRejectedValue({response: {status: 409}})
 
         const req = makeMockReq({
@@ -1709,6 +1706,6 @@ describe('POST /api/order-lookup/return — real handler', () => {
         await handler(req, res)
 
         expect(res.status).toHaveBeenCalledWith(409)
-        expect(res.json).toHaveBeenCalledWith({errorKind: 'not_returnable'})
+        expect(res.json).toHaveBeenCalledWith({errorKind: 'conflict'})
     })
 })

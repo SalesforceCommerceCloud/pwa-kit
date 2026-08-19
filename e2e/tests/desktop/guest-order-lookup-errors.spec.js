@@ -163,39 +163,16 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
         await expect(page.getByText(/session has expired/i)).toBeVisible()
     })
 
-    test('Mid-session expiry: clicking "Refresh Status" on Step 3 with 404 → redirect to /order-lookup?expired=1', async ({
+    test('Mid-session expiry on Step 3: mock 403 from GET order → redirect to /order-lookup?expired=1 → expiry banner and orderNo pre-filled', async ({
         page
     }) => {
         await page.route('**/api/order-lookup/verify', (route) => {
             route.fulfill({status: 200, contentType: 'application/json', body: '{}'})
         })
 
-        // First load succeeds; second (refresh) returns 404
-        let callCount = 0
+        // Order endpoint returns 403 (session cookie missing/expired)
         await page.route('**/api/order-lookup/order**', (route) => {
-            callCount++
-            if (callCount === 1) {
-                route.fulfill({
-                    status: 200,
-                    contentType: 'application/json',
-                    body: JSON.stringify({
-                        orderNo: 'ORD-001234',
-                        status: 'Open',
-                        currency: 'USD',
-                        orderTotal: 59.98,
-                        productItems: [
-                            {
-                                itemId: 'item-1',
-                                productName: 'Cotton Sweater',
-                                quantity: 1,
-                                price: 49.99
-                            }
-                        ]
-                    })
-                })
-            } else {
-                route.fulfill({status: 404, contentType: 'application/json', body: '{}'})
-            }
+            route.fulfill({status: 403, contentType: 'application/json', body: '{}'})
         })
 
         await navigateToStep2(page)
@@ -207,15 +184,16 @@ test.describe('Guest Order Access — error paths (feature-on)', () => {
             page.getByRole('button', {name: /verify code/i}).click()
         ])
 
-        await expect(page.getByRole('heading', {name: /order details/i})).toBeVisible()
-
-        // Click "Refresh Status" — second call returns 404
-        await page.getByRole('button', {name: /refresh status/i}).click()
-
+        // Step 3 fetches the order and gets 403 — component redirects to /order-lookup?order=...&expired=1
         await page.waitForURL('**/order-lookup?**expired=1**', {timeout: 10000})
 
+        expect(page.url()).toContain('/order-lookup')
         expect(page.url()).toContain('expired=1')
+        expect(page.url()).toContain('order=')
+
+        // Expiry banner and orderNo pre-fill visible on Step 1
         await expect(page.getByRole('alert')).toBeVisible()
+        await expect(page.getByText(/session has expired/i)).toBeVisible()
     })
 
     test('Direct navigation to /order-lookup/verify without orderNo → redirect to /order-lookup', async ({

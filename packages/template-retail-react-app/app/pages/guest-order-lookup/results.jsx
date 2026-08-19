@@ -190,6 +190,7 @@ const GuestOrderLookupResults = () => {
     const [cancelModalOpen, setCancelModalOpen] = useState(false)
     const [cancelSubmitting, setCancelSubmitting] = useState(false)
     const [cancelSuccess, setCancelSuccess] = useState(false)
+    const [cancelError, setCancelError] = useState(null)
 
     // ─── Return state ──────────────────────────────────────────────────────────
     const [returnModalOpen, setReturnModalOpen] = useState(false)
@@ -226,6 +227,7 @@ const GuestOrderLookupResults = () => {
     }, [order?.omsData?.shipments, order?.shipments])
 
     const handleCancel = async (orderArg, reason) => {
+        setCancelError(null)
         setCancelSubmitting(true)
         try {
             const token = await getTokenWhenReady()
@@ -238,9 +240,13 @@ const GuestOrderLookupResults = () => {
                 setCancelModalOpen(false)
                 setCancelSuccess(true)
                 refetch()
+            } else {
+                const data = await res.json().catch(() => ({}))
+                setCancelModalOpen(false)
+                setCancelError(data.errorKind ?? 'transient')
             }
         } catch {
-            // Error handled by modal
+            setCancelError('transient')
         } finally {
             setCancelSubmitting(false)
         }
@@ -360,13 +366,15 @@ const GuestOrderLookupResults = () => {
     // ─── Auth redirect (401/403 = cookie missing/expired) ─────────────────────
 
     // React Query retains the last successful `order` value even when a background
-    // refetch returns a 401/403 (cookie expired). Redirect to the verify page so
-    // stale order data is never shown to an unverified user.
+    // refetch returns a 401/403 (cookie expired). Send back to Step 1 with orderNo
+    // pre-filled so the shopper re-enters their email and requests a new code.
+    // We redirect to Step 1 rather than Step 2 because the verify form requires
+    // the email via router state and does not have it on session expiry.
     const requiresVerification =
         !order || (isError && (error?.status === 401 || error?.status === 403))
 
     if (requiresVerification) {
-        return <Redirect to={`/order-lookup/verify/${encodeURIComponent(orderNo)}`} />
+        return <Redirect to={`/order-lookup?order=${encodeURIComponent(orderNo)}&expired=1`} />
     }
 
     // ─── Order details ─────────────────────────────────────────────────────────
@@ -511,6 +519,35 @@ const GuestOrderLookupResults = () => {
                                 id="guestOrderLookup.order.cancel.success"
                                 defaultMessage="Your order has been cancelled."
                             />
+                        </Text>
+                    </Box>
+                )}
+                {cancelError && (
+                    <Box
+                        p={4}
+                        border="1px solid"
+                        borderColor="red.300"
+                        borderRadius="base"
+                        bg="red.50"
+                        role="alert"
+                    >
+                        <Text fontWeight="semibold" fontSize="sm" color="red.700">
+                            {cancelError === 'not_cancellable' ? (
+                                <FormattedMessage
+                                    id="guestOrderLookup.order.cancel.error.notCancellable"
+                                    defaultMessage="This order can no longer be cancelled."
+                                />
+                            ) : cancelError === 'not_found' ? (
+                                <FormattedMessage
+                                    id="guestOrderLookup.order.cancel.error.notFound"
+                                    defaultMessage="Order not found."
+                                />
+                            ) : (
+                                <FormattedMessage
+                                    id="guestOrderLookup.order.cancel.error.generic"
+                                    defaultMessage="We couldn't cancel your order. Please try again."
+                                />
+                            )}
                         </Text>
                     </Box>
                 )}

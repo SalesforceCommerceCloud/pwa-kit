@@ -71,18 +71,9 @@ Shoppers receive the access code via email triggered by the SFCC Business Manage
 
 If the hook is not configured, is misconfigured, or fails silently, shoppers will submit the form but never receive the email. This is a merchant configuration issue, not a PWA Kit failure. The storefront cannot detect whether the email was delivered.
 
-## 6. ECOM 26.8 dependency
+## 6. SDK dependency
 
-The `requestOrderAccessCode` method is not yet available in commerce-sdk-isomorphic 5.4.0. The call in `useShopperOrdersMutation` is guarded with:
-
-```ts
-// @ts-expect-error SDK 26.8 pending — requestOrderAccessCode is not yet in commerce-sdk-isomorphic 5.4.0
-const {mutateAsync: requestOrderAccessCode} = useShopperOrdersMutation('requestOrderAccessCode')
-```
-
-This `@ts-expect-error` comment will cause a TypeScript compile error once `requestOrderAccessCode` is added to the SDK type definitions (i.e., when the SDK ships 26.8 support). That compile error is intentional — it is the CI signal to remove both the `@ts-expect-error` annotation and the `// SDK 26.8 pending` comments throughout the codebase.
-
-Do not remove these comments until `requestOrderAccessCode` appears in the SDK types.
+`requestOrderAccessCode` is available in `commerce-sdk-isomorphic` 5.5.0 (shipped with ECOM 26.8). The `@ts-expect-error` guards and `// SDK 26.8 pending` comments that were present in earlier drafts of this feature have been removed now that the method is in the SDK types.
 
 ## 7. Cookie behavior and `allowCookies`
 
@@ -118,9 +109,6 @@ The email is sent by ECOM via the Business Manager hook `sfcc.app.order.sendOrde
 
 **"The access code email arrives but the code is rejected with 404"**
 The code has a 15-minute TTL. If the shopper waited too long before entering it, the code has expired. They need to restart the flow. Also check that the clock skew between the MRT server and ECOM does not exceed the TTL.
-
-**"I see `@ts-expect-error` in mutation.ts / request.jsx / verify.jsx"**
-This is expected until ECOM 26.8 ships and commerce-sdk-isomorphic adds the `requestOrderAccessCode` type. Do not remove these comments until the type is available in the SDK — removing them prematurely will cause a TypeScript type error because the method won't exist on the type.
 
 **"The throttle is rejecting legitimate requests"**
 The default `requestCodeThrottle` allows 5 verify attempts per IP per 60-second window. If this is too strict for your traffic, increase `max` or `windowMs` in `config/default.js`. In MRT deployments all requests arrive from the MRT proxy IP, so IP-based throttling affects all shoppers equally — consider setting a higher `max` for MRT-deployed storefronts.
