@@ -2599,18 +2599,6 @@
       "value": "Cancel Order"
     }
   ],
-  "guestOrderLookup.order.button.refresh": [
-    {
-      "type": 0,
-      "value": "Refresh Order Status"
-    }
-  ],
-  "guestOrderLookup.order.button.refreshing": [
-    {
-      "type": 0,
-      "value": "Refreshing..."
-    }
-  ],
   "guestOrderLookup.order.button.retry": [
     {
       "type": 0,
@@ -2621,6 +2609,24 @@
     {
       "type": 0,
       "value": "Return Items"
+    }
+  ],
+  "guestOrderLookup.order.cancel.error.generic": [
+    {
+      "type": 0,
+      "value": "We couldn't cancel your order. Please try again."
+    }
+  ],
+  "guestOrderLookup.order.cancel.error.notCancellable": [
+    {
+      "type": 0,
+      "value": "This order can no longer be cancelled."
+    }
+  ],
+  "guestOrderLookup.order.cancel.error.notFound": [
+    {
+      "type": 0,
+      "value": "Order not found."
     }
   ],
   "guestOrderLookup.order.cancel.success": [
@@ -2685,16 +2691,6 @@
       "value": "count"
     }
   ],
-  "guestOrderLookup.order.lastUpdated": [
-    {
-      "type": 0,
-      "value": "Last updated at "
-    },
-    {
-      "type": 1,
-      "value": "time"
-    }
-  ],
   "guestOrderLookup.order.orderNumber": [
     {
       "type": 0,
@@ -2725,12 +2721,6 @@
     {
       "type": 0,
       "value": "Your return has been submitted."
-    }
-  ],
-  "guestOrderLookup.order.section.shipping": [
-    {
-      "type": 0,
-      "value": "Shipping"
     }
   ],
   "guestOrderLookup.order.section.tracking": [
@@ -2807,6 +2797,12 @@
     {
       "type": 0,
       "value": "Order number"
+    }
+  ],
+  "guestOrderLookup.request.sessionExpired": [
+    {
+      "type": 0,
+      "value": "Your session has expired. Please look up your order again."
     }
   ],
   "guestOrderLookup.request.subtext": [
