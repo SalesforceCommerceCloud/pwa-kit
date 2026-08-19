@@ -1041,17 +1041,20 @@
   "guestOrderLookup.order.button.cancel": {
     "defaultMessage": "Cancel Order"
   },
-  "guestOrderLookup.order.button.refresh": {
-    "defaultMessage": "Refresh Order Status"
-  },
-  "guestOrderLookup.order.button.refreshing": {
-    "defaultMessage": "Refreshing..."
-  },
   "guestOrderLookup.order.button.retry": {
     "defaultMessage": "Try Again"
   },
   "guestOrderLookup.order.button.return": {
     "defaultMessage": "Return Items"
+  },
+  "guestOrderLookup.order.cancel.error.generic": {
+    "defaultMessage": "We couldn't cancel your order. Please try again."
+  },
+  "guestOrderLookup.order.cancel.error.notCancellable": {
+    "defaultMessage": "This order can no longer be cancelled."
+  },
+  "guestOrderLookup.order.cancel.error.notFound": {
+    "defaultMessage": "Order not found."
   },
   "guestOrderLookup.order.cancel.success": {
     "defaultMessage": "Your order has been cancelled."
@@ -1071,9 +1074,6 @@
   "guestOrderLookup.order.itemCount": {
     "defaultMessage": "{count, plural, one {# item} other {# items}}"
   },
-  "guestOrderLookup.order.lastUpdated": {
-    "defaultMessage": "Last updated at {time}"
-  },
   "guestOrderLookup.order.orderNumber": {
     "defaultMessage": "Order Number: {orderNo}"
   },
@@ -1085,9 +1085,6 @@
   },
   "guestOrderLookup.order.return.success": {
     "defaultMessage": "Your return has been submitted."
-  },
-  "guestOrderLookup.order.section.shipping": {
-    "defaultMessage": "Shipping"
   },
   "guestOrderLookup.order.section.tracking": {
     "defaultMessage": "Tracking"
@@ -1124,6 +1121,9 @@
   },
   "guestOrderLookup.request.label.orderNumber": {
     "defaultMessage": "Order number"
+  },
+  "guestOrderLookup.request.sessionExpired": {
+    "defaultMessage": "Your session has expired. Please look up your order again."
   },
   "guestOrderLookup.request.subtext": {
     "defaultMessage": "Enter your order details to track your order or view your receipt."
