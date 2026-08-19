@@ -448,10 +448,6 @@ test.describe('Guest Order Access — flag-off invisibility (feature-off)', () =
     const FLAG_OFF_BASE_URL =
         process.env.GUEST_ORDER_LOOKUP_FLAG_OFF_BASE_URL || config.RETAIL_APP_HOME
 
-    test.beforeEach(async ({page}) => {
-        await mockSlasToken(page)
-    })
-
     test('No "Order Lookup" footer link is visible when feature is off', async ({page}) => {
         await page.goto(FLAG_OFF_BASE_URL)
         await answerConsentTrackingForm(page)
