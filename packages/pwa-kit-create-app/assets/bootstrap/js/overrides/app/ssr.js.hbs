@@ -48,7 +48,7 @@ function parseCookieValue(req, cookieName) {
     return raw ? decodeURIComponent(raw.slice(cookieName.length + 1)) : null
 }
 
-function parseGuestOrderCookie(req, cookieName) {
+export function parseGuestOrderCookie(req, cookieName) {
     try {
         const raw = req.headers?.cookie
             ?.split(';')
@@ -61,7 +61,7 @@ function parseGuestOrderCookie(req, cookieName) {
     }
 }
 
-function evictIfNeeded(cookieMap) {
+export function evictIfNeeded(cookieMap) {
     let entries = Object.entries(cookieMap)
     while (JSON.stringify(Object.fromEntries(entries)).length > 2500 && entries.length > 1) {
         entries.shift()
@@ -79,7 +79,7 @@ const GUEST_ORDER_SUPPRESSED_FIELDS = new Set([
     'orderViewCode'
 ])
 
-function filterGuestOrderFields(order) {
+export function filterGuestOrderFields(order) {
     if (!order || typeof order !== 'object') return order
     const filtered = {}
     for (const [key, val] of Object.entries(order)) {
@@ -137,7 +137,7 @@ function filterGuestOrderFields(order) {
     return filtered
 }
 
-function createVerifyThrottle() {
+export function createVerifyThrottle() {
     const store = new Map()
     return function verifyThrottleMiddleware(req, res, next) {
         const appConfig = getConfig()?.app
