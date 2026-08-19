@@ -129,7 +129,7 @@ const GuestOrderLookupResults = () => {
                 headers: {Authorization: `Bearer ${token}`}
             })
             if (res.status === 401 || res.status === 403) {
-                // Not verified yet — expected on first visit before OTP entry.
+                // Not verified yet — expected on first visit before access code entry.
                 const err = new Error('not-verified')
                 err.status = res.status
                 throw err

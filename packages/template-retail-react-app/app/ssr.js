@@ -488,7 +488,7 @@ export function createVerifyThrottle() {
         const appConfig = getConfig()?.app
         // No-op when feature is disabled
         if (!appConfig?.guestOrderLookup?.enabled) return next()
-        // Only throttle the verify (OTP submission) endpoint
+        // Only throttle the verify (access code submission) endpoint
         if (req.path !== '/api/order-lookup/verify') return next()
 
         const throttleConfig = appConfig?.guestOrderLookup?.requestCodeThrottle

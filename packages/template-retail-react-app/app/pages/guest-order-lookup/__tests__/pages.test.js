@@ -52,7 +52,7 @@ import GuestOrderLookupOrder, {
     GUEST_ORDER_CLIENT_SUPPRESSED_FIELDS
 } from '@salesforce/retail-react-app/app/pages/guest-order-lookup/order'
 
-// Helper to type a 6-digit OTP code into the individual digit inputs
+// Helper to type a 6-digit access code into the individual digit inputs
 const typeOtpCode = async (user, code) => {
     const inputs = screen.getAllByRole('textbox')
     for (let i = 0; i < Math.min(code.length, 6); i++) {
@@ -465,7 +465,7 @@ describe('GuestOrderLookupVerify', () => {
     })
 
     // ── S17: A11y attributes ────────────────────────────────────────────────────
-    test('S17: OTP input does not have aria-invalid=true when no error', () => {
+    test('S17: access code input does not have aria-invalid=true when no error', () => {
         renderVerifyWithState()
         const input = screen.getByLabelText('Digit 1 of 6')
         // When no error, aria-invalid is either absent or 'false' — either is correct
@@ -473,7 +473,7 @@ describe('GuestOrderLookupVerify', () => {
         expect(ariaInvalid === null || ariaInvalid === 'false').toBe(true)
     })
 
-    test('S17: OTP input has aria-invalid=true when server error is present', async () => {
+    test('S17: access code input has aria-invalid=true when server error is present', async () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
@@ -500,7 +500,7 @@ describe('GuestOrderLookupVerify', () => {
         expect(alert).toBeInTheDocument()
     })
 
-    test('S17: OTP input aria-describedby includes server error element id when error is present', async () => {
+    test('S17: access code input aria-describedby includes server error element id when error is present', async () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
         const user = userEvent.setup()
         renderVerifyWithState()
@@ -512,7 +512,7 @@ describe('GuestOrderLookupVerify', () => {
         const input = screen.getByLabelText('Digit 1 of 6')
         // Chakra FormControl may append additional ids; verify ours is included
         const describedBy = input.getAttribute('aria-describedby') || ''
-        expect(describedBy).toContain('otp-error')
+        expect(describedBy).toContain('access-code-error')
     })
 })
 

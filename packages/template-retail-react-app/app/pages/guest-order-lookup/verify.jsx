@@ -25,7 +25,7 @@ import {
 import {useCustomerType, useAccessToken} from '@salesforce/commerce-sdk-react'
 import {Redirect, useHistory, useLocation, useParams} from 'react-router-dom'
 
-const OTP_LENGTH = 6
+const ACCESS_CODE_LENGTH = 6
 
 const GuestOrderLookupVerify = () => {
     const {formatMessage} = useIntl()
@@ -45,7 +45,7 @@ const GuestOrderLookupVerify = () => {
     // Auth resolves asynchronously — null means not yet known.
     const authResolved = customerType !== null
 
-    const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(''))
+    const [digits, setDigits] = useState(Array(ACCESS_CODE_LENGTH).fill(''))
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [serverError, setServerError] = useState(null)
     const inputRefs = useRef([])
@@ -57,7 +57,7 @@ const GuestOrderLookupVerify = () => {
             next[index] = cleaned
             setDigits(next)
             setServerError(null)
-            if (cleaned && index < OTP_LENGTH - 1) {
+            if (cleaned && index < ACCESS_CODE_LENGTH - 1) {
                 inputRefs.current[index + 1]?.focus()
             }
         },
@@ -75,14 +75,17 @@ const GuestOrderLookupVerify = () => {
 
     const handlePaste = useCallback((e) => {
         e.preventDefault()
-        const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH)
+        const pasted = e.clipboardData
+            .getData('text')
+            .replace(/\D/g, '')
+            .slice(0, ACCESS_CODE_LENGTH)
         if (!pasted) return
-        const next = Array(OTP_LENGTH).fill('')
+        const next = Array(ACCESS_CODE_LENGTH).fill('')
         for (let i = 0; i < pasted.length; i++) {
             next[i] = pasted[i]
         }
         setDigits(next)
-        inputRefs.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus()
+        inputRefs.current[Math.min(pasted.length, ACCESS_CODE_LENGTH - 1)]?.focus()
     }, [])
 
     // All hooks declared above — early returns must come after all hook calls
@@ -90,7 +93,7 @@ const GuestOrderLookupVerify = () => {
     if (!orderNo) return <Redirect to="/order-lookup" />
 
     const enteredCode = digits.join('')
-    const isComplete = enteredCode.length === OTP_LENGTH
+    const isComplete = enteredCode.length === ACCESS_CODE_LENGTH
 
     const onSubmit = async (e) => {
         e.preventDefault()
@@ -192,24 +195,24 @@ const GuestOrderLookupVerify = () => {
                 >
                     <Stack spacing={6}>
                         {serverError && (
-                            <Alert id="otp-error" status="error" borderRadius="md">
+                            <Alert id="access-code-error" status="error" borderRadius="md">
                                 <AlertIcon />
                                 {serverError}
                             </Alert>
                         )}
 
                         <FormControl isInvalid={!!serverError}>
-                            <FormLabel htmlFor="otp-input-0" textAlign="center">
+                            <FormLabel htmlFor="access-code-input-0" textAlign="center">
                                 {formatMessage({
                                     id: 'guestOrderLookup.verify.label.code',
                                     defaultMessage: 'Verification code'
                                 })}
                             </FormLabel>
                             <HStack spacing={3} justify="center">
-                                {Array.from({length: OTP_LENGTH}, (_, i) => (
+                                {Array.from({length: ACCESS_CODE_LENGTH}, (_, i) => (
                                     <Input
                                         key={i}
-                                        id={i === 0 ? 'otp-input-0' : undefined}
+                                        id={i === 0 ? 'access-code-input-0' : undefined}
                                         ref={(el) => {
                                             inputRefs.current[i] = el
                                         }}
@@ -233,10 +236,12 @@ const GuestOrderLookupVerify = () => {
                                                 id: 'guestOrderLookup.verify.label.digitN',
                                                 defaultMessage: 'Digit {n} of {total}'
                                             },
-                                            {n: i + 1, total: OTP_LENGTH}
+                                            {n: i + 1, total: ACCESS_CODE_LENGTH}
                                         )}
                                         aria-invalid={!!serverError || undefined}
-                                        aria-describedby={serverError ? 'otp-error' : undefined}
+                                        aria-describedby={
+                                            serverError ? 'access-code-error' : undefined
+                                        }
                                     />
                                 ))}
                             </HStack>

@@ -55,7 +55,7 @@ const mockRequestCode = (page) => {
 }
 
 /**
- * Type a 6-digit OTP code into the individual digit inputs on the verify page.
+ * Type a 6-digit access code into the individual digit inputs on the verify page.
  * Each digit has aria-label "Digit N of 6".
  */
 const fillOtpCode = async (page, code) => {
