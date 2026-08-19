@@ -96,6 +96,11 @@ const GuestOrderLookupOrder = () => {
             const res = await fetch(`/api/order-lookup/order/${encodeURIComponent(orderNo)}`, {
                 headers: {Authorization: `Bearer ${token}`}
             })
+            if (res.status === 401 || res.status === 403) {
+                const err = new Error('not-verified')
+                err.status = res.status
+                throw err
+            }
             if (res.status === 404) {
                 const err = new Error('Session expired or order not found')
                 err.status = 404
@@ -109,7 +114,7 @@ const GuestOrderLookupOrder = () => {
             return res.json()
         },
         enabled: !!orderNo && typeof window !== 'undefined',
-        retry: false,
+        retry: (failureCount, err) => failureCount < 1 && err?.status >= 500,
         staleTime: 15 * 60 * 1000,
         gcTime: 15 * 60 * 1000
     })
@@ -146,6 +151,7 @@ const GuestOrderLookupOrder = () => {
     const [cancelModalOpen, setCancelModalOpen] = useState(false)
     const [cancelSubmitting, setCancelSubmitting] = useState(false)
     const [cancelSuccess, setCancelSuccess] = useState(false)
+    const [cancelError, setCancelError] = useState(null)
 
     // ─── Return state ──────────────────────────────────────────────────────────
     const [returnModalOpen, setReturnModalOpen] = useState(false)
@@ -182,6 +188,7 @@ const GuestOrderLookupOrder = () => {
     }, [order?.omsData?.shipments, order?.shipments])
 
     const handleCancel = async (orderArg, reason) => {
+        setCancelError(null)
         setCancelSubmitting(true)
         try {
             const token = await getTokenWhenReady()
@@ -194,9 +201,13 @@ const GuestOrderLookupOrder = () => {
                 setCancelModalOpen(false)
                 setCancelSuccess(true)
                 refetch()
+            } else {
+                const data = await res.json().catch(() => ({}))
+                setCancelModalOpen(false)
+                setCancelError(data.errorKind ?? 'transient')
             }
         } catch {
-            // Error handled by modal
+            setCancelError('transient')
         } finally {
             setCancelSubmitting(false)
         }
@@ -218,7 +229,11 @@ const GuestOrderLookupOrder = () => {
                 setReturnSuccess(true)
                 refetch()
             } else {
-                setReturnError({kind: data.errorKind ?? 'transient'})
+                const kind = data.errorKind ?? 'transient'
+                setReturnError({kind})
+                if (kind === 'unknownItems' || kind === 'quantityExceeded') {
+                    refetch()
+                }
             }
         } catch {
             setReturnError({kind: 'transient'})
@@ -283,6 +298,12 @@ const GuestOrderLookupOrder = () => {
     if (isError && error?.status === 404) {
         history.replace(`/order-lookup?order=${encodeURIComponent(orderNo)}&expired=1`)
         return null
+    }
+
+    // ─── Auth redirect (401/403 = cookie missing/expired) ─────────────────────
+
+    if (isError && (error?.status === 401 || error?.status === 403)) {
+        return <Redirect to={`/order-lookup?order=${encodeURIComponent(orderNo)}&expired=1`} />
     }
 
     // ─── Generic fetch error ───────────────────────────────────────────────────
@@ -464,6 +485,35 @@ const GuestOrderLookupOrder = () => {
                                 id="guestOrderLookup.order.cancel.success"
                                 defaultMessage="Your order has been cancelled."
                             />
+                        </Text>
+                    </Box>
+                )}
+                {cancelError && (
+                    <Box
+                        p={4}
+                        border="1px solid"
+                        borderColor="red.300"
+                        borderRadius="base"
+                        bg="red.50"
+                        role="alert"
+                    >
+                        <Text fontWeight="semibold" fontSize="sm" color="red.700">
+                            {cancelError === 'not_cancellable' ? (
+                                <FormattedMessage
+                                    id="guestOrderLookup.order.cancel.error.notCancellable"
+                                    defaultMessage="This order can no longer be cancelled."
+                                />
+                            ) : cancelError === 'not_found' ? (
+                                <FormattedMessage
+                                    id="guestOrderLookup.order.cancel.error.notFound"
+                                    defaultMessage="Order not found."
+                                />
+                            ) : (
+                                <FormattedMessage
+                                    id="guestOrderLookup.order.cancel.error.generic"
+                                    defaultMessage="We couldn't cancel your order. Please try again."
+                                />
+                            )}
                         </Text>
                     </Box>
                 )}

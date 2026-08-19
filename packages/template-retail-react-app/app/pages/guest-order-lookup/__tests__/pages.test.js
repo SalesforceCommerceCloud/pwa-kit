@@ -615,6 +615,36 @@ describe('GuestOrderLookupOrder', () => {
         expect(screen.getByTestId('request-page')).toBeInTheDocument()
     })
 
+    test('redirects to /order-lookup?expired=1 on 401 error (missing session cookie)', () => {
+        const authError = new Error('not-verified')
+        authError.status = 401
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({
+                data: undefined,
+                isLoading: false,
+                isError: true,
+                error: authError
+            })
+        )
+        renderOrderPage()
+        expect(screen.getByTestId('request-page')).toBeInTheDocument()
+    })
+
+    test('redirects to /order-lookup?expired=1 on 403 error (session cookie present but order mismatch)', () => {
+        const authError = new Error('not-verified')
+        authError.status = 403
+        useQuery.mockReturnValue(
+            defaultUseQueryMock({
+                data: undefined,
+                isLoading: false,
+                isError: true,
+                error: authError
+            })
+        )
+        renderOrderPage()
+        expect(screen.getByTestId('request-page')).toBeInTheDocument()
+    })
+
     // ── S13: 5xx error state with retry button ─────────────────────────────────
     test('S13: shows error message and retry button when 5xx fetch fails', () => {
         const serverError = new Error('Service error')
@@ -1092,6 +1122,91 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
         await waitFor(() => {
             expect(screen.getByRole('button', {name: /confirm cancellation/i})).toBeInTheDocument()
         })
+    })
+
+    test('cancel API error: shows page-level error banner with role=alert', async () => {
+        const user = userEvent.setup()
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockOmsMeta)
+                })
+            }
+            if (url === '/api/order-lookup/cancel') {
+                return Promise.resolve({
+                    ok: false,
+                    status: 409,
+                    json: () => Promise.resolve({errorKind: 'not_cancellable'})
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /cancel order/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /cancel order/i}))
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /confirm cancellation/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /confirm cancellation/i}))
+        await waitFor(() => {
+            expect(screen.getByRole('alert')).toBeInTheDocument()
+        })
+        expect(screen.getByText(/can no longer be cancelled/i)).toBeInTheDocument()
+        expect(screen.queryByText(/your order has been cancelled/i)).not.toBeInTheDocument()
+    })
+
+    test('return error unknownItems triggers order refetch', async () => {
+        const user = userEvent.setup()
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () =>
+                        Promise.resolve({
+                            ...mockOmsMeta,
+                            returnReasonCodes: [{reason: 'DEFECT', default: true}]
+                        })
+                })
+            }
+            if (url === '/api/order-lookup/return') {
+                return Promise.resolve({
+                    ok: false,
+                    status: 400,
+                    json: () => Promise.resolve({errorKind: 'unknownItems'})
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /return items/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /return items/i}))
+        await waitFor(() => {
+            expect(screen.getByTestId('return-items-modal-cancel')).toBeInTheDocument()
+        })
+        const itemRow = screen.getByTestId('return-items-modal-item-row')
+        const checkbox = within(itemRow).getByRole('checkbox')
+        await user.click(checkbox)
+        const reviewBtn = screen.getByTestId('return-items-modal-review')
+        await user.click(reviewBtn)
+        await waitFor(() => {
+            expect(screen.getByTestId('return-items-modal-submit')).toBeInTheDocument()
+        })
+        await user.click(screen.getByTestId('return-items-modal-submit'))
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/order-lookup/return',
+                expect.objectContaining({method: 'POST'})
+            )
+        })
+        // Order should be refetched after unknownItems error
+        expect(mockRefetch).toHaveBeenCalled()
     })
 
     test('OMS meta fetch failure on page load: buttons stay hidden (graceful degradation)', async () => {

@@ -975,8 +975,8 @@ const {handler} = runtime.createHandler(options, (app) => {
             const cancelReasonCodes = meta.cancelReasonCodes ?? []
             const returnReasonCodes = meta.returnReasonCodes ?? []
             return res.json({
-                // OmsMetaData has no omsActive field; derive from cancelReasonCodes presence
-                omsActive: cancelReasonCodes.length > 0,
+                // OmsMetaData has no omsActive field; derive from either operation being available
+                omsActive: cancelReasonCodes.length > 0 || returnReasonCodes.length > 0,
                 cancelReasonCodes,
                 returnReasonCodes
             })
