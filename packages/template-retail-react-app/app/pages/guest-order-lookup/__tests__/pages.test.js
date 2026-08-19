@@ -1209,6 +1209,105 @@ describe('GuestOrderLookupOrder — cancel/return UI', () => {
         expect(mockRefetch).toHaveBeenCalled()
     })
 
+    test('return error quantityExceeded triggers order refetch', async () => {
+        const user = userEvent.setup()
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () =>
+                        Promise.resolve({
+                            ...mockOmsMeta,
+                            returnReasonCodes: [{reason: 'DEFECT', default: true}]
+                        })
+                })
+            }
+            if (url === '/api/order-lookup/return') {
+                return Promise.resolve({
+                    ok: false,
+                    status: 400,
+                    json: () => Promise.resolve({errorKind: 'quantityExceeded'})
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /return items/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /return items/i}))
+        await waitFor(() => {
+            expect(screen.getByTestId('return-items-modal-cancel')).toBeInTheDocument()
+        })
+        const itemRow = screen.getByTestId('return-items-modal-item-row')
+        const checkbox = within(itemRow).getByRole('checkbox')
+        await user.click(checkbox)
+        const reviewBtn = screen.getByTestId('return-items-modal-review')
+        await user.click(reviewBtn)
+        await waitFor(() => {
+            expect(screen.getByTestId('return-items-modal-submit')).toBeInTheDocument()
+        })
+        await user.click(screen.getByTestId('return-items-modal-submit'))
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/order-lookup/return',
+                expect.objectContaining({method: 'POST'})
+            )
+        })
+        expect(mockRefetch).toHaveBeenCalled()
+    })
+
+    test('return error transient does NOT trigger order refetch', async () => {
+        const user = userEvent.setup()
+        mockRefetch.mockClear()
+        useQuery.mockReturnValue(defaultUseQueryMock({data: mockOrderWithOmsData}))
+        global.fetch = jest.fn().mockImplementation((url) => {
+            if (url === '/api/order-lookup/oms-meta') {
+                return Promise.resolve({
+                    ok: true,
+                    json: () =>
+                        Promise.resolve({
+                            ...mockOmsMeta,
+                            returnReasonCodes: [{reason: 'DEFECT', default: true}]
+                        })
+                })
+            }
+            if (url === '/api/order-lookup/return') {
+                return Promise.resolve({
+                    ok: false,
+                    status: 500,
+                    json: () => Promise.resolve({errorKind: 'transient'})
+                })
+            }
+            return Promise.resolve({ok: true, json: () => Promise.resolve({})})
+        })
+        renderOrderPage()
+        await waitFor(() => {
+            expect(screen.getByRole('button', {name: /return items/i})).toBeInTheDocument()
+        })
+        await user.click(screen.getByRole('button', {name: /return items/i}))
+        await waitFor(() => {
+            expect(screen.getByTestId('return-items-modal-cancel')).toBeInTheDocument()
+        })
+        const itemRow = screen.getByTestId('return-items-modal-item-row')
+        const checkbox = within(itemRow).getByRole('checkbox')
+        await user.click(checkbox)
+        const reviewBtn = screen.getByTestId('return-items-modal-review')
+        await user.click(reviewBtn)
+        await waitFor(() => {
+            expect(screen.getByTestId('return-items-modal-submit')).toBeInTheDocument()
+        })
+        await user.click(screen.getByTestId('return-items-modal-submit'))
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/order-lookup/return',
+                expect.objectContaining({method: 'POST'})
+            )
+        })
+        expect(mockRefetch).not.toHaveBeenCalled()
+    })
+
     test('OMS meta fetch failure on page load: buttons stay hidden (graceful degradation)', async () => {
         // Simulate /api/order-lookup/oms-meta returning a non-ok response.
         // order.jsx silently swallows this and keeps omsActive: false,

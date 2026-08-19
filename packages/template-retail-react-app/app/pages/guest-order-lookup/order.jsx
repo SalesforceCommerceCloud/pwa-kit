@@ -24,7 +24,7 @@ import {
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCustomerType, useAccessToken} from '@salesforce/commerce-sdk-react'
-import {Redirect, useHistory, useParams, Link as RouterLink} from 'react-router-dom'
+import {Redirect, useParams, Link as RouterLink} from 'react-router-dom'
 import {ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import OrderProducts, {
@@ -71,7 +71,6 @@ const GuestOrderLookupOrder = () => {
     const {formatMessage, formatDate} = useIntl()
     const breadcrumbStyles = useStyleConfig('Breadcrumb')
     const {isRegistered} = useCustomerType()
-    const history = useHistory()
     const {orderNo} = useParams()
     const {getTokenWhenReady} = useAccessToken()
 
@@ -223,7 +222,7 @@ const GuestOrderLookupOrder = () => {
                 headers: {'Content-Type': 'application/json', Authorization: `Bearer ${token}`},
                 body: JSON.stringify({orderNo: order.orderNo, productItems})
             })
-            const data = await res.json()
+            const data = await res.json().catch(() => ({}))
             if (res.ok) {
                 setReturnModalOpen(false)
                 setReturnSuccess(true)
@@ -293,16 +292,9 @@ const GuestOrderLookupOrder = () => {
         )
     }
 
-    // ─── Session expired (404) ─────────────────────────────────────────────────
+    // ─── Session expired (404 / 401 / 403) ────────────────────────────────────
 
-    if (isError && error?.status === 404) {
-        history.replace(`/order-lookup?order=${encodeURIComponent(orderNo)}&expired=1`)
-        return null
-    }
-
-    // ─── Auth redirect (401/403 = cookie missing/expired) ─────────────────────
-
-    if (isError && (error?.status === 401 || error?.status === 403)) {
+    if (isError && (error?.status === 404 || error?.status === 401 || error?.status === 403)) {
         return <Redirect to={`/order-lookup?order=${encodeURIComponent(orderNo)}&expired=1`} />
     }
 
