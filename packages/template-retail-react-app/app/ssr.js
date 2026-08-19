@@ -46,7 +46,9 @@ function getSiteIdFromRequest(req) {
 // go via /mobify/proxy/api (same path the client SDK uses).
 function makeShopperOrders(apiParams, authorization) {
     const {clientId, organizationId, shortCode, siteId} = apiParams
-    const proxy = `${getAppOrigin()}${getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
+    const proxy = `${getAppOrigin()}${
+        getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'
+    }`
     return new ShopperOrders({
         parameters: {clientId, organizationId, shortCode, siteId},
         headers: {authorization},
@@ -815,8 +817,10 @@ const {handler} = runtime.createHandler(options, (app) => {
             // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
             if (!order?.orderNo) {
                 const title = order?.title || ''
-                const fakeStatus = /unauthorized/i.test(title) ? 401
-                    : /not.found/i.test(title) ? 404
+                const fakeStatus = /unauthorized/i.test(title)
+                    ? 401
+                    : /not.found/i.test(title)
+                    ? 404
                     : 500
                 const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
                 proxyErr.response = {status: fakeStatus}
@@ -898,8 +902,10 @@ const {handler} = runtime.createHandler(options, (app) => {
             // 5.5.0 resolves instead of throwing on SCAPI error responses — detect by shape
             if (!order?.orderNo) {
                 const title = order?.title || ''
-                const fakeStatus = /unauthorized/i.test(title) ? 401
-                    : /not.found/i.test(title) ? 404
+                const fakeStatus = /unauthorized/i.test(title)
+                    ? 401
+                    : /not.found/i.test(title)
+                    ? 404
                     : 500
                 const proxyErr = new Error(order?.detail || 'Unexpected SCAPI response')
                 proxyErr.response = {status: fakeStatus}

@@ -565,9 +565,7 @@ describe('GuestOrderLookupOrder', () => {
     })
 
     test('shows skeleton while loading', () => {
-        useQuery.mockReturnValue(
-            defaultUseQueryMock({data: undefined, isLoading: true})
-        )
+        useQuery.mockReturnValue(defaultUseQueryMock({data: undefined, isLoading: true}))
         const {container} = renderOrderPage()
         // Skeleton renders via aria roles; check loading state indirectly via absence of content
         expect(screen.queryByText('Order Details')).not.toBeInTheDocument()
@@ -670,7 +668,6 @@ describe('GuestOrderLookupOrder', () => {
             expect(mockRefetch).toHaveBeenCalled()
         })
     })
-
 })
 
 // ─── GuestOrderLookupOrder — cancel/return UI ─────────────────────────────────

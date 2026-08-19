@@ -20,13 +20,12 @@
 // it when ssr.js calls runtime.createHandler(options, appFn) at module-load time.
 // Using global ensures the reference is stable across the jest.mock hoisting boundary.
 jest.mock('@salesforce/pwa-kit-runtime/ssr/server/express', () => {
-    // eslint-disable-next-line no-undef
     global._routeHandlers = {}
     return {
         getRuntime: jest.fn(() => ({
             createHandler: jest.fn((opts, cb) => {
                 // Build a minimal fake express app that captures route handlers
-                // eslint-disable-next-line no-undef
+
                 const captured = global._routeHandlers
                 const fakeApp = {
                     use: jest.fn(),
@@ -178,7 +177,9 @@ const SLAS_TOKEN = 'test-slas-token'
  * orderMap e.g. { ORD123: { email: 'a@b.com', verifiedCode: 'code' } }
  */
 function makeCookieHeader(orderMap) {
-    return `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(orderMap))}; ${SLAS_COOKIE_NAME}=${encodeURIComponent(SLAS_TOKEN)}`
+    return `${COOKIE_NAME}=${encodeURIComponent(
+        JSON.stringify(orderMap)
+    )}; ${SLAS_COOKIE_NAME}=${encodeURIComponent(SLAS_TOKEN)}`
 }
 
 function makeMockReq(overrides = {}) {
@@ -1094,7 +1095,9 @@ describe('GET /api/order-lookup/oms-meta — real handler', () => {
 
     test('401: no SLAS cookie', async () => {
         // Only the GOA cookie is present — no cc-at_ token, so authorization fails
-        const goaCookieOnly = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify({ORD123: {email: 'a@b.com', verifiedCode: 'code'}}))}`
+        const goaCookieOnly = `${COOKIE_NAME}=${encodeURIComponent(
+            JSON.stringify({ORD123: {email: 'a@b.com', verifiedCode: 'code'}})
+        )}`
         const req = makeMockReq({
             headers: {
                 cookie: goaCookieOnly
@@ -1278,7 +1281,9 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
 
     test('401: no SLAS cookie', async () => {
         // No cc-at_ token — auth fails before reaching the order session check
-        const goaCookieOnly = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify({[VALID_ORDER_NO]: {email: 'a@b.com', verifiedCode: 'code'}}))}`
+        const goaCookieOnly = `${COOKIE_NAME}=${encodeURIComponent(
+            JSON.stringify({[VALID_ORDER_NO]: {email: 'a@b.com', verifiedCode: 'code'}})
+        )}`
         const req = makeMockReq({
             headers: {cookie: goaCookieOnly},
             body: {orderNo: VALID_ORDER_NO}
@@ -1500,7 +1505,9 @@ describe('POST /api/order-lookup/return — real handler', () => {
 
     test('401: no SLAS cookie', async () => {
         // Only the GOA cookie present — no cc-at_ token, so authorization fails
-        const goaCookieOnly = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify({[VALID_ORDER_NO]: {email: 'a@b.com', verifiedCode: 'code'}}))}`
+        const goaCookieOnly = `${COOKIE_NAME}=${encodeURIComponent(
+            JSON.stringify({[VALID_ORDER_NO]: {email: 'a@b.com', verifiedCode: 'code'}})
+        )}`
         const req = makeMockReq({
             headers: {cookie: goaCookieOnly},
             body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
