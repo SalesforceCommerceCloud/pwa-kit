@@ -548,96 +548,100 @@ test.describe('Guest Order Access — flag-off invisibility (feature-off)', () =
 // snapshot suite can be added once the feature ships to a stable environment.
 // ---------------------------------------------------------------------------
 
-test.describe.skip(!FEATURE_ON, 'Guest Order Access — a11y (zero critical violations, feature-on)', () => {
-    test.beforeEach(async ({page}) => {
-        await mockSlasToken(page)
-    })
+test.describe.skip(
+    !FEATURE_ON,
+    'Guest Order Access — a11y (zero critical violations, feature-on)',
+    () => {
+        test.beforeEach(async ({page}) => {
+            await mockSlasToken(page)
+        })
 
-    test('Step 1 (request) has zero critical axe violations', async ({page}) => {
-        await mockRequestCode(page)
+        test('Step 1 (request) has zero critical axe violations', async ({page}) => {
+            await mockRequestCode(page)
 
-        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
-        await answerConsentTrackingForm(page)
-        await expect(page.getByRole('heading', {name: /look up your order/i})).toBeVisible()
+            await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
+            await answerConsentTrackingForm(page)
+            await expect(page.getByRole('heading', {name: /look up your order/i})).toBeVisible()
 
-        const results = await new AxeBuilder({page})
-            .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
-            .analyze()
+            const results = await new AxeBuilder({page})
+                .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+                .analyze()
 
-        const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
-        expect(
-            criticalViolations,
-            `Critical a11y violations on Step 1: ${JSON.stringify(
-                criticalViolations.map((v) => v.id)
-            )}`
-        ).toHaveLength(0)
-    })
+            const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
+            expect(
+                criticalViolations,
+                `Critical a11y violations on Step 1: ${JSON.stringify(
+                    criticalViolations.map((v) => v.id)
+                )}`
+            ).toHaveLength(0)
+        })
 
-    test('Step 2 (verify) has zero critical axe violations', async ({page}) => {
-        await mockRequestCode(page)
+        test('Step 2 (verify) has zero critical axe violations', async ({page}) => {
+            await mockRequestCode(page)
 
-        // Navigate through Step 1 to reach Step 2 with router state
-        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
-        await answerConsentTrackingForm(page)
+            // Navigate through Step 1 to reach Step 2 with router state
+            await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
+            await answerConsentTrackingForm(page)
 
-        await page.getByLabel(/order number/i).fill('ORD-001234')
-        await page.getByLabel(/email address/i).fill('shopper@example.com')
+            await page.getByLabel(/order number/i).fill('ORD-001234')
+            await page.getByLabel(/email address/i).fill('shopper@example.com')
 
-        await Promise.all([
-            page.waitForURL('**/order-lookup/verify/**'),
-            page.getByRole('button', {name: /find my order/i}).click()
-        ])
+            await Promise.all([
+                page.waitForURL('**/order-lookup/verify/**'),
+                page.getByRole('button', {name: /find my order/i}).click()
+            ])
 
-        await expect(page.getByRole('heading', {name: /verify your email/i})).toBeVisible()
+            await expect(page.getByRole('heading', {name: /verify your email/i})).toBeVisible()
 
-        const results = await new AxeBuilder({page})
-            .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
-            .analyze()
+            const results = await new AxeBuilder({page})
+                .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+                .analyze()
 
-        const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
-        expect(
-            criticalViolations,
-            `Critical a11y violations on Step 2: ${JSON.stringify(
-                criticalViolations.map((v) => v.id)
-            )}`
-        ).toHaveLength(0)
-    })
+            const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
+            expect(
+                criticalViolations,
+                `Critical a11y violations on Step 2: ${JSON.stringify(
+                    criticalViolations.map((v) => v.id)
+                )}`
+            ).toHaveLength(0)
+        })
 
-    test('Step 3 (order) has zero critical axe violations', async ({page}) => {
-        await mockRequestCode(page)
-        await mockVerifyEndpoint(page, {status: 200})
-        await mockOrderEndpoint(page)
+        test('Step 3 (order) has zero critical axe violations', async ({page}) => {
+            await mockRequestCode(page)
+            await mockVerifyEndpoint(page, {status: 200})
+            await mockOrderEndpoint(page)
 
-        await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
-        await answerConsentTrackingForm(page)
+            await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
+            await answerConsentTrackingForm(page)
 
-        await page.getByLabel(/order number/i).fill('ORD-001234')
-        await page.getByLabel(/email address/i).fill('shopper@example.com')
+            await page.getByLabel(/order number/i).fill('ORD-001234')
+            await page.getByLabel(/email address/i).fill('shopper@example.com')
 
-        await Promise.all([
-            page.waitForURL('**/order-lookup/verify/**'),
-            page.getByRole('button', {name: /find my order/i}).click()
-        ])
+            await Promise.all([
+                page.waitForURL('**/order-lookup/verify/**'),
+                page.getByRole('button', {name: /find my order/i}).click()
+            ])
 
-        await fillOtpCode(page, '123456')
+            await fillOtpCode(page, '123456')
 
-        await Promise.all([
-            page.waitForURL('**/order-lookup/order/**'),
-            page.getByRole('button', {name: /verify code/i}).click()
-        ])
+            await Promise.all([
+                page.waitForURL('**/order-lookup/order/**'),
+                page.getByRole('button', {name: /verify code/i}).click()
+            ])
 
-        await expect(page.getByRole('heading', {name: /order details/i})).toBeVisible()
+            await expect(page.getByRole('heading', {name: /order details/i})).toBeVisible()
 
-        const results = await new AxeBuilder({page})
-            .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
-            .analyze()
+            const results = await new AxeBuilder({page})
+                .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+                .analyze()
 
-        const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
-        expect(
-            criticalViolations,
-            `Critical a11y violations on Step 3: ${JSON.stringify(
-                criticalViolations.map((v) => v.id)
-            )}`
-        ).toHaveLength(0)
-    })
-})
+            const criticalViolations = results.violations.filter((v) => v.impact === 'critical')
+            expect(
+                criticalViolations,
+                `Critical a11y violations on Step 3: ${JSON.stringify(
+                    criticalViolations.map((v) => v.id)
+                )}`
+            ).toHaveLength(0)
+        })
+    }
+)
