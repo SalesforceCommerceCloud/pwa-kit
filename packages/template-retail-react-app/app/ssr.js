@@ -52,7 +52,8 @@ function makeShopperOrders(apiParams, authorization) {
     return new ShopperOrders({
         parameters: {clientId, organizationId, shortCode, siteId},
         headers: {authorization},
-        proxy
+        proxy,
+        throwOnBadResponse: true
     })
 }
 
