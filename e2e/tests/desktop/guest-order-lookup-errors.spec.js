@@ -90,7 +90,8 @@ const navigateToStep2 = async (page, {orderNo = 'ORD-001234', email = 'test@exam
 // Error path tests
 // ---------------------------------------------------------------------------
 
-test.describe.skip(!FEATURE_ON, 'Guest Order Access — error paths (feature-on)', () => {
+test.describe('Guest Order Access — error paths (feature-on)', () => {
+    test.skip(!FEATURE_ON, 'Requires GUEST_ORDER_LOOKUP_E2E_BASE_URL to be set')
     test.beforeEach(async ({page}) => {
         await mockSlasToken(page)
         await mockRequestCode(page)
@@ -221,7 +222,8 @@ test.describe.skip(!FEATURE_ON, 'Guest Order Access — error paths (feature-on)
 // dedicated S19 error-path file; the checks complement each other.)
 // ---------------------------------------------------------------------------
 
-test.describe.skip(!FEATURE_ON, 'Guest Order Access — a11y critical violations check (S19)', () => {
+test.describe('Guest Order Access — a11y critical violations check (S19)', () => {
+    test.skip(!FEATURE_ON, 'Requires GUEST_ORDER_LOOKUP_E2E_BASE_URL to be set')
     test.beforeEach(async ({page}) => {
         await mockSlasToken(page)
         await mockRequestCode(page)
