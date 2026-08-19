@@ -8,7 +8,7 @@
 // You can also provide alias for your locale. They will be used in place of your locale id when generating paths across the app
 module.exports = [
     {
-        id: 'RefArch',
+        id: 'PWA',
         l10n: {
             supportedCurrencies: ['USD'],
             defaultCurrency: 'USD',

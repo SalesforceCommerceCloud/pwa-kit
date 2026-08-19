@@ -5483,70 +5483,6 @@
       "value": "]"
     }
   ],
-  "home.description.features": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ǿŭŭŧ-ǿǿƒ-ŧħḗḗ-ƀǿǿẋ ƒḗḗȧȧŧŭŭřḗḗş şǿǿ ŧħȧȧŧ ẏǿǿŭŭ ƒǿǿƈŭŭş ǿǿƞŀẏ ǿǿƞ ȧȧḓḓīƞɠ ḗḗƞħȧȧƞƈḗḗḿḗḗƞŧş."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "home.description.here_to_help": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƈǿǿƞŧȧȧƈŧ ǿǿŭŭř şŭŭƥƥǿǿřŧ şŧȧȧƒƒ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "home.description.here_to_help_line_2": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŧħḗḗẏ ẇīŀŀ ɠḗḗŧ ẏǿǿŭŭ ŧǿǿ ŧħḗḗ řīɠħŧ ƥŀȧȧƈḗḗ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "home.description.shop_products": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŧħīş şḗḗƈŧīǿǿƞ ƈǿǿƞŧȧȧīƞş ƈǿǿƞŧḗḗƞŧ ƒřǿǿḿ ŧħḗḗ ƈȧȧŧȧȧŀǿǿɠ. "
-    },
-    {
-      "type": 1,
-      "value": "docLink"
-    },
-    {
-      "type": 0,
-      "value": " ǿǿƞ ħǿǿẇ ŧǿǿ řḗḗƥŀȧȧƈḗḗ īŧ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "home.features.description.cart_checkout": [
     {
       "type": 0,
@@ -5715,48 +5651,6 @@
       "value": "]"
     }
   ],
-  "home.heading.features": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƒḗḗȧȧŧŭŭřḗḗş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "home.heading.here_to_help": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ẇḗḗ'řḗḗ ħḗḗřḗḗ ŧǿǿ ħḗḗŀƥ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "home.heading.shop_products": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Şħǿǿƥ Ƥřǿǿḓŭŭƈŧş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "home.hero_features.link.design_kit": [
     {
       "type": 0,
@@ -5799,48 +5693,6 @@
       "value": "]"
     }
   ],
-  "home.link.contact_us": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƈǿǿƞŧȧȧƈŧ Ŭş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "home.link.get_started": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ɠḗḗŧ şŧȧȧřŧḗḗḓ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "home.link.read_docs": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Řḗḗȧȧḓ ḓǿǿƈş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "home.title.home": [
     {
       "type": 0,
@@ -5849,20 +5701,6 @@
     {
       "type": 0,
       "value": "Ħǿǿḿḗḗ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "home.title.react_starter_store": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŧħḗḗ Řḗḗȧȧƈŧ ƤẆȦ Şŧȧȧřŧḗḗř Şŧǿǿřḗḗ ƒǿǿř Řḗḗŧȧȧīŀ"
     },
     {
       "type": 0,
