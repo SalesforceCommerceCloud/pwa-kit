@@ -76,12 +76,13 @@ jest.mock('jose', () => ({
     decodeJwt: jest.fn()
 }))
 
-// Mock the token bridge
-jest.mock(
-    '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge.js',
-    () => ({registerTokenBridgeRoute: jest.fn()}),
-    {virtual: true}
-)
+// Mock the token bridge and auth-link proxy (both imported by ssr.js at module scope)
+jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/token-bridge.js', () => ({
+    registerTokenBridgeRoute: jest.fn()
+}))
+jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/auth-link-proxy.js', () => ({
+    registerAuthLinkRoute: jest.fn()
+}))
 
 // ─── ShopperOrders mock ───────────────────────────────────────────────────────
 // Must include all methods called by ssr.js endpoints under test.
@@ -94,13 +95,9 @@ const mockShopperOrdersInstance = {
     returnOmsOrder: jest.fn()
 }
 
-jest.mock(
-    'commerce-sdk-isomorphic',
-    () => ({
-        ShopperOrders: jest.fn().mockImplementation(() => mockShopperOrdersInstance)
-    }),
-    {virtual: true}
-)
+jest.mock('commerce-sdk-isomorphic', () => ({
+    ShopperOrders: jest.fn().mockImplementation(() => mockShopperOrdersInstance)
+}))
 
 // ─── Config state ─────────────────────────────────────────────────────────────
 // Use a module-level state object; the factory captures the reference, not the value.

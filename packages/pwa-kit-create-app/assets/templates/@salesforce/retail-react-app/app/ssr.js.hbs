@@ -676,7 +676,10 @@ const {handler} = runtime.createHandler(options, (app) => {
     registerTokenBridgeRoute(app)
     registerAuthLinkRoute(app)
 
-    const cookieSecureFlag = options.localAllowCookies ? '' : ' Secure;'
+    // Always require Secure on the cc-goa_* cookie regardless of cookie-forwarding config.
+    // For local dev, set localAllowCookies: true AND use HTTPS (pwa-kit-dev --https) so
+    // the browser accepts the Secure cookie; plain-HTTP local runs cannot complete the flow.
+    const cookieSecureFlag = ' Secure;'
 
     // Defense-in-depth throttle on /api/order-lookup/* endpoints
     app.use(createVerifyThrottle())

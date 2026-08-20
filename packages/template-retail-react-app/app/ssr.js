@@ -213,7 +213,7 @@ const options = {
     // HYBRID PROXY REQUIREMENT:
     // - Hybrid Proxy requires this to be 'true' for SFCC session management to work properly
     // - Only enable Hybrid Proxy in development environments, never in production
-    localAllowCookies: true,
+    localAllowCookies: false,
 
     // Hybrid Proxy configuration for local development and MRT to ODS connection testing.
     //
@@ -547,7 +547,10 @@ export function handleCallback(req, res, next) {
     res.send()
 }
 
-const cookieSecureFlag = options.localAllowCookies ? '' : ' Secure;'
+// Always require Secure on the cc-goa_* cookie regardless of cookie-forwarding config.
+// For local dev, set localAllowCookies: true AND use HTTPS (pwa-kit-dev --https) so
+// the browser accepts the Secure cookie; plain-HTTP local runs cannot complete the flow.
+const cookieSecureFlag = ' Secure;'
 
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
