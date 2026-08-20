@@ -121,23 +121,20 @@ describe('auth-link-client', () => {
         [{auth_link_key: 123}],
         [{}],
         [null]
-    ])(
-        'rejects a successful response without a valid auth link key',
-        async (body) => {
-            mockFetch.mockResolvedValue({
-                ok: true,
-                status: 200,
-                json: async () => body
-            })
+    ])('rejects a successful response without a valid auth link key', async (body) => {
+        mockFetch.mockResolvedValue({
+            ok: true,
+            status: 200,
+            json: async () => body
+        })
 
-            await expect(
-                callAuthLink({
-                    commerceClientJWT: COMMERCE_CLIENT_JWT,
-                    scrt2Url: TRUSTED_SCRT2_ORIGIN
-                })
-            ).rejects.toThrow('INVALID_AUTH_LINK_RESPONSE')
-        }
-    )
+        await expect(
+            callAuthLink({
+                commerceClientJWT: COMMERCE_CLIENT_JWT,
+                scrt2Url: TRUSTED_SCRT2_ORIGIN
+            })
+        ).rejects.toThrow('INVALID_AUTH_LINK_RESPONSE')
+    })
 
     it('reports an HTTP failure without exposing the SCRT response body', async () => {
         mockFetch.mockResolvedValue({
