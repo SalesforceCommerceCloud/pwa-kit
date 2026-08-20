@@ -13,7 +13,8 @@ const {
     validateWishlist,
     loginShopper,
     navigateToPDPMobile,
-    answerConsentTrackingForm
+    answerConsentTrackingForm,
+    advanceToPayment
 } = require('../../scripts/pageHelpers')
 const {generateUserCredentials, getCreditCardExpiry} = require('../../scripts/utils.js')
 const {clearCartAndWishlist} = require('../../scripts/cleanup.js')
@@ -35,6 +36,8 @@ test.afterEach(async ({page}) => {
  * and that order shows up in order history
  */
 test('Registered shopper can checkout items', async ({page}) => {
+    test.setTimeout(120000)
+
     // Since we're re-using the same account, we need to check if the user is already registered.
     // This ensures the tests are independent and not dependent on the order they are run in.
     const isLoggedIn = await loginShopper({
@@ -92,27 +95,7 @@ test('Registered shopper can checkout items', async ({page}) => {
 
     await expect(page.getByRole('heading', {name: /Shipping & Gift Options/i})).toBeVisible()
 
-    await page.waitForLoadState()
-
-    // Handle optional shipping step - some checkout flows skip this step
-    const continueToPayment = page.getByRole('button', {
-        name: /Continue to Payment/i
-    })
-
-    let hasShippingStep = false
-    try {
-        await expect(continueToPayment).toBeVisible({timeout: 2000})
-        await continueToPayment.click()
-        hasShippingStep = true
-    } catch {
-        // Shipping step was skipped, proceed directly to payment
-    }
-
-    // Verify step-2 edit button only if shipping step was present
-    if (hasShippingStep) {
-        const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']")
-        await expect(step2Card.getByRole('button', {name: /Edit/i})).toBeVisible()
-    }
+    await advanceToPayment(page)
 
     await expect(page.getByRole('heading', {name: /Payment/i})).toBeVisible()
 

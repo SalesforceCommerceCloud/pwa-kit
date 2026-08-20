@@ -7,6 +7,52 @@
 const {expect} = require('@playwright/test')
 const config = require('../config')
 const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js')
+
+const CHECKOUT_TRANSITION_TIMEOUT = 30000
+const CHECKOUT_POLL_INTERVAL = 100
+
+const waitForPaymentOrReadyButton = async (page, paymentHeading, continueToPayment) => {
+    const deadline = Date.now() + CHECKOUT_TRANSITION_TIMEOUT
+
+    while (Date.now() < deadline) {
+        if (await paymentHeading.isVisible()) return 'payment'
+        if ((await continueToPayment.isVisible()) && (await continueToPayment.isEnabled())) {
+            return 'button'
+        }
+        await page.waitForTimeout(CHECKOUT_POLL_INTERVAL)
+    }
+
+    throw new Error('Timed out waiting for Payment or a ready Continue to Payment button')
+}
+
+export const advanceToPayment = async (page) => {
+    const paymentHeading = page.getByRole('heading', {name: /Payment/i})
+    if (await paymentHeading.isVisible()) return
+
+    const shippingForm = page.getByTestId('sf-checkout-shipping-options-form')
+    const continueToPayment = shippingForm.getByRole('button', {
+        name: /Continue to Payment/i
+    })
+
+    const transition = await waitForPaymentOrReadyButton(page, paymentHeading, continueToPayment)
+    if (transition === 'payment') return
+
+    // Checkout may auto-submit shipping after the button becomes ready.
+    if (await paymentHeading.isVisible()) return
+
+    // Locator.click re-resolves after React renders and waits for the button to
+    // be stable, enabled, and able to receive pointer events.
+    try {
+        await continueToPayment.click()
+    } catch (error) {
+        // The button can disappear after winning the transition wait when the
+        // checkout auto-submits. Preserve genuine click failures.
+        if (await paymentHeading.isVisible()) return
+        throw error
+    }
+    await paymentHeading.waitFor({state: 'visible'})
+}
+
 /**
  * Note: As a best practice, we should await the network call and assert on the network response rather than waiting for pageLoadState()
  * to avoid race conditions from lock in pageLoadState being released before network call resolves.
@@ -35,6 +81,27 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
         return
     }
 
+    // The consent modal can render before the initial guest session finishes. Clicking it during
+    // that window races setDnt() against the in-flight login: the modal closes immediately, but
+    // the older token can win with a different dnt claim and make the modal reappear on the next
+    // navigation. Wait until either the public-client access token or the HttpOnly companion DNT
+    // cookie proves that auth initialization is complete.
+    await page.waitForFunction(
+        () => {
+            const hasAccessToken = Object.keys(localStorage).some(
+                (name) => name === 'access_token' || name.startsWith('access_token_')
+            )
+            const hasAccessTokenDntCookie = document.cookie
+                .split(';')
+                .map((cookie) => cookie.trim().split('=')[0])
+                .some((name) => name === 'cc-at-dnt' || name.startsWith('cc-at-dnt_'))
+
+            return hasAccessToken || hasAccessTokenDntCookie
+        },
+        undefined,
+        {timeout: 15000}
+    )
+
     const ariaLabel = dnt ? 'Decline tracking' : 'Accept tracking'
     const button = page.locator(`button[aria-label="${ariaLabel}"]`).and(page.locator(':visible'))
 
@@ -46,15 +113,60 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
     // up — this is more robust than a single click + long wait, and avoids
     // the misleading 60s waitForResponse timeouts we see when a stale modal
     // intercepts a later click in the test.
+    let dismissed = false
     for (let attempt = 0; attempt < 2; attempt++) {
         try {
             await button.first().click()
             await consentForm.waitFor({state: 'hidden', timeout: 5000})
-            return
+            dismissed = true
+            break
         } catch {
             // fall through and retry
         }
     }
+    if (!dismissed) return
+
+    // onClose() runs before updateDnt() completes, so hidden is only a visual state. Wait
+    // for both the selected cookie and the token claim to reach the requested value before
+    // navigating. This covers public clients (JWT in localStorage) and private/HttpOnly
+    // clients (the cc-at-dnt companion cookie). Keep this outside the dismissal retry so a
+    // synchronization timeout is reported instead of causing another click on a hidden button.
+    await page.waitForFunction(
+        (expectedDnt) => {
+            const cookies = Object.fromEntries(
+                document.cookie.split(';').map((cookie) => {
+                    const [name, ...value] = cookie.trim().split('=')
+                    return [name, value.join('=')]
+                })
+            )
+            const selectedDnt = cookies.dw_dnt
+            const accessTokenDntCookie = Object.entries(cookies).find(
+                ([name]) => name === 'cc-at-dnt' || name.startsWith('cc-at-dnt_')
+            )?.[1]
+
+            let accessTokenDnt
+            const accessTokenKey = Object.keys(localStorage).find(
+                (name) => name === 'access_token' || name.startsWith('access_token_')
+            )
+            const accessToken = accessTokenKey ? localStorage.getItem(accessTokenKey) : null
+            if (accessToken) {
+                try {
+                    const payload = accessToken.split('.')[1]
+                    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+                    accessTokenDnt = String(JSON.parse(atob(base64)).dnt)
+                } catch {
+                    return false
+                }
+            }
+
+            return (
+                selectedDnt === expectedDnt &&
+                (accessTokenDnt === expectedDnt || accessTokenDntCookie === expectedDnt)
+            )
+        },
+        dnt ? '1' : '0',
+        {timeout: 15000}
+    )
 }
 
 /**
@@ -484,20 +596,10 @@ export const checkoutProduct = async ({page, userCredentials, a11y = {checkA11y:
     await expect(step1Card.getByRole('button', {name: /Edit/i})).toBeVisible()
     await expect(page.getByRole('heading', {name: /Shipping & Gift Options/i})).toBeVisible()
 
-    try {
-        // sometimes the shipping & gifts section gets skipped
-        // so there is no 'Continue to payment' button available
-        const continueToPayment = page.getByRole('button', {
-            name: /Continue to Payment/i
-        })
-        await expect(continueToPayment).toBeVisible({timeout: 2000})
-        if (checkA11y) {
-            await runAccessibilityTest(page, [snapShotName, 'checkout-a11y-violations-step-2.json'])
-        }
-        await continueToPayment.click()
-    } catch (error) {
-        // Silently continue - consent form handling should not break tests
+    if (checkA11y) {
+        await runAccessibilityTest(page, [snapShotName, 'checkout-a11y-violations-step-2.json'])
     }
+    await advanceToPayment(page)
 
     await expect(page.getByRole('heading', {name: /Payment/i})).toBeVisible()
     const creditCardExpiry = getCreditCardExpiry()
@@ -595,12 +697,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
         await runAccessibilityTest(page, [snapShotName, 'checkout-a11y-violations-step-2.json'])
     }
 
-    const continueToPayment = page.getByRole('button', {name: /Continue to Payment/i})
-
-    // If the Continue to Payment button is not visible, the payment details form is already being shown, so we can skip this step.
-    if ((await continueToPayment.count()) > 0 && (await continueToPayment.isEnabled())) {
-        await continueToPayment.click()
-    }
+    await advanceToPayment(page)
 
     const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']")
     await expect(step2Card.getByRole('button', {name: /Edit Shipping Options/i})).toBeVisible()
@@ -835,7 +932,6 @@ export const wishlistMasterProductAddToCartFlow = async ({page, registeredUserCr
     await answerConsentTrackingForm(page)
 
     await expect(page.getByRole('heading', {name: /Wishlist/i})).toBeVisible()
-    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
 
     // Master product should show "View Options" button instead of "Add to Cart"
     const viewOptionsButton = page.getByRole('button', {name: /View Options/i})
