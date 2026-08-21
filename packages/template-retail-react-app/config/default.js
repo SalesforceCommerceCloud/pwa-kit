@@ -97,9 +97,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '85beaadb-b42c-4bbf-a197-54f52efa8152',
-                organizationId: 'f_ecom_zysg_001',
-                shortCode: 'sandbox-001',
+                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                organizationId: 'f_ecom_zzrf_001',
+                shortCode: 'kv7kzm78',
                 siteId: 'RefArchGlobal'
             }
             // Optional: Set the domain for auth cookies to share them across subdomains.
