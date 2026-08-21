@@ -147,7 +147,7 @@ module.exports = {
             parameters: {
                 clientId: '475ad705-e2c1-4808-af78-81661f754511',
                 organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                shortCode: 'kv7kzm78',
                 siteId: 'RefArchGlobal'
             }
             // Optional: Set the domain for auth cookies to share them across subdomains.
