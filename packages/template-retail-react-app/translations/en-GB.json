@@ -930,6 +930,9 @@
   "footer.link.contact_us": {
     "defaultMessage": "Contact Us"
   },
+  "footer.link.order_lookup": {
+    "defaultMessage": "Order Lookup"
+  },
   "footer.link.order_status": {
     "defaultMessage": "Order Status"
   },
@@ -1028,6 +1031,126 @@
   },
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "View"
+  },
+  "guestOrderLookup.order.breadcrumb.home": {
+    "defaultMessage": "Home"
+  },
+  "guestOrderLookup.order.breadcrumb.orderLookup": {
+    "defaultMessage": "Order Lookup"
+  },
+  "guestOrderLookup.order.button.cancel": {
+    "defaultMessage": "Cancel Order"
+  },
+  "guestOrderLookup.order.button.retry": {
+    "defaultMessage": "Try Again"
+  },
+  "guestOrderLookup.order.button.return": {
+    "defaultMessage": "Return Items"
+  },
+  "guestOrderLookup.order.cancel.error.generic": {
+    "defaultMessage": "We couldn't cancel your order. Please try again."
+  },
+  "guestOrderLookup.order.cancel.error.notCancellable": {
+    "defaultMessage": "This order can no longer be cancelled."
+  },
+  "guestOrderLookup.order.cancel.error.notFound": {
+    "defaultMessage": "Order not found."
+  },
+  "guestOrderLookup.order.cancel.success": {
+    "defaultMessage": "Your order has been cancelled."
+  },
+  "guestOrderLookup.order.error.generic": {
+    "defaultMessage": "Something went wrong loading your order. Please try again."
+  },
+  "guestOrderLookup.order.error.tooManyRequests": {
+    "defaultMessage": "You've refreshed too many times. Please wait a moment before trying again."
+  },
+  "guestOrderLookup.order.heading": {
+    "defaultMessage": "Order Details"
+  },
+  "guestOrderLookup.order.heading.billingAddress": {
+    "defaultMessage": "Billing Address"
+  },
+  "guestOrderLookup.order.itemCount": {
+    "defaultMessage": "{count, plural, one {# item} other {# items}}"
+  },
+  "guestOrderLookup.order.orderNumber": {
+    "defaultMessage": "Order Number: {orderNo}"
+  },
+  "guestOrderLookup.order.orderedDate": {
+    "defaultMessage": "Ordered: {date}"
+  },
+  "guestOrderLookup.order.otherItems": {
+    "defaultMessage": "Other items"
+  },
+  "guestOrderLookup.order.return.success": {
+    "defaultMessage": "Your return has been submitted."
+  },
+  "guestOrderLookup.order.section.tracking": {
+    "defaultMessage": "Tracking"
+  },
+  "guestOrderLookup.order.shipment": {
+    "defaultMessage": "Shipment"
+  },
+  "guestOrderLookup.order.shipment.number": {
+    "defaultMessage": "Shipment {number}"
+  },
+  "guestOrderLookup.order.shippingAddress": {
+    "defaultMessage": "Shipping Address"
+  },
+  "guestOrderLookup.request.button.submit": {
+    "defaultMessage": "Find My Order"
+  },
+  "guestOrderLookup.request.error.emailInvalid": {
+    "defaultMessage": "Enter a valid email address"
+  },
+  "guestOrderLookup.request.error.emailRequired": {
+    "defaultMessage": "Email address is required"
+  },
+  "guestOrderLookup.request.error.orderNumberInvalid": {
+    "defaultMessage": "Enter a valid order number"
+  },
+  "guestOrderLookup.request.error.orderNumberRequired": {
+    "defaultMessage": "Order number is required"
+  },
+  "guestOrderLookup.request.heading": {
+    "defaultMessage": "Look Up Your Order"
+  },
+  "guestOrderLookup.request.label.email": {
+    "defaultMessage": "Email address"
+  },
+  "guestOrderLookup.request.label.orderNumber": {
+    "defaultMessage": "Order number"
+  },
+  "guestOrderLookup.request.sessionExpired": {
+    "defaultMessage": "Your session has expired. Please look up your order again."
+  },
+  "guestOrderLookup.request.subtext": {
+    "defaultMessage": "Enter your order details to track your order or view your receipt."
+  },
+  "guestOrderLookup.verify.button.submit": {
+    "defaultMessage": "Verify Code"
+  },
+  "guestOrderLookup.verify.error.generic": {
+    "defaultMessage": "Something went wrong. Please try again."
+  },
+  "guestOrderLookup.verify.error.invalidCode": {
+    "defaultMessage": "The code you entered is invalid or has expired. Please try again."
+  },
+  "guestOrderLookup.verify.error.tooManyAttempts": {
+    "defaultMessage": "Too many attempts. Please wait a moment and try again."
+  },
+  "guestOrderLookup.verify.heading": {
+    "defaultMessage": "Verify Your Email"
+  },
+  "guestOrderLookup.verify.label.code": {
+    "defaultMessage": "Verification code"
+  },
+  "guestOrderLookup.verify.label.digitN": {
+    "defaultMessage": "Digit {n} of {total}"
+  },
+  "guestOrderLookup.verify.subtext": {
+    "defaultMessage": "We've sent a verification code to {email}. Please enter it below."
   },
   "header.button.assistive_msg.ask_shopping_agent": {
     "defaultMessage": "Ask Shopping Agent"

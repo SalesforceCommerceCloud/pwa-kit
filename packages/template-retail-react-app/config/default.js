@@ -188,6 +188,14 @@ module.exports = {
             }
         },
         storeLocatorEnabled: true,
+        guestOrderLookup: {
+            enabled: false,
+            orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$',
+            requestCodeThrottle: {
+                windowMs: 60000,
+                max: 5
+            }
+        },
         multishipEnabled: true,
         // Salesforce Payments configuration
         // Set enabled to true to enable Salesforce Payments (requires the Salesforce Payments feature toggle to be enabled on the Commerce Cloud instance).

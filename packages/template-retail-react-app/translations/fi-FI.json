@@ -615,6 +615,9 @@
   "footer.link.site_map": {
     "defaultMessage": "Sivustokartta"
   },
+  "footer.link.find_your_order": {
+    "defaultMessage": "Find Your Order"
+  },
   "footer.link.store_locator": {
     "defaultMessage": "Myymäläpaikannin"
   },
@@ -1782,5 +1785,152 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Kirjaudu sisään jatkaaksesi!"
+  },
+  "guestOrderLookup.request.heading": {
+    "defaultMessage": "Find Your Order"
+  },
+  "guestOrderLookup.request.subtext": {
+    "defaultMessage": "Enter your order number and email address to receive a one-time access code."
+  },
+  "guestOrderLookup.request.label.orderNumber": {
+    "defaultMessage": "Order Number"
+  },
+  "guestOrderLookup.request.label.email": {
+    "defaultMessage": "Email Address"
+  },
+  "guestOrderLookup.request.error.orderNumberRequired": {
+    "defaultMessage": "Order number is required"
+  },
+  "guestOrderLookup.request.error.orderNumberInvalid": {
+    "defaultMessage": "Enter a valid order number"
+  },
+  "guestOrderLookup.request.error.emailRequired": {
+    "defaultMessage": "Email address is required"
+  },
+  "guestOrderLookup.request.error.emailInvalid": {
+    "defaultMessage": "Enter a valid email address"
+  },
+  "guestOrderLookup.request.button.submit": {
+    "defaultMessage": "Send Access Code"
+  },
+  "guestOrderLookup.verify.heading": {
+    "defaultMessage": "Enter Your Access Code"
+  },
+  "guestOrderLookup.verify.subtext": {
+    "defaultMessage": "We've sent a 6-digit code to {email}. It may take a moment to arrive."
+  },
+  "guestOrderLookup.verify.label.code": {
+    "defaultMessage": "Access Code"
+  },
+  "guestOrderLookup.verify.error.codeRequired": {
+    "defaultMessage": "Access code is required"
+  },
+  "guestOrderLookup.verify.error.codeInvalid": {
+    "defaultMessage": "Enter the 6-digit code from your email"
+  },
+  "guestOrderLookup.verify.error.invalidCode": {
+    "defaultMessage": "Code invalid or expired. Please try again or request a new code."
+  },
+  "guestOrderLookup.verify.error.tooManyAttempts": {
+    "defaultMessage": "Too many attempts. Please wait a moment and try again."
+  },
+  "guestOrderLookup.verify.error.generic": {
+    "defaultMessage": "Something went wrong. Please try again."
+  },
+  "guestOrderLookup.verify.button.submit": {
+    "defaultMessage": "Verify Code"
+  },
+  "guestOrderLookup.verify.resend.prompt": {
+    "defaultMessage": "Didn't receive a code?"
+  },
+  "guestOrderLookup.verify.resend.link": {
+    "defaultMessage": "Resend code"
+  },
+  "guestOrderLookup.verify.toast.resent": {
+    "defaultMessage": "Check your inbox — it may take a moment."
+  },
+  "guestOrderLookup.request.alert.sessionExpired": {
+    "defaultMessage": "Your session has expired. Please request a new access code."
+  },
+  "guestOrderLookup.order.heading": {
+    "defaultMessage": "Order Details"
+  },
+  "guestOrderLookup.order.orderNumber": {
+    "defaultMessage": "Order #{orderNo}"
+  },
+  "guestOrderLookup.order.placedOn": {
+    "defaultMessage": "Placed on {date}"
+  },
+  "guestOrderLookup.order.status": {
+    "defaultMessage": "Status: {status}"
+  },
+  "guestOrderLookup.order.button.refreshStatus": {
+    "defaultMessage": "Refresh Status"
+  },
+  "guestOrderLookup.order.button.refreshStatus.aria": {
+    "defaultMessage": "Refresh order status"
+  },
+  "guestOrderLookup.order.button.refreshing": {
+    "defaultMessage": "Refreshing…"
+  },
+  "guestOrderLookup.order.button.retry": {
+    "defaultMessage": "Try Again"
+  },
+  "guestOrderLookup.order.lastUpdated": {
+    "defaultMessage": "Last updated at {time}"
+  },
+  "guestOrderLookup.order.error.generic": {
+    "defaultMessage": "Something went wrong loading your order. Please try again."
+  },
+  "guestOrderLookup.order.section.items": {
+    "defaultMessage": "Items"
+  },
+  "guestOrderLookup.order.item.unnamed": {
+    "defaultMessage": "Product"
+  },
+  "guestOrderLookup.order.item.qty": {
+    "defaultMessage": "Qty: {qty}"
+  },
+  "guestOrderLookup.order.section.shipping": {
+    "defaultMessage": "Shipping"
+  },
+  "guestOrderLookup.order.shipping.status": {
+    "defaultMessage": "Shipping status: {status}"
+  },
+  "guestOrderLookup.order.shipping.postalCode": {
+    "defaultMessage": "Postal code: {postalCode}"
+  },
+  "guestOrderLookup.order.shipping.expectedDelivery": {
+    "defaultMessage": "Expected delivery: {date}"
+  },
+  "guestOrderLookup.order.shipping.tracking": {
+    "defaultMessage": "Tracking: {trackingNumber}"
+  },
+  "guestOrderLookup.order.section.totals": {
+    "defaultMessage": "Order Summary"
+  },
+  "guestOrderLookup.order.totals.subtotal": {
+    "defaultMessage": "Subtotal"
+  },
+  "guestOrderLookup.order.totals.shipping": {
+    "defaultMessage": "Shipping"
+  },
+  "guestOrderLookup.order.totals.tax": {
+    "defaultMessage": "Tax"
+  },
+  "guestOrderLookup.order.totals.total": {
+    "defaultMessage": "Total"
+  },
+  "guestOrderLookup.order.button.cancel": {
+    "defaultMessage": "Cancel Order"
+  },
+  "guestOrderLookup.order.button.return": {
+    "defaultMessage": "Return Items"
+  },
+  "guestOrderLookup.order.cancel.success": {
+    "defaultMessage": "Your order has been cancelled."
+  },
+  "guestOrderLookup.order.return.success": {
+    "defaultMessage": "Your return has been submitted."
   }
 }
