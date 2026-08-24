@@ -228,7 +228,10 @@ export const validateCommerceClientDomain = (url) => {
         return (
             hostname === 'cimulate.ai' ||
             hostname.endsWith('.cimulate.ai') ||
-            hostname.endsWith('.sfcc-store-internal.net')
+            hostname.endsWith('.sfcc-store-internal.net') ||
+            // LOCAL DEV ONLY — do not commit. Allows serving messaging.umd.js from a local build.
+            hostname === 'localhost' ||
+            hostname === '127.0.0.1'
         )
     } catch {
         return false

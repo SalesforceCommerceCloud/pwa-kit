@@ -42,7 +42,7 @@ const options = {
     mobify: config,
 
     // The port that the local dev server listens on
-    port: 3000,
+    port: 3001,
 
     // The protocol on which the development Express app listens.
     // Set DEV_SERVER_PROTOCOL to 'https' for HTTPS; defaults to 'http' when unset.
@@ -356,6 +356,11 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Set custom HTTP security headers
     app.use(
         helmet({
+            // iframe way — force X-Frame-Options to SAMEORIGIN so the smoke page
+            // can be embedded by the same-origin Cimulate widget on localhost.
+            // Some upstream middleware appears to set 'DENY' by default; this
+            // overrides it. Revert before productization.
+            frameguard: {action: 'sameorigin'},
             contentSecurityPolicy: {
                 useDefaults: true,
                 directives: {
@@ -364,6 +369,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.commercecloud.salesforce.com',
                         '*.demandware.net',
                         '*.adyen.com',
+                        '*.dis.cc.salesforce.com',
                         'pay.google.com', // Google Pay payment handler icon
                         'www.gstatic.com', // optional, if icon is on gstatic
                         // Commerce Client messaging widget images
@@ -375,6 +381,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.cimulate.ai',
                         // Commerce Client bundle served from the SFCC static CDN
                         '*.sfcc-store-internal.net',
+                        // LOCAL DEV ONLY — do not commit. Allows serving messaging.umd.js from a local build.
+                        'localhost:*',
+                        '127.0.0.1:*',
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
                         // Payment gateways
@@ -424,7 +433,12 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.paypal.com',
                         '*.adyen.com',
                         'payments.google.com',
-                        'pay.google.com'
+                        'pay.google.com',
+                        // iframe way — local dev bypass for the iframe-vs-slot spike.
+                        // Cimulate widget embeds /__sf-payments-express-agent-smoke
+                        // in an iframe on the PDP card. Revert before productization.
+                        'localhost:*',
+                        'http://localhost:*'
                     ],
                     'frame-ancestors': [
                         // Allow Page Designer to embed the storefront in an iframe

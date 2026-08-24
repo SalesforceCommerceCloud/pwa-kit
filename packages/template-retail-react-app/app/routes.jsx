@@ -51,6 +51,10 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
 const PaymentProcessing = loadable(() => import('./pages/checkout/payment-processing'), {fallback})
+const SFPaymentsExpressAgentSmoke = loadable(
+    () => import('./pages/sf-payments-express-agent-smoke'),
+    {fallback}
+)
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 export const routes = [
@@ -136,6 +140,8 @@ export default () => {
     const socialRedirectURI = loginConfig?.social?.redirectURI
     const passwordlessLoginEnabled = loginConfig?.passwordless?.enabled
     const passwordlessLoginLandingPath = loginConfig?.passwordless?.landingPath
+    const sfPaymentsExpressAgentSmokeEnabled =
+        config?.app?.sfPaymentsExpressAgentSmoke?.enabled
 
     // Add dynamic routes conditionally (only if features are enabled and paths are defined)
     const dynamicRoutes = [
@@ -155,7 +161,12 @@ export default () => {
                 path: socialRedirectURI,
                 component: SocialLoginRedirect,
                 exact: true
-            }
+            },
+        sfPaymentsExpressAgentSmokeEnabled && {
+            path: '/__sf-payments-express-agent-smoke',
+            component: SFPaymentsExpressAgentSmoke,
+            exact: true
+        }
     ].filter(Boolean)
 
     const allRoutes = configureRoutes([...routes, ...dynamicRoutes], config, {

@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/retail-react-app",
-  "version": "10.2.0-dev",
+  "version": "9.1.0-dev",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {
@@ -21,7 +21,7 @@
     "postinstall": "npm run compile-translations && npm run compile-translations:pseudo",
     "push": "npm run build && pwa-kit-dev push",
     "save-credentials": "pwa-kit-dev save-credentials",
-    "start": "set -a; [ -f .env ] && . ./.env; set +a; cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
+    "start": "cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
     "start:https": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ICU_DATA=node_modules/full-icu DEV_SERVER_PROTOCOL=https DEV_SERVER_SSL_FILE_PATH=../../localhost.pem pwa-kit-dev start",
     "start:inspect": "npm run start -- --inspect",
     "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
@@ -42,16 +42,15 @@
     "@chakra-ui/system": "^2.5.6",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
-    "@formatjs/cli": "6.9.0",
+    "@formatjs/cli": "^6.0.4",
     "@lhci/cli": "^0.11.0",
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
     "@salesforce/cc-datacloud-typescript": "1.1.2",
-    "@salesforce/commerce-sdk-react": "5.4.0-dev",
-    "@salesforce/pwa-kit-dev": "3.20.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "3.20.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.20.0-dev",
-    "@salesforce/storefront-next-runtime": "0.4.2",
+    "@salesforce/commerce-sdk-react": "5.1.0-dev",
+    "@salesforce/pwa-kit-dev": "3.17.0-dev",
+    "@salesforce/pwa-kit-react-sdk": "3.17.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.17.0-dev",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/dom": "^9.0.1",
@@ -69,7 +68,7 @@
     "framer-motion": "^10.12.9",
     "full-icu": "^1.5.0",
     "helmet": "^4.6.0",
-    "jest-fetch-mock": "^3.0.3",
+    "jest-fetch-mock": "^2.1.2",
     "jose": "^4.14.4",
     "js-cookie": "^3.0.1",
     "jsonwebtoken": "^9.0.0",
@@ -94,11 +93,6 @@
   "overrides": {
     "react-router": {
       "path-to-regexp": "^1.9.0"
-    },
-    "@salesforce/storefront-next-runtime": {
-      "react": "^18.2.0",
-      "react-dom": "^18.2.0",
-      "react-router": "^5.3.4"
     }
   },
   "engines": {
@@ -108,11 +102,11 @@
   "bundlesize": [
     {
       "path": "build/main.js",
-      "maxSize": "105 kB"
+      "maxSize": "98 kB"
     },
     {
       "path": "build/vendor.js",
-      "maxSize": "400 kB"
+      "maxSize": "370 kB"
     }
   ]
 }

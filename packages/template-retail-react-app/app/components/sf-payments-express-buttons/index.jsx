@@ -65,7 +65,10 @@ const SFPaymentsExpressButtons = ({
     expressButtonLayout = 'vertical',
     maximumButtonCount = undefined,
     onPaymentMethodsRendered,
-    onExpressPaymentCompleted
+    onExpressPaymentCompleted,
+    onOrderApproved,
+    onExpressPaymentCancel,
+    onExpressPaymentError
 }) => {
     const intl = useIntl()
     const navigate = useNavigation()
@@ -536,6 +539,9 @@ const SFPaymentsExpressButtons = ({
                 endConfirming()
                 await cleanupExpressBasket()
                 showErrorMessage(ERROR_MESSAGE_KEYS.DEFAULT)
+                if (onExpressPaymentCancel) {
+                    onExpressPaymentCancel()
+                }
             }
 
             const onShippingAddressChange = async (shippingAddress, callback) => {
@@ -1036,8 +1042,14 @@ const SFPaymentsExpressButtons = ({
 
                     endConfirming()
 
-                    // Navigate to confirmation page with the order number
-                    navigate(`/checkout/confirmation/${orderRef.current?.orderNo}`)
+                    // Agent/widget contexts opt out of the built-in navigation by supplying
+                    // onOrderApproved. They own the "what happens next" story.
+                    if (onOrderApproved) {
+                        onOrderApproved(orderRef.current)
+                    } else {
+                        // Navigate to confirmation page with the order number
+                        navigate(`/checkout/confirmation/${orderRef.current?.orderNo}`)
+                    }
                     isPaymentInProgress.current = false
                 } catch (error) {
                     endConfirming()
@@ -1060,10 +1072,14 @@ const SFPaymentsExpressButtons = ({
                     showErrorMessage(ERROR_MESSAGE_KEYS.FAIL_ORDER)
                 } else {
                     showErrorMessage(ERROR_MESSAGE_KEYS.ORDER_RECOVERY_FAILED)
-                    // Only navigate to cart if NOT on PDP
-                    if (usage !== EXPRESS_BUY_NOW) {
+                    // Only navigate to cart if NOT on PDP and no agent/widget error handler is
+                    // present — agent contexts own their own error recovery via onExpressPaymentError.
+                    if (usage !== EXPRESS_BUY_NOW && !onExpressPaymentError) {
                         navigate('/cart')
                     }
+                }
+                if (onExpressPaymentError) {
+                    onExpressPaymentError({basketRecovered})
                 }
             }
 
@@ -1159,7 +1175,10 @@ SFPaymentsExpressButtons.propTypes = {
     expressButtonLayout: PropTypes.oneOf(['horizontal', 'vertical']),
     maximumButtonCount: PropTypes.number,
     onPaymentMethodsRendered: PropTypes.func,
-    onExpressPaymentCompleted: PropTypes.func
+    onExpressPaymentCompleted: PropTypes.func,
+    onOrderApproved: PropTypes.func,
+    onExpressPaymentCancel: PropTypes.func,
+    onExpressPaymentError: PropTypes.func
 }
 
 export default SFPaymentsExpressButtons

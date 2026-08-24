@@ -108,6 +108,30 @@ const ShopperAgent = loadable(
     {ssr: false}
 )
 
+// Scratch PoC — portal a placeholder into every Cimulate product card to validate the
+// mount mechanism for S8/Slice-0 (see scratch/spike-mechanism-portal.md). Remove once
+// the real card-level payments slot lands.
+const ScratchPortalPoC = loadable(
+    () =>
+        import(
+            '@salesforce/retail-react-app/app/components/sf-payments-express-agent/scratch-portal-poc'
+        ),
+    {ssr: false}
+)
+
+// Native-slot adapter for Cimulate's `ProductTileExtension` slot. Owns the
+// customElements.define + window.CimulateOverrides registration, and portals a
+// React subtree into every mounted extension element from within our host tree
+// (so QueryClient / CommerceApiProvider / SF Payments state are inherited).
+// Own chunk — SF Payments code stays isolated from the critical bundle.
+const SFPaymentsTileExtensionAdapter = loadable(
+    () =>
+        import(
+            '@salesforce/retail-react-app/app/components/sf-payments-express-agent/tile-extension-adapter'
+        ),
+    {ssr: false}
+)
+
 const PlaceholderComponent = () => (
     <Center p="2">
         <Spinner size="lg" />
@@ -224,6 +248,13 @@ const App = (props) => {
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
+
+    // iframe way — when the app is loaded inside an iframe (e.g. the smoke page
+    // embedded by Cimulate for the tile-extension iframe spike), skip the
+    // storefront chrome (header, footer, ShopperAgent widget) so only the
+    // route contents render. Standalone tab loads are unaffected.
+    const isEmbeddedInIframe =
+        typeof window !== 'undefined' && window.top !== window.self
 
     const {l10n} = site
     // Get the current currency to be used through out the app
@@ -395,12 +426,18 @@ const App = (props) => {
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
                         </Seo>
 
-                        {commerceAgentConfiguration?.enabled === 'true' && (
-                            <ShopperAgent
-                                commerceAgentConfiguration={commerceAgentConfiguration}
-                                basketDoneLoading={basketQueryLastUpdateTime > 0}
-                            />
-                        )}
+                        {commerceAgentConfiguration?.enabled === 'true' &&
+                            !isEmbeddedInIframe && (
+                                <>
+                                    <ShopperAgent
+                                        commerceAgentConfiguration={commerceAgentConfiguration}
+                                        basketDoneLoading={basketQueryLastUpdateTime > 0}
+                                    />
+                                    <SFPaymentsTileExtensionAdapter />
+                                    {/* PoC temporarily disabled — isolating whether tile-render failures reproduce without our code */}
+                                    {/* <ScratchPortalPoC /> */}
+                                </>
+                            )}
 
                         <ScrollToTop />
 
@@ -418,6 +455,8 @@ const App = (props) => {
                                     onClose={onCloseStoreLocator}
                                 />
                             )}
+                            {/* iframe way — hide storefront header when embedded */}
+                            {!isEmbeddedInIframe && (
                             <Island hydrateOn={'visible'}>
                                 <Box {...styles.headerWrapper}>
                                     {!isCheckout ? (
@@ -467,6 +506,7 @@ const App = (props) => {
                                     )}
                                 </Box>
                             </Island>
+                            )}
                             {!isOnline && <OfflineBanner />}
                             <AddToCartModalProvider>
                                 <BonusProductSelectionModalProvider>
@@ -500,9 +540,12 @@ const App = (props) => {
                                         </Box>
                                     </SkipNavContent>
 
-                                    <Island hydrateOn={'visible'}>
-                                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
-                                    </Island>
+                                    {/* iframe way — hide storefront footer when embedded */}
+                                    {!isEmbeddedInIframe && (
+                                        <Island hydrateOn={'visible'}>
+                                            {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                                        </Island>
+                                    )}
 
                                     <AuthModal {...authModal} />
                                     <DntNotification {...dntNotification} />
