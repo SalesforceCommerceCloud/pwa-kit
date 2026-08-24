@@ -2317,6 +2317,12 @@
       "value": "Contact Us"
     }
   ],
+  "footer.link.order_lookup": [
+    {
+      "type": 0,
+      "value": "Order Lookup"
+    }
+  ],
   "footer.link.order_status": [
     {
       "type": 0,
@@ -2573,6 +2579,304 @@
     {
       "type": 0,
       "value": "View"
+    }
+  ],
+  "guestOrderLookup.order.breadcrumb.home": [
+    {
+      "type": 0,
+      "value": "Home"
+    }
+  ],
+  "guestOrderLookup.order.breadcrumb.orderLookup": [
+    {
+      "type": 0,
+      "value": "Order Lookup"
+    }
+  ],
+  "guestOrderLookup.order.button.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel Order"
+    }
+  ],
+  "guestOrderLookup.order.button.retry": [
+    {
+      "type": 0,
+      "value": "Try Again"
+    }
+  ],
+  "guestOrderLookup.order.button.return": [
+    {
+      "type": 0,
+      "value": "Return Items"
+    }
+  ],
+  "guestOrderLookup.order.cancel.error.generic": [
+    {
+      "type": 0,
+      "value": "We couldn't cancel your order. Please try again."
+    }
+  ],
+  "guestOrderLookup.order.cancel.error.notCancellable": [
+    {
+      "type": 0,
+      "value": "This order can no longer be cancelled."
+    }
+  ],
+  "guestOrderLookup.order.cancel.error.notFound": [
+    {
+      "type": 0,
+      "value": "Order not found."
+    }
+  ],
+  "guestOrderLookup.order.cancel.success": [
+    {
+      "type": 0,
+      "value": "Your order has been cancelled."
+    }
+  ],
+  "guestOrderLookup.order.error.generic": [
+    {
+      "type": 0,
+      "value": "Something went wrong loading your order. Please try again."
+    }
+  ],
+  "guestOrderLookup.order.error.tooManyRequests": [
+    {
+      "type": 0,
+      "value": "You've refreshed too many times. Please wait a moment before trying again."
+    }
+  ],
+  "guestOrderLookup.order.heading": [
+    {
+      "type": 0,
+      "value": "Order Details"
+    }
+  ],
+  "guestOrderLookup.order.heading.billingAddress": [
+    {
+      "type": 0,
+      "value": "Billing Address"
+    }
+  ],
+  "guestOrderLookup.order.itemCount": [
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " item"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " items"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "count"
+    }
+  ],
+  "guestOrderLookup.order.orderNumber": [
+    {
+      "type": 0,
+      "value": "Order Number: "
+    },
+    {
+      "type": 1,
+      "value": "orderNo"
+    }
+  ],
+  "guestOrderLookup.order.orderedDate": [
+    {
+      "type": 0,
+      "value": "Ordered: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "guestOrderLookup.order.otherItems": [
+    {
+      "type": 0,
+      "value": "Other items"
+    }
+  ],
+  "guestOrderLookup.order.return.success": [
+    {
+      "type": 0,
+      "value": "Your return has been submitted."
+    }
+  ],
+  "guestOrderLookup.order.section.tracking": [
+    {
+      "type": 0,
+      "value": "Tracking"
+    }
+  ],
+  "guestOrderLookup.order.shipment": [
+    {
+      "type": 0,
+      "value": "Shipment"
+    }
+  ],
+  "guestOrderLookup.order.shipment.number": [
+    {
+      "type": 0,
+      "value": "Shipment "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    }
+  ],
+  "guestOrderLookup.order.shippingAddress": [
+    {
+      "type": 0,
+      "value": "Shipping Address"
+    }
+  ],
+  "guestOrderLookup.request.button.submit": [
+    {
+      "type": 0,
+      "value": "Find My Order"
+    }
+  ],
+  "guestOrderLookup.request.error.emailInvalid": [
+    {
+      "type": 0,
+      "value": "Enter a valid email address"
+    }
+  ],
+  "guestOrderLookup.request.error.emailRequired": [
+    {
+      "type": 0,
+      "value": "Email address is required"
+    }
+  ],
+  "guestOrderLookup.request.error.orderNumberInvalid": [
+    {
+      "type": 0,
+      "value": "Enter a valid order number"
+    }
+  ],
+  "guestOrderLookup.request.error.orderNumberRequired": [
+    {
+      "type": 0,
+      "value": "Order number is required"
+    }
+  ],
+  "guestOrderLookup.request.heading": [
+    {
+      "type": 0,
+      "value": "Look Up Your Order"
+    }
+  ],
+  "guestOrderLookup.request.label.email": [
+    {
+      "type": 0,
+      "value": "Email address"
+    }
+  ],
+  "guestOrderLookup.request.label.orderNumber": [
+    {
+      "type": 0,
+      "value": "Order number"
+    }
+  ],
+  "guestOrderLookup.request.sessionExpired": [
+    {
+      "type": 0,
+      "value": "Your session has expired. Please look up your order again."
+    }
+  ],
+  "guestOrderLookup.request.subtext": [
+    {
+      "type": 0,
+      "value": "Enter your order details to track your order or view your receipt."
+    }
+  ],
+  "guestOrderLookup.verify.button.submit": [
+    {
+      "type": 0,
+      "value": "Verify Code"
+    }
+  ],
+  "guestOrderLookup.verify.error.generic": [
+    {
+      "type": 0,
+      "value": "Something went wrong. Please try again."
+    }
+  ],
+  "guestOrderLookup.verify.error.invalidCode": [
+    {
+      "type": 0,
+      "value": "The code you entered is invalid or has expired. Please try again."
+    }
+  ],
+  "guestOrderLookup.verify.error.tooManyAttempts": [
+    {
+      "type": 0,
+      "value": "Too many attempts. Please wait a moment and try again."
+    }
+  ],
+  "guestOrderLookup.verify.heading": [
+    {
+      "type": 0,
+      "value": "Verify Your Email"
+    }
+  ],
+  "guestOrderLookup.verify.label.code": [
+    {
+      "type": 0,
+      "value": "Verification code"
+    }
+  ],
+  "guestOrderLookup.verify.label.digitN": [
+    {
+      "type": 0,
+      "value": "Digit "
+    },
+    {
+      "type": 1,
+      "value": "n"
+    },
+    {
+      "type": 0,
+      "value": " of "
+    },
+    {
+      "type": 1,
+      "value": "total"
+    }
+  ],
+  "guestOrderLookup.verify.subtext": [
+    {
+      "type": 0,
+      "value": "We've sent a verification code to "
+    },
+    {
+      "type": 1,
+      "value": "email"
+    },
+    {
+      "type": 0,
+      "value": ". Please enter it below."
     }
   ],
   "header.button.assistive_msg.ask_shopping_agent": [
