@@ -219,7 +219,17 @@ const runGenerator = () => {
     cp.execSync(
         `npx ${flags} @salesforce/pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`,
         {
-            stdio: 'inherit'
+            stdio: 'inherit',
+            env: {
+                ...process.env,
+                // Packages published to the local Verdaccio repo always have a
+                // "just published" timestamp, which trips npm's min-release-age
+                // cooldown (npm >=11) if the user has a non-zero value set in
+                // their global .npmrc. That protection is meaningless against
+                // packages we just built and published locally, so disable it
+                // for this generator run.
+                npm_config_min_release_age: '0'
+            }
         }
     )
 }
