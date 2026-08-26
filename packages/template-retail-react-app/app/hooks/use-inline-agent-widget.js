@@ -54,6 +54,7 @@ const useInlineAgentWidget = (config) => {
         el.setAttribute('es-developer-name', config.esDeveloperName)
         el.setAttribute('capabilities-version', config.capabilitiesVersion)
         if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
+        el.setAttribute('product-id-pattern', '/product/([^/?#]+)')
 
         containerRef.current.appendChild(el)
 
