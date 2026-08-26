@@ -12,6 +12,8 @@ import {
     resolveAgentforceMyDomain,
     TOKEN_BRIDGE_PROXY_PATH
 } from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
+import fs from 'fs'
+import path from 'path'
 
 // Mock the httponly-cookie-config helpers
 jest.mock('@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config.js', () => ({
@@ -445,8 +447,8 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         logSpy.mockRestore()
     })
 
-    test('forwards to Core without refresh_token when cookie not present and logs debug', async () => {
-        const debugSpy = jest.spyOn(console, 'debug').mockImplementation(() => {})
+    test('forwards to Core without refresh_token when cookie not present and logs error', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
         process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
@@ -463,8 +465,8 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         expect(global.fetch).toHaveBeenCalledTimes(1)
         const init = global.fetch.mock.calls[0][1]
         expect(JSON.parse(init.body)).toEqual({auth_link_key: 'auth-key'})
-        expect(debugSpy).toHaveBeenCalledWith(expect.stringContaining('No SLAS refresh token'))
-        debugSpy.mockRestore()
+        expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('No SLAS refresh token'))
+        errorSpy.mockRestore()
         logSpy.mockRestore()
     })
 
@@ -648,8 +650,8 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
         logSpy.mockRestore()
     })
 
-    test('works without refresh token cookie in HttpOnly mode (logs debug)', async () => {
-        const debugSpy = jest.spyOn(console, 'debug').mockImplementation(() => {})
+    test('works without refresh token cookie in HttpOnly mode (logs error)', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
         process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
@@ -667,8 +669,8 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
         await handleTokenBridge(req, res)
 
         expect(res.statusCode).toBe(200)
-        expect(debugSpy).toHaveBeenCalled()
-        debugSpy.mockRestore()
+        expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('No SLAS refresh token'))
+        errorSpy.mockRestore()
         logSpy.mockRestore()
     })
 
@@ -838,14 +840,12 @@ describe('module import hygiene (server-loaded under babel-node)', () => {
     // lenient and the module is mocked, so both `.../httponly-cookie-config` and
     // `.../httponly-cookie-config.js` pass identically. We therefore assert the
     // invariant statically against the source text (one file read, no module loading).
-    const fs = require('fs')
-    const path = require('path')
     const source = fs.readFileSync(path.join(__dirname, 'token-bridge.js'), 'utf8')
 
     test('every @salesforce/pwa-kit-runtime submodule import has an explicit .js extension', () => {
-        const subpathImports = [
-            ...source.matchAll(/@salesforce\/pwa-kit-runtime\/[^'"\n]+/g)
-        ].map((match) => match[0])
+        const subpathImports = [...source.matchAll(/@salesforce\/pwa-kit-runtime\/[^'"\n]+/g)].map(
+            (match) => match[0]
+        )
 
         // Guard against a false pass if the import is renamed away or the file is
         // restructured — there is at least one such import today (httponly-cookie-config).
