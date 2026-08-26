@@ -157,6 +157,27 @@ describe('Shopper Experience query hooks with Page Designer params', () => {
         expect(result.current.data).toEqual(pageData)
     })
 
+    test.each(testCases)(
+        '`%s` returns error on error response in Page Designer mode',
+        async (queryName) => {
+            // In Page Designer mode the hooks use rawResponse, which bypasses the SDK's
+            // throwOnBadResponse check. An error status must still surface as a query error
+            // rather than being parsed as successful data.
+            mockQueryEndpoint(experienceEndpoint, {}, 400)
+
+            const pageDesignerParams = {
+                mode: 'edit' as const,
+                pdToken: 'test-pd-token'
+            }
+
+            const {result} = renderHookWithProviders(() => queries[queryName](OPTIONS), {
+                pageDesignerParams
+            })
+
+            await waitAndExpectError(() => result.current)
+        }
+    )
+
     test('useComponent merges pageDesignerParams from provider config', async () => {
         const componentData = {id: 'testComponent', typeId: 'commerce_assets.imageTile'}
         mockQueryEndpoint(experienceEndpoint, componentData)

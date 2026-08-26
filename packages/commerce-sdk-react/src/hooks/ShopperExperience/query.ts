@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {UseQueryResult} from '@tanstack/react-query'
-import {ShopperExperience} from 'commerce-sdk-isomorphic'
+import {ResponseError, ShopperExperience} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
@@ -71,6 +71,11 @@ export const usePages = (
     const method = async (options: Options) => {
         if (isPageDesignerMode) {
             const response = await client[methodName](options, true)
+            // rawResponse bypasses the SDK's throwOnBadResponse check, so we replicate it here
+            // to ensure error responses surface as query errors rather than parsed "success" data.
+            if (!response.ok && response.status !== 304) {
+                throw new ResponseError(response)
+            }
             return await response.json()
         }
         return await client[methodName](options)
@@ -144,6 +149,11 @@ export const usePage = (
     const method = async (options: Options) => {
         if (isPageDesignerMode) {
             const response = await client[methodName](options, true)
+            // rawResponse bypasses the SDK's throwOnBadResponse check, so we replicate it here
+            // to ensure error responses surface as query errors rather than parsed "success" data.
+            if (!response.ok && response.status !== 304) {
+                throw new ResponseError(response)
+            }
             return await response.json()
         }
         return await client[methodName](options)
@@ -214,6 +224,11 @@ export const useComponent = (
     const method = async (options: Options) => {
         if (isPageDesignerMode) {
             const response = await client[methodName](options, true)
+            // rawResponse bypasses the SDK's throwOnBadResponse check, so we replicate it here
+            // to ensure error responses surface as query errors rather than parsed "success" data.
+            if (!response.ok && response.status !== 304) {
+                throw new ResponseError(response)
+            }
             return await response.json()
         }
         return await client[methodName](options)
