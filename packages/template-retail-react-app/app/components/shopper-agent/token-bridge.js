@@ -9,7 +9,7 @@ import {
     getCookieName,
     getSiteId,
     SESSION_COOKIE_CONFIG
-} from '@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config'
+} from '@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config.js'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {isTrustedSalesforceDomain} from './salesforce-domain-allowlist.js'
 
