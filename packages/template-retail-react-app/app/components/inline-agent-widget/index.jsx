@@ -6,6 +6,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import useInlineAgentWidget from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 
 const InlineAgentWidget = ({config}) => {
@@ -14,6 +15,17 @@ const InlineAgentWidget = ({config}) => {
     if (!config?.enabled) return null
 
     return <div ref={containerRef} />
+}
+
+InlineAgentWidget.propTypes = {
+    config: PropTypes.shape({
+        enabled: PropTypes.bool,
+        scrt2Url: PropTypes.string,
+        orgId: PropTypes.string,
+        esDeveloperName: PropTypes.string,
+        capabilitiesVersion: PropTypes.string,
+        placeholder: PropTypes.string
+    })
 }
 
 export default InlineAgentWidget
