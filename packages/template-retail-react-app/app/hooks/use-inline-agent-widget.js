@@ -7,12 +7,11 @@
 
 import {useEffect, useRef, useState} from 'react'
 
-const isConfigured = (config) => {
-    return !!(config?.scrt2Url && config?.orgId && config?.esDeveloperName)
-}
+let scriptPromise = null
 
 const loadScript = () => {
-    return new Promise((resolve, reject) => {
+    if (scriptPromise) return scriptPromise
+    scriptPromise = new Promise((resolve, reject) => {
         if (customElements.get('inline-agent-widget')) {
             resolve()
             return
@@ -28,32 +27,42 @@ const loadScript = () => {
             }
             resolve()
         }
-        script.onerror = (e) => reject(e)
+        script.onerror = (e) => {
+            scriptPromise = null
+            reject(e)
+        }
         document.head.appendChild(script)
     })
+    return scriptPromise
 }
 
 const useInlineAgentWidget = (config) => {
     const [ready, setReady] = useState(false)
     const containerRef = useRef(null)
+    const enabled = config?.enabled
+    const scrt2Url = config?.scrt2Url
+    const orgId = config?.orgId
+    const esDeveloperName = config?.esDeveloperName
+    const capabilitiesVersion = config?.capabilitiesVersion
+    const placeholder = config?.placeholder
 
     useEffect(() => {
         if (typeof window === 'undefined') return
-        if (!config?.enabled || !isConfigured(config)) return
+        if (!enabled || !scrt2Url || !orgId || !esDeveloperName) return
         loadScript().then(() => setReady(true))
-    }, [config])
+    }, [enabled, scrt2Url, orgId, esDeveloperName])
 
     useEffect(() => {
-        if (!config?.enabled || !ready) return
+        if (!enabled || !ready) return
         if (!containerRef.current) return
         if (containerRef.current.querySelector('inline-agent-widget')) return
 
         const el = document.createElement('inline-agent-widget')
-        el.setAttribute('scrt2-url', config.scrt2Url)
-        el.setAttribute('org-id', config.orgId)
-        el.setAttribute('es-developer-name', config.esDeveloperName)
-        el.setAttribute('capabilities-version', config.capabilitiesVersion)
-        if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
+        el.setAttribute('scrt2-url', scrt2Url)
+        el.setAttribute('org-id', orgId)
+        el.setAttribute('es-developer-name', esDeveloperName)
+        el.setAttribute('capabilities-version', capabilitiesVersion)
+        if (placeholder) el.setAttribute('placeholder', placeholder)
         el.setAttribute('product-id-pattern', '/product/([^/?#]+)')
 
         containerRef.current.appendChild(el)
@@ -61,7 +70,7 @@ const useInlineAgentWidget = (config) => {
         return () => {
             el.remove()
         }
-    }, [ready, config])
+    }, [ready, enabled, scrt2Url, orgId, esDeveloperName, capabilitiesVersion, placeholder])
 
     return containerRef
 }
