@@ -91,7 +91,6 @@ export const isVariantValueOrderable = (product, variationParams) => {
  * @param {boolean} isProductPartOfSet
  * @param {boolean} isProductPartOfBundle
  * @param {Object} controlledVariationValues - Optional controlled variation values (skips URL reading)
- * @param {Function} onVariationChange - Optional callback for controlled mode (attributeId, value) => void
  * @returns {Array} a decorated variation attributes list.
  *
  */
@@ -99,8 +98,7 @@ export const useVariationAttributes = (
     product = {},
     isProductPartOfSet = false,
     isProductPartOfBundle = false,
-    controlledVariationValues = null,
-    onVariationChange = null
+    controlledVariationValues = null
 ) => {
     const {variationAttributes = []} = product
     const location = useLocation()

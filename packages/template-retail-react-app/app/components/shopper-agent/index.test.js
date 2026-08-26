@@ -37,10 +37,10 @@ jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/token-bridg
     callTokenBridge: (...args) => mockCallTokenBridge(...args)
 }))
 
-const mockCallAuthLinkProxy = jest.fn()
-jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/auth-link-proxy', () => ({
+const mockCallAuthLink = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/auth-link-client', () => ({
     __esModule: true,
-    callAuthLinkProxy: (...args) => mockCallAuthLinkProxy(...args)
+    callAuthLink: (...args) => mockCallAuthLink(...args)
 }))
 
 // Import ShopperAgent after all mocks are set up
@@ -1961,8 +1961,8 @@ describe('ShopperAgent Component', () => {
                 )
 
             beforeEach(() => {
-                mockCallAuthLinkProxy.mockReset()
-                mockCallAuthLinkProxy.mockResolvedValue({auth_link_key: 'commerce-auth-link-key'})
+                mockCallAuthLink.mockReset()
+                mockCallAuthLink.mockResolvedValue({auth_link_key: 'commerce-auth-link-key'})
             })
 
             afterEach(() => {
@@ -1991,8 +1991,9 @@ describe('ShopperAgent Component', () => {
                 renderCommerceClient()
 
                 await waitFor(() =>
-                    expect(mockCallAuthLinkProxy).toHaveBeenCalledWith({
-                        commerceClientJWT: 'commerce.jwt'
+                    expect(mockCallAuthLink).toHaveBeenCalledWith({
+                        commerceClientJWT: 'commerce.jwt',
+                        scrt2Url: 'https://test.salesforce-scrt.com'
                     })
                 )
                 expect(mockCallTokenBridge).toHaveBeenCalledWith({
@@ -2070,29 +2071,31 @@ describe('ShopperAgent Component', () => {
                 await act(async () => {
                     window.dispatchEvent(new Event('onCimulateWidgetReady'))
                 })
-                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1)
+                expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
 
                 window.sessionStorage.setItem(
                     tokenKey,
                     JSON.stringify({accessToken: 'rotated.jwt'})
                 )
 
-                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
-                expect(mockCallAuthLinkProxy).toHaveBeenLastCalledWith({
-                    commerceClientJWT: 'rotated.jwt'
+                await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(2))
+                expect(mockCallAuthLink).toHaveBeenLastCalledWith({
+                    commerceClientJWT: 'rotated.jwt',
+                    scrt2Url: 'https://test.salesforce-scrt.com'
                 })
             })
 
             test('excludes the last attempted JWT after a failed auth-link before widget-ready', async () => {
                 seedAuthLinkStorage({jwt: 'jwt-a'})
-                mockCallAuthLinkProxy
+                mockCallAuthLink
                     .mockResolvedValueOnce({auth_link_key: 'jwt-a-auth-link-key'})
                     .mockRejectedValueOnce(new Error('jwt-b auth-link failed'))
                 const {rerender} = renderCommerceClientWithBasket()
 
                 await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
-                expect(mockCallAuthLinkProxy).toHaveBeenNthCalledWith(1, {
-                    commerceClientJWT: 'jwt-a'
+                expect(mockCallAuthLink).toHaveBeenNthCalledWith(1, {
+                    commerceClientJWT: 'jwt-a',
+                    scrt2Url: 'https://test.salesforce-scrt.com'
                 })
 
                 window.sessionStorage.setItem(tokenKey, JSON.stringify({accessToken: 'jwt-b'}))
@@ -2110,25 +2113,27 @@ describe('ShopperAgent Component', () => {
                     />
                 )
 
-                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
-                expect(mockCallAuthLinkProxy).toHaveBeenNthCalledWith(2, {
-                    commerceClientJWT: 'jwt-b'
+                await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(2))
+                expect(mockCallAuthLink).toHaveBeenNthCalledWith(2, {
+                    commerceClientJWT: 'jwt-b',
+                    scrt2Url: 'https://test.salesforce-scrt.com'
                 })
                 await waitFor(() => expect(mockShowToast).toHaveBeenCalledTimes(1))
 
                 await act(async () => {
                     window.dispatchEvent(new Event('onCimulateWidgetReady'))
                 })
-                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2)
+                expect(mockCallAuthLink).toHaveBeenCalledTimes(2)
 
                 window.sessionStorage.setItem(tokenKey, JSON.stringify({accessToken: 'jwt-c'}))
 
-                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(3))
-                expect(mockCallAuthLinkProxy).toHaveBeenNthCalledWith(3, {
-                    commerceClientJWT: 'jwt-c'
+                await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(3))
+                expect(mockCallAuthLink).toHaveBeenNthCalledWith(3, {
+                    commerceClientJWT: 'jwt-c',
+                    scrt2Url: 'https://test.salesforce-scrt.com'
                 })
                 expect(
-                    mockCallAuthLinkProxy.mock.calls.filter(
+                    mockCallAuthLink.mock.calls.filter(
                         ([{commerceClientJWT}]) => commerceClientJWT === 'jwt-b'
                     )
                 ).toHaveLength(1)
@@ -2142,24 +2147,26 @@ describe('ShopperAgent Component', () => {
                 )
                 renderCommerceClient()
 
-                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1))
+                await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(1))
 
                 await act(async () => {
                     window.dispatchEvent(new Event('onCimulateWidgetReady'))
                 })
-                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1)
+                expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
 
                 window.sessionStorage.setItem(
                     tokenKey,
                     JSON.stringify({accessToken: 'rotated-session.jwt'})
                 )
 
-                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
-                expect(mockCallAuthLinkProxy).toHaveBeenLastCalledWith({
-                    commerceClientJWT: 'rotated-session.jwt'
+                await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(2))
+                expect(mockCallAuthLink).toHaveBeenLastCalledWith({
+                    commerceClientJWT: 'rotated-session.jwt',
+                    scrt2Url: 'https://test.salesforce-scrt.com'
                 })
-                expect(mockCallAuthLinkProxy).not.toHaveBeenCalledWith({
-                    commerceClientJWT: 'stale-local.jwt'
+                expect(mockCallAuthLink).not.toHaveBeenCalledWith({
+                    commerceClientJWT: 'stale-local.jwt',
+                    scrt2Url: 'https://test.salesforce-scrt.com'
                 })
             })
 
@@ -2201,8 +2208,9 @@ describe('ShopperAgent Component', () => {
                     renderCommerceClient()
 
                     await waitFor(() =>
-                        expect(mockCallAuthLinkProxy).toHaveBeenCalledWith({
-                            commerceClientJWT: expectedJWT
+                        expect(mockCallAuthLink).toHaveBeenCalledWith({
+                            commerceClientJWT: expectedJWT,
+                            scrt2Url: 'https://test.salesforce-scrt.com'
                         })
                     )
                 }
@@ -2214,12 +2222,12 @@ describe('ShopperAgent Component', () => {
                 const firstAuthLink = new Promise((resolve) => {
                     resolveFirstAuthLink = resolve
                 })
-                mockCallAuthLinkProxy
+                mockCallAuthLink
                     .mockImplementationOnce(() => firstAuthLink)
                     .mockResolvedValue({auth_link_key: 'registered-auth-link-key'})
                 const {rerender} = renderCommerceClientWithBasket()
 
-                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1))
+                await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(1))
 
                 mockedUseCustomerType.mockReturnValue({
                     customerType: 'registered',
@@ -2235,10 +2243,10 @@ describe('ShopperAgent Component', () => {
                     />
                 )
 
-                expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(1)
+                expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
                 resolveFirstAuthLink({auth_link_key: 'stale-auth-link-key'})
 
-                await waitFor(() => expect(mockCallAuthLinkProxy).toHaveBeenCalledTimes(2))
+                await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(2))
                 await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
                 expect(mockCallTokenBridge).toHaveBeenCalledWith(
                     expect.objectContaining({authLinkKey: 'registered-auth-link-key'})
@@ -2301,7 +2309,7 @@ describe('ShopperAgent Component', () => {
                 renderCommerceClient()
 
                 await waitFor(() => expect(warnSpy).toHaveBeenCalled())
-                expect(mockCallAuthLinkProxy).not.toHaveBeenCalled()
+                expect(mockCallAuthLink).not.toHaveBeenCalled()
                 expect(mockCallTokenBridge).not.toHaveBeenCalled()
                 warnSpy.mockRestore()
             })

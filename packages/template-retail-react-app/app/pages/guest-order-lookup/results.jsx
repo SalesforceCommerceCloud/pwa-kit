@@ -109,6 +109,7 @@ const GuestOrderLookupResults = () => {
     // useAccessToken returns a new getTokenWhenReady on every render — store in ref
     // so effects can always call the latest version with a stable dep array.
     const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    // eslint-disable-next-line use-effect-no-deps/use-effect-no-deps -- intentionally runs every render to keep the ref current
     useEffect(() => {
         getTokenWhenReadyRef.current = getTokenWhenReady
     })

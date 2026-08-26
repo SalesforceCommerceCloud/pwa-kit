@@ -36,6 +36,7 @@ const GuestOrderLookupVerify = () => {
     const {getTokenWhenReady} = useAccessToken()
     const queryClient = useQueryClient()
     const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    // eslint-disable-next-line use-effect-no-deps/use-effect-no-deps -- intentionally runs every render to keep the ref current
     useEffect(() => {
         getTokenWhenReadyRef.current = getTokenWhenReady
     })

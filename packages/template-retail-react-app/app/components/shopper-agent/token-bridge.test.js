@@ -12,9 +12,11 @@ import {
     resolveAgentforceMyDomain,
     TOKEN_BRIDGE_PROXY_PATH
 } from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge'
+import fs from 'fs'
+import path from 'path'
 
 // Mock the httponly-cookie-config helpers
-jest.mock('@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config', () => ({
+jest.mock('@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config.js', () => ({
     getSiteId: (req) => req.headers?.['x-site-id'],
     getCookieName: (config, siteId) => `${config.key}_${siteId}`,
     SESSION_COOKIE_CONFIG: {
@@ -445,8 +447,8 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         logSpy.mockRestore()
     })
 
-    test('forwards to Core without refresh_token when cookie not present and logs debug', async () => {
-        const debugSpy = jest.spyOn(console, 'debug').mockImplementation(() => {})
+    test('forwards to Core without refresh_token when cookie not present and logs error', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
         process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
@@ -463,8 +465,8 @@ describe('handleTokenBridge - Non-HttpOnly Mode', () => {
         expect(global.fetch).toHaveBeenCalledTimes(1)
         const init = global.fetch.mock.calls[0][1]
         expect(JSON.parse(init.body)).toEqual({auth_link_key: 'auth-key'})
-        expect(debugSpy).toHaveBeenCalledWith(expect.stringContaining('No SLAS refresh token'))
-        debugSpy.mockRestore()
+        expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('No SLAS refresh token'))
+        errorSpy.mockRestore()
         logSpy.mockRestore()
     })
 
@@ -648,8 +650,8 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
         logSpy.mockRestore()
     })
 
-    test('works without refresh token cookie in HttpOnly mode (logs debug)', async () => {
-        const debugSpy = jest.spyOn(console, 'debug').mockImplementation(() => {})
+    test('works without refresh token cookie in HttpOnly mode (logs error)', async () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
         process.env.AGENT_MYDOMAIN = 'https://orgfarm-1234.test1.my.pc-rnd.salesforce.com'
         global.fetch.mockResolvedValueOnce({
@@ -667,8 +669,8 @@ describe('handleTokenBridge - HttpOnly Mode', () => {
         await handleTokenBridge(req, res)
 
         expect(res.statusCode).toBe(200)
-        expect(debugSpy).toHaveBeenCalled()
-        debugSpy.mockRestore()
+        expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('No SLAS refresh token'))
+        errorSpy.mockRestore()
         logSpy.mockRestore()
     })
 
@@ -822,5 +824,34 @@ describe('callTokenBridge (browser helper)', () => {
 
     test('exposes the proxy path constant', () => {
         expect(TOKEN_BRIDGE_PROXY_PATH).toBe('/api/agent/identity/bridge')
+    })
+})
+
+describe('module import hygiene (server-loaded under babel-node)', () => {
+    // token-bridge.js is required directly by the SSR server (app/ssr.js). In a
+    // generated project it lives under node_modules, which @babel/register does not
+    // transpile, so Node loads it as a NATIVE ES module. Node's strict ESM resolver
+    // rejects extensionless bare-specifier subpaths (pwa-kit-runtime ships flat .js
+    // files with no "exports" map), so every pwa-kit-runtime submodule import in this
+    // file MUST carry an explicit .js extension or `pwa-kit-dev start` fails with
+    // ERR_MODULE_NOT_FOUND before the app boots.
+    //
+    // A behavioral jest test cannot catch a regression here: jest's module resolver is
+    // lenient and the module is mocked, so both `.../httponly-cookie-config` and
+    // `.../httponly-cookie-config.js` pass identically. We therefore assert the
+    // invariant statically against the source text (one file read, no module loading).
+    const source = fs.readFileSync(path.join(__dirname, 'token-bridge.js'), 'utf8')
+
+    test('every @salesforce/pwa-kit-runtime submodule import has an explicit .js extension', () => {
+        const subpathImports = [...source.matchAll(/@salesforce\/pwa-kit-runtime\/[^'"\n]+/g)].map(
+            (match) => match[0]
+        )
+
+        // Guard against a false pass if the import is renamed away or the file is
+        // restructured — there is at least one such import today (httponly-cookie-config).
+        expect(subpathImports.length).toBeGreaterThan(0)
+        subpathImports.forEach((specifier) => {
+            expect(specifier).toMatch(/\.js$/)
+        })
     })
 })
