@@ -28,12 +28,11 @@ import {isTrustedSalesforceDomain} from './salesforce-domain-allowlist.js'
  *        sent automatically to same-origin proxy. Client sends auth_link_key
  *        in request body, and siteId as x-site-id header.
  *      - HttpOnly OFF: Access token in localStorage, refresh token in cookie.
- *        Client sends auth_link_key in the request body, the access token
- *        (from localStorage) as an `Authorization: Bearer` header, and siteId
- *        as the x-site-id header.
+ *        Client sends auth_link_key and the access token (from localStorage)
+ *        in the request body, and siteId as the x-site-id header.
  *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js):
  *      - Reads siteId from x-site-id header (standard PWA Kit pattern)
- *      - Reads tokens from cookies (HttpOnly mode) or the Authorization header (non-HttpOnly)
+ *      - Reads tokens from cookies (HttpOnly mode) or the request body (non-HttpOnly)
  *      - Reads my_domain directly from AGENT_MYDOMAIN environment variable
  *      - Validates my_domain against Salesforce domain allowlist (SSRF prevention)
  *      - Forwards to Core with `Authorization: SLAS <access_token>` and
@@ -67,17 +66,6 @@ function parseCookies(cookieHeader) {
 }
 
 /**
- * Extract a Bearer token from an Authorization header value.
- * @param {string} [headerValue] - e.g. "Bearer eyJhbGci..."
- * @returns {string|null} the token, or null if absent/malformed
- */
-function parseBearerToken(headerValue) {
-    if (!headerValue || typeof headerValue !== 'string') return null
-    const match = /^Bearer\s+(.+)$/i.exec(headerValue.trim())
-    return match ? match[1].trim() : null
-}
-
-/**
  * Resolve the Agentforce My Domain origin to call.
  *
  * Accepts the raw value from the AGENT_MYDOMAIN environment variable — which
@@ -105,7 +93,7 @@ export function resolveAgentforceMyDomain(myDomain) {
 /** Express handler for POST /api/agent/identity/bridge. */
 export async function handleTokenBridge(req, res) {
     try {
-        const {auth_link_key: authLinkKey} = req.body || {}
+        const {auth_link_key: authLinkKey, slas_access_token: bodySlasAccessToken} = req.body || {}
 
         if (!authLinkKey || typeof authLinkKey !== 'string') {
             return res.status(400).json({error: 'MISSING_AUTH_LINK_KEY'})
@@ -177,8 +165,8 @@ export async function handleTokenBridge(req, res) {
                 return res.status(401).json({error: 'INVALID_SLAS_TOKEN'})
             }
         } else {
-            // Non-HttpOnly mode: access token arrives as an Authorization: Bearer
-            // credential (browser reads it from localStorage), refresh token from cookie
+            // Non-HttpOnly mode: access token arrives in the request body
+            // (browser reads it from localStorage), refresh token from cookie
             const refreshTokenRegisteredCookie = getCookieName(
                 SESSION_COOKIE_CONFIG.refreshTokenRegistered,
                 siteId
@@ -188,10 +176,10 @@ export async function handleTokenBridge(req, res) {
                 siteId
             )
 
-            slasAccessToken = parseBearerToken(req.headers.authorization)
+            slasAccessToken = bodySlasAccessToken
             refreshToken = cookies[refreshTokenRegisteredCookie] || cookies[refreshTokenGuestCookie]
 
-            if (!slasAccessToken) {
+            if (!slasAccessToken || typeof slasAccessToken !== 'string') {
                 return res.status(401).json({error: 'INVALID_SLAS_TOKEN'})
             }
         }
@@ -263,8 +251,8 @@ export function registerTokenBridgeRoute(app) {
  * Browser helper: POSTs to the same-origin proxy and returns Core's status + body.
  *
  * In HttpOnly mode, tokens are sent automatically via cookies. In non-HttpOnly mode,
- * the access token is read from localStorage and sent as an `Authorization: Bearer`
- * header, while the refresh token is read from cookies server-side.
+ * the access token is read from localStorage and sent in the request body,
+ * while the refresh token is read from cookies server-side.
  *
  * myDomain is now derived server-side from AGENT_MYDOMAIN environment variable.
  *

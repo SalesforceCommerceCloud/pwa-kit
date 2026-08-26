@@ -42,7 +42,7 @@ export class MrtConsoleSpanExporter extends ConsoleSpanExporter {
                     end_time: span.endTime,
                     forwardTrace: getOTELConfig().enabled
                 }
-
+                // eslint-disable-next-line no-console -- intentional: MRT collects stdout as the telemetry transport
                 console.info(JSON.stringify(spanData))
             } catch {
                 // Skip malformed spans — never let a serialization failure propagate

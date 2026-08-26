@@ -170,7 +170,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         ...actual,
         useShopperBasketsMutation: mockUseShopperBasketsMutation,
         useShopperBasketsV2Mutation: mockUseShopperBasketsMutation,
-        useShippingMethodsForShipment: (params, options) => {
+        useShippingMethodsForShipment: () => {
             if (mockValidateTestMocks && mockValidateTestMocks.refetchShippingMethods) {
                 return {refetch: mockValidateTestMocks.refetchShippingMethods}
             }
@@ -178,7 +178,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
                 refetch: jest.fn().mockResolvedValue({data: {applicableShippingMethods: []}})
             }
         },
-        useShippingMethodsForShipmentV2: (params, options) => {
+        useShippingMethodsForShipmentV2: () => {
             if (mockValidateTestMocks && mockValidateTestMocks.refetchShippingMethods) {
                 return {refetch: mockValidateTestMocks.refetchShippingMethods}
             }

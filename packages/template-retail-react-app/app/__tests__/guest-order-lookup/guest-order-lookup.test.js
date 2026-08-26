@@ -586,12 +586,7 @@ describe('POST /api/order-lookup/verify handler logic', () => {
         const email = 'guest@test.com'
         const accessCode = 'VALIDCODE'
         const appConfig = makeAppConfig().app
-        const {
-            clientId,
-            organizationId,
-            shortCode,
-            siteId: configSiteId
-        } = appConfig.commerceAPI.parameters
+        const {siteId: configSiteId} = appConfig.commerceAPI.parameters
 
         // Simulate the lookup
         const order = await mockGuestOrderLookup({
@@ -729,7 +724,6 @@ describe('GET /api/order-lookup/order handler logic', () => {
         const orderNo = 'ORD456'
         const email = 'guest@test.com'
         const accessCode = 'COOKIECODE'
-        const cookieData = {[orderNo]: {email, accessCode}}
 
         // Lookup succeeds
         const order = await mockGuestOrderLookup({
@@ -1517,10 +1511,6 @@ describe('POST /api/order-lookup/return — real handler', () => {
     })
 
     test('401: orderNo not in cookie', async () => {
-        const req = makeMockReq({
-            headers: {cookie: VALID_COOKIE},
-            body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
-        })
         // VALID_COOKIE only has VALID_ORDER_NO, but we request a different orderNo
         const req2 = makeMockReq({
             headers: {cookie: makeCookieHeader({OTHER: {email: 'a@b.com', verifiedCode: 'code'}})},
