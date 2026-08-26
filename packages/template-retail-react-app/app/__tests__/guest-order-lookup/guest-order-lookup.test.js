@@ -76,12 +76,9 @@ jest.mock('jose', () => ({
     decodeJwt: jest.fn()
 }))
 
-// Mock the token bridge and auth-link proxy (both imported by ssr.js at module scope)
+// Mock the token bridge (imported by ssr.js at module scope)
 jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/token-bridge.js', () => ({
     registerTokenBridgeRoute: jest.fn()
-}))
-jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/auth-link-proxy.js', () => ({
-    registerAuthLinkRoute: jest.fn()
 }))
 
 // ─── ShopperOrders mock ───────────────────────────────────────────────────────
