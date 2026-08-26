@@ -7,6 +7,10 @@
 
 import {useEffect, useRef, useState} from 'react'
 
+const isConfigured = (config) => {
+    return !!(config?.scrt2Url && config?.orgId && config?.esDeveloperName)
+}
+
 const loadScript = () => {
     return new Promise((resolve, reject) => {
         if (customElements.get('inline-agent-widget')) {
@@ -35,8 +39,9 @@ const useInlineAgentWidget = (config) => {
 
     useEffect(() => {
         if (typeof window === 'undefined') return
+        if (!config?.enabled || !isConfigured(config)) return
         loadScript().then(() => setReady(true))
-    }, [])
+    }, [config])
 
     useEffect(() => {
         if (!config?.enabled || !ready) return
