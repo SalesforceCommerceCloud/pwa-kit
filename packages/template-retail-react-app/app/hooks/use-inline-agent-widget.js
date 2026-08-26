@@ -5,15 +5,41 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect, useRef} from 'react'
-import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
+import {useEffect, useRef, useState} from 'react'
+
+const loadScript = () => {
+    return new Promise((resolve, reject) => {
+        if (customElements.get('inline-agent-widget')) {
+            resolve()
+            return
+        }
+        const script = document.createElement('script')
+        script.src = '/static/inline-agent-widget.umd.js'
+        script.onload = () => {
+            if (
+                !customElements.get('inline-agent-widget') &&
+                window.InlineAgentWidget?.defineElement
+            ) {
+                window.InlineAgentWidget.defineElement()
+            }
+            resolve()
+        }
+        script.onerror = (e) => reject(e)
+        document.head.appendChild(script)
+    })
+}
 
 const useInlineAgentWidget = (config) => {
-    const scriptLoadStatus = useScript('/static/inline-agent-widget.umd.js')
+    const [ready, setReady] = useState(false)
     const containerRef = useRef(null)
 
     useEffect(() => {
-        if (!scriptLoadStatus.loaded || scriptLoadStatus.error) return
+        if (typeof window === 'undefined') return
+        loadScript().then(() => setReady(true))
+    }, [])
+
+    useEffect(() => {
+        if (!config?.enabled || !ready) return
         if (!containerRef.current) return
         if (containerRef.current.querySelector('inline-agent-widget')) return
 
@@ -23,14 +49,13 @@ const useInlineAgentWidget = (config) => {
         el.setAttribute('es-developer-name', config.esDeveloperName)
         el.setAttribute('capabilities-version', config.capabilitiesVersion)
         if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
-        el.setAttribute('persist-session', '')
 
         containerRef.current.appendChild(el)
 
         return () => {
             el.remove()
         }
-    }, [scriptLoadStatus, config])
+    }, [ready, config])
 
     return containerRef
 }

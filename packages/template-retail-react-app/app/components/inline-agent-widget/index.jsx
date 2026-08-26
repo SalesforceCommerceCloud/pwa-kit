@@ -9,9 +9,9 @@ import React from 'react'
 import useInlineAgentWidget from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 
 const InlineAgentWidget = ({config}) => {
-    if (!config?.enabled) return null
-
     const containerRef = useInlineAgentWidget(config)
+
+    if (!config?.enabled) return null
 
     return <div ref={containerRef} />
 }
