@@ -147,7 +147,7 @@ module.exports = {
             parameters: {
                 clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
                 organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                shortCode: 'kv7kzm78',
                 siteId: 'RefArchGlobal'
             }
             // Optional: Set the domain for auth cookies to share them across subdomains.
@@ -188,6 +188,14 @@ module.exports = {
             }
         },
         storeLocatorEnabled: true,
+        guestOrderLookup: {
+            enabled: false,
+            orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$',
+            requestCodeThrottle: {
+                windowMs: 60000,
+                max: 5
+            }
+        },
         multishipEnabled: true,
         // Salesforce Payments configuration
         // Set enabled to true to enable Salesforce Payments (requires the Salesforce Payments feature toggle to be enabled on the Commerce Cloud instance).

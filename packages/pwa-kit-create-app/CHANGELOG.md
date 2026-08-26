@@ -1,4 +1,5 @@
 ## v3.21.0-dev (Aug 12, 2026)
+- Keep the generated `ssr.js.hbs` templates in sync with `template-retail-react-app` for Guest Order Lookup (GLO): add all `/api/order-lookup/*` Express route handlers (verify, order, oms-meta, cancel, return), helper functions (`makeShopperOrders`, `filterGuestOrderFields`, `parseGuestOrderCookie`, `evictIfNeeded`, `createVerifyThrottle`), and the `commerce-sdk-isomorphic` `ShopperOrders` import so generated projects compile and run the feature when `guestOrderLookup.enabled` is set to `true`. [#3982](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3982)
 - Keep the generated Commerce Client auth-link templates in sync with `template-retail-react-app`: the browser reads the deployment-scoped `cim_af_ct_<orgId>_<embeddedServiceName>` storage value and calls SCRT2's `/iamessage/api/v2/authorization/authlink` endpoint directly with the Commerce Client JWT to obtain an `auth_link_key` for Token Bridge use. The generated `ssr.js.hbs` no longer registers a `/api/agent/authlink` proxy route. [#3981](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3981)
 
 ## v3.20.0 (Aug 12, 2026)
