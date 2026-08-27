@@ -32,6 +32,7 @@ const onClient = typeof window !== 'undefined'
  * @param {string} [options.capabilitiesVersion] - Embedded Messaging capabilities version (defaults to '65')
  * @param {boolean} [options.enableEscalationToAgent=true] - Whether shoppers can escalate to a human agent
  * @param {boolean} [options.enableDownloadTranscript=true] - Whether shoppers can download the chat transcript
+ * @param {number} [options.conversationHistoryLimit=200] - Max conversation entries to fetch on resume
  * @param {Object} [options.routingAttributes] - Optional Agentforce routing attributes
  * @param {string} [options.logoUrl] - URL of the logo shown in the widget
  * @param {string} [options.headerText] - Header text shown at the top of the widget
@@ -57,6 +58,7 @@ const injectCommerceClientWidget = ({
     capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     enableEscalationToAgent = true,
     enableDownloadTranscript = true,
+    conversationHistoryLimit = 200,
     routingAttributes,
     logoUrl,
     headerText,
@@ -96,6 +98,9 @@ const injectCommerceClientWidget = ({
             elementId,
             mode: 'messaging',
             messagingConfig,
+            conversationHistory: {
+                limit: conversationHistoryLimit
+            },
             ...(logoUrl ? {logoUrl} : {}),
             ...(headerText ? {headerText} : {}),
             ...(disclaimerMarkdown ? {disclaimerMarkdown} : {}),

@@ -83,6 +83,9 @@ module.exports = {
             // When 'true' (default), shoppers can download the chat transcript.
             // Forwarded as `messagingConfig.enableDownloadTranscript`.
             cc_enableDownloadTranscript: 'true',
+            // Max conversation entries to fetch on resume. Defaults to 200. The SCRT2 API
+            // caps this at 1000. Forwarded as `conversationHistory.limit`.
+            cc_conversationHistoryLimit: '200',
             // Optional URL to customer's component override script. Must use HTTPS;
             // a non-HTTPS or malformed URL is dropped and the widget keeps its defaults.
             // The script defines Web Components that replace default product cards, carousels,
