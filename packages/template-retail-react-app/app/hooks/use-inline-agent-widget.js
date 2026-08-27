@@ -64,7 +64,7 @@ const useInlineAgentWidget = (config) => {
     }, [enabled, scrt2Url, orgId, esDeveloperName])
 
     useEffect(() => {
-        if (!enabled || !ready) return
+        if (!enabled || !ready || !scrt2Url || !orgId || !esDeveloperName) return
         if (!containerRef.current) return
         if (containerRef.current.querySelector('inline-agent-widget')) return
 
@@ -72,9 +72,8 @@ const useInlineAgentWidget = (config) => {
         el.setAttribute('scrt2-url', scrt2Url)
         el.setAttribute('org-id', orgId)
         el.setAttribute('es-developer-name', esDeveloperName)
-        el.setAttribute('capabilities-version', capabilitiesVersion)
+        if (capabilitiesVersion) el.setAttribute('capabilities-version', capabilitiesVersion)
         if (placeholder) el.setAttribute('placeholder', placeholder)
-        el.setAttribute('product-id-pattern', '/product/([^/?#]+)')
 
         containerRef.current.appendChild(el)
 
