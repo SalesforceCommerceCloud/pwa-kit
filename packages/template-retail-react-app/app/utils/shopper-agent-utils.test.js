@@ -898,5 +898,48 @@ describe('shopper-agent-utils', () => {
                 })
             ).toEqual({isCartMgmtSupported: 'false', clientVersion: '1.24.0'})
         })
+
+        test('stamps the active locale and currency as PascalCase Locale/Currency', () => {
+            expect(
+                resolveCommerceClientRoutingAttributes({locale: 'en-US', currency: 'USD'})
+            ).toEqual({
+                isCartMgmtSupported: 'false',
+                Locale: 'en-US',
+                Currency: 'USD'
+            })
+        })
+
+        test('trims whitespace around the active locale and currency', () => {
+            const attrs = resolveCommerceClientRoutingAttributes({
+                locale: '  fr-FR  ',
+                currency: '  EUR  '
+            })
+            expect(attrs.Locale).toBe('fr-FR')
+            expect(attrs.Currency).toBe('EUR')
+        })
+
+        test('active locale/currency override statically-configured values', () => {
+            const attrs = resolveCommerceClientRoutingAttributes({
+                cc_routingAttributes: {Locale: 'de-DE', Currency: 'CHF'},
+                locale: 'en-GB',
+                currency: 'GBP'
+            })
+            expect(attrs.Locale).toBe('en-GB')
+            expect(attrs.Currency).toBe('GBP')
+        })
+
+        test('omits Locale/Currency when not supplied (leaves configured values intact)', () => {
+            const attrs = resolveCommerceClientRoutingAttributes({
+                cc_routingAttributes: {Currency: 'EUR'}
+            })
+            expect(attrs).not.toHaveProperty('Locale')
+            expect(attrs.Currency).toBe('EUR')
+        })
+
+        test('ignores blank active locale/currency', () => {
+            const attrs = resolveCommerceClientRoutingAttributes({locale: '   ', currency: '  '})
+            expect(attrs).not.toHaveProperty('Locale')
+            expect(attrs).not.toHaveProperty('Currency')
+        })
     })
 })

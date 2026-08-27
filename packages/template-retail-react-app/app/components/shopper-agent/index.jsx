@@ -25,6 +25,7 @@ import {
     COMMERCE_CLIENT_UI_STATE_EVENT
 } from '@salesforce/retail-react-app/app/constants'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
@@ -194,8 +195,12 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     const toastRef = useRef(toast)
     toastRef.current = toast
 
-    // Multi-site hook for locale and currency information
+    // Multi-site hook for locale information
     const {locale} = useMultiSite()
+
+    // Active shopper currency (from the currency switcher). Source of truth for the
+    // session's currency — the static locale.preferredCurrency is only the default.
+    const {currency} = useCurrency()
 
     // Normalize locale to Salesforce language format
     const sfLanguage = normalizeLocaleToSalesforce(locale.id)
@@ -266,7 +271,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
     embeddedLifecycleRef.current = {
         siteId,
         localeId: locale.id,
-        preferredCurrency: locale.preferredCurrency,
+        preferredCurrency: currency,
         commerceOrgId,
         usid,
         sfLanguage,
@@ -664,6 +669,12 @@ const CommerceClientAgentWindow = ({
         cc_overrides
     } = commerceAgentConfiguration
 
+    // Active shopper locale (from the URL) and currency (from the currency switcher).
+    // These are stamped into routingAttributes so the SCRT2 session reflects the
+    // shopper's real selections rather than static config.
+    const {locale} = useMultiSite()
+    const {currency} = useCurrency()
+
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
     const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
     const {formatMessage} = useIntl()
@@ -1020,7 +1031,9 @@ const CommerceClientAgentWindow = ({
             routingAttributes: resolveCommerceClientRoutingAttributes({
                 cc_routingAttributes,
                 cc_cdnVersion,
-                commerceClientScriptSourceUrl
+                commerceClientScriptSourceUrl,
+                locale: locale?.id,
+                currency
             }),
             logoUrl: cc_logoUrl,
             headerText: cc_headerText,
@@ -1054,6 +1067,8 @@ const CommerceClientAgentWindow = ({
             cc_routingAttributes,
             cc_cdnVersion,
             commerceClientScriptSourceUrl,
+            locale?.id,
+            currency,
             cc_logoUrl,
             cc_headerText,
             cc_disclaimerMarkdown,
