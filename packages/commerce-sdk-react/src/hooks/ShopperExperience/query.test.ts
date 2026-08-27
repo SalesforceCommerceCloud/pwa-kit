@@ -178,6 +178,27 @@ describe('Shopper Experience query hooks with Page Designer params', () => {
         }
     )
 
+    test.each(testCases)(
+        '`%s` resolves to null on a 304 Not Modified in Page Designer mode',
+        async (queryName) => {
+            // A 304 (conditional request) carries no body. rawResponse mode must return null
+            // instead of calling response.json() on an empty body, which would throw a SyntaxError.
+            mockQueryEndpoint(experienceEndpoint, '', 304)
+
+            const pageDesignerParams = {
+                mode: 'edit' as const,
+                pdToken: 'test-pd-token'
+            }
+
+            const {result} = renderHookWithProviders(() => queries[queryName](OPTIONS), {
+                pageDesignerParams
+            })
+
+            await waitAndExpectSuccess(() => result.current)
+            expect(result.current.data).toBeNull()
+        }
+    )
+
     test('useComponent merges pageDesignerParams from provider config', async () => {
         const componentData = {id: 'testComponent', typeId: 'commerce_assets.imageTile'}
         mockQueryEndpoint(experienceEndpoint, componentData)

@@ -76,6 +76,11 @@ export const usePages = (
             if (!response.ok && response.status !== 304) {
                 throw new ResponseError(response)
             }
+            // A 304 Not Modified (conditional request) carries no body, so response.json()
+            // would reject with a SyntaxError. Return null instead of parsing an empty body.
+            if (response.status === 304) {
+                return null
+            }
             return await response.json()
         }
         return await client[methodName](options)
@@ -154,6 +159,11 @@ export const usePage = (
             if (!response.ok && response.status !== 304) {
                 throw new ResponseError(response)
             }
+            // A 304 Not Modified (conditional request) carries no body, so response.json()
+            // would reject with a SyntaxError. Return null instead of parsing an empty body.
+            if (response.status === 304) {
+                return null
+            }
             return await response.json()
         }
         return await client[methodName](options)
@@ -228,6 +238,11 @@ export const useComponent = (
             // to ensure error responses surface as query errors rather than parsed "success" data.
             if (!response.ok && response.status !== 304) {
                 throw new ResponseError(response)
+            }
+            // A 304 Not Modified (conditional request) carries no body, so response.json()
+            // would reject with a SyntaxError. Return null instead of parsing an empty body.
+            if (response.status === 304) {
+                return null
             }
             return await response.json()
         }
