@@ -226,10 +226,19 @@ export const resolveCommerceClientScriptUrl = (commerceAgent) => {
  * override is set (that URL, not `cc_cdnVersion`, defines the running bundle) or when `cc_cdnVersion`
  * is unset, so the backend never gates against a version that doesn't match the running code.
  *
+ * When the active shopper locale/currency are supplied they are stamped on as the
+ * PascalCase `Locale`/`Currency` session attributes the SCRT2 backend expects. These
+ * are the live storefront selections (locale from the URL, currency from the currency
+ * switcher), so they take precedence over any statically-configured values in
+ * `cc_routingAttributes` — the storefront is the source of truth for the shopper's
+ * current locale/currency, and the backend docs warn against hardcoding them.
+ *
  * @param {Object} commerceAgent - Commerce agent configuration object
  * @param {Object} [commerceAgent.cc_routingAttributes] - Merchant routing attributes
  * @param {string} [commerceAgent.cc_cdnVersion] - Cimulate CDN bundle version (e.g. '1.24.0')
  * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override; when set, `clientVersion` is omitted
+ * @param {string} [commerceAgent.locale] - Active shopper locale id (e.g. 'en-US'); stamped as `Locale`
+ * @param {string} [commerceAgent.currency] - Active shopper currency (e.g. 'USD'); stamped as `Currency`
  * @returns {Object} Routing attributes object (never null)
  */
 export const resolveCommerceClientRoutingAttributes = (commerceAgent) => {
@@ -249,6 +258,18 @@ export const resolveCommerceClientRoutingAttributes = (commerceAgent) => {
     const version = commerceAgent?.cc_cdnVersion
     if (!hasScriptSourceOverride && typeof version === 'string' && version.trim() !== '') {
         attrs.clientVersion = version.trim()
+    }
+
+    // Live shopper context. The storefront owns these selections, so they override
+    // anything configured in cc_routingAttributes.
+    const locale = commerceAgent?.locale
+    if (typeof locale === 'string' && locale.trim() !== '') {
+        attrs.Locale = locale.trim()
+    }
+
+    const currency = commerceAgent?.currency
+    if (typeof currency === 'string' && currency.trim() !== '') {
+        attrs.Currency = currency.trim()
     }
 
     return attrs

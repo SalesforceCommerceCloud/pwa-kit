@@ -129,6 +129,12 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     default: jest.fn()
 }))
 
+// Mock the useCurrency hook (active shopper currency)
+jest.mock('@salesforce/retail-react-app/app/hooks/use-currency', () => ({
+    __esModule: true,
+    useCurrency: jest.fn()
+}))
+
 // Mock the useTheme hook
 jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => ({
     useTheme: jest.fn()
@@ -145,6 +151,7 @@ import {
     useUsid
 } from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
 
@@ -157,6 +164,7 @@ const mockedUseConfig = useConfig
 const mockedUseConfigurations = useConfigurations
 const mockedUseCustomerType = useCustomerType
 const mockedUseMultiSite = useMultiSite
+const mockedUseCurrency = useCurrency
 const mockedUseTheme = useTheme
 const mockedUseCommerceClientMessaging = useCommerceClientMessaging
 
@@ -216,6 +224,9 @@ describe('ShopperAgent Component', () => {
             locale: {id: 'en-US', preferredCurrency: 'USD'},
             buildUrl: jest.fn(() => '/us/en-US')
         })
+
+        // Mock useCurrency hook — active shopper currency (defaults to the locale default)
+        mockedUseCurrency.mockReturnValue({currency: 'USD', setCurrency: jest.fn()})
 
         // Mock useTheme hook
         mockedUseTheme.mockReturnValue({
@@ -794,12 +805,36 @@ describe('ShopperAgent Component', () => {
         delete window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__
     })
 
-    test('should update prechat fields when currency changes', async () => {
-        // Mock useMultiSite to return different currency values
+    test('should send the active selected currency, not the locale default', async () => {
+        // Locale default is USD, but the shopper has switched the active currency to EUR
+        // via the currency switcher. The prechat fields must reflect the active selection.
         mockedUseMultiSite.mockReturnValue({
             locale: {id: 'en-US', preferredCurrency: 'USD'},
             buildUrl: jest.fn(() => '/us/en-US')
         })
+        mockedUseCurrency.mockReturnValue({currency: 'EUR', setCurrency: jest.fn()})
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+        })
+
+        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+            SiteId: 'RefArchGlobal',
+            Locale: 'en-US',
+            OrganizationId: 'test-commerce-org-id',
+            UsId: 'test-usid',
+            IsCartMgmtSupported: 'true',
+            Currency: 'EUR',
+            Language: 'en_US',
+            DomainUrl: 'https://example.com/us/en-US'
+        })
+    })
+
+    test('should update prechat fields when currency changes', async () => {
+        // Active currency starts at USD
+        mockedUseCurrency.mockReturnValue({currency: 'USD', setCurrency: jest.fn()})
 
         render(<ShopperAgent {...defaultProps} />)
 
@@ -819,12 +854,9 @@ describe('ShopperAgent Component', () => {
             DomainUrl: 'https://example.com/us/en-US'
         })
 
-        // Clear mock and change currency to EUR
+        // Clear mock and change the active currency to EUR
         mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
-        mockedUseMultiSite.mockReturnValue({
-            locale: {id: 'en-US', preferredCurrency: 'EUR'},
-            buildUrl: jest.fn(() => '/us/en-US')
-        })
+        mockedUseCurrency.mockReturnValue({currency: 'EUR', setCurrency: jest.fn()})
 
         // Re-render with new currency
         render(<ShopperAgent {...defaultProps} />)
@@ -871,12 +903,14 @@ describe('ShopperAgent Component', () => {
             DomainUrl: 'https://example.com/us/en-US'
         })
 
-        // Clear mock and change locale to en-GB
+        // Clear mock and change locale to en-GB (a locale switch reseeds the active
+        // currency to the new locale's default)
         mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
         mockedUseMultiSite.mockReturnValue({
             locale: {id: 'en-GB', preferredCurrency: 'GBP'},
             buildUrl: jest.fn(() => '/us/en-US')
         })
+        mockedUseCurrency.mockReturnValue({currency: 'GBP', setCurrency: jest.fn()})
 
         // Re-render with new locale
         render(<ShopperAgent {...defaultProps} />)
@@ -1652,15 +1686,53 @@ describe('ShopperAgent Component', () => {
         test('forwards cc_routingAttributes to the widget options, augmented with backend signals', () => {
             renderCommerceClient({cc_routingAttributes: {foo: 'bar'}})
 
-            // cc_cdnVersion is '1.0.0' in the shared commerceClientSettings.
+            // cc_cdnVersion is '1.0.0' in the shared commerceClientSettings; Locale/Currency
+            // come from the active useMultiSite/useCurrency mocks (en-US / USD).
             expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
                 expect.anything(),
                 expect.objectContaining({
                     routingAttributes: {
                         foo: 'bar',
                         isCartMgmtSupported: 'false',
-                        clientVersion: '1.0.0'
+                        clientVersion: '1.0.0',
+                        Locale: 'en-US',
+                        Currency: 'USD'
                     }
+                })
+            )
+        })
+
+        test('stamps the active locale and currency into routingAttributes', () => {
+            mockedUseMultiSite.mockReturnValue({
+                locale: {id: 'fr-FR', preferredCurrency: 'EUR'},
+                buildUrl: jest.fn(() => '/fr/fr-FR')
+            })
+            mockedUseCurrency.mockReturnValue({currency: 'EUR', setCurrency: jest.fn()})
+
+            renderCommerceClient()
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    routingAttributes: expect.objectContaining({
+                        Locale: 'fr-FR',
+                        Currency: 'EUR'
+                    })
+                })
+            )
+        })
+
+        test('sends the active selected currency, not a configured routingAttributes value', () => {
+            // Shopper has switched the active currency to JPY; a stale configured value
+            // must not win over the live selection.
+            mockedUseCurrency.mockReturnValue({currency: 'JPY', setCurrency: jest.fn()})
+
+            renderCommerceClient({cc_routingAttributes: {Currency: 'USD'}})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    routingAttributes: expect.objectContaining({Currency: 'JPY'})
                 })
             )
         })
