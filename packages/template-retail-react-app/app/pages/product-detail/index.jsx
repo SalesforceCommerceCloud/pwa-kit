@@ -41,12 +41,7 @@ import RecommendedProducts from '@salesforce/retail-react-app/app/components/rec
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
 import Island from '@salesforce/retail-react-app/app/components/island'
-import loadable from '@loadable/component'
-
-const InlineAgentWidget = loadable(
-    () => import('@salesforce/retail-react-app/app/components/inline-agent-widget'),
-    {ssr: false}
-)
+import InlineAgentWidget from '@salesforce/retail-react-app/app/components/inline-agent-widget'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'

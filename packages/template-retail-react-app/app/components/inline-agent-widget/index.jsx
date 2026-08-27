@@ -6,6 +6,7 @@
  */
 
 import React from 'react'
+import {Helmet} from 'react-helmet'
 import PropTypes from 'prop-types'
 import useInlineAgentWidget from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 
@@ -14,7 +15,14 @@ const InlineAgentWidget = ({config}) => {
 
     if (!config?.enabled) return null
 
-    return <div ref={containerRef} />
+    return (
+        <>
+            <Helmet>
+                <script src="/static/inline-agent-widget.umd.js" async></script>
+            </Helmet>
+            <div ref={containerRef} />
+        </>
+    )
 }
 
 InlineAgentWidget.propTypes = {

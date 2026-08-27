@@ -7,33 +7,38 @@
 
 import {useEffect, useRef, useState} from 'react'
 
-let scriptPromise = null
+const SCRIPT_SRC = '/static/inline-agent-widget.umd.js'
 
-const loadScript = () => {
-    if (scriptPromise) return scriptPromise
-    scriptPromise = new Promise((resolve, reject) => {
-        if (customElements.get('inline-agent-widget')) {
-            resolve()
-            return
-        }
+let readyPromise = null
+
+const ensureWidget = () => {
+    if (readyPromise) return readyPromise
+
+    if (customElements.get('inline-agent-widget')) {
+        readyPromise = Promise.resolve()
+        return readyPromise
+    }
+
+    // Ensure the script tag exists in <head> (Helmet adds it on SSR, but on
+    // client-only navigation we may need to inject it manually).
+    if (!document.querySelector(`script[src="${SCRIPT_SRC}"]`)) {
         const script = document.createElement('script')
-        script.src = '/static/inline-agent-widget.umd.js'
-        script.onload = () => {
-            if (
-                !customElements.get('inline-agent-widget') &&
-                window.InlineAgentWidget?.defineElement
-            ) {
-                window.InlineAgentWidget.defineElement()
-            }
-            resolve()
-        }
-        script.onerror = (e) => {
-            scriptPromise = null
-            reject(e)
-        }
+        script.src = SCRIPT_SRC
+        script.async = true
         document.head.appendChild(script)
+    }
+
+    // Wait for the custom element to be registered — works regardless of
+    // whether the script was included in SSR HTML or injected dynamically.
+    readyPromise = customElements.whenDefined('inline-agent-widget').then(() => {
+        if (
+            !customElements.get('inline-agent-widget') &&
+            window.InlineAgentWidget?.defineElement
+        ) {
+            window.InlineAgentWidget.defineElement()
+        }
     })
-    return scriptPromise
+    return readyPromise
 }
 
 const useInlineAgentWidget = (config) => {
@@ -49,7 +54,13 @@ const useInlineAgentWidget = (config) => {
     useEffect(() => {
         if (typeof window === 'undefined') return
         if (!enabled || !scrt2Url || !orgId || !esDeveloperName) return
-        loadScript().then(() => setReady(true))
+        let cancelled = false
+        ensureWidget().then(() => {
+            if (!cancelled) setReady(true)
+        })
+        return () => {
+            cancelled = true
+        }
     }, [enabled, scrt2Url, orgId, esDeveloperName])
 
     useEffect(() => {
