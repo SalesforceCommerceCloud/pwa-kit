@@ -31,10 +31,7 @@ const ensureWidget = () => {
     // Wait for the custom element to be registered — works regardless of
     // whether the script was included in SSR HTML or injected dynamically.
     readyPromise = customElements.whenDefined('inline-agent-widget').then(() => {
-        if (
-            !customElements.get('inline-agent-widget') &&
-            window.InlineAgentWidget?.defineElement
-        ) {
+        if (!customElements.get('inline-agent-widget') && window.InlineAgentWidget?.defineElement) {
             window.InlineAgentWidget.defineElement()
         }
     })
