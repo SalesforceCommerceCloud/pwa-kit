@@ -41,19 +41,17 @@ const ensureWidget = () => {
     return readyPromise
 }
 
+const isConfigured = (config) =>
+    Boolean(config?.enabled && config?.scrt2Url && config?.orgId && config?.esDeveloperName)
+
 const useInlineAgentWidget = (config) => {
     const [ready, setReady] = useState(false)
     const containerRef = useRef(null)
-    const enabled = config?.enabled
-    const scrt2Url = config?.scrt2Url
-    const orgId = config?.orgId
-    const esDeveloperName = config?.esDeveloperName
-    const capabilitiesVersion = config?.capabilitiesVersion
-    const placeholder = config?.placeholder
+    const configured = isConfigured(config)
 
     useEffect(() => {
         if (typeof window === 'undefined') return
-        if (!enabled || !scrt2Url || !orgId || !esDeveloperName) return
+        if (!configured) return
         let cancelled = false
         ensureWidget().then(() => {
             if (!cancelled) setReady(true)
@@ -61,26 +59,27 @@ const useInlineAgentWidget = (config) => {
         return () => {
             cancelled = true
         }
-    }, [enabled, scrt2Url, orgId, esDeveloperName])
+    }, [configured])
 
     useEffect(() => {
-        if (!enabled || !ready || !scrt2Url || !orgId || !esDeveloperName) return
+        if (!configured || !ready) return
         if (!containerRef.current) return
         if (containerRef.current.querySelector('inline-agent-widget')) return
 
         const el = document.createElement('inline-agent-widget')
-        el.setAttribute('scrt2-url', scrt2Url)
-        el.setAttribute('org-id', orgId)
-        el.setAttribute('es-developer-name', esDeveloperName)
-        if (capabilitiesVersion) el.setAttribute('capabilities-version', capabilitiesVersion)
-        if (placeholder) el.setAttribute('placeholder', placeholder)
+        el.setAttribute('scrt2-url', config.scrt2Url)
+        el.setAttribute('org-id', config.orgId)
+        el.setAttribute('es-developer-name', config.esDeveloperName)
+        if (config.capabilitiesVersion)
+            el.setAttribute('capabilities-version', config.capabilitiesVersion)
+        if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
 
         containerRef.current.appendChild(el)
 
         return () => {
             el.remove()
         }
-    }, [ready, enabled, scrt2Url, orgId, esDeveloperName, capabilitiesVersion, placeholder])
+    }, [configured, ready, config])
 
     return containerRef
 }
