@@ -9,7 +9,7 @@ import {
     getCookieName,
     getSiteId,
     SESSION_COOKIE_CONFIG
-} from '@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config'
+} from '@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config.js'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {isTrustedSalesforceDomain} from './salesforce-domain-allowlist.js'
 
@@ -28,11 +28,11 @@ import {isTrustedSalesforceDomain} from './salesforce-domain-allowlist.js'
  *        sent automatically to same-origin proxy. Client sends auth_link_key
  *        in request body, and siteId as x-site-id header.
  *      - HttpOnly OFF: Access token in localStorage, refresh token in cookie.
- *        Client sends auth_link_key, slas_access_token (from localStorage)
- *        in request body, and siteId as x-site-id header.
+ *        Client sends auth_link_key and the access token (from localStorage)
+ *        in the request body, and siteId as the x-site-id header.
  *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js):
  *      - Reads siteId from x-site-id header (standard PWA Kit pattern)
- *      - Reads tokens from cookies (HttpOnly mode) or request body (non-HttpOnly)
+ *      - Reads tokens from cookies (HttpOnly mode) or the request body (non-HttpOnly)
  *      - Reads my_domain directly from AGENT_MYDOMAIN environment variable
  *      - Validates my_domain against Salesforce domain allowlist (SSRF prevention)
  *      - Forwards to Core with `Authorization: SLAS <access_token>` and
@@ -85,16 +85,15 @@ export function resolveAgentforceMyDomain(myDomain) {
     return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
 }
 
-// isTrustedSalesforceDomain (Core `*.salesforce.com` allowlist) is shared with
-// auth-link-proxy.js via ./salesforce-domain-allowlist.js — the Token Bridge only
-// ever talks to Core's My Domain (AGENT_MYDOMAIN), so it uses the Core list for both
-// its upstream SSRF check and the CSRF Origin check.
+// isTrustedSalesforceDomain (Core `*.salesforce.com` allowlist) lives in
+// ./salesforce-domain-allowlist.js — the Token Bridge only ever talks to Core's
+// My Domain (AGENT_MYDOMAIN), so it uses the Core list for both its upstream SSRF
+// check and the CSRF Origin check.
 
 /** Express handler for POST /api/agent/identity/bridge. */
 export async function handleTokenBridge(req, res) {
     try {
-        const {auth_link_key: authLinkKey, slas_access_token: slasAccessTokenFromBody} =
-            req.body || {}
+        const {auth_link_key: authLinkKey, slas_access_token: bodySlasAccessToken} = req.body || {}
 
         if (!authLinkKey || typeof authLinkKey !== 'string') {
             return res.status(400).json({error: 'MISSING_AUTH_LINK_KEY'})
@@ -166,7 +165,8 @@ export async function handleTokenBridge(req, res) {
                 return res.status(401).json({error: 'INVALID_SLAS_TOKEN'})
             }
         } else {
-            // Non-HttpOnly mode: Access token from body (localStorage), refresh token from cookie
+            // Non-HttpOnly mode: access token arrives in the request body
+            // (browser reads it from localStorage), refresh token from cookie
             const refreshTokenRegisteredCookie = getCookieName(
                 SESSION_COOKIE_CONFIG.refreshTokenRegistered,
                 siteId
@@ -176,7 +176,7 @@ export async function handleTokenBridge(req, res) {
                 siteId
             )
 
-            slasAccessToken = slasAccessTokenFromBody
+            slasAccessToken = bodySlasAccessToken
             refreshToken = cookies[refreshTokenRegisteredCookie] || cookies[refreshTokenGuestCookie]
 
             if (!slasAccessToken || typeof slasAccessToken !== 'string') {
@@ -209,9 +209,9 @@ export async function handleTokenBridge(req, res) {
         }
 
         if (!refreshToken) {
-            // Core treats refresh_token as optional (guest sessions never have one).
-            // Only log at debug level to avoid noise in production monitoring.
-            console.debug(
+            // We never expect to reach Core without a refresh token in this flow;
+            // log at error level so it surfaces in production monitoring.
+            console.error(
                 '[token-bridge] No SLAS refresh token available; ' +
                     'forwarding to Core without refresh_token.'
             )
@@ -251,8 +251,8 @@ export function registerTokenBridgeRoute(app) {
  * Browser helper: POSTs to the same-origin proxy and returns Core's status + body.
  *
  * In HttpOnly mode, tokens are sent automatically via cookies. In non-HttpOnly mode,
- * the access token is read from localStorage and sent in the body, while the refresh
- * token is read from cookies server-side.
+ * the access token is read from localStorage and sent in the request body,
+ * while the refresh token is read from cookies server-side.
  *
  * myDomain is now derived server-side from AGENT_MYDOMAIN environment variable.
  *

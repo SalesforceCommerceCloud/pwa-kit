@@ -68,7 +68,7 @@ const isCancellable = (order) => {
 }
 
 const GuestOrderLookupOrder = () => {
-    const {formatMessage, formatDate} = useIntl()
+    const {formatDate} = useIntl()
     const breadcrumbStyles = useStyleConfig('Breadcrumb')
     const {isRegistered} = useCustomerType()
     const {orderNo} = useParams()
@@ -77,6 +77,7 @@ const GuestOrderLookupOrder = () => {
     // useAccessToken returns a new getTokenWhenReady on every render — store in ref
     // so effects can always call the latest version with a stable dep array.
     const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    // eslint-disable-next-line use-effect-no-deps/use-effect-no-deps -- intentionally runs every render to keep the ref current
     useEffect(() => {
         getTokenWhenReadyRef.current = getTokenWhenReady
     })

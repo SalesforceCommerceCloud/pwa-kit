@@ -8,20 +8,20 @@
 /* -------------------------------------------------------------------------
  * Shared Salesforce domain allowlists for the shopper-agent proxies.
  *
- * SSRF/CSRF prevention: the Token Bridge and Auth Link proxies both need to
- * validate that a URL's host belongs to trusted Salesforce infrastructure
- * before they fetch it (SSRF) or trust it as a request Origin (CSRF). The two
- * proxies talk to two DIFFERENT host families, so there are two validators:
+ * SSRF/CSRF prevention: the Token Bridge proxy and the browser-side auth-link
+ * client both need to validate that a URL's host belongs to trusted Salesforce
+ * infrastructure before they fetch it (SSRF) or trust it as a request Origin
+ * (CSRF). They talk to two DIFFERENT host families, so there are two validators:
  *
  *   - isTrustedSalesforceDomain — Core My Domain (`*.salesforce.com`). Used by
- *     the Token Bridge for its upstream (AGENT_MYDOMAIN) and by both proxies
- *     for the CSRF Origin check (the Storefront Preview iframe is served from
- *     Core).
- *   - isTrustedSCRTDomain — SCRT2 (`*.salesforce-scrt.com`). Used by the Auth
- *     Link proxy for its upstream (scrt2Url); the /iamessage/* endpoint lives
- *     on SCRT2, a different host from Core's My Domain.
+ *     the Token Bridge proxy for its upstream (AGENT_MYDOMAIN) and for its CSRF
+ *     Origin check (the Storefront Preview iframe is served from Core).
+ *   - isTrustedSCRTDomain — SCRT2 (`*.salesforce-scrt.com`). Used by the
+ *     auth-link client to validate the configured scrt2Url before the browser
+ *     sends the Commerce Client JWT to it; the /iamessage/* endpoint lives on
+ *     SCRT2, a different host from Core's My Domain.
  *
- * These lists previously lived (and drifted) as copies inside each proxy. They
+ * These lists previously lived (and drifted) as copies inside each caller. They
  * are consolidated here so there is a single source of truth. This module is
  * intentionally free of React and of `@salesforce/retail-react-app/...`
  * self-referential imports so it can be loaded by `app/ssr.js` under bare
@@ -32,8 +32,8 @@
  * Validate that a URL's hostname is a trusted Salesforce **Core** domain
  * (`*.salesforce.com`, incl. `*.my.salesforce.com` and `*.pc-rnd.salesforce.com`).
  *
- * Used for the CSRF Origin check in both proxies (the Storefront Preview iframe
- * is served from Core's My Domain) and for the Token Bridge's upstream SSRF check
+ * Used for the Token Bridge proxy's CSRF Origin check (the Storefront Preview
+ * iframe is served from Core's My Domain) and for its upstream SSRF check
  * (AGENT_MYDOMAIN). Deliberately does NOT include SCRT2 suffixes — see
  * isTrustedSCRTDomain for those.
  *
@@ -62,9 +62,10 @@ export function isTrustedSalesforceDomain(candidateUrl) {
  * (`*.salesforce-scrt.com`, incl. `*.my.salesforce-scrt.com` and
  * `*.pc-rnd.salesforce-scrt.com`).
  *
- * Used for the SSRF check on the Auth Link proxy's upstream (scrt2Url). SCRT2 is
- * a different host family from Core's My Domain, so this is a separate list from
- * isTrustedSalesforceDomain — do NOT merge them into one broader allowlist.
+ * Used by the auth-link client to validate the configured scrt2Url before the
+ * browser sends the Commerce Client JWT to it. SCRT2 is a different host family
+ * from Core's My Domain, so this is a separate list from isTrustedSalesforceDomain
+ * — do NOT merge them into one broader allowlist.
  *
  * @param {string} candidateUrl - The full URL to check (e.g., https://org.my.salesforce-scrt.com)
  * @returns {boolean} - True if the host is a trusted SCRT2 domain, false otherwise
