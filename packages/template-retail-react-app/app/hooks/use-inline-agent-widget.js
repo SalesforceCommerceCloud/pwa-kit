@@ -81,4 +81,5 @@ const useInlineAgentWidget = (config) => {
     return containerRef
 }
 
+export {isConfigured}
 export default useInlineAgentWidget

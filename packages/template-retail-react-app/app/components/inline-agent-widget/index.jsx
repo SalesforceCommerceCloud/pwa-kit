@@ -8,12 +8,14 @@
 import React from 'react'
 import {Helmet} from 'react-helmet'
 import PropTypes from 'prop-types'
-import useInlineAgentWidget from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
+import useInlineAgentWidget, {
+    isConfigured
+} from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 
 const InlineAgentWidget = ({config}) => {
     const containerRef = useInlineAgentWidget(config)
 
-    if (!config?.enabled) return null
+    if (!isConfigured(config)) return null
 
     return (
         <>
