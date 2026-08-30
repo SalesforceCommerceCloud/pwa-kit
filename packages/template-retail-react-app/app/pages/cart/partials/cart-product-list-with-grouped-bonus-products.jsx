@@ -8,7 +8,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Stack, Box, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
 import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
-import {getBonusProductsForSpecificCartItem} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import {getRemainingAvailableBonusProductsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
 import {shouldShowBonusProductSelection} from '@salesforce/retail-react-app/app/utils/bonus-product/business-logic'
 
@@ -79,13 +78,15 @@ const CartProductListWithGroupedBonusProducts = ({
 
                 // Enhanced rendering for eligible products
                 try {
-                    // Get bonus products allocated specifically to this cart item
-                    const bonusProductsForThisProduct = getBonusProductsForSpecificCartItem(
-                        basket,
-                        qualifyingProduct,
-                        productsWithPromotions,
-                        ruleBasedQualifyingProductsMap
-                    )
+                    // Get bonus products allocated specifically to this cart item using qualifyingProductItemId
+                    // Filter bonus products that belong to this qualifying product
+                    const bonusProductsForThisProduct =
+                        basket?.productItems?.filter(
+                            (item) =>
+                                item.bonusProductLineItem &&
+                                item.qualifyingProductItemId === qualifyingProduct.itemId
+                        ) || []
+
                     const remainingBonusProductsData = getRemainingAvailableBonusProductsForProduct(
                         basket,
                         qualifyingProduct.productId,
@@ -207,7 +208,8 @@ CartProductListWithGroupedBonusProducts.propTypes = {
             PropTypes.shape({
                 itemId: PropTypes.string,
                 productId: PropTypes.string,
-                bonusProductLineItem: PropTypes.bool
+                bonusProductLineItem: PropTypes.bool,
+                qualifyingProductItemId: PropTypes.string
             })
         )
     }).isRequired,
