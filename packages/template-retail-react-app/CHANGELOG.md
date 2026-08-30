@@ -86,6 +86,7 @@
 - [BREAKING] Remove unused absoluteUrl util from retail react app [#3633](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3633)
 - Allow shopper to manually input OTP during passwordless login [#3554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3554)
 
+
 ## v8.3.0 (Dec 17, 2025)
 - [Bugfix] Fix Forgot Password link not working from Account Profile password update form [#3493](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3493)
 - Introduce Address Autocompletion feature in the checkout flow, powered by Google Maps Platform [#3071](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3071)
