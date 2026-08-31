@@ -130,6 +130,10 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
     })
 }))
 
+jest.mock('@salesforce/retail-react-app/app/components/inline-agent-widget', () => {
+    return () => null
+})
+
 const MockedComponent = () => {
     return (
         <Switch>

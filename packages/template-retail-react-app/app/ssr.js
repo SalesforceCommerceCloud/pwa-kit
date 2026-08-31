@@ -732,6 +732,10 @@ const {handler} = runtime.createHandler(options, (app) => {
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
+    app.get(
+        '/static/inline-agent-widget.umd.js',
+        runtime.serveStaticFile('static/inline-agent-widget.umd.js')
+    )
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
 
