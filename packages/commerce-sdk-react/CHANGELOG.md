@@ -1,3 +1,6 @@
+## v5.5.0-nightly-20260901080519 (Sep 01, 2026)
+## v5.5.0-dev (Sep 01, 2026)
+## v3.21.0-nightly-20260901080519 (Sep 01, 2026)
 ## v5.5.0-dev (Aug 12, 2026)
 - [Feature] Add Shopper Experience `useComponent` query hook for fetching a single Page Designer component by component ID, with Page Designer edit/preview mode support (raw response preserved when a `mode` or `pdToken` is present). Page Designer mode uses `rawResponse`, which bypasses the SDK's `throwOnBadResponse` check, so `usePage`, `usePages`, and `useComponent` now explicitly throw a `ResponseError` on a non-ok response in that mode instead of parsing the error body as successful data.
 - [Feature] Add `requestOrderAccessCode` to `ShopperOrdersMutations` and bump `commerce-sdk-isomorphic` to `5.5.0`, which ships the method. `useShopperOrdersMutation('requestOrderAccessCode')` is now fully typed and functional. [#3982](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3982)
