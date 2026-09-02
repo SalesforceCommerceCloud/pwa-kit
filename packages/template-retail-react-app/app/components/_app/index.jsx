@@ -16,6 +16,7 @@ import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
+    useComponent,
     useShopperBasketsMutation,
     useUsid
 } from '@salesforce/commerce-sdk-react'
@@ -71,8 +72,9 @@ import {useAttribution} from '@salesforce/retail-react-app/app/hooks/use-attribu
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
 
-import {PageDesignerProvider} from '@salesforce/commerce-sdk-react/page-designer'
+import {PageDesignerProvider, Region} from '@salesforce/commerce-sdk-react/page-designer'
 import PageDesignerInit from '@salesforce/retail-react-app/app/components/page-designer-init'
+import {EmbeddedSubtreeProvider} from '@salesforce/storefront-next-runtime/design/react/core'
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -150,12 +152,16 @@ const ListMenuContentWithData = withCommerceSdkReact(
     }
 )
 
-const App = (props) => {
+const StorefrontApp = (props) => {
     const {children} = props
     const {data: categoriesTree} = useCategory({
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
     const categories = flatten(categoriesTree || {}, 'categories')
+    // Embedded content-block header: a singleton Page Designer component (instance id
+    // `header`) that exposes an `announcement` region rendered above the storefront header.
+    // `useComponent` is Page-Designer-mode aware (handles mode/pdToken internally).
+    const {data: embeddedHeader} = useComponent({parameters: {componentId: 'header'}})
     const {getTokenWhenReady} = useAccessToken()
     const {usid} = useUsid()
     const appOrigin = useAppOrigin()
@@ -428,6 +434,14 @@ const App = (props) => {
                                 <Box {...styles.headerWrapper}>
                                     {!isCheckout ? (
                                         <>
+                                            {embeddedHeader && (
+                                                <EmbeddedSubtreeProvider embedded>
+                                                    <Region
+                                                        component={embeddedHeader}
+                                                        regionId="announcement"
+                                                    />
+                                                </EmbeddedSubtreeProvider>
+                                            )}
                                             <AboveHeader />
                                             <Header
                                                 onMenuClick={onOpen}
@@ -520,6 +534,124 @@ const App = (props) => {
             </StorefrontPreview>
         </Box>
     )
+}
+
+StorefrontApp.propTypes = {
+    children: PropTypes.node
+}
+
+/**
+ * Path (without the `/:site/:locale` prefix) served chrome-free by the Page Designer
+ * component-preview iframe. See app/pages/component-preview and app/routes.jsx.
+ */
+const COMPONENT_PREVIEW_PATH_RE = /\/preview\/component$/
+
+/**
+ * Minimal app surface for the Page Designer component-preview iframe.
+ *
+ * It renders only the providers a single Page Designer component needs — i18n, currency,
+ * the Storefront Preview postMessage bridge, and the Page Designer context/init — and none
+ * of the storefront chrome (header, footer, menus) or shopper-state hooks (basket, customer,
+ * category, analytics, shopper agent). Those hooks mutate session state and fire analytics,
+ * which must not happen inside an authoring iframe; skipping them is the point of this split,
+ * not merely hiding the chrome.
+ */
+const ComponentPreviewApp = (props) => {
+    const {children} = props
+    const {getTokenWhenReady} = useAccessToken()
+    const {usid} = useUsid()
+    const appOrigin = useAppOrigin()
+    const location = useLocation()
+    const {site, locale} = useMultiSite()
+    const {req} = useServerContext()
+
+    // Determine Page Designer mode from URL - use req for server-side detection
+    const pageDesignerMode = useMemo(() => {
+        const queryParams = location?.search || ''
+        if (queryParams.includes('mode=EDIT')) return 'EDIT'
+        else if (queryParams.includes('mode=PREVIEW')) return 'PREVIEW'
+        return undefined
+    }, [req?.url])
+
+    const targetLocale = getTargetLocale({
+        getUserPreferredLocales: () => [locale?.id || DEFAULT_LOCALE],
+        l10nConfig: site.l10n
+    })
+
+    const {data: messages} = useQuery({
+        queryKey: ['app', 'translations', 'messages', targetLocale],
+        queryFn: () => fetchTranslations(targetLocale, appOrigin),
+        enabled: isServer
+    })
+
+    const currency = locale.preferredCurrency || site.l10n.defaultCurrency
+
+    return (
+        <Box className="sf-app">
+            <StorefrontPreview getToken={getTokenWhenReady} getBasePath={getRouterBasePath}>
+                <IntlProvider
+                    onError={(err) => {
+                        if (!messages) {
+                            // During the ssr prepass phase the messages object has not loaded,
+                            // so we can suppress errors during this time.
+                            return
+                        }
+                        if (err.code === 'MISSING_TRANSLATION') {
+                            logger.warn('Missing translation', {
+                                namespace: 'ComponentPreviewApp.IntlProvider',
+                                additionalProperties: {errorMessage: err.message}
+                            })
+                            return
+                        }
+                        throw err
+                    }}
+                    locale={targetLocale}
+                    messages={messages}
+                    defaultLocale={DEFAULT_LOCALE}
+                >
+                    <CurrencyProvider currency={currency}>
+                        <Box
+                            as="main"
+                            id="app-main"
+                            role="main"
+                            display="flex"
+                            flexDirection="column"
+                            flex="1"
+                        >
+                            <PageDesignerProvider
+                                clientId="pwa-kit-client"
+                                targetOrigin="*"
+                                usid={usid}
+                                mode={pageDesignerMode}
+                            >
+                                <PageDesignerInit />
+                                {children}
+                            </PageDesignerProvider>
+                        </Box>
+                    </CurrencyProvider>
+                </IntlProvider>
+            </StorefrontPreview>
+        </Box>
+    )
+}
+
+ComponentPreviewApp.propTypes = {
+    children: PropTypes.node
+}
+
+/**
+ * Selects the app shell by route: the Page Designer component-preview iframe gets a
+ * chrome-free surface, every other route gets the full storefront app. Uses `req.url`
+ * on the server and `location.pathname` on the client, matching the SSR-safe pattern
+ * already used for Page Designer mode detection.
+ */
+const App = (props) => {
+    const location = useLocation()
+    const {req} = useServerContext()
+    const pathname = req?.url ? req.url.split('?')[0] : location?.pathname || ''
+    const isComponentPreview = COMPONENT_PREVIEW_PATH_RE.test(pathname)
+
+    return isComponentPreview ? <ComponentPreviewApp {...props} /> : <StorefrontApp {...props} />
 }
 
 App.propTypes = {
