@@ -65,6 +65,8 @@ const GuestOrderLookupResults = loadable(() => import('./pages/guest-order-looku
     fallback
 })
 
+const ComponentPreview = loadable(() => import('./pages/component-preview'), {fallback})
+
 export const routes = [
     {
         path: '/',
@@ -137,6 +139,10 @@ export const routes = [
     {
         path: '/store-locator',
         component: StoreLocator
+    },
+    {
+        path: '/preview/component',
+        component: ComponentPreview
     }
 ]
 
