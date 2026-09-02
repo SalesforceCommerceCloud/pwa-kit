@@ -214,7 +214,7 @@ module.exports = {
             orgId: '',
             esDeveloperName: '',
             capabilitiesVersion: '1',
-            placeholder: 'Ask me anything'
+            placeholder: ''
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
