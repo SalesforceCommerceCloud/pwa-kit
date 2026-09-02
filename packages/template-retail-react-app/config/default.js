@@ -208,6 +208,14 @@ module.exports = {
             sdkUrl: '',
             metadataUrl: ''
         },
+        inlineAgentWidget: {
+            enabled: false,
+            scrt2Url: '',
+            orgId: '',
+            esDeveloperName: '',
+            capabilitiesVersion: '1',
+            placeholder: ''
+        },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
         }
