@@ -6,6 +6,7 @@
  */
 
 export * from './carousel'
+export * from './header'
 export * from './mobileGrid1r1c'
 export * from './mobileGrid2r1c'
 export * from './mobileGrid2r2c'
