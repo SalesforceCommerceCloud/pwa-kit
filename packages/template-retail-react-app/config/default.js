@@ -92,7 +92,7 @@ module.exports = {
             // Serving the script from a host other than the one configured here (for example
             // when the URL varies per environment) means adding that hostname to `script-src`
             // in app/ssr.js yourself.
-            cc_overridesUrl: ''
+            cc_overridesUrl: '',
             // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
@@ -109,6 +109,16 @@ module.exports = {
             // elements must already be registered with customElements.define() before the widget
             // injects. Mutually exclusive with `cc_overridesUrl` — set one or the other, not
             // both; when both are set `cc_overrides` wins and the URL is ignored.
+            inlinepdpAgentWidget: {
+                enabled: false,
+                scrt2Url: '',
+                orgId: '',
+                esDeveloperName: '',
+                capabilitiesVersion: '1',
+                placeholder: '',
+                persistSession: true,
+                enableLogging: false
+            }
         },
         url: {
             site: 'path',
@@ -207,16 +217,6 @@ module.exports = {
             enabled: false,
             sdkUrl: '',
             metadataUrl: ''
-        },
-        inlineAgentWidget: parseSettings(process.env.INLINE_AGENT_WIDGET_SETTINGS) || {
-            enabled: false,
-            scrt2Url: '',
-            orgId: '',
-            esDeveloperName: '',
-            capabilitiesVersion: '1',
-            placeholder: '',
-            persistSession: true,
-            enableLogging: false
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY

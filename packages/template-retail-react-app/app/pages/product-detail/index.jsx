@@ -77,7 +77,7 @@ const ProductDetail = () => {
     const {onOpen: onOpenStoreLocator} = useStoreLocatorModal()
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
-    const inlineAgentWidgetConfig = getConfig()?.app?.inlineAgentWidget
+    const inlineAgentWidgetConfig = getConfig()?.app?.commerceAgent?.inlinepdpAgentWidget
 
     /****************************** Basket *********************************/
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
