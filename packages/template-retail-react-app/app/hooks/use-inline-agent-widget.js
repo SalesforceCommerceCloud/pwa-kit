@@ -70,6 +70,8 @@ const useInlineAgentWidget = (config) => {
         if (config.capabilitiesVersion)
             el.setAttribute('capabilities-version', config.capabilitiesVersion)
         if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
+        if (config.persistSession) el.setAttribute('persist-session', '')
+        if (config.enableLogging) el.setAttribute('enable-logging', '')
 
         containerRef.current.appendChild(el)
 
