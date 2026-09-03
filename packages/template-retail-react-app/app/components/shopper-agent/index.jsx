@@ -10,11 +10,14 @@ import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {
     useAccessToken,
+    useBasketV2,
     useConfig,
     useConfigurations,
     useCustomerType,
+    useProduct,
     useUsid
 } from '@salesforce/commerce-sdk-react'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
@@ -60,14 +63,15 @@ const validateSalesforceDomain = (url) => {
     try {
         const urlObj = new URL(url)
         const hostname = urlObj.hostname
-
+        console.log("url:"+url+ ", hostname: "+hostname)
         // Check for trusted Salesforce domains
         return (
             hostname.endsWith('.salesforce.com') ||
             hostname.endsWith('.salesforce-scrt.com') ||
             hostname.endsWith('pc-rnd.salesforce-scrt.com') ||
             hostname.endsWith('.pc-rnd.site.com') ||
-            hostname.endsWith('.my.site.com')
+            hostname.endsWith('.my.site.com') || 
+            hostname.endsWith('localhost')
         )
     } catch {
         return false
@@ -586,6 +590,13 @@ const COMMERCE_CLIENT_GLOBAL_CLASS = 'commerce-client-shopper-agent'
 const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
 
 /**
+ * POC placeholder: the Commerce Client widget's `getProductDetail(id)` is wired
+ * to fetch this fixed product for now. Replace with the id the widget passes
+ * once the product-detail flow is finalized.
+ */
+const POC_PRODUCT_DETAIL_ID = '25752981M'
+
+/**
  * Internal component that renders the Commerce Client messaging widget.
  *
  * Unlike {@link ShopperAgentWindow} (which boots the Salesforce Embedded
@@ -677,6 +688,34 @@ const CommerceClientAgentWindow = ({
     getTokenWhenReadyRef.current = getTokenWhenReady
 
     const {organizationId, siteId: configSiteId} = useConfig()
+
+    // Current basket, exposed to the widget via commerceProxy so it can read live
+    // basket state. getBasket uses the Shopper Baskets V2 query hook's refetch
+    // (below) so auth (SLAS token / HttpOnly cookie) is handled by the SDK.
+    const {data: currentBasket} = useCurrentBasket()
+    const basketId = currentBasket?.basketId
+
+    // Disabled v2 getBasket query — we only want it on demand (when the widget
+    // calls getBasket), not on render. refetch() routes through the SDK's
+    // auth-wrapped query fn, so we never attach Authorization headers by hand.
+    const {refetch: refetchBasket} = useBasketV2({parameters: {basketId}}, {enabled: false})
+    // The widget is injected once, so getBasket reads the latest refetch/basketId
+    // from refs rather than the values captured at injection time.
+    const refetchBasketRef = useRef(refetchBasket)
+    refetchBasketRef.current = refetchBasket
+    const basketIdRef = useRef(basketId)
+    basketIdRef.current = basketId
+
+    // Disabled product query — exposed to the widget via commerceProxy.getProductDetail.
+    // Like getBasket, it only runs on demand (refetch), so auth is handled by the SDK.
+    // POC: keyed on a fixed product id (POC_PRODUCT_DETAIL_ID) rather than the id the
+    // widget passes.
+    const {refetch: refetchProduct} = useProduct(
+        {parameters: {id: POC_PRODUCT_DETAIL_ID}},
+        {enabled: false}
+    )
+    const refetchProductRef = useRef(refetchProduct)
+    refetchProductRef.current = refetchProduct
 
     // Fetch my_domain from the Shopper Configurations API. Auth-linking calls
     // Core (via the Token Bridge), which is only reachable once my_domain has
@@ -1008,6 +1047,49 @@ const CommerceClientAgentWindow = ({
         }
     }, [])
 
+    // Stable accessor the widget calls to read live basket state. Triggers the
+    // disabled v2 getBasket query via refetch (auth handled by the SDK) and
+    // normalizes its line items to {id, count} — SCAPI exposes `quantity`, not
+    // `count` — matching the widget's expected commerceProxy basket shape.
+    const getBasketRef = useRef(async () => {
+        if (!basketIdRef.current) return null
+        const {data: basket} = await refetchBasketRef.current()
+        if (!basket) return null
+        return {
+            basketId: basket.basketId,
+            items: (basket.productItems || []).map((item) => ({
+                id: item.itemId,
+                count: item.quantity
+            }))
+        }
+    })
+
+    // Stable accessor the widget calls to read product detail. POC: ignores the
+    // requested id and refetches the fixed POC_PRODUCT_DETAIL_ID, normalizing the
+    // SCAPI product to the widget's {id, name, description, price} shape.
+    const getProductDetailRef = useRef(async () => {
+        const {data: product} = await refetchProductRef.current()
+        if (!product) return null
+        return {
+            id: product.id,
+            name: product.name,
+            description: product.longDescription || product.shortDescription || '',
+            price: product.price
+        }
+    })
+
+    // commerceProxy passed to the widget. `basket.id` is the snapshot at injection;
+    // getBasket always returns live data regardless of that static id. (`item` is
+    // intentionally omitted for now — it can be populated later, e.g. from a PDP.)
+    const commerceProxy = useMemo(
+        () => ({
+            basket: {id: basketId},
+            getBasket: getBasketRef.current,
+            getProductDetail: getProductDetailRef.current
+        }),
+        [basketId]
+    )
+
     const widgetOptions = useMemo(
         () => ({
             elementId: commerceClientElementId,
@@ -1040,6 +1122,7 @@ const CommerceClientAgentWindow = ({
                 }
             },
             theme: cc_theme,
+            commerceProxy,
             ...resolveCommerceClientOverrideOptions({cc_overrides, cc_overridesUrl})
         }),
         [
@@ -1066,6 +1149,7 @@ const CommerceClientAgentWindow = ({
             cc_widgetPosition,
             cc_dialogWidth,
             cc_theme,
+            commerceProxy,
             cc_overridesUrl,
             cc_overrides
         ]
