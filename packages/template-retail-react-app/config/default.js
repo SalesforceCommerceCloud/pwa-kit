@@ -208,7 +208,7 @@ module.exports = {
             sdkUrl: '',
             metadataUrl: ''
         },
-        inlineAgentWidget: {
+        inlineAgentWidget: parseSettings(process.env.INLINE_AGENT_WIDGET_SETTINGS) || {
             enabled: false,
             scrt2Url: '',
             orgId: '',
