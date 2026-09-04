@@ -1,3 +1,4 @@
+## v3.21.0-nightly-20260904080455 (Sep 04, 2026)
 ## v3.21.0-dev (Aug 12, 2026)
 ## v3.20.0 (Aug 12, 2026)
 - Remove the custom per-request CloudWatch metrics emitted by the SSR remote server (`GCTime`, `RequestTime`, `RequestSuccess`, `RequestFailed404`/`RequestFailed400`/`RequestFailed500`, `LambdaCreated`, `LambdaReused`, `RenderTime`, `RenderErrors`) to eliminate the `PutMetricData` cost incurred on every request. This is not a breaking change: `app.sendMetric()` and the `MetricsSender` (`send()`/`flush()`) are retained with their original signatures as no-ops for backwards compatibility.
