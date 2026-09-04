@@ -109,16 +109,6 @@ module.exports = {
             // elements must already be registered with customElements.define() before the widget
             // injects. Mutually exclusive with `cc_overridesUrl` — set one or the other, not
             // both; when both are set `cc_overrides` wins and the URL is ignored.
-            inlinepdpAgentWidget: {
-                enabled: false,
-                scrt2Url: '',
-                orgId: '',
-                esDeveloperName: '',
-                capabilitiesVersion: '1',
-                placeholder: '',
-                persistSession: true,
-                enableLogging: false
-            }
         },
         url: {
             site: 'path',
@@ -217,6 +207,16 @@ module.exports = {
             enabled: false,
             sdkUrl: '',
             metadataUrl: ''
+        },
+        inlinepdpAgentWidget: parseSettings(process.env.INLINE_PDP_AGENT_WIDGET_SETTINGS) || {
+            enabled: false,
+            scrt2Url: '',
+            orgId: '',
+            esDeveloperName: '',
+            capabilitiesVersion: '1',
+            placeholder: '',
+            persistSession: true,
+            enableLogging: false
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
