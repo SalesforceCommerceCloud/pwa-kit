@@ -21,13 +21,14 @@ module.exports = {
             enabled: false
         },
         commerceAgent: parseSettings(process.env.COMMERCE_AGENT_SETTINGS) || {
-            enabled: 'false',
+            enabled: 'true',
+            enableAgentFromHeader: 'true',
             askAgentOnSearch: 'false',
             embeddedServiceName: '',
             embeddedServiceEndpoint: '',
             scriptSourceUrl: '',
-            scrt2Url: '',
-            salesforceOrgId: '',
+            scrt2Url: 'https://q3sdb1504032026zs3.test2.my.pc-rnd.salesforce-scrt.com',
+            salesforceOrgId: '00Dfi800001CByP',
             commerceOrgId: '',
             siteId: '',
             enableConversationContext: 'false',
@@ -35,7 +36,7 @@ module.exports = {
             // Widget provider: 'miaw' (default, Salesforce Embedded Messaging) or
             // 'commerce-client' (Commerce Client widget). Selecting 'commerce-client' uses the
             // fields below instead of the MIAW embedded-service fields above.
-            provider: 'miaw',
+            provider: 'commerce-client',
             // Cimulate CDN version of the Commerce Client messaging UMD bundle (e.g.
             // '1.18.0'). Resolved into
             // https://cdn.search.cimulate.ai/copilot-widget/<version>/messaging.umd.js.
@@ -43,10 +44,10 @@ module.exports = {
             cc_cdnVersion: '',
             // Optional explicit bundle URL. Overrides cc_cdnVersion when set; use for local
             // dev (http://localhost:...) or an SFCC self-hosted bundle.
-            commerceClientScriptSourceUrl: '',
+            commerceClientScriptSourceUrl: 'http://localhost:4173/messaging.umd.js',
             // Embedded Service developer name for the Commerce Client widget. Falls back
             // to embeddedServiceName when not set.
-            cc_esDeveloperName: '',
+            cc_esDeveloperName: 'BYONFreeformNTOExample',
             // Header text shown at the top of the Commerce Client widget.
             cc_headerText: '',
             // Markdown disclaimer shown in the Commerce Client widget. Supports links and
@@ -145,9 +146,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: 'kv7kzm78',
+                clientId: '55008ad6-cbde-4e1b-a660-233580080d19',
+                organizationId: 'f_ecom_zzrm_015',
+                shortCode: 'sandbox-001',
                 siteId: 'RefArchGlobal'
             }
             // Optional: Set the domain for auth cookies to share them across subdomains.
@@ -240,11 +241,11 @@ module.exports = {
         enableHttpOnlySessionCookies: false,
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'zzrm-015.unified.demandware.net',
                 path: 'ocapi'
             }
         ]
