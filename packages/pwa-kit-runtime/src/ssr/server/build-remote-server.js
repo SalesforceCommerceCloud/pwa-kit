@@ -322,6 +322,15 @@ export const SLAS_PRIVATE_PROXY_ALLOWLIST = Object.freeze([
         injectAuth: SlasProxyAuthType.NONE
     },
     {
+        // Front-channel IDP / social-login authorize redirect. GET only, and no
+        // credential injection: the client secret is only needed on the
+        // back-channel `oauth2/token` exchange (above). Without this entry the
+        // private-client proxy rejects social login with a 403.
+        segments: ['oauth2', 'authorize'],
+        methods: [HttpMethod.GET],
+        injectAuth: SlasProxyAuthType.NONE
+    },
+    {
         segments: ['oauth2', 'passwordless', 'login'],
         methods: [HttpMethod.POST],
         injectAuth: SlasProxyAuthType.BASIC

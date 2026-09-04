@@ -34,9 +34,14 @@ const ResetPasswordLanding = () => {
     const {formatMessage} = useIntl()
     const {search} = useLocation()
     const navigate = useNavigation()
-    const queryParams = new URLSearchParams(search)
-    const email = decodeURIComponent(queryParams.get('email'))
-    const token = decodeURIComponent(queryParams.get('token'))
+    // A raw '+' in a query string decodes to a space, which corrupts plus-addressed
+    // emails (e.g. name+tag@example.com). Re-encode raw '+' as %2B before parsing so
+    // it survives as a literal '+'. URLSearchParams.get() already decodes the value,
+    // so no additional decodeURIComponent() is needed (that would be a double-decode
+    // and throws on values containing a stray '%').
+    const queryParams = new URLSearchParams(search.replace(/\+/g, '%2B'))
+    const email = queryParams.get('email')
+    const token = queryParams.get('token')
     const fields = useUpdatePasswordFields({form})
     const password = form.watch('password')
     const {resetPassword} = usePasswordReset()

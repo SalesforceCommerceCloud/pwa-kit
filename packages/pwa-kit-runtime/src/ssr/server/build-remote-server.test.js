@@ -313,6 +313,15 @@ describe('_matchSlasAllowlistEntry', () => {
         expect(entry?.injectAuth).toBe('none')
     })
 
+    test('matches oauth2/authorize (social login) with no credential injection', () => {
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v1/organizations/${ORG}/oauth2/authorize`,
+            'GET'
+        )
+        expect(entry?.segments).toEqual(['oauth2', 'authorize'])
+        expect(entry?.injectAuth).toBe('none')
+    })
+
     test('matches future API versions via structural prefix', () => {
         const entry = RemoteServerFactory._matchSlasAllowlistEntry(
             `/shopper/auth/v2/organizations/${ORG}/oauth2/token`,
@@ -373,7 +382,8 @@ describe('_matchSlasAllowlistEntry', () => {
         ['DELETE', `/shopper/auth/v1/organizations/${ORG}/oauth2/token`],
         ['PATCH', `/shopper/auth/v1/organizations/${ORG}/oauth2/passwordless/login`],
         ['GET', `/shopper/auth/v1/organizations/${ORG}/oauth2/passwordless/token`],
-        ['POST', `/shopper/auth/v1/organizations/${ORG}/oauth2/trusted-agent/authorize`]
+        ['POST', `/shopper/auth/v1/organizations/${ORG}/oauth2/trusted-agent/authorize`],
+        ['POST', `/shopper/auth/v1/organizations/${ORG}/oauth2/authorize`]
     ])('returns null when method %s is not declared for the endpoint', (method, path) => {
         expect(RemoteServerFactory._matchSlasAllowlistEntry(path, method)).toBeNull()
     })
