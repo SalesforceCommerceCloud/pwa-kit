@@ -92,7 +92,7 @@ module.exports = {
             // Serving the script from a host other than the one configured here (for example
             // when the URL varies per environment) means adding that hostname to `script-src`
             // in app/ssr.js yourself.
-            cc_overridesUrl: '',
+            cc_overridesUrl: ''
             // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
@@ -208,7 +208,9 @@ module.exports = {
             sdkUrl: '',
             metadataUrl: ''
         },
-        inlinepdpAgentWidget: parseSettings(process.env.INLINE_PDP_AGENT_WIDGET_COMMERCE_SETTINGS) || {
+        inlinepdpAgentWidget: parseSettings(
+            process.env.INLINE_PDP_AGENT_WIDGET_COMMERCE_SETTINGS
+        ) || {
             enabled: false,
             scrt2Url: '',
             orgId: '',
