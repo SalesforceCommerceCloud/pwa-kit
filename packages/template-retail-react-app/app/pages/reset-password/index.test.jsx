@@ -137,3 +137,39 @@ test.each([
         expect(screen.getByText(/confirm new password/i)).toBeInTheDocument()
     })
 })
+
+test('preserves a "+" in the email when submitting the reset (plus-addressing)', async () => {
+    // A raw '+' in a query string decodes to a space via URLSearchParams. The landing
+    // page must preserve it so the plus-addressed email is sent unchanged to SLAS.
+    const plusEmail = 'jangho.jung+1234@salesforce.com'
+    let capturedUserId
+    global.server.use(
+        rest.post('*/password/action', (req, res, ctx) => {
+            const body = req.body
+            capturedUserId =
+                typeof body === 'string'
+                    ? new URLSearchParams(body).get('user_id')
+                    : body?.user_id
+            return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+        })
+    )
+
+    // Land on the reset-password landing page with a raw '+' in the email query param.
+    const landingUrl =
+        createPathWithDefaults('/reset-password-landing') +
+        `?token=abc123&email=${plusEmail}`
+    window.history.pushState({}, 'Reset Password', landingUrl)
+
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    await screen.findByText(/confirm new password/i)
+    await user.type(screen.getByLabelText('New Password'), 'Test1234@')
+    await user.type(screen.getByLabelText('Confirm New Password'), 'Test1234@')
+    await user.click(screen.getByRole('button', {name: /reset password/i}))
+
+    await waitFor(() => {
+        expect(capturedUserId).toBe(plusEmail)
+    })
+})
