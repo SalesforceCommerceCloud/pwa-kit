@@ -67,8 +67,6 @@ const useInlineAgentWidget = (config) => {
         el.setAttribute('scrt2-url', config.scrt2Url)
         el.setAttribute('org-id', config.orgId)
         el.setAttribute('es-developer-name', config.esDeveloperName)
-        if (config.capabilitiesVersion)
-            el.setAttribute('capabilities-version', config.capabilitiesVersion)
         if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
         if (config.persistSession) el.setAttribute('persist-session', '')
         if (config.enableLogging) el.setAttribute('enable-logging', '')

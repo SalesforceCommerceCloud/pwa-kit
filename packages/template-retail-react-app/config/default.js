@@ -215,7 +215,6 @@ module.exports = {
             scrt2Url: '',
             orgId: '',
             esDeveloperName: '',
-            capabilitiesVersion: '1',
             placeholder: '',
             persistSession: true,
             enableLogging: false
