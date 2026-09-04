@@ -1,4 +1,9 @@
-## v3.19.0-dev
+## v3.21.0-dev (Aug 12, 2026)
+## v3.20.0 (Aug 12, 2026)
+- The dev server's `app.sendMetric()` is now a backwards-compatible no-op, following removal of custom per-request CloudWatch metrics in `pwa-kit-runtime`.
+## v3.19.0 (Jul 13, 2026)
+- Add TextEncoder polyfill alongside existing TextDecoder in Jest test environment setup (setup-jest.js). Required for complete AWS SDK 3.x's @smithy/core CBOR support (both encode and decode paths) used by mrt-utilities 0.2.2+. [#3917](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3917)
+- **Security**: Add TextDecoder polyfill to Jest test environment setup (setup-jest.js). Required for AWS SDK 3.x's @smithy/core CBOR encoding used by mrt-utilities 0.2.2+. Ensures template tests run successfully with the upgraded AWS SDK dependency. [#3911](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3911)
 - Fix babel-loader exclude regex on Windows where unescaped backslashes created broken escape sequences [#3840](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3840)
 
 ## v3.18.1 (May 21, 2026)

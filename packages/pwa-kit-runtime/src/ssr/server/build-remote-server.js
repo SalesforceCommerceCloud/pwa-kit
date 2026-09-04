@@ -18,7 +18,8 @@ import {
     SLAS_TOKEN_RESPONSE_ENDPOINTS,
     SLAS_LOGOUT_ENDPOINT,
     X_SITE_ID,
-    X_GRANT_TYPE
+    X_GRANT_TYPE,
+    X_PREVIEW_PARENT
 } from './constants'
 import {SESSION_COOKIE_CONFIG, getCookieName, getSiteId} from './httponly-cookie-config'
 import {tryWriteStorefrontPreviewMarker} from './preview-context'
@@ -264,11 +265,6 @@ export const REMOTE_REQUIRED_ENV_VARS = [
     'EXTERNAL_DOMAIN_NAME',
     'MOBIFY_PROPERTY_ID'
 ]
-
-const METRIC_DIMENSIONS = {
-    Project: process.env.MOBIFY_PROPERTY_ID,
-    Target: process.env.DEPLOY_TARGET
-}
 
 /**
  * Uppercase HTTP method names.
@@ -747,14 +743,9 @@ export const RemoteServerFactory = {
                 // eligible for garbage collection.
 
                 /* istanbul ignore next */
-                let gcTime = 0
-                /* istanbul ignore next */
                 if (global.gc) {
-                    const start = Date.now()
                     global.gc()
-                    gcTime = Date.now() - start
                 }
-                this.sendMetric('GCTime', gcTime, 'Milliseconds')
             },
 
             _requestMonitor: new RequestMonitor(),
@@ -762,24 +753,24 @@ export const RemoteServerFactory = {
             metrics: MetricsSender.getSender(),
 
             /**
-             * Send a metric with fixed dimensions. See MetricsSender.send for more details.
+             * Emitting per-request CloudWatch custom metrics has been removed to
+             * eliminate the PutMetricData cost incurred on every request (W-22715301).
+             *
+             * This method is intentionally retained as a no-op for backwards
+             * compatibility: it is exposed on the Express `app` and may be called
+             * by customer code. It accepts the same arguments as before and does
+             * nothing. The underlying MetricsSender (`this.metrics`) is left in
+             * place for the same reason.
              *
              * @private
-             * @param name {String} metric name
-             * @param [value] {Number} metric value (defaults to 1)
-             * @param [unit] {String} defaults to 'Count'
-             * @param [dimensions] {Object} optional extra dimensions
+             * @param name {String} metric name (ignored)
+             * @param [value] {Number} metric value (ignored)
+             * @param [unit] {String} metric unit (ignored)
+             * @param [dimensions] {Object} optional extra dimensions (ignored)
              */
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             sendMetric(name, value = 1, unit = 'Count', dimensions) {
-                this.metrics.send([
-                    {
-                        name,
-                        value,
-                        timestamp: Date.now(),
-                        unit,
-                        dimensions: Object.assign({}, dimensions || {}, METRIC_DIMENSIONS)
-                    }
-                ])
+                // no-op: custom metric emission removed (W-22715301)
             },
 
             get applicationCache() {
@@ -1074,7 +1065,6 @@ export const RemoteServerFactory = {
 
         const ssrRequestProcessorMiddleware = (req, res, next) => {
             const locals = res.locals
-            locals.requestStart = Date.now()
             locals.afterResponseCalled = false
             locals.responseCaching = {}
 
@@ -1111,31 +1101,10 @@ export const RemoteServerFactory = {
                         locals.__queryClient = null
                     }
 
-                    // Emit timing unless the request is for a proxy
-                    // or bundle path. We don't want to emit metrics
-                    // for those requests. We test req.originalUrl
-                    // because it is consistently available across
-                    // different types of the 'req' object, and will
-                    // always contain the original full path.
-                    /* istanbul ignore else */
-                    if (!this._isBundleOrProxyPath(req.originalUrl)) {
-                        req.app.sendMetric(
-                            'RequestTime',
-                            Date.now() - locals.requestStart,
-                            'Milliseconds'
-                        )
-                        // We count 4xx and 5xx as errors, everything else is
-                        // a success. 404 is a special case.
-                        let metricName = 'RequestSuccess'
-                        if (res.statusCode === 404) {
-                            metricName = 'RequestFailed404'
-                        } else if (res.statusCode >= 400 && res.statusCode <= 499) {
-                            metricName = 'RequestFailed400'
-                        } else if (res.statusCode >= 500 && res.statusCode <= 599) {
-                            metricName = 'RequestFailed500'
-                        }
-                        req.app.sendMetric(metricName)
-                    }
+                    // Per-request custom CloudWatch metrics (RequestTime,
+                    // RequestSuccess, RequestFailed4xx/5xx) were removed to
+                    // eliminate the PutMetricData cost on every request
+                    // (W-22715301).
                 }
             }
 
@@ -1396,6 +1365,11 @@ export const RemoteServerFactory = {
                             targetProtocol: 'https'
                         })
 
+                        // Internal preview-context signal consumed by the response
+                        // interceptor (process-token-response); never forwarded to
+                        // SLAS, regardless of the HttpOnly session-cookie flag.
+                        proxyRequest.removeHeader(X_PREVIEW_PARENT)
+
                         // Credential mode is taken from the allow-list entry
                         // attached by the pre-proxy guard.
                         const {injectAuth = SlasProxyAuthType.NONE} =
@@ -1603,6 +1577,11 @@ export const RemoteServerFactory = {
                             targetHost: options.slasHostName,
                             targetProtocol: 'https'
                         })
+
+                        // Internal preview-context signal consumed by the response
+                        // interceptor (process-token-response); never forwarded to
+                        // SLAS, regardless of the HttpOnly session-cookie flag.
+                        proxyRequest.removeHeader(X_PREVIEW_PARENT)
 
                         if (httpOnlyCookiesEnabled) {
                             handleHttpOnlyCookiesOnProxyReq(proxyRequest, incomingRequest)
@@ -2040,12 +2019,12 @@ export const RemoteServerFactory = {
                     // hundred mS.
                     app._collectGarbage()
                 }
-                app.sendMetric('LambdaReused')
+                // LambdaReused custom metric removed (W-22715301)
             } else {
                 // This is the first use of this container, so set the
                 // reused flag for next time.
                 lambdaContainerReused = true
-                app.sendMetric('LambdaCreated')
+                // LambdaCreated custom metric removed (W-22715301)
             }
 
             const managedCallback = (err, response) => {
@@ -2181,23 +2160,17 @@ const prepNonProxyRequest = (req, res, next) => {
  * @private
  */
 const ssrMiddleware = (req, res, next) => {
+    // The RenderTime custom metric previously emitted here was removed to
+    // eliminate per-request PutMetricData cost (W-22715301).
     setDefaultHeaders(req, res)
-    const renderStartTime = Date.now()
-
-    const done = () => {
-        const elapsedRenderTime = Date.now() - renderStartTime
-        req.app.sendMetric('RenderTime', elapsedRenderTime, 'Milliseconds')
-    }
-
-    res.on('finish', done)
-    res.on('close', done)
     next()
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorHandlerMiddleware = (err, req, res, next) => {
+    // The RenderErrors custom metric previously emitted here was removed to
+    // eliminate per-request PutMetricData cost (W-22715301).
     catchAndLog(err)
-    req.app.sendMetric('RenderErrors')
     res.sendStatus(500)
 }
 

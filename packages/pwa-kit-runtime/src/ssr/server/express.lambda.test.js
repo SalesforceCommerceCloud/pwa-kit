@@ -304,20 +304,6 @@ describe('SSRServer Lambda integration', () => {
                 .get('/test1')
                 .reply(200, 'success1', {'Content-Type': 'text/plain'})
 
-            // Ensure that this server sends metrics and that we can
-            // track them.
-            const metrics = []
-            app.metrics._CW = {
-                putMetricData: (params) => {
-                    metrics.push(params)
-                    return Promise.resolve()
-                }
-            }
-            const metricSent = (name) =>
-                !!metrics.find(
-                    (metric) => !!metric.MetricData.find((data) => data.MetricName === name)
-                )
-
             // Set up a fake event and a fake context for the Lambda call
             const event = createEvent('aws:apiGateway', {
                 path: testCase.path,
@@ -350,16 +336,9 @@ describe('SSRServer Lambda integration', () => {
                     // The callback function gets passed an error object and
                     // the API Gateway response.
                     .then((response) => {
-                        // We expect all metrics to have been sent
+                        // Custom per-request CloudWatch metric emission has been
+                        // removed (W-22715301), so the queue always stays empty.
                         expect(app.metrics.queueLength).toBe(0)
-
-                        // We're not asserting which metrics were sent, just
-                        // checking if any were sent. As of DESKTOP-434, every
-                        // request will send metrics.
-                        expect(!!metrics.length).toBe(true)
-
-                        // We check for some specific metrics here
-                        expect(metricSent('LambdaCreated')).toBe(true)
 
                         // We expect a context property to have been set false
                         expect(context.callbackWaitsForEmptyEventLoop).toBe(false)
@@ -441,8 +420,9 @@ describe('SSRServer Lambda integration', () => {
                 expect(response.statusCode).toBe(200)
                 expect(collectGarbage.mock.calls).toHaveLength(0)
                 expect(route.mock.calls).toHaveLength(1)
-                expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
-                expect(sendMetric).not.toHaveBeenCalledWith('LambdaReused')
+                // sendMetric is now a backwards-compatible no-op (W-22715301);
+                // no metrics are emitted at all.
+                expect(sendMetric).not.toHaveBeenCalled()
             })
             .then(() => call(event))
             .then((response) => {
@@ -450,8 +430,6 @@ describe('SSRServer Lambda integration', () => {
                 expect(response.statusCode).toBe(200)
                 expect(collectGarbage.mock.calls).toHaveLength(0)
                 expect(route.mock.calls).toHaveLength(2)
-                expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
-                expect(sendMetric).toHaveBeenCalledWith('LambdaReused')
             })
     })
 
@@ -471,8 +449,9 @@ describe('SSRServer Lambda integration', () => {
                 expect(response.statusCode).toBe(200)
                 expect(collectGarbage.mock.calls).toHaveLength(0)
                 expect(route.mock.calls).toHaveLength(1)
-                expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
-                expect(sendMetric).not.toHaveBeenCalledWith('LambdaReused')
+                // sendMetric is now a backwards-compatible no-op (W-22715301);
+                // no metrics are emitted at all.
+                expect(sendMetric).not.toHaveBeenCalled()
             })
             .then(() => call(event))
             .then((response) => {
@@ -480,8 +459,6 @@ describe('SSRServer Lambda integration', () => {
                 expect(response.statusCode).toBe(200)
                 expect(collectGarbage.mock.calls).toHaveLength(1)
                 expect(route.mock.calls).toHaveLength(2)
-                expect(sendMetric).toHaveBeenCalledWith('LambdaCreated')
-                expect(sendMetric).toHaveBeenCalledWith('LambdaReused')
             })
     })
 })

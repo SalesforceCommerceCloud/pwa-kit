@@ -7,6 +7,7 @@
 
 import React, {useState, useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
+import loadable from '@loadable/component'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl, getRouterBasePath} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
@@ -89,7 +90,6 @@ import {fetchTranslations, getTargetLocale} from '@salesforce/retail-react-app/a
 import {flatten, isServer, watchOnlineStatus} from '@salesforce/retail-react-app/app/utils/utils'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
-import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
 import {initializeRegistry} from '@salesforce/retail-react-app/app/page-designer/registry'
 
 // Initialize registry synchronously at module load time so components are available during SSR
@@ -97,6 +97,16 @@ initializeRegistry()
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import {useShopperAgent} from '@salesforce/retail-react-app/app/hooks/use-shopper-agent'
+import {useCommerceClientPagePush} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-push'
+
+// Code-split the optional, client-only Shopper Agent so the component and its messaging
+// integrations (MIAW / Commerce Client) ship in a separate async chunk instead of the
+// critical `main.js` bundle. `ssr: false` keeps it out of the server render (the component
+// already returns null on the server) and the chunk is only fetched when the agent is enabled.
+const ShopperAgent = loadable(
+    () => import('@salesforce/retail-react-app/app/components/shopper-agent'),
+    {ssr: false}
+)
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -241,6 +251,10 @@ const App = (props) => {
     const commerceAgentConfiguration = useMemo(() => {
         return getCommerceAgentConfig()
     }, [config.app.commerceAgent])
+
+    // Shifts page content aside for the Commerce Client side panel when page-push
+    // is configured; empty (no shift) otherwise.
+    const pagePushProps = useCommerceClientPagePush(commerceAgentConfiguration)
 
     useEffect(() => {
         // update the basket customer email
@@ -390,7 +404,13 @@ const App = (props) => {
 
                         <ScrollToTop />
 
-                        <Box id="app" display="flex" flexDirection="column" flex={1}>
+                        <Box
+                            id="app"
+                            display="flex"
+                            flexDirection="column"
+                            flex={1}
+                            {...pagePushProps}
+                        >
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
                             {storeLocatorEnabled && (
                                 <StoreLocatorModal

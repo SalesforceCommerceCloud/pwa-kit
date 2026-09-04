@@ -60,6 +60,9 @@ let mockOnCancelMocks = null
 // When set, failOrder error handling tests use this for useToast (mock-prefix required by Jest)
 let mockFailOrderToast = null
 
+// When set, PayPal onPayerApprove tests use this for api.shopperBasketsV2.getBasket (mock-prefix required by Jest)
+let mockGetBasketWithRefs = null
+
 // Used by onApproveEvent tests to assert navigate calls (mock-prefix required by Jest)
 const mockNavigate = jest.fn()
 
@@ -104,6 +107,13 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             mockValidateTestMocks.addPaymentInstrumentToBasket
         ) {
             return {mutateAsync: mockValidateTestMocks.addPaymentInstrumentToBasket}
+        }
+        if (
+            mockValidateTestMocks &&
+            key === 'updatePaymentInstrumentInBasket' &&
+            mockValidateTestMocks.updatePaymentInstrumentInBasket
+        ) {
+            return {mutateAsync: mockValidateTestMocks.updatePaymentInstrumentInBasket}
         }
         if (
             mockPayPalCreateIntentMocks &&
@@ -160,7 +170,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         ...actual,
         useShopperBasketsMutation: mockUseShopperBasketsMutation,
         useShopperBasketsV2Mutation: mockUseShopperBasketsMutation,
-        useShippingMethodsForShipment: (params, options) => {
+        useShippingMethodsForShipment: () => {
             if (mockValidateTestMocks && mockValidateTestMocks.refetchShippingMethods) {
                 return {refetch: mockValidateTestMocks.refetchShippingMethods}
             }
@@ -168,7 +178,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
                 refetch: jest.fn().mockResolvedValue({data: {applicableShippingMethods: []}})
             }
         },
-        useShippingMethodsForShipmentV2: (params, options) => {
+        useShippingMethodsForShipmentV2: () => {
             if (mockValidateTestMocks && mockValidateTestMocks.refetchShippingMethods) {
                 return {refetch: mockValidateTestMocks.refetchShippingMethods}
             }
@@ -196,18 +206,16 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             }
         },
         useCommerceApi: () => {
-            if (mockAttemptFailOrderMocks && mockAttemptFailOrderMocks.getOrder) {
-                return {
-                    shopperOrders: {
-                        getOrder: mockAttemptFailOrderMocks.getOrder
-                    }
-                }
+            const shopperOrders = {
+                getOrder:
+                    mockAttemptFailOrderMocks?.getOrder ||
+                    jest.fn().mockResolvedValue({status: 'created'})
             }
-            return {
-                shopperOrders: {
-                    getOrder: jest.fn().mockResolvedValue({status: 'created'})
-                }
+            const shopperBasketsV2 = {
+                getBasket:
+                    mockGetBasketWithRefs || jest.fn().mockResolvedValue({paymentInstruments: []})
             }
+            return {shopperOrders, shopperBasketsV2}
         },
         useAccessToken: () => {
             if (mockAttemptFailOrderMocks && mockAttemptFailOrderMocks.getTokenWhenReady) {
@@ -1234,6 +1242,188 @@ describe('onPayerApprove', () => {
         )
         expect(mockOnCancelMocks.endConfirming).toHaveBeenCalled()
         mockOnCancelMocks = null
+    })
+})
+
+describe('onPayerApprove PayPal/Venmo address resolution', () => {
+    const basketId = 'basket-paypal-payer-approve'
+    const mockBasket = {
+        basketId,
+        orderTotal: 100,
+        productSubTotal: 100,
+        shipments: [{shipmentId: DEFAULT_SHIPMENT_ID}]
+    }
+    const paypalShipping = {
+        addressLine1: '4 Main St.',
+        addressLine2: 'Basement Flat',
+        adminArea1: 'MA',
+        adminArea2: 'Boston',
+        countryCode: 'US',
+        postalCode: '40982'
+    }
+    const paypalPayer = {
+        emailAddress: 'buyer@example.com',
+        givenName: 'Pat',
+        surname: 'Buyer'
+    }
+    const basketWithPaypalRef = (overrides = {}) => ({
+        basketId,
+        paymentInstruments: [
+            {
+                paymentInstrumentId: 'pi-1',
+                paymentMethodId: 'Salesforce Payments',
+                paymentReference: {
+                    gateway: 'paypal',
+                    paymentReferenceId: 'abc123',
+                    gatewayProperties: {
+                        paypal: {
+                            id: 'abc123',
+                            payer: paypalPayer,
+                            shipping: paypalShipping,
+                            ...overrides
+                        }
+                    }
+                }
+            }
+        ]
+    })
+    const expectedAddressBody = {
+        firstName: 'Pat',
+        lastName: 'Buyer',
+        address1: '4 Main St.',
+        address2: 'Basement Flat',
+        city: 'Boston',
+        stateCode: 'MA',
+        postalCode: '40982',
+        countryCode: 'US',
+        phone: null
+    }
+
+    // Drive the component through onClick → createIntent so that expressBasket.current is
+    // populated (the PayPal flow only sets it in createIntent, not in onClick).
+    const primePayPalBasket = async (config, type) => {
+        await config.actions.onClick(type)
+        await config.actions.createIntent({})
+        await flush()
+    }
+
+    const basketAfterAddInstrument = {
+        ...mockBasket,
+        paymentInstruments: [
+            {
+                paymentMethodId: 'Salesforce Payments',
+                paymentInstrumentId: 'pi-1',
+                paymentReference: {
+                    paymentReferenceId: 'pr-1',
+                    gatewayProperties: {paypal: {id: 'pr-1'}}
+                }
+            }
+        ]
+    }
+
+    beforeEach(() => {
+        mockValidateTestCaptureConfig = {}
+        // mockValidateTestMocks takes precedence over mockPayPalCreateIntentMocks for
+        // addPaymentInstrumentToBasket, so it must also return the populated basket so the
+        // PayPal createIntent path leaves expressBasket.current populated for onPayerApprove.
+        mockValidateTestMocks = {
+            updateShippingAddress: jest.fn().mockResolvedValue(mockBasket),
+            updateBillingAddressForBasket: jest.fn().mockResolvedValue(mockBasket),
+            addPaymentInstrumentToBasket: jest.fn().mockResolvedValue(basketAfterAddInstrument)
+        }
+        mockPayPalCreateIntentMocks = {
+            removePaymentInstrumentFromBasket: jest.fn().mockResolvedValue(mockBasket),
+            addPaymentInstrumentToBasket: jest.fn().mockResolvedValue(basketAfterAddInstrument)
+        }
+        mockOnCancelMocks = {endConfirming: jest.fn(), toast: jest.fn()}
+    })
+
+    afterEach(() => {
+        mockValidateTestCaptureConfig = null
+        mockValidateTestMocks = null
+        mockPayPalCreateIntentMocks = null
+        mockOnCancelMocks = null
+        mockGetBasketWithRefs = null
+    })
+
+    test.each([['paypal'], ['venmo']])(
+        'fetches basket with expand=payment_references and stamps shipping+billing from paypal data — %s',
+        async (type) => {
+            mockGetBasketWithRefs = jest.fn().mockResolvedValue(basketWithPaypalRef())
+
+            const {config} = await renderAndGetConfig({
+                prepareBasket: jest.fn().mockResolvedValue(mockBasket)
+            })
+
+            await primePayPalBasket(config, type)
+
+            // SDK does not surface billing/shipping for PayPal/Venmo — args are absent
+            await expect(
+                config.actions.onPayerApprove(undefined, undefined)
+            ).resolves.toBeUndefined()
+
+            expect(mockGetBasketWithRefs).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    parameters: expect.objectContaining({
+                        basketId,
+                        expand: ['payment_references']
+                    }),
+                    headers: expect.objectContaining({
+                        Authorization: expect.stringMatching(/^Bearer /)
+                    })
+                })
+            )
+            expect(mockValidateTestMocks.updateShippingAddress).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    parameters: expect.objectContaining({
+                        basketId,
+                        shipmentId: DEFAULT_SHIPMENT_ID,
+                        useAsBilling: false
+                    }),
+                    body: expectedAddressBody
+                })
+            )
+            expect(mockValidateTestMocks.updateBillingAddressForBasket).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    parameters: expect.objectContaining({basketId}),
+                    body: expectedAddressBody
+                })
+            )
+            // PayPal flow does not add a Salesforce Payments instrument inside onPayerApprove —
+            // the only call is the one createIntent already made before this test ran.
+            expect(mockValidateTestMocks.addPaymentInstrumentToBasket).toHaveBeenCalledTimes(1)
+        }
+    )
+
+    test('throws and calls endConfirming when paymentReference is missing the paypal address', async () => {
+        mockGetBasketWithRefs = jest.fn().mockResolvedValue({basketId, paymentInstruments: []})
+
+        const {config} = await renderAndGetConfig({
+            prepareBasket: jest.fn().mockResolvedValue(mockBasket)
+        })
+
+        await primePayPalBasket(config, 'paypal')
+
+        await expect(config.actions.onPayerApprove(undefined, undefined)).rejects.toThrow(
+            'Missing PayPal address on paymentReference'
+        )
+        expect(mockOnCancelMocks.endConfirming).toHaveBeenCalled()
+        expect(mockValidateTestMocks.updateShippingAddress).not.toHaveBeenCalled()
+        expect(mockValidateTestMocks.updateBillingAddressForBasket).not.toHaveBeenCalled()
+    })
+
+    test('does not crash when SDK invokes onPayerApprove with no arguments (paypal)', async () => {
+        mockGetBasketWithRefs = jest.fn().mockResolvedValue(basketWithPaypalRef())
+
+        const {config} = await renderAndGetConfig({
+            prepareBasket: jest.fn().mockResolvedValue(mockBasket)
+        })
+
+        await primePayPalBasket(config, 'paypal')
+
+        await expect(config.actions.onPayerApprove()).resolves.toBeUndefined()
+        expect(mockGetBasketWithRefs).toHaveBeenCalled()
+        expect(mockValidateTestMocks.updateShippingAddress).toHaveBeenCalled()
     })
 })
 
@@ -2347,5 +2537,326 @@ describe('failOrder error handling', () => {
         expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
         expect(mockFailOrder).toBeDefined()
         expect(mockFailOrderToast).toBeDefined()
+    })
+})
+
+describe('onShippingAddressChange PayPal PATCH', () => {
+    const basketId = 'basket-paypal-patch'
+    const paymentInstrumentId = 'pi-sfp-1'
+    const sfPaymentsInstrument = {
+        paymentInstrumentId,
+        paymentMethodId: 'Salesforce Payments'
+    }
+    const applicableShippingMethods = [
+        {id: 'standard', name: 'Standard', price: 5.99},
+        {id: 'express', name: 'Express', price: 12.99}
+    ]
+    const updatedBasket = {
+        basketId,
+        currency: 'USD',
+        orderTotal: 25,
+        productSubTotal: 19.01,
+        shipments: [
+            {
+                shipmentId: DEFAULT_SHIPMENT_ID,
+                shippingMethod: {id: 'standard'}
+            }
+        ],
+        paymentInstruments: [sfPaymentsInstrument]
+    }
+    const shippingAddress = {
+        city: 'San Francisco',
+        state: 'CA',
+        postal_code: '94102',
+        country: 'US'
+    }
+
+    beforeEach(() => {
+        mockValidateTestCaptureConfig = {}
+        mockValidateTestMocks = {
+            updateShippingAddress: jest.fn().mockResolvedValue(updatedBasket),
+            updateShippingMethod: jest.fn().mockResolvedValue(updatedBasket),
+            refetchShippingMethods: jest
+                .fn()
+                .mockResolvedValue({data: {applicableShippingMethods}}),
+            updatePaymentInstrumentInBasket: jest.fn().mockResolvedValue(updatedBasket),
+            addPaymentInstrumentToBasket: jest.fn().mockResolvedValue(updatedBasket)
+        }
+        mockPayPalCreateIntentMocks = {
+            removePaymentInstrumentFromBasket: jest.fn().mockResolvedValue(updatedBasket),
+            addPaymentInstrumentToBasket: jest.fn().mockResolvedValue(updatedBasket)
+        }
+    })
+
+    afterEach(() => {
+        mockValidateTestCaptureConfig = null
+        mockValidateTestMocks = null
+        mockPayPalCreateIntentMocks = null
+    })
+
+    // For PayPal, expressBasket.current is populated in createIntent (not onClick),
+    // so we drive onClick → createIntent before invoking onShippingAddressChange.
+    const primePayPal = async (config, type = 'paypal') => {
+        await config.actions.onClick(type)
+        await config.actions.createIntent({})
+        await flush()
+    }
+
+    test('PATCHes payment instrument with shipping options for PayPal', async () => {
+        const {config} = await renderAndGetConfig({
+            prepareBasket: jest.fn().mockResolvedValue(updatedBasket)
+        })
+
+        await primePayPal(config, 'paypal')
+
+        const mockCallback = {updateShippingAddress: jest.fn()}
+        await config.actions.onShippingAddressChange(shippingAddress, mockCallback)
+
+        expect(mockValidateTestMocks.updatePaymentInstrumentInBasket).toHaveBeenCalledTimes(1)
+        const call = mockValidateTestMocks.updatePaymentInstrumentInBasket.mock.calls[0][0]
+        expect(call.parameters).toEqual({basketId, paymentInstrumentId})
+        expect(call.body).toMatchObject({
+            amount: 25,
+            paymentMethodId: 'Salesforce Payments',
+            paymentReferenceRequest: {
+                paymentMethodType: 'paypal',
+                gatewayProperties: {
+                    paypal: {
+                        amount: '25',
+                        currencyCode: 'USD',
+                        shippingOptions: [
+                            {
+                                id: 'standard',
+                                label: 'Standard',
+                                amount: '5.99',
+                                currencyCode: 'USD',
+                                selected: true
+                            },
+                            {
+                                id: 'express',
+                                label: 'Express',
+                                amount: '12.99',
+                                currencyCode: 'USD',
+                                selected: false
+                            }
+                        ]
+                    }
+                }
+            }
+        })
+        expect(mockCallback.updateShippingAddress).toHaveBeenCalledWith(
+            expect.objectContaining({total: expect.any(String)})
+        )
+    })
+
+    test('does not PATCH for non-PayPal payment methods (e.g. card)', async () => {
+        const {config} = await renderAndGetConfig({
+            prepareBasket: jest.fn().mockResolvedValue(updatedBasket)
+        })
+
+        // Card flow: onClick prepares the basket synchronously, no createIntent needed
+        await config.actions.onClick('card')
+        await flush()
+
+        const mockCallback = {updateShippingAddress: jest.fn()}
+        await config.actions.onShippingAddressChange(shippingAddress, mockCallback)
+
+        expect(mockValidateTestMocks.updatePaymentInstrumentInBasket).not.toHaveBeenCalled()
+    })
+
+    test('does not PATCH when basket has no Salesforce Payments instrument', async () => {
+        const basketNoInstrument = {...updatedBasket, paymentInstruments: []}
+        mockValidateTestMocks.updateShippingAddress.mockResolvedValue(basketNoInstrument)
+        mockPayPalCreateIntentMocks.addPaymentInstrumentToBasket.mockResolvedValue(
+            basketNoInstrument
+        )
+
+        const {config} = await renderAndGetConfig({
+            prepareBasket: jest.fn().mockResolvedValue(basketNoInstrument)
+        })
+
+        await primePayPal(config, 'paypal')
+
+        const mockCallback = {updateShippingAddress: jest.fn()}
+        await config.actions.onShippingAddressChange(shippingAddress, mockCallback)
+
+        expect(mockValidateTestMocks.updatePaymentInstrumentInBasket).not.toHaveBeenCalled()
+        expect(mockCallback.updateShippingAddress).toHaveBeenCalledWith(
+            expect.objectContaining({total: expect.any(String)})
+        )
+    })
+
+    test('swallows PATCH failure and still completes the address change', async () => {
+        mockValidateTestMocks.updatePaymentInstrumentInBasket.mockRejectedValue(new Error('boom'))
+
+        const {config} = await renderAndGetConfig({
+            prepareBasket: jest.fn().mockResolvedValue(updatedBasket)
+        })
+
+        await primePayPal(config, 'paypal')
+
+        const mockCallback = {updateShippingAddress: jest.fn()}
+        await config.actions.onShippingAddressChange(shippingAddress, mockCallback)
+
+        expect(mockValidateTestMocks.updatePaymentInstrumentInBasket).toHaveBeenCalledTimes(1)
+        expect(mockCallback.updateShippingAddress).toHaveBeenCalledWith(
+            expect.objectContaining({total: expect.any(String)})
+        )
+        expect(mockCallback.updateShippingAddress).not.toHaveBeenCalledWith(
+            expect.objectContaining({errors: expect.anything()})
+        )
+    })
+})
+
+describe('onShippingMethodChange PayPal PATCH', () => {
+    const basketId = 'basket-paypal-method-patch'
+    const paymentInstrumentId = 'pi-sfp-2'
+    const sfPaymentsInstrument = {
+        paymentInstrumentId,
+        paymentMethodId: 'Salesforce Payments'
+    }
+    const applicableShippingMethods = [
+        {id: 'standard', name: 'Standard', price: 5.99},
+        {id: 'express', name: 'Express', price: 12.99}
+    ]
+    const updatedBasket = {
+        basketId,
+        currency: 'USD',
+        orderTotal: 32,
+        productSubTotal: 19.01,
+        shipments: [
+            {
+                shipmentId: DEFAULT_SHIPMENT_ID,
+                shippingMethod: {id: 'express'}
+            }
+        ],
+        paymentInstruments: [sfPaymentsInstrument]
+    }
+    const shippingMethod = {id: 'express', name: 'Express'}
+
+    beforeEach(() => {
+        mockValidateTestCaptureConfig = {}
+        mockValidateTestMocks = {
+            updateShippingAddress: jest.fn().mockResolvedValue(updatedBasket),
+            updateShippingMethod: jest.fn().mockResolvedValue(updatedBasket),
+            refetchShippingMethods: jest
+                .fn()
+                .mockResolvedValue({data: {applicableShippingMethods}}),
+            updatePaymentInstrumentInBasket: jest.fn().mockResolvedValue(updatedBasket),
+            addPaymentInstrumentToBasket: jest.fn().mockResolvedValue(updatedBasket)
+        }
+        mockPayPalCreateIntentMocks = {
+            removePaymentInstrumentFromBasket: jest.fn().mockResolvedValue(updatedBasket),
+            addPaymentInstrumentToBasket: jest.fn().mockResolvedValue(updatedBasket)
+        }
+    })
+
+    afterEach(() => {
+        mockValidateTestCaptureConfig = null
+        mockValidateTestMocks = null
+        mockPayPalCreateIntentMocks = null
+    })
+
+    // For PayPal, expressBasket.current is populated in createIntent (not onClick),
+    // so we drive onClick → createIntent before invoking onShippingMethodChange.
+    const primePayPal = async (config, type = 'paypal') => {
+        await config.actions.onClick(type)
+        await config.actions.createIntent({})
+        await flush()
+    }
+
+    test.each([['paypal'], ['venmo']])(
+        'PATCHes payment instrument with amount-only body (no shippingOptions) — %s',
+        async (type) => {
+            const {config} = await renderAndGetConfig({
+                prepareBasket: jest.fn().mockResolvedValue(updatedBasket)
+            })
+
+            await primePayPal(config, type)
+
+            const mockCallback = {updateShippingMethod: jest.fn()}
+            await config.actions.onShippingMethodChange(shippingMethod, mockCallback)
+
+            expect(mockValidateTestMocks.updatePaymentInstrumentInBasket).toHaveBeenCalledTimes(1)
+            const call = mockValidateTestMocks.updatePaymentInstrumentInBasket.mock.calls[0][0]
+            expect(call.parameters).toEqual({basketId, paymentInstrumentId})
+            expect(call.body).toMatchObject({
+                amount: 32,
+                paymentMethodId: 'Salesforce Payments',
+                paymentReferenceRequest: {
+                    paymentMethodType: type,
+                    gatewayProperties: {
+                        paypal: {
+                            amount: '32',
+                            currencyCode: 'USD'
+                        }
+                    }
+                }
+            })
+            expect(call.body.paymentReferenceRequest.gatewayProperties.paypal).not.toHaveProperty(
+                'shippingOptions'
+            )
+            expect(mockCallback.updateShippingMethod).toHaveBeenCalledWith(
+                expect.objectContaining({total: expect.any(String)})
+            )
+        }
+    )
+
+    test('does not PATCH for non-PayPal payment methods (e.g. card)', async () => {
+        const {config} = await renderAndGetConfig({
+            prepareBasket: jest.fn().mockResolvedValue(updatedBasket)
+        })
+
+        // Card flow: onClick prepares the basket synchronously, no createIntent needed
+        await config.actions.onClick('card')
+        await flush()
+
+        const mockCallback = {updateShippingMethod: jest.fn()}
+        await config.actions.onShippingMethodChange(shippingMethod, mockCallback)
+
+        expect(mockValidateTestMocks.updatePaymentInstrumentInBasket).not.toHaveBeenCalled()
+    })
+
+    test('does not PATCH when basket has no Salesforce Payments instrument', async () => {
+        const basketNoInstrument = {...updatedBasket, paymentInstruments: []}
+        mockValidateTestMocks.updateShippingMethod.mockResolvedValue(basketNoInstrument)
+        mockPayPalCreateIntentMocks.addPaymentInstrumentToBasket.mockResolvedValue(
+            basketNoInstrument
+        )
+
+        const {config} = await renderAndGetConfig({
+            prepareBasket: jest.fn().mockResolvedValue(basketNoInstrument)
+        })
+
+        await primePayPal(config, 'paypal')
+
+        const mockCallback = {updateShippingMethod: jest.fn()}
+        await config.actions.onShippingMethodChange(shippingMethod, mockCallback)
+
+        expect(mockValidateTestMocks.updatePaymentInstrumentInBasket).not.toHaveBeenCalled()
+        expect(mockCallback.updateShippingMethod).toHaveBeenCalledWith(
+            expect.objectContaining({total: expect.any(String)})
+        )
+    })
+
+    test('swallows PATCH failure and still completes the shipping method change', async () => {
+        mockValidateTestMocks.updatePaymentInstrumentInBasket.mockRejectedValue(new Error('boom'))
+
+        const {config} = await renderAndGetConfig({
+            prepareBasket: jest.fn().mockResolvedValue(updatedBasket)
+        })
+
+        await primePayPal(config, 'paypal')
+
+        const mockCallback = {updateShippingMethod: jest.fn()}
+        await config.actions.onShippingMethodChange(shippingMethod, mockCallback)
+
+        expect(mockValidateTestMocks.updatePaymentInstrumentInBasket).toHaveBeenCalledTimes(1)
+        expect(mockCallback.updateShippingMethod).toHaveBeenCalledWith(
+            expect.objectContaining({total: expect.any(String)})
+        )
+        expect(mockCallback.updateShippingMethod).not.toHaveBeenCalledWith(
+            expect.objectContaining({errors: expect.anything()})
+        )
     })
 })

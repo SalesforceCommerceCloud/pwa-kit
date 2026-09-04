@@ -38,6 +38,14 @@ export type QueryKeys = {
         '/taxes',
         Params<'getTaxesFromOrder'>
     ]
+    getOmsMetaData: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/orders/',
+        '/oms-meta-data',
+        Params<'getOmsMetaData'>
+    ]
 }
 
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
@@ -95,6 +103,22 @@ export const getTaxesFromOrder: QueryKeyHelper<'getTaxesFromOrder'> = {
         return [
             ...getTaxesFromOrder.path(params),
             pickValidParams(params || {}, ShopperOrders.paramKeys.getTaxesFromOrder)
+        ]
+    }
+}
+
+export const getOmsMetaData: QueryKeyHelper<'getOmsMetaData'> = {
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params?.organizationId,
+        '/orders/',
+        '/oms-meta-data'
+    ],
+    queryKey: (params: Params<'getOmsMetaData'>) => {
+        return [
+            ...getOmsMetaData.path(params),
+            pickValidParams(params || {}, ShopperOrders.paramKeys.getOmsMetaData)
         ]
     }
 }

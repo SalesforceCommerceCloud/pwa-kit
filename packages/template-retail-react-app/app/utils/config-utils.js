@@ -6,6 +6,7 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION} from '@salesforce/retail-react-app/app/constants'
 
 export const getCommerceAgentConfig = () => {
     const defaults = {
@@ -22,7 +23,25 @@ export const getCommerceAgentConfig = () => {
         conversationContext: [],
         enableAgentFromHeader: 'false',
         enableAgentFromFloatingButton: 'false',
-        enableAgentFromSearchSuggestions: 'false'
+        enableAgentFromSearchSuggestions: 'false',
+        // Widget provider: 'miaw' (default) or 'commerce-client'. See config/default.js.
+        provider: 'miaw',
+        cc_cdnVersion: '',
+        commerceClientScriptSourceUrl: '',
+        cc_esDeveloperName: '',
+        cc_capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
+        cc_headerText: '',
+        cc_disclaimerMarkdown: '',
+        cc_dialogFullHeight: 'true',
+        cc_dialogWidth: '420px',
+        cc_widgetPosition: 'bottom-right',
+        cc_showFab: 'false',
+        cc_pagePush: 'false',
+        cc_logoUrl: '',
+        cc_isOpen: 'false',
+        cc_isDevelopment: 'false',
+        cc_enableEscalationToAgent: 'false',
+        cc_enableDownloadTranscript: 'true'
     }
     return getConfig().app.commerceAgent ?? defaults
 }

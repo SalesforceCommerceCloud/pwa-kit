@@ -10,18 +10,19 @@ import {
     buildTheme,
     getSFPaymentsInstrument,
     transformAddressDetails,
+    transformPayPalAddressFromPaymentReference,
+    getPaymentReference,
     transformShippingMethods,
     getSelectedShippingMethodId,
     isShippingMethodValid,
     isPayPalPaymentMethodType,
     findPaymentAccount,
     createPaymentInstrumentBody,
+    createPayPalShippingPatchBody,
     getGatewayFromPaymentMethod,
     transformPaymentMethodReferences,
     getExpressPaymentMethodType
 } from '@salesforce/retail-react-app/app/utils/sf-payments-utils'
-
-import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
 
 describe('sf-payments-utils', () => {
     describe('buildPaymentReturnUrl', () => {
@@ -869,6 +870,124 @@ describe('sf-payments-utils', () => {
             expect(result.billingAddress.firstName).toBe('Jane')
             expect(result.billingAddress.lastName).toBe('Smith')
             expect(result.billingAddress.city).toBe('Los Angeles')
+        })
+    })
+
+    describe('transformPayPalAddressFromPaymentReference', () => {
+        const paypalProps = {
+            payer: {givenName: 'Pat', surname: 'Buyer', emailAddress: 'pat@example.com'},
+            shipping: {
+                addressLine1: '4 Main St.',
+                addressLine2: 'Basement Flat',
+                adminArea1: 'MA',
+                adminArea2: 'Boston',
+                countryCode: 'US',
+                postalCode: '40982'
+            }
+        }
+
+        test('maps payer + shipping into a basket address body', () => {
+            expect(transformPayPalAddressFromPaymentReference(paypalProps)).toEqual({
+                firstName: 'Pat',
+                lastName: 'Buyer',
+                address1: '4 Main St.',
+                address2: 'Basement Flat',
+                city: 'Boston',
+                stateCode: 'MA',
+                postalCode: '40982',
+                countryCode: 'US',
+                phone: null
+            })
+        })
+
+        test('returns null only when the shipping payload is absent', () => {
+            expect(
+                transformPayPalAddressFromPaymentReference({payer: paypalProps.payer})
+            ).toBeNull()
+            expect(transformPayPalAddressFromPaymentReference(undefined)).toBeNull()
+        })
+
+        test('passes through partial shipping data so SCAPI can surface field-level errors', () => {
+            const result = transformPayPalAddressFromPaymentReference({
+                payer: paypalProps.payer,
+                shipping: {addressLine1: '4 Main St.'}
+            })
+            expect(result).toEqual({
+                firstName: 'Pat',
+                lastName: 'Buyer',
+                address1: '4 Main St.',
+                address2: null,
+                city: null,
+                stateCode: null,
+                postalCode: null,
+                countryCode: null,
+                phone: null
+            })
+        })
+
+        test('returns a fully-null body when shipping is an empty object', () => {
+            const result = transformPayPalAddressFromPaymentReference({shipping: {}})
+            expect(result).toEqual({
+                firstName: null,
+                lastName: null,
+                address1: null,
+                address2: null,
+                city: null,
+                stateCode: null,
+                postalCode: null,
+                countryCode: null,
+                phone: null
+            })
+        })
+
+        test('omits payer name fields when payer is missing', () => {
+            const result = transformPayPalAddressFromPaymentReference({
+                shipping: paypalProps.shipping
+            })
+            expect(result.firstName).toBeNull()
+            expect(result.lastName).toBeNull()
+            expect(result.address1).toBe('4 Main St.')
+        })
+    })
+
+    describe('getPaymentReference', () => {
+        test('defaults to gateway=paypal and returns the matching paymentReference', () => {
+            const ref = {gateway: 'paypal', paymentReferenceId: 'pr-1'}
+            const basket = {
+                paymentInstruments: [
+                    {paymentMethodId: 'Salesforce Payments', paymentReference: ref}
+                ]
+            }
+            expect(getPaymentReference(basket)).toBe(ref)
+        })
+
+        test('matches the given gateway when one is supplied', () => {
+            const stripeRef = {gateway: 'stripe', paymentReferenceId: 'pr-stripe'}
+            const basket = {
+                paymentInstruments: [
+                    {paymentMethodId: 'Salesforce Payments', paymentReference: stripeRef}
+                ]
+            }
+
+            expect(getPaymentReference(basket, 'stripe')).toBe(stripeRef)
+        })
+
+        test('returns undefined when no instrument has the requested gateway', () => {
+            const basket = {
+                paymentInstruments: [
+                    {
+                        paymentMethodId: 'Salesforce Payments',
+                        paymentReference: {gateway: 'stripe'}
+                    }
+                ]
+            }
+            expect(getPaymentReference(basket, 'paypal')).toBeUndefined()
+        })
+
+        test('returns undefined for an empty / missing basket', () => {
+            expect(getPaymentReference(undefined)).toBeUndefined()
+            expect(getPaymentReference({})).toBeUndefined()
+            expect(getPaymentReference({paymentInstruments: []})).toBeUndefined()
         })
     })
 
@@ -2035,6 +2154,129 @@ describe('sf-payments-utils', () => {
                 paymentMethodSetAccounts
             )
             expect(result).toBe('paypal')
+        })
+    })
+
+    describe('createPayPalShippingPatchBody', () => {
+        const basket = {
+            basketId: 'basket-1',
+            currency: 'USD',
+            orderTotal: 25
+        }
+        const shippingMethods = {
+            applicableShippingMethods: [
+                {id: 'standard', name: 'Standard Shipping', price: 5.99},
+                {id: 'express', name: 'Express Shipping', price: 12.99}
+            ]
+        }
+
+        test('builds PATCH body with shipping options and selected flag', () => {
+            const result = createPayPalShippingPatchBody({
+                basket,
+                shippingMethods,
+                selectedShippingMethodId: 'standard',
+                paymentMethodType: 'paypal',
+                zoneId: 'default'
+            })
+
+            expect(result).toEqual({
+                amount: 25,
+                paymentMethodId: 'Salesforce Payments',
+                paymentReferenceRequest: {
+                    paymentMethodType: 'paypal',
+                    zoneId: 'default',
+                    gatewayProperties: {
+                        paypal: {
+                            amount: '25',
+                            currencyCode: 'USD',
+                            shippingOptions: [
+                                {
+                                    id: 'standard',
+                                    label: 'Standard Shipping',
+                                    amount: '5.99',
+                                    currencyCode: 'USD',
+                                    selected: true
+                                },
+                                {
+                                    id: 'express',
+                                    label: 'Express Shipping',
+                                    amount: '12.99',
+                                    currencyCode: 'USD',
+                                    selected: false
+                                }
+                            ]
+                        }
+                    }
+                }
+            })
+        })
+
+        test('marks no option selected when selectedShippingMethodId does not match', () => {
+            const result = createPayPalShippingPatchBody({
+                basket,
+                shippingMethods,
+                selectedShippingMethodId: 'overnight',
+                paymentMethodType: 'paypal',
+                zoneId: 'default'
+            })
+
+            const options = result.paymentReferenceRequest.gatewayProperties.paypal.shippingOptions
+            expect(options.every((o) => o.selected === false)).toBe(true)
+        })
+
+        test('passes through paymentMethodType (e.g. venmo)', () => {
+            const result = createPayPalShippingPatchBody({
+                basket,
+                shippingMethods,
+                selectedShippingMethodId: 'standard',
+                paymentMethodType: 'venmo',
+                zoneId: 'zone-a'
+            })
+
+            expect(result.paymentReferenceRequest.paymentMethodType).toBe('venmo')
+            expect(result.paymentReferenceRequest.zoneId).toBe('zone-a')
+        })
+
+        test('defaults zoneId to "default" when undefined', () => {
+            const result = createPayPalShippingPatchBody({
+                basket,
+                shippingMethods,
+                selectedShippingMethodId: 'standard',
+                paymentMethodType: 'paypal'
+            })
+
+            expect(result.paymentReferenceRequest.zoneId).toBe('default')
+        })
+
+        test('produces empty shippingOptions array when no applicable methods', () => {
+            const result = createPayPalShippingPatchBody({
+                basket,
+                shippingMethods: {applicableShippingMethods: []},
+                selectedShippingMethodId: null,
+                paymentMethodType: 'paypal',
+                zoneId: 'default'
+            })
+
+            expect(result.paymentReferenceRequest.gatewayProperties.paypal.shippingOptions).toEqual(
+                []
+            )
+        })
+
+        test('omits shippingOptions when shippingMethods is not passed (amount-only PATCH)', () => {
+            const result = createPayPalShippingPatchBody({
+                basket,
+                paymentMethodType: 'paypal',
+                zoneId: 'default'
+            })
+
+            const paypal = result.paymentReferenceRequest.gatewayProperties.paypal
+            expect(paypal).toEqual({
+                amount: '25',
+                currencyCode: 'USD'
+            })
+            expect(paypal).not.toHaveProperty('shippingOptions')
+            expect(result.amount).toBe(25)
+            expect(result.paymentMethodId).toBe('Salesforce Payments')
         })
     })
 })

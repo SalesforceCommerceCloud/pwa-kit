@@ -358,6 +358,7 @@ const AccountAddresses = () => {
                                             variant="solid"
                                             bg="gray.100"
                                             color="gray.900"
+                                            textTransform="none"
                                         >
                                             <FormattedMessage
                                                 defaultMessage="Default"

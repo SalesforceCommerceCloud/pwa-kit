@@ -13,7 +13,6 @@ import {
     Heading,
     Text,
     Stack,
-    Badge,
     Flex,
     Button,
     Divider,
@@ -32,6 +31,7 @@ import {ChevronRightIcon, ReceiptIcon} from '@salesforce/retail-react-app/app/co
 import Pagination from '@salesforce/retail-react-app/app/components/pagination'
 import PropTypes from 'prop-types'
 import {DEFAULT_ORDERS_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/constants'
+import OrderStatusBadge from '@salesforce/retail-react-app/app/components/order-status-badge'
 
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
@@ -167,7 +167,7 @@ const AccountOrderHistory = () => {
                                                 fontSize={{base: 'sm', lg: 'md'}}
                                             >
                                                 <FormattedMessage
-                                                    defaultMessage="View details"
+                                                    defaultMessage="View Details"
                                                     id="account_order_history.link.view_details"
                                                 />
                                             </Button>
@@ -181,9 +181,7 @@ const AccountOrderHistory = () => {
                                                 values={{orderNumber: order.orderNo}}
                                             />
                                         </Text>
-                                        <Badge colorScheme="green">
-                                            {order.status || order.omsData?.status}
-                                        </Badge>
+                                        <OrderStatusBadge order={order} />
                                     </Stack>
                                 </Box>
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
@@ -204,7 +202,7 @@ const AccountOrderHistory = () => {
                                 >
                                     <Text>
                                         <FormattedMessage
-                                            defaultMessage="{count} items"
+                                            defaultMessage="{count, plural, one {# item} other {# items}}"
                                             id="account_order_history.label.num_of_items"
                                             description="Number of items in order"
                                             values={{count: order.productItems.length}}

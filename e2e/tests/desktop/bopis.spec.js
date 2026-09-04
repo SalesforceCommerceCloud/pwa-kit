@@ -57,16 +57,26 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
     await expect(
         page.getByRole('heading', {name: /Casual To Dressy Trousers/i}).first()
     ).toBeVisible()
+    const initialPid = new URL(page.url()).searchParams.get('pid')
     await page.getByRole('radio', {name: '30'}).click()
-    await page.waitForLoadState()
 
-    // Select pickup option immediately after size selection
-    const pickupRadio = page.locator('label.chakra-radio:has(input[value="pickup"])')
-    await pickupRadio.click()
-    await page.waitForLoadState()
+    // Pickup state is keyed by product ID. Wait for the selected variant to
+    // replace the master product before choosing pickup so that the selection
+    // is not discarded during the PDP rerender.
+    await page.waitForURL((url) => {
+        const selectedPid = url.searchParams.get('pid')
+        return Boolean(selectedPid && selectedPid !== initialPid)
+    })
+    const selectedPid = new URL(page.url()).searchParams.get('pid')
+    await expect(
+        page.locator(`meta[name="og:url"][content*="/products/${selectedPid}?"]`)
+    ).toHaveCount(1)
+
+    const pickupRadio = page.getByRole('radio', {name: /Pick Up in Store/i})
+    await page.locator('label').filter({has: pickupRadio}).click()
 
     // Verify the pickup radio is selected
-    await expect(pickupRadio).toHaveAttribute('data-checked')
+    await expect(pickupRadio).toBeChecked()
 
     const addToCartButton = page.getByRole('button', {name: /Add to Cart/i})
     await page.waitForLoadState()

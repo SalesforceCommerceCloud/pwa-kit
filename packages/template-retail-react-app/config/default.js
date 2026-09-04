@@ -31,7 +31,84 @@ module.exports = {
             commerceOrgId: '',
             siteId: '',
             enableConversationContext: 'false',
-            conversationContext: []
+            conversationContext: [],
+            // Widget provider: 'miaw' (default, Salesforce Embedded Messaging) or
+            // 'commerce-client' (Commerce Client widget). Selecting 'commerce-client' uses the
+            // fields below instead of the MIAW embedded-service fields above.
+            provider: 'miaw',
+            // Cimulate CDN version of the Commerce Client messaging UMD bundle (e.g.
+            // '1.18.0'). Resolved into
+            // https://cdn.search.cimulate.ai/copilot-widget/<version>/messaging.umd.js.
+            // Only used when provider === 'commerce-client'.
+            cc_cdnVersion: '',
+            // Optional explicit bundle URL. Overrides cc_cdnVersion when set; use for local
+            // dev (http://localhost:...) or an SFCC self-hosted bundle.
+            commerceClientScriptSourceUrl: '',
+            // Embedded Service developer name for the Commerce Client widget. Falls back
+            // to embeddedServiceName when not set.
+            cc_esDeveloperName: '',
+            // Header text shown at the top of the Commerce Client widget.
+            cc_headerText: '',
+            // Markdown disclaimer shown in the Commerce Client widget. Supports links and
+            // basic markdown (e.g. 'This is AI. See [details](https://example.com).').
+            cc_disclaimerMarkdown: '',
+            // When 'true' (default) the widget renders as a full-height side panel
+            // docked to the configured corner; when 'false' it renders as a standard
+            // floating corner dialog. Forwarded to the widget as `dialogFullHeight`.
+            cc_dialogFullHeight: 'true',
+            // Width of the side panel when cc_dialogFullHeight is 'true'.
+            cc_dialogWidth: '420px',
+            // Corner the widget docks to: 'bottom-left' or 'bottom-right' (default).
+            // Forwarded to the widget as `dialogPosition`.
+            cc_widgetPosition: 'bottom-right',
+            // When 'true', a floating action button is rendered at cc_widgetPosition.
+            // Clicking it opens the Commerce Client shopping agent. Defaults to 'false'.
+            cc_showFab: 'false',
+            // When 'true', storefront content shifts aside for the open side panel
+            // instead of being overlaid by it. Handled template-side by
+            // useCommerceClientPagePush; needs an enabled agent on a full-height
+            // dialog widget (cc_dialogFullHeight 'true') and `lg`+ width.
+            cc_pagePush: 'false',
+            // Optional URL of a logo shown in the widget, forwarded as `logoUrl`.
+            cc_logoUrl: '',
+            // When 'true', the widget opens automatically as the page loads. Forwarded
+            // to the widget as `componentConfig.isOpen`. Defaults to 'false'.
+            cc_isOpen: 'false',
+            // When 'true', the widget logs its events to the console. Forwarded to the
+            // widget as `isDevelopment`. Defaults to 'false'.
+            cc_isDevelopment: 'false',
+            // When 'true', shoppers can escalate the conversation to a human agent.
+            // Forwarded as `messagingConfig.enableEscalationToAgent`. Defaults to 'false'.
+            cc_enableEscalationToAgent: 'false',
+            // When 'true' (default), shoppers can download the chat transcript.
+            // Forwarded as `messagingConfig.enableDownloadTranscript`.
+            cc_enableDownloadTranscript: 'true',
+            // Optional URL to customer's component override script. Must use HTTPS;
+            // a non-HTTPS or malformed URL is dropped and the widget keeps its defaults.
+            // The script defines Web Components that replace default product cards, carousels,
+            // and custom action payloads. See Commerce Client override documentation.
+            // This origin is added to the `script-src` CSP directive in app/ssr.js, otherwise
+            // the browser blocks the script before it can register window.CimulateOverrides.
+            // Serving the script from a host other than the one configured here (for example
+            // when the URL varies per environment) means adding that hostname to `script-src`
+            // in app/ssr.js yourself.
+            cc_overridesUrl: ''
+            // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
+            // to customize the widget search input. Forwarded to the widget as
+            // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
+            // Optional: pass `cc_theme` (object) via COMMERCE_AGENT_SETTINGS to override
+            // the widget theme (primaryColor, secondaryColor, backgroundColor, fontColor,
+            // borderColor, fontFamily).
+            // Optional: pass `cc_routingAttributes` (object) via COMMERCE_AGENT_SETTINGS to
+            // forward Agentforce routing attributes to the widget as `routingAttributes`.
+            // Always augmented with `clientVersion` (from `cc_cdnVersion`) and
+            // `isCartMgmtSupported` (`'true'`/`'false'`, default `'false'`) for backend gating.
+            // Optional: pass `cc_overrides` (object) via COMMERCE_AGENT_SETTINGS to map widget
+            // override keys (e.g. `ProductTile`) to custom element tag names, such as
+            // {"ProductTile": "my-product-tile"}. Forwarded to the widget as `overrides`. The
+            // elements must already be registered with customElements.define() before the widget
+            // injects. Mutually exclusive with `cc_overridesUrl` — set one or the other, not
+            // both; when both are set `cc_overrides` wins and the URL is ignored.
         },
         url: {
             site: 'path',
@@ -70,7 +147,7 @@ module.exports = {
             parameters: {
                 clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
                 organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                shortCode: 'kv7kzm78',
                 siteId: 'RefArchGlobal'
             }
             // Optional: Set the domain for auth cookies to share them across subdomains.
@@ -110,21 +187,36 @@ module.exports = {
                 forwardedHost: ''
             }
         },
-        oms: {
-            enabled: false
-        },
         storeLocatorEnabled: true,
+        guestOrderLookup: {
+            enabled: false,
+            orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$',
+            requestCodeThrottle: {
+                windowMs: 60000,
+                max: 5
+            }
+        },
         multishipEnabled: true,
         // Salesforce Payments configuration
         // Set enabled to true to enable Salesforce Payments (requires the Salesforce Payments feature toggle to be enabled on the Commerce Cloud instance).
         // Set enabled to false to disable Salesforce Payments on the storefront (the Commerce Cloud feature toggle is unaffected).
         // Set the sdkUrl and metadataUrl values to point to your Commerce Cloud instance host by replacing the [bm_or_vanity_host] placeholder with your Business Manager or vanity URL host name.
-        //   sdkUrl:       'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js'
+        //   sdkUrl:       'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v3/sfp.js'
         //   metadataUrl:  'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
         sfPayments: {
             enabled: false,
             sdkUrl: '',
             metadataUrl: ''
+        },
+        inlineAgentWidget: {
+            enabled: false,
+            scrt2Url: '',
+            orgId: '',
+            esDeveloperName: '',
+            capabilitiesVersion: '1',
+            placeholder: '',
+            persistSession: true,
+            enableLogging: false
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY

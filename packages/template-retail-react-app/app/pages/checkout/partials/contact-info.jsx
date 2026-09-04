@@ -41,8 +41,6 @@ import {
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {
     AuthHelpers,
     useAuthHelper,

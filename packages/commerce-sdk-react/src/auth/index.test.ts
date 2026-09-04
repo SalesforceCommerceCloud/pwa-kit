@@ -14,7 +14,7 @@ import {
     ShopperLogin
 } from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
-import {SLAS_SECRET_PLACEHOLDER, X_GRANT_TYPE} from '../constant'
+import {SLAS_SECRET_PLACEHOLDER, X_GRANT_TYPE, X_PREVIEW_PARENT} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
@@ -86,6 +86,7 @@ jest.mock('../utils', () => ({
     getParentOrigin: jest.fn().mockResolvedValue(''),
     isOriginTrusted: () => false,
     getDefaultCookieAttributes: () => {},
+    getTrustedPreviewParentOrigin: jest.fn().mockReturnValue(undefined),
     isAbsoluteUrl: () => true
 }))
 
@@ -269,6 +270,53 @@ describe('Auth', () => {
         auth.clearSFRAAuthToken()
 
         expect(auth.get('access_token_sfra')).toBeFalsy()
+    })
+    describe('graceful handling of stale/invalid session tokens', () => {
+        // Regression coverage for W-23444948: a stale or malformed session cookie
+        // (e.g. a truncated cc-at chunk or a value from an older format) must not
+        // surface jwt-decode's "Invalid token specified: missing part #2" to the
+        // storefront. Instead the token is discarded and the flow re-bootstraps.
+        test('parseSlasJWT returns null for an undecodable token instead of throwing', () => {
+            const auth = new Auth(config)
+            expect(auth.parseSlasJWT('not-a-valid-jwt')).toBeNull()
+        })
+        test('isAccessTokenExpired clears an undecodable access token and treats it as expired', () => {
+            const auth = new Auth(config)
+            // @ts-expect-error private method
+            auth.set('access_token', 'not-a-valid-jwt')
+            // @ts-expect-error private method
+            expect(auth.isAccessTokenExpired()).toBe(true)
+            expect(auth.get('access_token')).toBeFalsy()
+        })
+        test('getAccessToken clears an undecodable SFRA handoff token and falls back to local store', () => {
+            const auth = new Auth(config)
+            // @ts-expect-error private method
+            auth.set('access_token', 'local-token')
+            // @ts-expect-error private method
+            auth.set('access_token_sfra', 'not-a-valid-jwt')
+            // @ts-expect-error private method
+            expect(auth.getAccessToken()).toBe('local-token')
+            expect(auth.get('access_token_sfra')).toBeFalsy()
+        })
+        test('getDntFromAccessToken returns undefined for an undecodable access token', () => {
+            const auth = new Auth(config)
+            // @ts-expect-error private method
+            auth.set('access_token', 'not-a-valid-jwt')
+            // @ts-expect-error private method
+            expect(auth.getDntFromAccessToken()).toBeUndefined()
+        })
+        test('handleTokenResponse does not throw when the access token is not a valid JWT', () => {
+            const auth = new Auth(config)
+            expect(() =>
+                // @ts-expect-error private method
+                auth.handleTokenResponse({...TOKEN_RESPONSE, access_token: 'not-a-valid-jwt'}, true)
+            ).not.toThrow()
+        })
+        test('ready - malformed fetchedToken does not throw and falls through to login', async () => {
+            const auth = new Auth({...config, fetchedToken: 'not-a-valid-jwt'})
+            await expect(auth.ready()).resolves.toBeDefined()
+            expect(helpers.loginGuestUser).toHaveBeenCalled()
+        })
     })
     test('site switch clears auth storage', () => {
         const auth = new Auth(config)
@@ -1818,7 +1866,12 @@ describe('HttpOnly Session Cookies', () => {
         const refreshMock = helpers.refreshAccessToken as jest.Mock
         refreshMock.mockRejectedValueOnce(
             Object.assign(new Error('invalid refresh_token'), {
-                response: {json: () => Promise.resolve({message: 'invalid refresh_token'})}
+                // The body is read via a clone (a Response body is single-use), so the mock
+                // must expose clone() for the 'invalid refresh_token' branch to be exercised.
+                response: {
+                    json: () => Promise.resolve({message: 'invalid refresh_token'}),
+                    clone: () => ({json: () => Promise.resolve({message: 'invalid refresh_token'})})
+                }
             })
         )
         // After refresh fails, it falls through to loginGuestUser
@@ -1855,5 +1908,69 @@ describe('HttpOnly Session Cookies', () => {
         expect(headerDuringCall).toBeUndefined()
         // @ts-expect-error private property
         expect(auth.client.clientConfig.headers[X_GRANT_TYPE]).toBeUndefined()
+    })
+
+    test('sets x-pwakit-preview-parent header when httpOnly is enabled inside a trusted preview iframe', () => {
+        const TRUSTED_PARENT = 'https://runtime.commercecloud.com'
+        ;(utils.getTrustedPreviewParentOrigin as jest.Mock).mockReturnValueOnce(TRUSTED_PARENT)
+
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_PREVIEW_PARENT]).toBe(TRUSTED_PARENT)
+    })
+
+    test('does not set x-pwakit-preview-parent header when not in a trusted preview iframe', () => {
+        // Default mock returns undefined (getTrustedPreviewParentOrigin gates on
+        // iframe detection + allow-list), so the header must not be attached.
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_PREVIEW_PARENT]).toBeUndefined()
+    })
+
+    test('does not set x-pwakit-preview-parent header when httpOnly cookies are disabled', () => {
+        // Even if the storefront is in a trusted iframe, the header is only
+        // meaningful for the HttpOnly-cookie BFF flow, so it must be skipped.
+        const trustedMock = utils.getTrustedPreviewParentOrigin as jest.Mock
+        trustedMock.mockReturnValueOnce('https://runtime.commercecloud.com')
+
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: false})
+
+        // @ts-expect-error private property
+        expect(auth.client.clientConfig.headers[X_PREVIEW_PARENT]).toBeUndefined()
+        expect(trustedMock).not.toHaveBeenCalled()
+    })
+
+    describe('authorizeTrustedAgent', () => {
+        test('sends a CSRF state on the authorize URL, distinct from the PKCE code verifier', async () => {
+            const auth = new Auth(config)
+
+            // authorizeTrustedAgent calls createCodeVerifier twice: once for the PKCE
+            // code verifier, once for the CSRF state. Hand back distinct values so the
+            // assertions below can prove the two nonces are NOT collapsed into one.
+            const createCodeVerifierMock = helpers.createCodeVerifier as jest.Mock
+            createCodeVerifierMock
+                .mockReturnValueOnce('pkce-code-verifier')
+                .mockReturnValueOnce('csrf-state-nonce')
+
+            const {url, codeVerifier, state} = await auth.authorizeTrustedAgent({
+                loginId: 'test@test.com'
+            })
+
+            // The state must be present on the authorize request so SLAS echoes it
+            // back on the /callback redirect; without it the popup callback lands with
+            // `code` only, the code is stripped as a standard-login redirect, and the
+            // trusted agent popup hangs.
+            expect(url).toContain('/oauth2/trusted-agent/authorize?')
+            expect(url).toContain(`state=${state}`)
+            expect(state).toBe('csrf-state-nonce')
+            // Returned so the caller can compare it against the popup-echoed state.
+            expect(codeVerifier).toBe('pkce-code-verifier')
+            // Guards the two-nonce invariant: a regression that reuses the code verifier
+            // as the state (e.g. `const state = codeVerifier`) would still pass a `state=`
+            // param but would fail this assertion.
+            expect(state).not.toBe(codeVerifier)
+        })
     })
 })

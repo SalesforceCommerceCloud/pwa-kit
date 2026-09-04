@@ -9,6 +9,7 @@ import {
     X_ENCODED_HEADERS,
     X_SITE_ID,
     X_GRANT_TYPE,
+    X_PREVIEW_PARENT,
     STOREFRONT_PREVIEW_CTX_COOKIE
 } from './constants'
 import {default as createEvent} from '@serverless/event-mocks'
@@ -1178,6 +1179,65 @@ describe('HttpOnly session cookies', () => {
         }
     })
 
+    test('strips x-pwakit-preview-parent from the upstream request even when HttpOnly is disabled', async () => {
+        // The header is an internal preview-context signal consumed by the
+        // response interceptor; it must never reach SLAS, regardless of the
+        // HttpOnly session-cookie flag (the private proxy is wired whenever
+        // useSLASPrivateClient is true).
+        delete process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES
+
+        let capturedPreviewParent = 'sentinel'
+        const mockSlasServer = mockExpress()
+        mockSlasServer.post(
+            '/shopper/auth/v1/organizations/f_ecom_test/oauth2/token',
+            (req, res) => {
+                capturedPreviewParent = req.headers[X_PREVIEW_PARENT]
+                res.status(200).json({
+                    access_token: 'mock-token',
+                    expires_in: 1800,
+                    refresh_token: 'mock-refresh-token'
+                })
+            }
+        )
+
+        const mockSlasServerInstance = mockSlasServer.listen(0)
+        const mockSlasPort = mockSlasServerInstance.address().port
+
+        try {
+            const app = mockExpress()
+            const options = RemoteServerFactory._configure({
+                useSLASPrivateClient: true,
+                slasTarget: `http://localhost:${mockSlasPort}`,
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                shortCode: 'test',
+                                organizationId: 'f_ecom_test',
+                                clientId: 'test-client-id',
+                                siteId: 'testsite'
+                            }
+                        }
+                    }
+                }
+            })
+
+            process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'test-secret'
+
+            RemoteServerFactory._setupSlasPrivateClientProxy(app, options, false)
+
+            const response = await request(app)
+                .post('/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/token')
+                .set(X_PREVIEW_PARENT, 'https://runtime.commercecloud.com')
+
+            expect(response.status).toBe(200)
+            // Upstream SLAS must not see the internal preview-context header.
+            expect(capturedPreviewParent).toBeUndefined()
+        } finally {
+            mockSlasServerInstance.close()
+        }
+    })
+
     test('returns 500 when siteId is missing', async () => {
         process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES = 'true'
 
@@ -2249,17 +2309,20 @@ describe('SLAS public proxy', () => {
 })
 
 describe('errorHandlerMiddleware logic', () => {
-    it('calls sendMetric and sendStatus(500) when error is handled', () => {
+    it('logs the error and sends status 500 without emitting a metric', () => {
+        // Custom RenderErrors metric emission was removed (W-22715301); the
+        // handler should still log the error and respond with a 500, and must
+        // not call sendMetric.
         catchAndLog.mockImplementation(() => {})
         const req = {app: {sendMetric: jest.fn()}}
         const res = {sendStatus: jest.fn()}
         const err = new Error('fail')
         // Inlined errorHandlerMiddleware logic
         catchAndLog(err)
-        req.app.sendMetric('RenderErrors')
         res.sendStatus(500)
-        expect(req.app.sendMetric).toHaveBeenCalledWith('RenderErrors')
+        expect(catchAndLog).toHaveBeenCalledWith(err)
         expect(res.sendStatus).toHaveBeenCalledWith(500)
+        expect(req.app.sendMetric).not.toHaveBeenCalled()
     })
 })
 

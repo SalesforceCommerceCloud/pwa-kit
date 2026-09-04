@@ -30,5 +30,16 @@ if (typeof global.performance !== 'undefined' && typeof global.performance.mark 
     global.performance.clearMeasures = nodePerformance.clearMeasures.bind(nodePerformance)
 }
 
+// Polyfill TextDecoder/TextEncoder for jsdom environment
+// Required for AWS SDK 3.x's @smithy/core CBOR encoding (used by mrt-utilities)
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {TextDecoder, TextEncoder} = require('util')
+if (typeof global.TextDecoder === 'undefined') {
+    global.TextDecoder = TextDecoder
+}
+if (typeof global.TextEncoder === 'undefined') {
+    global.TextEncoder = TextEncoder
+}
+
 // Mock Fetch
 global.fetch = fetch
