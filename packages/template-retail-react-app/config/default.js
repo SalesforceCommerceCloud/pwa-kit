@@ -208,7 +208,7 @@ module.exports = {
             sdkUrl: '',
             metadataUrl: ''
         },
-        inlinepdpAgentWidget: parseSettings(process.env.INLINE_PDP_AGENT_WIDGET_SETTINGS) || {
+        inlinepdpAgentWidget: parseSettings(process.env.INLINE_PDP_AGENT_WIDGET_COMMERCE_SETTINGS) || {
             enabled: false,
             scrt2Url: '',
             orgId: '',
