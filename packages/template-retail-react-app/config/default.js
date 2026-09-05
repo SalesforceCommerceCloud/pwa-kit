@@ -208,12 +208,11 @@ module.exports = {
             sdkUrl: '',
             metadataUrl: ''
         },
-        inlineAgentWidget: {
+        inlineAgentWidget: parseSettings(process.env.INLINE_AGENT_WIDGET_COMMERCE_SETTINGS) || {
             enabled: false,
             scrt2Url: '',
             orgId: '',
             esDeveloperName: '',
-            capabilitiesVersion: '1',
             placeholder: '',
             persistSession: true,
             enableLogging: false
