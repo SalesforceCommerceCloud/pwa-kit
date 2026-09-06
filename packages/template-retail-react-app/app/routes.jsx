@@ -64,6 +64,7 @@ const GuestOrderLookupOrder = loadable(() => import('./pages/guest-order-lookup/
 const GuestOrderLookupResults = loadable(() => import('./pages/guest-order-lookup/results'), {
     fallback
 })
+const HelloWorld = loadable(() => import('./pages/hello-world'), {fallback})
 
 export const routes = [
     {
@@ -137,6 +138,11 @@ export const routes = [
     {
         path: '/store-locator',
         component: StoreLocator
+    },
+    {
+        path: '/hello-world',
+        component: HelloWorld,
+        exact: true
     }
 ]
 
