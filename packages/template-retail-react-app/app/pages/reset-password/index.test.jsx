@@ -147,17 +147,14 @@ test('preserves a "+" in the email when submitting the reset (plus-addressing)',
         rest.post('*/password/action', (req, res, ctx) => {
             const body = req.body
             capturedUserId =
-                typeof body === 'string'
-                    ? new URLSearchParams(body).get('user_id')
-                    : body?.user_id
+                typeof body === 'string' ? new URLSearchParams(body).get('user_id') : body?.user_id
             return res(ctx.delay(0), ctx.status(200), ctx.json({}))
         })
     )
 
     // Land on the reset-password landing page with a raw '+' in the email query param.
     const landingUrl =
-        createPathWithDefaults('/reset-password-landing') +
-        `?token=abc123&email=${plusEmail}`
+        createPathWithDefaults('/reset-password-landing') + `?token=abc123&email=${plusEmail}`
     window.history.pushState({}, 'Reset Password', landingUrl)
 
     const {user} = renderWithProviders(<MockedComponent />, {
