@@ -22,6 +22,7 @@ export {
     isDesignModeActive,
     isPreviewModeActive
 } from '@salesforce/storefront-next-runtime/design/mode'
+export {useRouteEmitter} from '@salesforce/storefront-next-runtime/design/react'
 export type {
     ComponentDesignMetadata,
     RegionDesignMetadata
