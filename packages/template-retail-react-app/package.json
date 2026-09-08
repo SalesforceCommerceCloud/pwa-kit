@@ -51,7 +51,7 @@
     "@salesforce/pwa-kit-dev": "3.21.0-dev",
     "@salesforce/pwa-kit-react-sdk": "3.21.0-dev",
     "@salesforce/pwa-kit-runtime": "3.21.0-dev",
-    "@salesforce/storefront-next-runtime": "file:../../.build/salesforce-storefront-next-runtime-1.4.0-dev.tgz",
+    "@salesforce/storefront-next-runtime": "file:./vendored/salesforce-storefront-next-runtime-1.4.0-dev.tgz",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/dom": "^9.0.1",

@@ -1,6 +1,8 @@
 .DS_Store
 *.tgz
 !.build/salesforce-storefront-next-runtime-*.tgz
+!packages/commerce-sdk-react/vendored/salesforce-storefront-next-runtime-*.tgz
+!packages/template-retail-react-app/vendored/salesforce-storefront-next-runtime-*.tgz
 dist/
 package/
 node_modules/
