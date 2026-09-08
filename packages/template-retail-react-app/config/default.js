@@ -21,32 +21,64 @@ module.exports = {
             enabled: false
         },
         commerceAgent: parseSettings(process.env.COMMERCE_AGENT_SETTINGS) || {
-            enabled: 'false',
+            // DEV VALUES — revert before opening a PR to develop.
+            enabled: 'true',
+            // DEV VALUES — revert before opening a PR to develop.
+            // Renders the agent-launcher button in the site header (cc_showFab is 'false').
+            enableAgentFromHeader: 'true',
             askAgentOnSearch: 'false',
             embeddedServiceName: '',
             embeddedServiceEndpoint: '',
             scriptSourceUrl: '',
-            scrt2Url: '',
-            salesforceOrgId: '',
-            commerceOrgId: '',
-            siteId: '',
+            //scrt2Url: 'https://q3sdb1504032026zs3.test2.my.pc-rnd.salesforce-scrt.com',
+            //salesforceOrgId: '00DQZ0000093xsn',
+
+            //anitha
+            scrt2Url: 'https://orgfarm-f519a10ed2.test2.my.pc-rnd.salesforce-scrt.com',
+            salesforceOrgId: '00DQZ00000CSHIL',
+
+            commerceOrgId: 'f_ecom_zyoe_010',
+            siteId: 'RefArchGlobal',
             enableConversationContext: 'false',
             conversationContext: [],
             // Widget provider: 'miaw' (default, Salesforce Embedded Messaging) or
             // 'commerce-client' (Commerce Client widget). Selecting 'commerce-client' uses the
             // fields below instead of the MIAW embedded-service fields above.
-            provider: 'miaw',
+            provider: 'commerce-client',
             // Cimulate CDN version of the Commerce Client messaging UMD bundle (e.g.
             // '1.18.0'). Resolved into
             // https://cdn.search.cimulate.ai/copilot-widget/<version>/messaging.umd.js.
             // Only used when provider === 'commerce-client'.
-            cc_cdnVersion: '',
+            cc_cdnVersion: '1.20.0',
             // Optional explicit bundle URL. Overrides cc_cdnVersion when set; use for local
             // dev (http://localhost:...) or an SFCC self-hosted bundle.
-            commerceClientScriptSourceUrl: '',
+            commerceClientScriptSourceUrl: 'http://localhost:4173/messaging.umd.js',
             // Embedded Service developer name for the Commerce Client widget. Falls back
             // to embeddedServiceName when not set.
-            cc_esDeveloperName: '',
+            //cc_esDeveloperName: 'Q3_FreeFormNto_CC',
+
+            // anitha's
+            cc_esDeveloperName: 'Team_404_PWA_Shopper_Agent_CC_ES',
+            
+            // DEV VALUES — revert before opening a PR to develop.
+            // Cross-tenant dev override: SCAPI on zyoe_010 returns an empty `my_domain`,
+            // and Anitha's Agentforce org (00DQZ00000CSHIL) is a different Salesforce Core
+            // than the commerce tenant. Fill in Anitha's Core my.salesforce.com URL here
+            // — the widget uses it to route the auth-link JWT to her Core via the Token Bridge.
+            // cc_myDomainOverride: 'https://orgfarm-f519a10ed2.test2.my.pc-rnd.salesforce.com',
+
+            cc_routingAttributes: {
+                isCartMgmtSupported: 'true'
+            },
+            // Inline component-override map. Registers our SFP tile-extension and
+            // cart-extension custom elements as the widget's ProductTileExtension (PDP
+            // card) and CartExtension (cart summary card) slots; both elements must be
+            // defined via customElements.define() before the widget mounts (handled by
+            // sf-payments-express-agent/{tile,cart}-extension-adapter on module load).
+            cc_overrides: {
+                ProductTileExtension: 'sf-product-tile-extension',
+                CartExtension: 'sf-cart-extension'
+            },
             // Header text shown at the top of the Commerce Client widget.
             cc_headerText: '',
             // Markdown disclaimer shown in the Commerce Client widget. Supports links and
@@ -144,10 +176,13 @@ module.exports = {
         sites,
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
+            // DEV VALUES — revert before opening a PR to develop.
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: 'kv7kzm78',
+                //clientId: 'bc43c923-eecd-4725-bbde-285bc7261978',
+                clientId: 'e5a4176d-ff13-4cc0-bc9b-a2693c70591f',
+
+                organizationId: 'f_ecom_zyoe_010',
+                shortCode: 'sandbox-001',
                 siteId: 'RefArchGlobal'
             }
             // Optional: Set the domain for auth cookies to share them across subdomains.
@@ -195,10 +230,12 @@ module.exports = {
         // Set the sdkUrl and metadataUrl values to point to your Commerce Cloud instance host by replacing the [bm_or_vanity_host] placeholder with your Business Manager or vanity URL host name.
         //   sdkUrl:       'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v3/sfp.js'
         //   metadataUrl:  'https://[bm_or_vanity_host]/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
+        // DEV VALUES — revert before opening a PR to develop.
         sfPayments: {
-            enabled: false,
-            sdkUrl: '',
-            metadataUrl: ''
+            enabled: true,
+            sdkUrl: 'https://zyoe-010.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
+            metadataUrl:
+                'https://zyoe-010.unified.demandware.net/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json'
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
@@ -220,13 +257,14 @@ module.exports = {
         // Store the session cookies as HttpOnly for enhanced security.
         // WIP: Do not enable. This feature is in-progress.
         enableHttpOnlySessionCookies: false,
+        // DEV VALUES — revert before opening a PR to develop.
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'zyoe-010.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]

@@ -46,7 +46,7 @@ const options = {
     mobify: config,
 
     // The port that the local dev server listens on
-    port: 3000,
+    port: 3001,
 
     // The protocol on which the development Express app listens.
     // Set DEV_SERVER_PROTOCOL to 'https' for HTTPS; defaults to 'http' when unset.
@@ -63,7 +63,12 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    // DEV VALUES — revert before opening a PR to develop.
+    // Shopper Agent's auth-link requires a confidential SLAS client (e5a4176d...)
+    // because Core rejects public-client audiences with SLAS_UNTRUSTED_AUDIENCE.
+    // With this on, PWA Kit mounts /mobify/slas/private/* and injects the secret
+    // from PWA_KIT_SLAS_CLIENT_SECRET server-side.
+    useSLASPrivateClient: true,
 
     // To extend the SLAS private-client proxy allow-list, supply
     // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
@@ -394,13 +399,28 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'www.gstatic.com', // optional, if icon is on gstatic
                         // Commerce Client messaging widget images
                         'cimulate.ai',
-                        '*.cimulate.ai'
+                        '*.cimulate.ai',
+                        '*.dis.cc.salesforce.com',
+                        // DEV VALUES — revert before opening a PR to develop.
+                        // Allows loading images bundled with a local Cimulate build.
+                        'localhost:*',
+                        '127.0.0.1:*'
                     ],
                     'script-src': [
                         // Commerce Client messaging widget bundle (messaging.umd.js)
                         '*.cimulate.ai',
                         // Commerce Client bundle served from the SFCC static CDN
                         '*.sfcc-store-internal.net',
+                        '*.dis.cc.salesforce.com',
+                        // DEV VALUES — revert before opening a PR to develop.
+                        // Allows serving messaging.umd.js from a local Cimulate build
+                        // (commerceClientScriptSourceUrl in config/default.js). PWA runs on
+                        // https:// via start:https, so the http:// scheme must be explicit —
+                        // scheme-less source expressions only match the document's own scheme.
+                        'localhost:*',
+                        '127.0.0.1:*',
+                        'http://localhost:*',
+                        'http://127.0.0.1:*',
                         // Origin of the merchant-hosted Commerce Client component-override
                         // script, added only when cc_overridesUrl holds a valid HTTPS URL.
                         // Serving that script from a different host than the configured one

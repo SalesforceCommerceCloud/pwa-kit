@@ -108,6 +108,31 @@ const ShopperAgent = loadable(
     {ssr: false}
 )
 
+// Native-slot adapter for Cimulate's `ProductTileExtension` slot. Registers the
+// custom element and portals a React subtree into every mounted extension
+// element from within our host tree (so QueryClient / CommerceApiProvider /
+// SF Payments state are inherited). Own chunk — SF Payments code stays
+// isolated from the critical bundle.
+const SFPaymentsTileExtensionAdapter = loadable(
+    () =>
+        import(
+            '@salesforce/retail-react-app/app/components/sf-payments-express-agent/tile-extension-adapter'
+        ),
+    {ssr: false}
+)
+
+// Sibling of the tile-extension adapter above, for Cimulate's `CartExtension`
+// slot on the widget's cart summary card. Binds to the shopper's live basket
+// via `useCurrentBasket` (no temporary basket) so the express payment charges
+// what the widget is showing.
+const SFPaymentsCartExtensionAdapter = loadable(
+    () =>
+        import(
+            '@salesforce/retail-react-app/app/components/sf-payments-express-agent/cart-extension-adapter'
+        ),
+    {ssr: false}
+)
+
 const PlaceholderComponent = () => (
     <Center p="2">
         <Spinner size="lg" />
@@ -396,10 +421,14 @@ const App = (props) => {
                         </Seo>
 
                         {commerceAgentConfiguration?.enabled === 'true' && (
-                            <ShopperAgent
-                                commerceAgentConfiguration={commerceAgentConfiguration}
-                                basketDoneLoading={basketQueryLastUpdateTime > 0}
-                            />
+                            <>
+                                <ShopperAgent
+                                    commerceAgentConfiguration={commerceAgentConfiguration}
+                                    basketDoneLoading={basketQueryLastUpdateTime > 0}
+                                />
+                                <SFPaymentsTileExtensionAdapter />
+                                <SFPaymentsCartExtensionAdapter />
+                            </>
                         )}
 
                         <ScrollToTop />

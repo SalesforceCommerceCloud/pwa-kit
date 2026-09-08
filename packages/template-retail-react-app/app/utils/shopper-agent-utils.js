@@ -266,7 +266,11 @@ export const validateCommerceClientDomain = (url) => {
         return (
             hostname === 'cimulate.ai' ||
             hostname.endsWith('.cimulate.ai') ||
-            hostname.endsWith('.sfcc-store-internal.net')
+            hostname.endsWith('.sfcc-store-internal.net') ||
+            // DEV VALUES — revert before opening a PR to develop.
+            // Allows loading a local Cimulate build via commerceClientScriptSourceUrl.
+            hostname === 'localhost' ||
+            hostname === '127.0.0.1'
         )
     } catch {
         return false

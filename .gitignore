@@ -9,6 +9,7 @@ coverage/
 # Local environment variables (secrets / per-developer config)
 .env
 .env.local
+*.local.json
 packages/*/out
 packages/*/docs/www
 lerna-debug.log

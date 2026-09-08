@@ -222,9 +222,14 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
     // Fetch my_domain from Shopper Configurations API
     const {data: configurationsData} = useConfigurations({})
-    const myDomain = configurationsData?.configurations?.find(
-        (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
-    )?.value
+    const myDomain =
+        configurationsData?.configurations?.find(
+            (config) =>
+                config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
+        )?.value ||
+        // DEV VALUES — revert before opening a PR to develop.
+        // Cross-tenant dev fallback when SCAPI returns an empty my_domain.
+        commerceAgentConfiguration?.cc_myDomainOverride
 
     // SLAS access token — needed to call Core's Token Bridge directly.
     const {getTokenWhenReady} = useAccessToken()
@@ -579,6 +584,53 @@ ShopperAgentWindow.propTypes = {
  */
 const COMMERCE_CLIENT_GLOBAL_CLASS = 'commerce-client-shopper-agent'
 
+const COMMERCE_CLIENT_PRECHAT_FIELD_NAMES = [
+    'SiteId',
+    'Locale',
+    'OrganizationId',
+    'UsId',
+    // DEV: temporarily NOT reserved — sanitize would strip it from
+    // cc_routingAttributes, and the widget needs it to route tile clicks to the
+    // inline detail-card (which hosts SFP Express) instead of the store URL.
+    // Revisit once ANC/gdot are wired up and prechat semantics are finalized.
+    // 'IsCartMgmtSupported',
+    'Currency',
+    'Language',
+    'DomainUrl'
+]
+const COMMERCE_CLIENT_PRECHAT_FIELD_NAMES_LOWER = new Set(
+    COMMERCE_CLIENT_PRECHAT_FIELD_NAMES.map((name) => name.toLowerCase())
+)
+
+/**
+ * Removes session-bound prechat fields from static routing attributes so stale
+ * configuration cannot override the values supplied for each conversation.
+ *
+ * @param {Object} routingAttributes - Configured Commerce Client routing attributes
+ * @returns {Object|undefined} Routing attributes without reserved prechat fields
+ */
+const sanitizeCommerceClientRoutingAttributes = (routingAttributes) => {
+    if (!routingAttributes || typeof routingAttributes !== 'object') return routingAttributes
+
+    const sanitized = {}
+    const reservedNames = []
+    Object.entries(routingAttributes).forEach(([name, value]) => {
+        if (COMMERCE_CLIENT_PRECHAT_FIELD_NAMES_LOWER.has(name.toLowerCase())) {
+            reservedNames.push(name)
+        } else {
+            sanitized[name] = value
+        }
+    })
+
+    if (reservedNames.length > 0) {
+        console.warn(
+            '[Commerce Client] Ignoring reserved prechat routing attributes:',
+            reservedNames
+        )
+    }
+    return sanitized
+}
+
 /**
  * Default width of the Commerce Client side panel. Applied through the widget's
  * `componentConfig.options.dialogWidth` option when `cc_dialogFullHeight` is 'true'.
@@ -630,12 +682,19 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  */
 const CommerceClientAgentWindow = ({
     commerceAgentConfiguration,
+    domainUrl,
     lastAuthLinkKeyRef,
     lastCommerceClientJWTRef,
     authLinkGenerationRef,
     authLinkQueueRef,
     lastAttemptedCommerceClientJWTRef
 }) => {
+    // DEV: remount-cycle diagnostic — remove before PR.
+    console.log('[CCW] render', new Date().toISOString())
+    useEffect(() => {
+        console.log('[CCW] MOUNTED', new Date().toISOString())
+        return () => console.log('[CCW] UNMOUNTED', new Date().toISOString())
+    }, [])
     const {
         scrt2Url,
         salesforceOrgId,
@@ -677,14 +736,21 @@ const CommerceClientAgentWindow = ({
     getTokenWhenReadyRef.current = getTokenWhenReady
 
     const {organizationId, siteId: configSiteId} = useConfig()
+    const {locale} = useMultiSite()
+    const sfLanguage = normalizeLocaleToSalesforce(locale.id)
 
     // Fetch my_domain from the Shopper Configurations API. Auth-linking calls
     // Core (via the Token Bridge), which is only reachable once my_domain has
     // resolved, so we gate performAuthLink on it exactly like the MIAW provider.
     const {data: configurationsData} = useConfigurations({})
-    const myDomain = configurationsData?.configurations?.find(
-        (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
-    )?.value
+    const myDomain =
+        configurationsData?.configurations?.find(
+            (config) =>
+                config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
+        )?.value ||
+        // DEV VALUES — revert before opening a PR to develop.
+        // Cross-tenant dev fallback when SCAPI returns an empty my_domain.
+        commerceAgentConfiguration?.cc_myDomainOverride
 
     const configRef = useRef({organizationId, configSiteId, myDomain})
     configRef.current = {organizationId, configSiteId, myDomain}
@@ -703,6 +769,17 @@ const CommerceClientAgentWindow = ({
     // window listeners always see current values without re-subscribing.
     const identityRef = useRef({usid, customerType})
     identityRef.current = {usid, customerType}
+    const prechatRef = useRef({})
+    prechatRef.current = {
+        SiteId: commerceAgentConfiguration.siteId,
+        Locale: locale.id,
+        OrganizationId: commerceAgentConfiguration.commerceOrgId,
+        UsId: usid,
+        IsCartMgmtSupported: 'true',
+        Currency: locale.preferredCurrency,
+        Language: sfLanguage,
+        DomainUrl: domainUrl
+    }
 
     const commerceClientStorageScope = `${salesforceOrgId}_${
         cc_esDeveloperName || embeddedServiceName
@@ -781,7 +858,12 @@ const CommerceClientAgentWindow = ({
      */
     const waitForCommerceClientJWT = async (
         excludedJWT = null,
-        maxRetries = 8,
+        // DEV VALUES — revert before opening a PR to develop.
+        // Bumped from 8 → 15 to accommodate slower first-open handshakes on
+        // sandbox SCRT2 (test2/pc-rnd). At 15 retries the cap is ~13s (vs ~4.5s
+        // at 8). The token normally lands within the first second; the higher
+        // ceiling only affects the give-up path when SCRT2 is slow.
+        maxRetries = 15,
         initialDelay = 100,
         maxDelay = 1000
     ) => {
@@ -920,25 +1002,58 @@ const CommerceClientAgentWindow = ({
     // latest performAuthLink closure (which reads current config/identity).
     const performAuthLinkRef = useRef(performAuthLink)
     performAuthLinkRef.current = performAuthLink
+    const handledWidgetReadyEventsRef = useRef(new WeakSet())
 
     /**
      * Trigger 1 — new Commerce Client conversation.
      * `onCimulateWidgetReady` is a cancelable handshake the widget dispatches
      * ONLY when it creates a NEW conversation (not on sessionStorage resume).
-     * We use it purely as the "new conversation identity" signal and run the
-     * link asynchronously — we do NOT call preventDefault()/done() here, so the
-     * widget proceeds immediately; the JWT poll in performAuthLink waits for the
-     * new conversation's token to land.
+     * Before the conversation is created, provide the same session context as
+     * ECV1. Then release the widget and asynchronously link the new Commerce
+     * Client JWT to the current SLAS shopper.
      */
     useEffect(() => {
         if (!isCommerceClientReady) {
             return
         }
-        const handleWidgetReady = () => {
-            // Clear-chat can dispatch this event before storage rotates. Wait for
-            // the new token rather than authenticating the previous conversation.
+        const handleWidgetReady = (event) => {
+            if (handledWidgetReadyEventsRef.current.has(event)) return
+            handledWidgetReadyEventsRef.current.add(event)
+
+            // Clear-chat can dispatch this event before storage rotates. Exclude a
+            // JWT ONLY when we've already attempted to auth-link it — that signals
+            // the widget is rotating and we need to wait for the new one. Reading
+            // storage directly (as we used to) misfires on plain page reloads: the
+            // widget reuses the stored JWT for a resumed conversation, and excluding
+            // it makes waitForCommerceClientJWT loop until it times out.
             const excludedJWT =
-                lastAttemptedCommerceClientJWTRef.current || lastCommerceClientJWTRef.current
+                lastAttemptedCommerceClientJWTRef.current ||
+                lastCommerceClientJWTRef.current
+
+            const setHiddenPrechatFields = event?.detail?.setHiddenPrechatFields
+            const done = event?.detail?.done
+            if (
+                event?.cancelable &&
+                typeof setHiddenPrechatFields === 'function' &&
+                typeof done === 'function'
+            ) {
+                event.preventDefault()
+                try {
+                    setHiddenPrechatFields(prechatRef.current)
+                } catch (error) {
+                    console.error('[Commerce Client] Failed to set prechat fields', error)
+                } finally {
+                    try {
+                        done()
+                    } catch (error) {
+                        console.error(
+                            '[Commerce Client] Failed to release prechat handshake',
+                            error
+                        )
+                    }
+                }
+            }
+
             performAuthLinkRef.current({
                 reason: 'widget-ready',
                 excludedJWT: excludedJWT || null
@@ -1007,6 +1122,18 @@ const CommerceClientAgentWindow = ({
         }
     }, [])
 
+    const routingAttributes = useMemo(
+        () =>
+            sanitizeCommerceClientRoutingAttributes(
+                resolveCommerceClientRoutingAttributes({
+                    cc_routingAttributes,
+                    cc_cdnVersion,
+                    commerceClientScriptSourceUrl
+                })
+            ),
+        [cc_routingAttributes, cc_cdnVersion, commerceClientScriptSourceUrl]
+    )
+
     const widgetOptions = useMemo(
         () => ({
             elementId: commerceClientElementId,
@@ -1016,11 +1143,7 @@ const CommerceClientAgentWindow = ({
             capabilitiesVersion: cc_capabilitiesVersion,
             enableEscalationToAgent: cc_enableEscalationToAgent !== 'false',
             enableDownloadTranscript: cc_enableDownloadTranscript !== 'false',
-            routingAttributes: resolveCommerceClientRoutingAttributes({
-                cc_routingAttributes,
-                cc_cdnVersion,
-                commerceClientScriptSourceUrl
-            }),
+            routingAttributes,
             logoUrl: cc_logoUrl,
             headerText: cc_headerText,
             disclaimerMarkdown: cc_disclaimerMarkdown,
@@ -1050,9 +1173,7 @@ const CommerceClientAgentWindow = ({
             cc_capabilitiesVersion,
             cc_enableEscalationToAgent,
             cc_enableDownloadTranscript,
-            cc_routingAttributes,
-            cc_cdnVersion,
-            commerceClientScriptSourceUrl,
+            routingAttributes,
             cc_logoUrl,
             cc_headerText,
             cc_disclaimerMarkdown,
@@ -1095,6 +1216,7 @@ CommerceClientAgentWindow.propTypes = {
      * @required
      */
     commerceAgentConfiguration: PropTypes.object.isRequired,
+    domainUrl: PropTypes.string.isRequired,
     lastAuthLinkKeyRef: PropTypes.shape({current: PropTypes.string}).isRequired,
     lastCommerceClientJWTRef: PropTypes.shape({current: PropTypes.string}).isRequired,
     authLinkGenerationRef: PropTypes.shape({current: PropTypes.number}).isRequired,
@@ -1172,6 +1294,7 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
             <div data-testid="shopper-agent">
                 <CommerceClientAgentWindow
                     commerceAgentConfiguration={commerceAgentConfiguration}
+                    domainUrl={domainUrl}
                     lastAuthLinkKeyRef={lastAuthLinkKeyRef}
                     lastCommerceClientJWTRef={lastCommerceClientJWTRef}
                     authLinkGenerationRef={authLinkGenerationRef}
