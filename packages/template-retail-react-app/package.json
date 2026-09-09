@@ -47,7 +47,7 @@
     "@peculiar/webcrypto": "^1.4.2",
     "@salesforce/cc-datacloud-typescript": "1.1.2",
     "@salesforce/commerce-sdk-react": "5.5.0-dev",
-    "commerce-sdk-isomorphic": "5.5.0",
+    "commerce-sdk-isomorphic": "5.6.0-unstable-20260909155346",
     "@salesforce/pwa-kit-dev": "3.21.0-dev",
     "@salesforce/pwa-kit-react-sdk": "3.21.0-dev",
     "@salesforce/pwa-kit-runtime": "3.21.0-dev",
@@ -112,7 +112,7 @@
     },
     {
       "path": "build/vendor.js",
-      "maxSize": "400 kB"
+      "maxSize": "401 kB"
     }
   ]
 }

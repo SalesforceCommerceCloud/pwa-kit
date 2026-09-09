@@ -15,7 +15,10 @@ describe('Shopper Payments hooks', () => {
         const unimplemented = getUnimplementedEndpoints(ShopperPayments, queries)
         // If this test fails: create a new query hook, add the endpoint to the mutations enum,
         // or add it to the `expected` array with a comment explaining "TODO" or "never" (and why).
-        expect(unimplemented).toEqual([])
+        expect(unimplemented).toEqual([
+            // Added by commerce-sdk-isomorphic@5.6.0-unstable-20260909155346; no hook yet.
+            'getPaymentInstrumentBalance'
+        ])
     })
     test('all mutations have cache update logic', () => {
         // unimplemented = value in mutations enum, but no method in cache update matrix

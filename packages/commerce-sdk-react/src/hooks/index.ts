@@ -22,6 +22,7 @@ export type {ShopperBasketsMutation as ShopperBasketsV2Mutation} from './Shopper
 export * from './ShopperConsents'
 export * from './ShopperContexts'
 export * from './ShopperCustomers'
+export * from './ShopperDeliveryEstimates'
 export * from './ShopperExperience'
 export * from './ShopperGiftCertificates'
 export * from './ShopperLogin'
