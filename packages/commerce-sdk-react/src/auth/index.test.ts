@@ -19,6 +19,7 @@ import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
     DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL,
+    lastUsidByDedupKey,
     pendingRefreshTokens
 } from './index'
 import {RequireKeys} from '../hooks/types'
@@ -1972,5 +1973,91 @@ describe('HttpOnly Session Cookies', () => {
             // param but would fail this assertion.
             expect(state).not.toBe(codeVerifier)
         })
+    })
+})
+
+describe('getUsidForPreview', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+        pendingRefreshTokens.clear()
+        lastUsidByDedupKey.clear()
+    })
+
+    test('returns the usid persisted by handleTokenResponse in non-httpOnly mode', async () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', 'refresh_token')
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockResolvedValueOnce({...TOKEN_RESPONSE})
+
+        const usid = await auth.getUsidForPreview()
+
+        expect(usid).toBe(TOKEN_RESPONSE.usid)
+    })
+
+    test('falls back to the module-level stash when the cookie write is silently dropped', async () => {
+        // Cross-site iframe (Storefront Preview embedded in BM) — the browser drops
+        // Set-Cookie for third-party contexts, so `this.get('usid')` returns empty
+        // after a successful SLAS 200. httpOnly mode reproduces the same shape:
+        // handleTokenResponse still stashes `usid` but skips all storage writes.
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        // @ts-expect-error private method — signal we have an httpOnly refresh token
+        auth.set('cc-nx-expires', String(Math.floor(Date.now() / 1000) + 3600))
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockResolvedValueOnce({...TOKEN_RESPONSE})
+
+        const usid = await auth.getUsidForPreview()
+
+        // Cookie-backed read is empty in httpOnly mode; fallback returns the stash.
+        expect(auth.get('usid')).toBeFalsy()
+        expect(usid).toBe(TOKEN_RESPONSE.usid)
+    })
+
+    test('recovers usid on a peer Auth instance that awaits a shared refresh promise', async () => {
+        // React can recreate the Auth instance mid-flight; `refreshAccessToken()`
+        // dedupes via the module-level `pendingRefreshTokens` map keyed by
+        // siteId+clientId. The peer instance therefore never runs
+        // `handleTokenResponse` itself. The fallback must still be visible to it,
+        // otherwise the cross-site-iframe fix silently regresses.
+        const authA = new Auth({...config, enableHttpOnlySessionCookies: true})
+        const authB = new Auth({...config, enableHttpOnlySessionCookies: true})
+        // @ts-expect-error private method
+        authA.set('cc-nx-expires', String(Math.floor(Date.now() / 1000) + 3600))
+        // @ts-expect-error private method
+        authB.set('cc-nx-expires', String(Math.floor(Date.now() / 1000) + 3600))
+
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockResolvedValueOnce({...TOKEN_RESPONSE})
+
+        // Kick off both concurrently — only one hits the mock; the other awaits.
+        const [usidA, usidB] = await Promise.all([
+            authA.getUsidForPreview(),
+            authB.getUsidForPreview()
+        ])
+
+        expect(refreshMock).toHaveBeenCalledTimes(1)
+        expect(usidA).toBe(TOKEN_RESPONSE.usid)
+        expect(usidB).toBe(TOKEN_RESPONSE.usid)
+    })
+
+    test('throws when neither the cookie nor the stash carries a usid', async () => {
+        const auth = new Auth({...config, enableHttpOnlySessionCookies: true})
+        // @ts-expect-error private method
+        auth.set('cc-nx-expires', String(Math.floor(Date.now() / 1000) + 3600))
+        // @ts-expect-error private method
+        auth.set('customer_type', 'guest')
+
+        const refreshMock = helpers.refreshAccessToken as jest.Mock
+        refreshMock.mockResolvedValueOnce({...TOKEN_RESPONSE, usid: ''})
+
+        await expect(auth.getUsidForPreview()).rejects.toThrow(
+            'SLAS refresh did not return a USID'
+        )
     })
 })
