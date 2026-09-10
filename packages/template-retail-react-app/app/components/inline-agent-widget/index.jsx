@@ -33,7 +33,6 @@ InlineAgentWidget.propTypes = {
         scrt2Url: PropTypes.string,
         orgId: PropTypes.string,
         esDeveloperName: PropTypes.string,
-        capabilitiesVersion: PropTypes.string,
         placeholder: PropTypes.string
     })
 }
