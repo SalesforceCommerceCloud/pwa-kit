@@ -59,6 +59,8 @@ import SFPaymentsExpressButtons from '@salesforce/retail-react-app/app/component
 import {EXPRESS_BUY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useCleanupTemporaryBaskets} from '@salesforce/retail-react-app/app/hooks/use-cleanup-temporary-baskets'
+import DeliveryEstimate from '@salesforce/retail-react-app/app/components/delivery-estimate'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const ProductViewHeader = ({
     name,
@@ -162,11 +164,13 @@ const ProductView = forwardRef(
             imageGalleryFooter = null,
             controlledVariationValues = null,
             onVariationChange = null,
-            actionFooter = null
+            actionFooter = null,
+            showDeliveryEstimate = false
         },
         ref
     ) => {
         const {currency: activeCurrency} = useCurrency()
+        const {site, locale} = useMultiSite()
         const showToast = useToast()
         const intl = useIntl()
         const location = useLocation()
@@ -219,6 +223,9 @@ const ProductView = forwardRef(
         const storeName = selectedStore?.name
         const inventoryId = selectedStore?.inventoryId
         const {pdp: showExpressOnPDP} = useExpressCheckoutEnabled()
+        const deliveryEstimateProductId =
+            variant?.productId || (product?.type?.item ? product.id : null)
+        const defaultCountryCode = locale?.id?.split('-')?.[1]
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -975,6 +982,13 @@ const ProductView = forwardRef(
                                         )}
                                     </>
                                 )}
+                                {showDeliveryEstimate && site?.id && deliveryEstimateProductId && (
+                                    <DeliveryEstimate
+                                        productId={deliveryEstimateProductId}
+                                        siteId={site.id}
+                                        defaultCountryCode={defaultCountryCode}
+                                    />
+                                )}
                                 <Box
                                     display={
                                         isProductPartOfSet
@@ -1051,7 +1065,8 @@ ProductView.propTypes = {
     alignItems: PropTypes.string,
     controlledVariationValues: PropTypes.object,
     onVariationChange: PropTypes.func,
-    actionFooter: PropTypes.node
+    actionFooter: PropTypes.node,
+    showDeliveryEstimate: PropTypes.bool
 }
 
 export default ProductView

@@ -1959,6 +1959,132 @@
       "value": "Security code info"
     }
   ],
+  "delivery_estimate.action.calculate": [
+    {
+      "type": 0,
+      "value": "Calculate"
+    }
+  ],
+  "delivery_estimate.action.calculate_aria_label": [
+    {
+      "type": 0,
+      "value": "Calculate delivery estimate"
+    }
+  ],
+  "delivery_estimate.error.enter_postal_code": [
+    {
+      "options": {
+        "GB": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a postcode."
+            }
+          ]
+        },
+        "US": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a ZIP code."
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a postal code."
+            }
+          ]
+        }
+      },
+      "type": 5,
+      "value": "countryCode"
+    }
+  ],
+  "delivery_estimate.heading": [
+    {
+      "type": 0,
+      "value": "Estimated Delivery Date"
+    }
+  ],
+  "delivery_estimate.instructions.postal_code": [
+    {
+      "options": {
+        "GB": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter your postcode (e.g. SW1A 1AA) to see delivery estimates."
+            }
+          ]
+        },
+        "US": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter your ZIP code (e.g. 90210) to see delivery estimates."
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter your postal code to see delivery estimates."
+            }
+          ]
+        }
+      },
+      "type": 5,
+      "value": "countryCode"
+    }
+  ],
+  "delivery_estimate.label.postal_code": [
+    {
+      "options": {
+        "GB": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Postcode"
+            }
+          ]
+        },
+        "US": {
+          "value": [
+            {
+              "type": 0,
+              "value": "ZIP code"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Postal code"
+            }
+          ]
+        }
+      },
+      "type": 5,
+      "value": "countryCode"
+    }
+  ],
+  "delivery_estimate.status.loading": [
+    {
+      "type": 0,
+      "value": "Calculating..."
+    }
+  ],
+  "delivery_estimate.status.unavailable": [
+    {
+      "type": 0,
+      "value": "Delivery dates unavailable. See checkout for options and costs."
+    }
+  ],
   "display_price.assistive_msg.current_price": [
     {
       "type": 0,
