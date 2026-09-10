@@ -777,6 +777,30 @@
   "credit_card_fields.tool_tip.security_code_aria_label": {
     "defaultMessage": "Security code info"
   },
+  "delivery_estimate.action.check_delivery": {
+    "defaultMessage": "Check delivery"
+  },
+  "delivery_estimate.error.enter_country_code": {
+    "defaultMessage": "Enter a valid country code."
+  },
+  "delivery_estimate.error.enter_postal_code": {
+    "defaultMessage": "Enter a postal code."
+  },
+  "delivery_estimate.heading": {
+    "defaultMessage": "Delivery estimate"
+  },
+  "delivery_estimate.label.country_code": {
+    "defaultMessage": "Country code"
+  },
+  "delivery_estimate.label.postal_code": {
+    "defaultMessage": "Postal code"
+  },
+  "delivery_estimate.status.loading": {
+    "defaultMessage": "Checking delivery estimate..."
+  },
+  "delivery_estimate.status.unavailable": {
+    "defaultMessage": "A delivery estimate is unavailable for this destination."
+  },
   "display_price.assistive_msg.current_price": {
     "defaultMessage": "current price {currentPrice}"
   },

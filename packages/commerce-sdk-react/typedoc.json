@@ -8,5 +8,5 @@
     "includeGroups": true
 },
   "categorizeByGroup": true,
-  "groupOrder": ["Components", "Helpers", "ShopperBaskets", "ShopperContexts", "ShopperCustomers", "ShopperExperience", "ShopperGiftCertificates", "ShopperLogin", "ShopperOrders", "ShopperProducts", "ShopperPromotions", "ShopperSearch"]
+  "groupOrder": ["Components", "Helpers", "ShopperBaskets", "ShopperContexts", "ShopperCustomers", "ShopperDeliveryEstimates", "ShopperExperience", "ShopperGiftCertificates", "ShopperLogin", "ShopperOrders", "ShopperProducts", "ShopperPromotions", "ShopperSearch"]
 }

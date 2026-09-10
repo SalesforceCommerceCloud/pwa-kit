@@ -1959,6 +1959,54 @@
       "value": "Security code info"
     }
   ],
+  "delivery_estimate.action.check_delivery": [
+    {
+      "type": 0,
+      "value": "Check delivery"
+    }
+  ],
+  "delivery_estimate.error.enter_country_code": [
+    {
+      "type": 0,
+      "value": "Enter a valid country code."
+    }
+  ],
+  "delivery_estimate.error.enter_postal_code": [
+    {
+      "type": 0,
+      "value": "Enter a postal code."
+    }
+  ],
+  "delivery_estimate.heading": [
+    {
+      "type": 0,
+      "value": "Delivery estimate"
+    }
+  ],
+  "delivery_estimate.label.country_code": [
+    {
+      "type": 0,
+      "value": "Country code"
+    }
+  ],
+  "delivery_estimate.label.postal_code": [
+    {
+      "type": 0,
+      "value": "Postal code"
+    }
+  ],
+  "delivery_estimate.status.loading": [
+    {
+      "type": 0,
+      "value": "Checking delivery estimate..."
+    }
+  ],
+  "delivery_estimate.status.unavailable": [
+    {
+      "type": 0,
+      "value": "A delivery estimate is unavailable for this destination."
+    }
+  ],
   "display_price.assistive_msg.current_price": [
     {
       "type": 0,

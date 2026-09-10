@@ -151,6 +151,14 @@ test('ProductView Component renders properly', async () => {
     expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
 })
 
+test('renders delivery estimates only when explicitly enabled for the PDP', () => {
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
+    )
+
+    expect(screen.getByRole('heading', {name: /delivery estimate/i})).toBeInTheDocument()
+})
+
 describe('Event Handlers', () => {
     test('calls addToCart when add to cart button is clicked', async () => {
         const addToCart = jest.fn()
