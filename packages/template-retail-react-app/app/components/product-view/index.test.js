@@ -156,7 +156,7 @@ test('renders delivery estimates only when explicitly enabled for the PDP', () =
         <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
     )
 
-    expect(screen.getByRole('heading', {name: /delivery estimate/i})).toBeInTheDocument()
+    expect(screen.getByRole('heading', {name: 'Estimated Delivery Date'})).toBeInTheDocument()
 })
 
 describe('Event Handlers', () => {

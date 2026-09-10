@@ -777,29 +777,29 @@
   "credit_card_fields.tool_tip.security_code_aria_label": {
     "defaultMessage": "Security code info"
   },
-  "delivery_estimate.action.check_delivery": {
-    "defaultMessage": "Check delivery"
+  "delivery_estimate.action.calculate": {
+    "defaultMessage": "Calculate"
   },
-  "delivery_estimate.error.enter_country_code": {
-    "defaultMessage": "Enter a valid country code."
+  "delivery_estimate.action.calculate_aria_label": {
+    "defaultMessage": "Calculate delivery estimate"
   },
   "delivery_estimate.error.enter_postal_code": {
-    "defaultMessage": "Enter a postal code."
+    "defaultMessage": "{countryCode, select, GB {Enter a postcode.} US {Enter a ZIP code.} other {Enter a postal code.}}"
   },
   "delivery_estimate.heading": {
-    "defaultMessage": "Delivery estimate"
+    "defaultMessage": "Estimated Delivery Date"
   },
-  "delivery_estimate.label.country_code": {
-    "defaultMessage": "Country code"
+  "delivery_estimate.instructions.postal_code": {
+    "defaultMessage": "{countryCode, select, GB {Enter your postcode (e.g. SW1A 1AA) to see delivery estimates.} US {Enter your ZIP code (e.g. 90210) to see delivery estimates.} other {Enter your postal code to see delivery estimates.}}"
   },
   "delivery_estimate.label.postal_code": {
-    "defaultMessage": "Postal code"
+    "defaultMessage": "{countryCode, select, GB {Postcode} US {ZIP code} other {Postal code}}"
   },
   "delivery_estimate.status.loading": {
-    "defaultMessage": "Checking delivery estimate..."
+    "defaultMessage": "Calculating..."
   },
   "delivery_estimate.status.unavailable": {
-    "defaultMessage": "A delivery estimate is unavailable for this destination."
+    "defaultMessage": "Delivery dates unavailable. See checkout for options and costs."
   },
   "display_price.assistive_msg.current_price": {
     "defaultMessage": "current price {currentPrice}"

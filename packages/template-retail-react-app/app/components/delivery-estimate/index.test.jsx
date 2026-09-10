@@ -11,6 +11,7 @@ import userEvent from '@testing-library/user-event'
 import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
 import DeliveryEstimate from '@salesforce/retail-react-app/app/components/delivery-estimate'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import usMessages from '@salesforce/retail-react-app/app/static/translations/compiled/en-US.json'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -49,7 +50,8 @@ const deliveryResult = {
 
 const renderDeliveryEstimate = (props = {}) => {
     return renderWithProviders(
-        <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="US" {...props} />
+        <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="US" {...props} />,
+        {wrapperProps: {locale: {id: 'en-US'}, messages: usMessages}}
     )
 }
 
@@ -84,8 +86,9 @@ describe('DeliveryEstimate', () => {
         const user = userEvent.setup()
         renderDeliveryEstimate()
 
-        await user.type(screen.getByRole('textbox', {name: /postal code/i}), '94105')
-        await user.click(screen.getByRole('button', {name: /check delivery/i}))
+        expect(screen.queryByRole('textbox', {name: /country code/i})).not.toBeInTheDocument()
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
         await waitFor(() => {
             expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
@@ -108,6 +111,17 @@ describe('DeliveryEstimate', () => {
         })
     })
 
+    test('uses the localized postcode label and instructions for GB', () => {
+        renderWithProviders(
+            <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="GB" />
+        )
+
+        const input = screen.getByRole('textbox', {name: /postcode/i})
+        expect(input).toHaveAccessibleDescription(
+            'Enter your postcode (e.g. SW1A 1AA) to see delivery estimates.'
+        )
+    })
+
     test('clears the previous estimate without persisting an invalid destination', async () => {
         const user = userEvent.setup()
         window.localStorage.setItem(
@@ -117,10 +131,13 @@ describe('DeliveryEstimate', () => {
         renderDeliveryEstimate()
 
         expect(await screen.findByText(/ground/i)).toBeInTheDocument()
-        await user.clear(screen.getByRole('textbox', {name: /postal code/i}))
-        await user.click(screen.getByRole('button', {name: /check delivery/i}))
+        await user.clear(screen.getByRole('textbox', {name: /zip code/i}))
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
-        expect(screen.getByText(/enter a postal code/i)).toBeInTheDocument()
+        expect(screen.getByText(/enter a zip code/i)).toBeInTheDocument()
+        expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveAccessibleDescription(
+            'Enter a ZIP code.'
+        )
         await waitFor(() => {
             expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
                 expect.any(Object),
@@ -134,28 +151,52 @@ describe('DeliveryEstimate', () => {
         })
     })
 
-    test('does not request when the country code is invalid', async () => {
-        const user = userEvent.setup()
+    test('announces and prevents duplicate submissions while calculating', async () => {
+        window.localStorage.setItem(
+            'deliveryDestination_site-1',
+            JSON.stringify({countryCode: 'US', postalCode: '94105'})
+        )
+        useDeliveryEstimates.mockReturnValue({
+            data: undefined,
+            isError: false,
+            isLoading: true,
+            isFetching: false
+        })
         renderDeliveryEstimate()
 
-        await user.clear(screen.getByRole('textbox', {name: /country code/i}))
-        await user.type(screen.getByRole('textbox', {name: /country code/i}), 'U')
-        await user.type(screen.getByRole('textbox', {name: /postal code/i}), '94105')
-        await user.click(screen.getByRole('button', {name: /check delivery/i}))
+        const button = await screen.findByRole('button', {name: 'Calculating...'})
+        expect(button).toBeDisabled()
+        expect(screen.getByRole('status')).toHaveTextContent('Calculating...')
+    })
 
-        expect(screen.getByText(/enter a valid country code/i)).toBeInTheDocument()
-        expect(useDeliveryEstimates).toHaveBeenCalledWith(
-            expect.any(Object),
-            expect.objectContaining({enabled: false})
+    test('uses the locale country code when restoring a saved postal code', async () => {
+        window.localStorage.setItem(
+            'deliveryDestination_site-1',
+            JSON.stringify({countryCode: 'US', postalCode: '94105'})
         )
+        renderDeliveryEstimate({defaultCountryCode: 'GB'})
+
+        await waitFor(() => {
+            expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+                {
+                    parameters: {
+                        productIds: ['sku-a'],
+                        postalCode: '94105',
+                        countryCode: 'GB',
+                        siteId: 'site-1'
+                    }
+                },
+                expect.objectContaining({enabled: true})
+            )
+        })
     })
 
     test('announces a successful estimate', async () => {
         const user = userEvent.setup()
         renderDeliveryEstimate()
 
-        await user.type(screen.getByRole('textbox', {name: /postal code/i}), '94105')
-        await user.click(screen.getByRole('button', {name: /check delivery/i}))
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
         expect(await screen.findByRole('status')).toHaveTextContent(/ground/i)
     })
@@ -171,8 +212,8 @@ describe('DeliveryEstimate', () => {
         try {
             renderDeliveryEstimate()
 
-            await user.type(screen.getByRole('textbox', {name: /postal code/i}), '94105')
-            await user.click(screen.getByRole('button', {name: /check delivery/i}))
+            await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+            await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
             expect(await screen.findByText(/ground/i)).toBeInTheDocument()
         } finally {
@@ -184,8 +225,8 @@ describe('DeliveryEstimate', () => {
         const user = userEvent.setup()
         renderWithProviders(<DeliveryEstimateVariantHarness />)
 
-        await user.type(screen.getByRole('textbox', {name: /postal code/i}), '94105')
-        await user.click(screen.getByRole('button', {name: /check delivery/i}))
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
         expect(await screen.findByText(/ground/i)).toBeInTheDocument()
 
         await user.click(screen.getByRole('button', {name: /select sku b/i}))
@@ -207,9 +248,9 @@ describe('DeliveryEstimate', () => {
         )
         renderDeliveryEstimate()
 
-        await user.click(screen.getByRole('button', {name: /check delivery/i}))
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
-        expect(await screen.findByText(/unavailable for this destination/i)).toBeInTheDocument()
+        expect(await screen.findByText(/delivery dates unavailable/i)).toBeInTheDocument()
         expect(JSON.parse(window.localStorage.getItem('deliveryDestination_site-1'))).toEqual({
             countryCode: 'US',
             postalCode: '94105'
@@ -238,10 +279,10 @@ describe('DeliveryEstimate', () => {
         })
         renderDeliveryEstimate()
 
-        await user.type(screen.getByRole('textbox', {name: /postal code/i}), '94105')
-        await user.click(screen.getByRole('button', {name: /check delivery/i}))
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
-        expect(await screen.findByText(/unavailable for this destination/i)).toBeInTheDocument()
+        expect(await screen.findByText(/delivery dates unavailable/i)).toBeInTheDocument()
         expect(screen.queryByText(/insufficient inventory/i)).not.toBeInTheDocument()
     })
 })

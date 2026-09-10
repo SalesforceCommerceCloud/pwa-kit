@@ -4023,28 +4023,28 @@
       "value": "]"
     }
   ],
-  "delivery_estimate.action.check_delivery": [
+  "delivery_estimate.action.calculate": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ƈħḗḗƈķ ḓḗḗŀīṽḗḗřẏ"
+      "value": "Ƈȧȧŀƈŭŭŀȧȧŧḗḗ"
     },
     {
       "type": 0,
       "value": "]"
     }
   ],
-  "delivery_estimate.error.enter_country_code": [
+  "delivery_estimate.action.calculate_aria_label": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ḗƞŧḗḗř ȧȧ ṽȧȧŀīḓ ƈǿǿŭŭƞŧřẏ ƈǿǿḓḗḗ."
+      "value": "Ƈȧȧŀƈŭŭŀȧȧŧḗḗ ḓḗḗŀīṽḗḗřẏ ḗḗşŧīḿȧȧŧḗḗ"
     },
     {
       "type": 0,
@@ -4057,8 +4057,34 @@
       "value": "["
     },
     {
-      "type": 0,
-      "value": "Ḗƞŧḗḗř ȧȧ ƥǿǿşŧȧȧŀ ƈǿǿḓḗḗ."
+      "options": {
+        "GB": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Ḗƞŧḗḗř ȧȧ ƥǿǿşŧƈǿǿḓḗḗ."
+            }
+          ]
+        },
+        "US": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Ḗƞŧḗḗř ȧȧ ẐĪƤ ƈǿǿḓḗḗ."
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Ḗƞŧḗḗř ȧȧ ƥǿǿşŧȧȧŀ ƈǿǿḓḗḗ."
+            }
+          ]
+        }
+      },
+      "type": 5,
+      "value": "countryCode"
     },
     {
       "type": 0,
@@ -4072,21 +4098,47 @@
     },
     {
       "type": 0,
-      "value": "Ḓḗḗŀīṽḗḗřẏ ḗḗşŧīḿȧȧŧḗḗ"
+      "value": "Ḗşŧīḿȧȧŧḗḗḓ Ḓḗḗŀīṽḗḗřẏ Ḓȧȧŧḗḗ"
     },
     {
       "type": 0,
       "value": "]"
     }
   ],
-  "delivery_estimate.label.country_code": [
+  "delivery_estimate.instructions.postal_code": [
     {
       "type": 0,
       "value": "["
     },
     {
-      "type": 0,
-      "value": "Ƈǿǿŭŭƞŧřẏ ƈǿǿḓḗḗ"
+      "options": {
+        "GB": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Ḗƞŧḗḗř ẏǿǿŭŭř ƥǿǿşŧƈǿǿḓḗḗ (ḗḗ.ɠ. ŞẆ1Ȧ 1ȦȦ) ŧǿǿ şḗḗḗḗ ḓḗḗŀīṽḗḗřẏ ḗḗşŧīḿȧȧŧḗḗş."
+            }
+          ]
+        },
+        "US": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Ḗƞŧḗḗř ẏǿǿŭŭř ẐĪƤ ƈǿǿḓḗḗ (ḗḗ.ɠ. 90210) ŧǿǿ şḗḗḗḗ ḓḗḗŀīṽḗḗřẏ ḗḗşŧīḿȧȧŧḗḗş."
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Ḗƞŧḗḗř ẏǿǿŭŭř ƥǿǿşŧȧȧŀ ƈǿǿḓḗḗ ŧǿǿ şḗḗḗḗ ḓḗḗŀīṽḗḗřẏ ḗḗşŧīḿȧȧŧḗḗş."
+            }
+          ]
+        }
+      },
+      "type": 5,
+      "value": "countryCode"
     },
     {
       "type": 0,
@@ -4099,8 +4151,34 @@
       "value": "["
     },
     {
-      "type": 0,
-      "value": "Ƥǿǿşŧȧȧŀ ƈǿǿḓḗḗ"
+      "options": {
+        "GB": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Ƥǿǿşŧƈǿǿḓḗḗ"
+            }
+          ]
+        },
+        "US": {
+          "value": [
+            {
+              "type": 0,
+              "value": "ẐĪƤ ƈǿǿḓḗḗ"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Ƥǿǿşŧȧȧŀ ƈǿǿḓḗḗ"
+            }
+          ]
+        }
+      },
+      "type": 5,
+      "value": "countryCode"
     },
     {
       "type": 0,
@@ -4114,7 +4192,7 @@
     },
     {
       "type": 0,
-      "value": "Ƈħḗḗƈķīƞɠ ḓḗḗŀīṽḗḗřẏ ḗḗşŧīḿȧȧŧḗḗ..."
+      "value": "Ƈȧȧŀƈŭŭŀȧȧŧīƞɠ..."
     },
     {
       "type": 0,
@@ -4128,7 +4206,7 @@
     },
     {
       "type": 0,
-      "value": "Ȧ ḓḗḗŀīṽḗḗřẏ ḗḗşŧīḿȧȧŧḗḗ īş ŭŭƞȧȧṽȧȧīŀȧȧƀŀḗḗ ƒǿǿř ŧħīş ḓḗḗşŧīƞȧȧŧīǿǿƞ."
+      "value": "Ḓḗḗŀīṽḗḗřẏ ḓȧȧŧḗḗş ŭŭƞȧȧṽȧȧīŀȧȧƀŀḗḗ. Şḗḗḗḗ ƈħḗḗƈķǿǿŭŭŧ ƒǿǿř ǿǿƥŧīǿǿƞş ȧȧƞḓ ƈǿǿşŧş."
     },
     {
       "type": 0,
