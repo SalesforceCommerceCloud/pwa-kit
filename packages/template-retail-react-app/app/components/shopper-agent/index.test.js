@@ -123,6 +123,11 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useConfigurations: jest.fn()
 }))
 
+// Mock useAuthContext, the internal "temporary bridge" hook the Commerce Client
+// provider uses to read the raw Auth instance (e.g. for the `cc-at-expires` cookie
+// in HttpOnly mode when arming the proactive SLAS refresh timer).
+jest.mock('@salesforce/commerce-sdk-react/hooks/useAuthContext')
+
 // Mock the useMultiSite hook
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     __esModule: true,
@@ -146,6 +151,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
+import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
 
 // Get mocked functions
@@ -159,8 +165,12 @@ const mockedUseCustomerType = useCustomerType
 const mockedUseMultiSite = useMultiSite
 const mockedUseTheme = useTheme
 const mockedUseCommerceClientMessaging = useCommerceClientMessaging
+const mockedUseAuthContext = useAuthContext
 
 const mockGetTokenWhenReady = jest.fn()
+const mockAuthGet = jest.fn()
+const mockClearAccessTokenExpiry = jest.fn()
+const mockRefreshAccessToken = jest.fn()
 
 const commerceAgentSettings = {
     enabled: 'true',
@@ -196,7 +206,22 @@ describe('ShopperAgent Component', () => {
         // Mock useAccessToken hook
         mockGetTokenWhenReady.mockReset()
         mockGetTokenWhenReady.mockResolvedValue('test-slas-access-token')
-        mockedUseAccessToken.mockReturnValue({getTokenWhenReady: mockGetTokenWhenReady})
+        mockedUseAccessToken.mockReturnValue({
+            token: 'test-slas-access-token',
+            getTokenWhenReady: mockGetTokenWhenReady
+        })
+
+        // Mock the raw Auth instance used for expiry reads and forced refresh.
+        mockAuthGet.mockReset()
+        mockAuthGet.mockReturnValue(undefined)
+        mockClearAccessTokenExpiry.mockReset()
+        mockRefreshAccessToken.mockReset()
+        mockRefreshAccessToken.mockResolvedValue({access_token: 'refreshed-slas-access-token'})
+        mockedUseAuthContext.mockReturnValue({
+            get: mockAuthGet,
+            clearAccessTokenExpiry: mockClearAccessTokenExpiry,
+            refreshAccessToken: mockRefreshAccessToken
+        })
 
         // Mock useConfig hook
         mockedUseConfig.mockReturnValue({
@@ -2312,6 +2337,254 @@ describe('ShopperAgent Component', () => {
                 expect(mockCallAuthLink).not.toHaveBeenCalled()
                 expect(mockCallTokenBridge).not.toHaveBeenCalled()
                 warnSpy.mockRestore()
+            })
+
+            describe('SLAS refresh trigger', () => {
+                // jwt-decode only reads the middle (payload) segment; header/signature
+                // content is irrelevant, so any placeholder values work here.
+                const makeJwt = (payload) => {
+                    // btoa (not Buffer) — this suite runs under jest-environment-jsdom,
+                    // which exposes browser globals, not Node's Buffer.
+                    const base64url = (obj) =>
+                        btoa(JSON.stringify(obj))
+                            .replace(/\+/g, '-')
+                            .replace(/\//g, '_')
+                            .replace(/=+$/, '')
+                    return `${base64url({alg: 'none'})}.${base64url(payload)}.sig`
+                }
+
+                // exp lands just past SLAS_REFRESH_BUFFER_SECONDS (55s), so the computed
+                // delay is clamped to SLAS_REFRESH_MIN_DELAY_MS (1s) — fast enough to wait
+                // out with real timers.
+                const nearExpiryJwt = () => makeJwt({exp: Math.floor(Date.now() / 1000) + 56})
+
+                afterEach(() => {
+                    delete window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__
+                })
+
+                test('arms a refresh timer that re-links with bypassDedup on fire', async () => {
+                    seedAuthLinkStorage()
+                    mockGetTokenWhenReady.mockResolvedValue(nearExpiryJwt())
+                    renderCommerceClient()
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2), {
+                        timeout: 5000
+                    })
+                    // Same (conversation, shopper) pair as the first link — only
+                    // bypassDedup lets this second auth-link + bridge through.
+                    expect(mockCallAuthLink).toHaveBeenCalledTimes(2)
+                    expect(mockGetTokenWhenReady).toHaveBeenCalledTimes(2)
+                })
+
+                test('backs off instead of hammering on a no-op refresh', async () => {
+                    seedAuthLinkStorage()
+                    // Same JWT (same exp) on every call — simulates the SDK's own
+                    // stale-buffer no longer lining up with SLAS_REFRESH_BUFFER_SECONDS,
+                    // so getTokenWhenReady() hands back the token unrefreshed.
+                    const staleJwt = nearExpiryJwt()
+                    mockGetTokenWhenReady.mockResolvedValue(staleJwt)
+                    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+                    renderCommerceClient()
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                    // The refresh timer fires (~1s, per nearExpiryJwt) and re-links with
+                    // the same unchanged token — a no-op refresh, but still a successful
+                    // bridge call.
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2), {
+                        timeout: 5000
+                    })
+                    expect(warnSpy).toHaveBeenCalledWith(
+                        expect.stringContaining('no-op refresh detected'),
+                        expect.objectContaining({attempt: 1})
+                    )
+
+                    // Without backoff, the next re-arm would also collapse to
+                    // SLAS_REFRESH_MIN_DELAY_MS (~1s) and fire again almost immediately.
+                    // Waiting well past that, but well short of the backoff delay,
+                    // proves it backed off instead of hammering.
+                    await new Promise((resolve) => setTimeout(resolve, 1500))
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(2)
+
+                    warnSpy.mockRestore()
+                })
+
+                test('does not back off when a re-link reuses the same far-off expiry (runway left)', async () => {
+                    // Regression: a re-link driven by something OTHER than token expiry
+                    // (here an identity change) legitimately reuses the same, still-far-off
+                    // SLAS expiry. The expiry not advancing must NOT be mistaken for a no-op
+                    // refresh — doing so armed a 5-60s backoff timer that re-bridged forever
+                    // (the continuous auth-link/bridge loop, most visible in HttpOnly mode
+                    // where the token never rotates on a re-link). With real runway left, the
+                    // normal proactive delay is used instead of a short backoff retry.
+                    seedAuthLinkStorage()
+                    // exp ~30 min out: the proactive delay lands ~29 min away, far beyond the
+                    // test window, so no refresh timer fires on its own during this test.
+                    mockGetTokenWhenReady.mockResolvedValue(
+                        makeJwt({exp: Math.floor(Date.now() / 1000) + 30 * 60})
+                    )
+                    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+                    const {rerender} = renderCommerceClientWithBasket()
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    // Identity change → a non-deduped re-link that reuses the same far expiry,
+                    // so arm #2 sees an expiry that did NOT advance vs. arm #1.
+                    mockedUseCustomerType.mockReturnValue({
+                        customerType: 'registered',
+                        isGuest: false,
+                        isRegistered: true,
+                        isExternal: false
+                    })
+                    mockedUseUsid.mockReturnValue({usid: 'registered-usid'})
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={true}
+                        />
+                    )
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+
+                    // Same expiry, but ~30 min of runway remains → NOT a no-op refresh:
+                    // no backoff warning, and (unlike the buggy 5-60s loop) no third bridge
+                    // call hammering in on a short backoff cadence.
+                    expect(warnSpy).not.toHaveBeenCalledWith(
+                        expect.stringContaining('no-op refresh detected'),
+                        expect.anything()
+                    )
+
+                    await new Promise((resolve) => setTimeout(resolve, 1500))
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(2)
+
+                    warnSpy.mockRestore()
+                })
+
+                test('does not fire the refresh timer after unmount', async () => {
+                    seedAuthLinkStorage()
+                    mockGetTokenWhenReady.mockResolvedValue(nearExpiryJwt())
+                    const {unmount} = renderCommerceClient()
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                    unmount()
+
+                    await new Promise((resolve) => setTimeout(resolve, 1500))
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                })
+
+                test('preserves the refresh deadline across a basket-loading remount', async () => {
+                    seedAuthLinkStorage()
+                    const token = nearExpiryJwt()
+                    mockGetTokenWhenReady.mockResolvedValue(token)
+                    mockedUseAccessToken.mockReturnValue({
+                        token,
+                        getTokenWhenReady: mockGetTokenWhenReady
+                    })
+                    const {rerender} = renderCommerceClientWithBasket()
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={false}
+                        />
+                    )
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={true}
+                        />
+                    )
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2), {
+                        timeout: 5000
+                    })
+                })
+
+                test('ignores an auth-link that finishes after unmount', async () => {
+                    seedAuthLinkStorage()
+                    let resolveAuthLink
+                    mockCallAuthLink.mockReturnValueOnce(
+                        new Promise((resolve) => {
+                            resolveAuthLink = resolve
+                        })
+                    )
+                    const {unmount} = renderCommerceClient()
+
+                    await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(1))
+                    unmount()
+                    await act(async () => {
+                        resolveAuthLink({auth_link_key: 'late-auth-link-key'})
+                    })
+
+                    expect(mockCallTokenBridge).not.toHaveBeenCalled()
+                })
+
+                test('HttpOnly mode forces getTokenWhenReady only on refresh trigger', async () => {
+                    window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ = 'true'
+                    seedAuthLinkStorage()
+                    mockAuthGet.mockImplementation((key) =>
+                        key === 'cc-at-expires'
+                            ? String(Math.floor(Date.now() / 1000) + 56)
+                            : undefined
+                    )
+                    renderCommerceClient()
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                    // The original (widget-ready) trigger must not call getTokenWhenReady in
+                    // HttpOnly mode — the agent identity bridge reads the access token
+                    // straight from the
+                    // cc-at_{siteId} cookie.
+                    expect(mockGetTokenWhenReady).not.toHaveBeenCalled()
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2), {
+                        timeout: 5000
+                    })
+                    // The refresh trigger forces getTokenWhenReady for its refresh side
+                    // effect (Auth.ready() -> refreshAccessToken()), even though the
+                    // resolved value itself is discarded in HttpOnly mode.
+                    expect(mockGetTokenWhenReady).toHaveBeenCalledTimes(1)
+                    expect(mockCallTokenBridge).toHaveBeenLastCalledWith({
+                        authLinkKey: 'commerce-auth-link-key',
+                        slasAccessToken: undefined,
+                        siteId: 'RefArchGlobal'
+                    })
+                })
+
+                test('retries once and recovers from a stale-token bridge failure', async () => {
+                    seedAuthLinkStorage()
+                    mockCallTokenBridge
+                        .mockResolvedValueOnce({status: 401, body: {error: 'SLAS_TOKEN_EXPIRED'}})
+                        .mockResolvedValueOnce({status: 200, body: {ok: true}})
+                    renderCommerceClient()
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+                    expect(mockCallAuthLink).toHaveBeenCalledTimes(2)
+                    expect(mockClearAccessTokenExpiry).toHaveBeenCalledTimes(1)
+                    expect(mockRefreshAccessToken).toHaveBeenCalledTimes(1)
+                    expect(mockCallTokenBridge.mock.calls[1][0]).toEqual({
+                        authLinkKey: 'commerce-auth-link-key',
+                        slasAccessToken: 'refreshed-slas-access-token',
+                        siteId: 'RefArchGlobal'
+                    })
+                    expect(mockShowToast).not.toHaveBeenCalled()
+                })
+
+                test('stops retrying after a second stale-token failure and toasts', async () => {
+                    seedAuthLinkStorage()
+                    mockCallTokenBridge.mockResolvedValue({
+                        status: 401,
+                        body: {error: 'SLAS_TOKEN_EXPIRED'}
+                    })
+                    renderCommerceClient()
+
+                    await waitFor(() => expect(mockShowToast).toHaveBeenCalledTimes(1))
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(2)
+                    expect(mockCallAuthLink).toHaveBeenCalledTimes(2)
+                })
             })
         })
     })

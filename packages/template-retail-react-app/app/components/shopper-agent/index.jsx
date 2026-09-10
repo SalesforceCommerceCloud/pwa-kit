@@ -15,6 +15,7 @@ import {
     useCustomerType,
     useUsid
 } from '@salesforce/commerce-sdk-react'
+import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
@@ -29,6 +30,7 @@ import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origi
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
     getPersistedCommerceClientOpenState,
+    getSlasExpiryEpochSeconds,
     persistCommerceClientOpenState,
     resetEmbeddedMessagingForCommerceSessionChange,
     resolveCommerceClientRoutingAttributes,
@@ -43,6 +45,36 @@ import {callAuthLink} from '@salesforce/retail-react-app/app/components/shopper-
 const onClient = typeof window !== 'undefined'
 
 const HTTP_OK = 200
+
+// The SLAS access token expires ~30 min after issuance. commerce-sdk-react's own
+// Auth.isAccessTokenExpired() treats a token as expired 60s before its real JWT
+// `exp` (both HttpOnly and non-HttpOnly modes) — firing our refresh timer inside
+// that same window (rather than earlier) guarantees getTokenWhenReady() actually
+// performs a refresh instead of handing back the same, unrefreshed token.
+const SLAS_REFRESH_BUFFER_SECONDS = 55
+// Used only when the expiry can't be read (missing/undecodable cookie or JWT) —
+// keeps the re-link chain alive on a fixed cadence rather than never firing.
+const SLAS_REFRESH_FALLBACK_DELAY_MS = 25 * 60 * 1000
+const SLAS_REFRESH_MIN_DELAY_MS = 1000
+// Backoff for a "no-op refresh": getTokenWhenReady() ran but handed back the
+// same token/expiry (e.g. SLAS_REFRESH_BUFFER_SECONDS no longer lands inside
+// the SDK's own stale-token buffer). Retrying at the normal cadence would
+// collapse to SLAS_REFRESH_MIN_DELAY_MS and hammer the bridge once a second
+// until the token's real expiry. Instead we back off, doubling each
+// consecutive no-op, capped at SLAS_REFRESH_NOOP_BACKOFF_CAP_MS, and always
+// clamped to the time actually left before the token's (unchanged) expiry —
+// see the no-op branch in armRefreshTimer.
+const SLAS_REFRESH_NOOP_BACKOFF_BASE_MS = 5 * 1000
+const SLAS_REFRESH_NOOP_BACKOFF_CAP_MS = 60 * 1000
+const SLAS_TOKEN_EXPIRED_ERROR_CODES = ['SLAS_TOKEN_EXPIRED', 'INVALID_SLAS_TOKEN']
+// Trigger 3 — proactive SLAS-refresh re-link (the timer), and its one-shot
+// reactive retry when the agent identity bridge rejects a bridge call as
+// expired anyway (e.g. clock skew between this client and the bridge). The
+// retry reuses this same reason so a second failure does not retry again (see
+// the `reason` check in the catch branch below) — an unrefreshable token
+// means the session is genuinely over.
+const SLAS_REFRESH_REASON = 'slas-token-refresh'
+const SLAS_REFRESH_RETRY_REASON = 'slas-token-refresh-retry'
 
 const SESSION_INIT_ERROR_MESSAGE = defineMessage({
     id: 'shopper_agent.error.session_init_failed',
@@ -156,7 +188,8 @@ const isEnabled = (enabled) => {
  * - Loads the embedded messaging script using useScript hook
  * - Initializes the MIAW service using useMiaw hook
  * - Sets up prechat fields with current locale, currency, and user context on embedded messaging ready
- * - Calls Core's Token Bridge proxy when a conversation starts (`onEmbeddedMessagingConversationStarted`)
+ * - Calls the agent identity bridge's Token Bridge proxy when a conversation starts
+ *   (`onEmbeddedMessagingConversationStarted`)
  * - Manages event listeners for messaging lifecycle events
  * - Handles z-index management for maximized chat windows
  * - On guest ↔ registered Commerce session transitions, resets MIAW (FAB) so shoppers start a fresh agent session
@@ -226,7 +259,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
     )?.value
 
-    // SLAS access token — needed to call Core's Token Bridge directly.
+    // SLAS access token — needed to call the agent identity bridge's Token Bridge directly.
     const {getTokenWhenReady} = useAccessToken()
     const getTokenWhenReadyRef = useRef(getTokenWhenReady)
     getTokenWhenReadyRef.current = getTokenWhenReady
@@ -446,8 +479,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
 
             getAuthLinkKey()
                 .then(async (authLinkKey) => {
-                    // Direct callout to Core's Token Bridge via the same-origin
-                    // PWA Kit proxy. Replaces the prior postSessionInit SCAPI call.
+                    // Direct callout to the agent identity bridge's Token Bridge via the
+                    // same-origin PWA Kit proxy. Replaces the prior postSessionInit SCAPI call.
                     try {
                         // Check if HttpOnly mode is enabled by reading the flag directly
                         // (same source as CommerceApiProvider's enableHttpOnlySessionCookies)
@@ -672,15 +705,36 @@ const CommerceClientAgentWindow = ({
     toastRef.current = toast
 
     // Customer details and auth tokens for Commerce Client session init
-    const {getTokenWhenReady} = useAccessToken()
+    const {token: slasAccessToken, getTokenWhenReady} = useAccessToken()
     const getTokenWhenReadyRef = useRef(getTokenWhenReady)
     getTokenWhenReadyRef.current = getTokenWhenReady
+    const slasAccessTokenRef = useRef(slasAccessToken)
+    slasAccessTokenRef.current = slasAccessToken
+
+    // Internal SDK Auth instance — used to read the non-HttpOnly
+    // `cc-at-expires` cookie and force the one-shot reactive refresh. Same
+    // "temporary bridge" pattern as app/hooks/use-refresh-token.js.
+    const auth = useAuthContext()
+    const authRef = useRef(auth)
+    authRef.current = auth
+
+    // Tracks the pending proactive SLAS-refresh timer so it can be cleared
+    // before re-arming (avoids a stale timer firing against an outdated
+    // expiry) and on unmount.
+    const refreshTimerRef = useRef(null)
+    const isMountedRef = useRef(true)
+    // The expiry (epoch seconds) armRefreshTimer last scheduled against, and
+    // how many consecutive times a refresh came back with an expiry that
+    // didn't advance past it (a "no-op refresh" — see armRefreshTimer).
+    const lastArmedExpiryEpochSecondsRef = useRef(undefined)
+    const noOpRefreshCountRef = useRef(0)
 
     const {organizationId, siteId: configSiteId} = useConfig()
 
     // Fetch my_domain from the Shopper Configurations API. Auth-linking calls
-    // Core (via the Token Bridge), which is only reachable once my_domain has
-    // resolved, so we gate performAuthLink on it exactly like the MIAW provider.
+    // the agent identity bridge (via the Token Bridge), which is only reachable
+    // once my_domain has resolved, so we gate performAuthLink on it exactly
+    // like the MIAW provider.
     const {data: configurationsData} = useConfigurations({})
     const myDomain = configurationsData?.configurations?.find(
         (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
@@ -797,48 +851,174 @@ const CommerceClientAgentWindow = ({
     }
 
     /**
+     * Trigger 3 — proactive SLAS-refresh re-link. Schedules a one-shot timer
+     * to re-run performAuthLink shortly before the just-bridged access token
+     * expires, so the widget re-links with a fresh token instead of waiting
+     * for the agent identity bridge to reject a stale one. Re-armed on every
+     * successful link (see the call site in performAuthLink), which is what
+     * makes the chain self-perpetuating for the life of the mounted widget.
+     *
+     * The delay is calibrated to land *inside* commerce-sdk-react's own
+     * expiry buffer (SLAS_REFRESH_BUFFER_SECONDS matches Auth's internal 60s
+     * buffer, minus a few seconds of slack) — firing any earlier would mean
+     * getTokenWhenReady() sees the token as still valid and returns it
+     * unchanged, silently no-op'ing the refresh.
+     *
+     * A re-link does NOT always mean the token rotated: the SLAS access token
+     * only changes when it actually expires, so re-links driven by anything
+     * else (a new conversation, an identity re-link, a dedup-bypass refresh, or
+     * the `finally` fallback re-arm) legitimately keep the *same* expiry. Those
+     * still have real runway left, so we schedule the normal proactive delay for
+     * them — treating "expiry didn't advance" alone as a failed refresh is what
+     * caused the tight auth-link/bridge loop this guards against.
+     *
+     * We only back off (see the no-op branch below) when the expiry did not
+     * advance AND we are already inside the buffer window — i.e. the proactive
+     * delay has collapsed to the floor and re-firing would just hammer the
+     * bridge every second (e.g. if the SDK's own buffer ever shrinks below
+     * SLAS_REFRESH_BUFFER_SECONDS). The backoff is clamped so we never wait past
+     * the token's actual expiry.
+     *
+     * @param {Object} opts
+     * @param {boolean} opts.isHttpOnly - Whether HttpOnly session cookies are enabled
+     * @param {string} [opts.token] - The just-bridged SLAS access token (non-HttpOnly mode only)
+     */
+    const armRefreshTimer = ({isHttpOnly, token}) => {
+        if (!isMountedRef.current) return
+        clearTimeout(refreshTimerRef.current)
+
+        const accessTokenExpiresCookie = isHttpOnly
+            ? authRef.current.get('cc-at-expires')
+            : undefined
+        const expiryEpochSeconds = getSlasExpiryEpochSeconds({
+            isHttpOnly,
+            accessTokenExpiresCookie,
+            token
+        })
+
+        let delayMs
+        if (Number.isNaN(expiryEpochSeconds) || expiryEpochSeconds <= 0) {
+            // Expiry unreadable (missing/undecodable/empty cookie or JWT — note
+            // Number('') === 0, hence the <= 0 guard) — not a no-op refresh signal,
+            // just missing data. Fall back to a fixed cadence; no-op streak resets.
+            noOpRefreshCountRef.current = 0
+            delayMs = SLAS_REFRESH_FALLBACK_DELAY_MS
+        } else {
+            const lastArmedExpiry = lastArmedExpiryEpochSecondsRef.current
+            const advanced = lastArmedExpiry === undefined || expiryEpochSeconds > lastArmedExpiry
+            // Time until the token is inside the SDK's stale-token buffer, where the
+            // next getTokenWhenReady() will actually rotate it. Positive (with slack
+            // above the floor) means the token still has real runway left.
+            const proactiveDelayMs =
+                (expiryEpochSeconds - SLAS_REFRESH_BUFFER_SECONDS) * 1000 - Date.now()
+
+            if (advanced || proactiveDelayMs > SLAS_REFRESH_MIN_DELAY_MS) {
+                // The token either genuinely refreshed (expiry advanced) or still has
+                // runway. An unchanged expiry with runway left is EXPECTED, not a
+                // failed refresh — the token only rotates when it actually expires,
+                // so re-links from a new conversation, an identity re-link, a
+                // dedup-bypass refresh, or the `finally` fallback re-arm legitimately
+                // keep the same expiry. Schedule the normal proactive refresh (never a
+                // short backoff retry) so those re-links don't spin the bridge.
+                noOpRefreshCountRef.current = 0
+                lastArmedExpiryEpochSecondsRef.current = expiryEpochSeconds
+                delayMs = Math.max(SLAS_REFRESH_MIN_DELAY_MS, proactiveDelayMs)
+            } else {
+                // Not advanced AND already inside the buffer window: a genuine no-op
+                // refresh (e.g. the SDK's own buffer shrank below
+                // SLAS_REFRESH_BUFFER_SECONDS). The proactive delay has collapsed to
+                // the floor, so re-firing at the normal cadence would hammer the
+                // bridge every second. Back off (doubling, capped), but never wait
+                // past the token's own (unchanged) real expiry — once that passes the
+                // next bridge call fails for real and the reactive retry (see
+                // performAuthLink) takes over from there.
+                noOpRefreshCountRef.current += 1
+                const backoffMs = Math.min(
+                    SLAS_REFRESH_NOOP_BACKOFF_CAP_MS,
+                    SLAS_REFRESH_NOOP_BACKOFF_BASE_MS * 2 ** (noOpRefreshCountRef.current - 1)
+                )
+                const remainingMs = expiryEpochSeconds * 1000 - Date.now()
+                delayMs = Math.max(SLAS_REFRESH_MIN_DELAY_MS, Math.min(backoffMs, remainingMs))
+                console.warn(
+                    '[Commerce Client] armRefreshTimer: no-op refresh detected, backing off',
+                    {attempt: noOpRefreshCountRef.current, delayMs}
+                )
+            }
+        }
+
+        refreshTimerRef.current = setTimeout(() => {
+            if (!isMountedRef.current) return
+            performAuthLinkRef.current({reason: SLAS_REFRESH_REASON, bypassDedup: true})
+        }, delayMs)
+    }
+
+    /**
      * Idempotently link the current Commerce Client conversation to the current
      * SLAS shopper. Deduped by `${conversationId}:${slasIdentity}` — a no-op if
-     * that exact pair was already linked successfully.
+     * that exact pair was already linked successfully, unless bypassDedup is set
+     * (used by the proactive/reactive SLAS-refresh paths, where the conversation
+     * and shopper are unchanged but the token itself needs re-bridging).
      *
      * @param {Object} opts
      * @param {string} opts.reason - Diagnostic label for the triggering signal.
+     * @param {boolean} [opts.bypassDedup] - Skip the (conversation, shopper) dedup guard.
      */
-    const performAuthLink = ({reason, excludedJWT = null}) => {
+    const performAuthLink = ({reason, excludedJWT = null, bypassDedup = false}) => {
         const generation = ++authLinkGenerationRef.current
         const scheduledJWT = extractCommerceClientJWT()
         if (scheduledJWT) {
             lastAttemptedCommerceClientJWTRef.current = scheduledJWT
         }
         const run = async () => {
-            const {organizationId: orgId, configSiteId: sid, myDomain: domain} = configRef.current
-            if (!orgId || !sid) {
-                console.error('[Commerce Client] performAuthLink: missing organizationId or siteId')
-                return
-            }
+            // Hoisted above the try/catch so the `finally` fallback re-arm below can
+            // always read it, even on an early return before the try block starts.
+            const isHttpOnly =
+                typeof window !== 'undefined'
+                    ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
+                    : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
 
-            // The Token Bridge reaches Core, which needs my_domain resolved. The mount
-            // is already gated on !isConfigurationsLoading, so this is a defensive skip
-            // rather than a call to the bridge with an unresolved domain.
-            if (!domain) {
-                console.warn(
-                    `[Commerce Client] performAuthLink(${reason}): my_domain not resolved yet`
-                )
-                return
-            }
-
-            const slasIdentity = getSlasIdentity()
+            // Set true right after the real, expiry-based armRefreshTimer call on the
+            // success path, so the fallback re-arm in `finally` below skips — otherwise
+            // it would immediately clobber that correct timer with a fallback-delay one.
+            let heartbeatArmed = false
+            let slasAccessToken
 
             try {
+                const {
+                    organizationId: orgId,
+                    configSiteId: sid,
+                    myDomain: domain
+                } = configRef.current
+                if (!orgId || !sid) {
+                    console.error(
+                        '[Commerce Client] performAuthLink: missing organizationId or siteId'
+                    )
+                    return
+                }
+
+                // The Token Bridge reaches the agent identity bridge, which needs my_domain
+                // resolved. The mount is already gated on !isConfigurationsLoading, so this
+                // is a defensive skip rather than a call to the bridge with an unresolved
+                // domain.
+                if (!domain) {
+                    console.warn(
+                        `[Commerce Client] performAuthLink(${reason}): my_domain not resolved yet`
+                    )
+                    return
+                }
+
+                const slasIdentity = getSlasIdentity()
+
                 const commerceClientJWT = await waitForCommerceClientJWT(excludedJWT)
                 if (!commerceClientJWT) {
+                    if (!isMountedRef.current) return
                     console.warn(
                         `[Commerce Client] performAuthLink(${reason}): no JWT after polling`
                     )
                     return
                 }
                 lastAttemptedCommerceClientJWTRef.current = commerceClientJWT
-                if (generation !== authLinkGenerationRef.current) return
+                if (!isMountedRef.current || generation !== authLinkGenerationRef.current) return
 
                 // Dedup on (conversation, shopper). conversationId is read here — after
                 // the JWT poll — so a still-creating conversation has time to appear.
@@ -846,7 +1026,7 @@ const CommerceClientAgentWindow = ({
                 // this guard, so it can bypass a still-stale conversationId safely.
                 const conversationId = readConversationId()
                 const linkKey = `${conversationId || 'unknown'}:${slasIdentity}`
-                if (!excludedJWT && lastAuthLinkKeyRef.current === linkKey) {
+                if (!excludedJWT && !bypassDedup && lastAuthLinkKeyRef.current === linkKey) {
                     // Already linked this exact (conversation, shopper) pair.
                     console.warn(
                         `[Commerce Client] performAuthLink(${reason}): already linked, skipping`
@@ -854,22 +1034,39 @@ const CommerceClientAgentWindow = ({
                     return
                 }
 
-                const isHttpOnly =
-                    typeof window !== 'undefined'
-                        ? window.__MRT_ENABLE_HTTPONLY_SESSION_COOKIES__ === 'true'
-                        : process.env.MRT_ENABLE_HTTPONLY_SESSION_COOKIES === 'true'
+                const isRefreshTrigger =
+                    reason === SLAS_REFRESH_REASON || reason === SLAS_REFRESH_RETRY_REASON
 
-                const slasAccessToken = isHttpOnly
-                    ? undefined
-                    : await getTokenWhenReadyRef.current()
-                if (generation !== authLinkGenerationRef.current) return
+                if (reason === SLAS_REFRESH_RETRY_REASON) {
+                    // The bridge rejected a token that the SDK may still consider valid
+                    // (for example, after revocation or clock skew), so ready() is not
+                    // sufficient here. Clear the stale expiry indicator before forcing
+                    // the SDK refresh flow, matching its standard 401 recovery path.
+                    authRef.current.clearAccessTokenExpiry()
+                    const refreshedToken = await authRef.current.refreshAccessToken()
+                    slasAccessToken = isHttpOnly ? undefined : refreshedToken.access_token
+                } else if (isHttpOnly) {
+                    slasAccessToken = undefined
+                    if (isRefreshTrigger) {
+                        // getTokenWhenReady() is normally skipped in HttpOnly mode (the
+                        // server reads the token straight from the cc-at_{siteId} cookie),
+                        // but the refresh/retry paths need its *side effect* — it forces
+                        // Auth.ready() to call refreshAccessToken() when the token is
+                        // stale, which rewrites cc-at_{siteId}/cc-at-expires before we
+                        // bridge. We still discard the returned value.
+                        await getTokenWhenReadyRef.current()
+                    }
+                } else {
+                    slasAccessToken = await getTokenWhenReadyRef.current()
+                }
+                if (!isMountedRef.current || generation !== authLinkGenerationRef.current) return
 
                 // Step 1: auth link key from SCRT. Called directly from the
                 // browser against the configured SCRT2 origin — the authlink
                 // endpoint authenticates with the Commerce Client JWT (Bearer)
                 // alone, needing neither the siteId nor the conversationId.
                 const authLinkResponse = await callAuthLink({commerceClientJWT, scrt2Url})
-                if (generation !== authLinkGenerationRef.current) return
+                if (!isMountedRef.current || generation !== authLinkGenerationRef.current) return
                 const authLinkKey = authLinkResponse?.auth_link_key || authLinkResponse?.authLinkKey
                 if (!authLinkKey || typeof authLinkKey !== 'string') {
                     console.error(
@@ -883,7 +1080,7 @@ const CommerceClientAgentWindow = ({
                 // Operations are serialized so the newest identity is the final
                 // server-side mutation even when an older request was already sent.
                 const result = await callTokenBridge({authLinkKey, slasAccessToken, siteId: sid})
-                if (generation !== authLinkGenerationRef.current) return
+                if (!isMountedRef.current || generation !== authLinkGenerationRef.current) return
                 if (result.status !== HTTP_OK) {
                     const errorCode = result.body?.error || `HTTP_${result.status}`
                     console.error(
@@ -893,6 +1090,23 @@ const CommerceClientAgentWindow = ({
                             error: errorCode
                         }
                     )
+
+                    // Reactive backstop: the agent identity bridge says the token was already
+                    // expired/invalid (e.g. clock skew, or the proactive timer fired a bit too
+                    // early). Retry exactly once, forcing a fresh token, before surfacing an error.
+                    // A second failure (reason already the retry) falls through to the
+                    // toast — the refresh token itself is presumably dead at that point.
+                    if (
+                        SLAS_TOKEN_EXPIRED_ERROR_CODES.includes(errorCode) &&
+                        reason !== SLAS_REFRESH_RETRY_REASON
+                    ) {
+                        performAuthLinkRef.current({
+                            reason: SLAS_REFRESH_RETRY_REASON,
+                            bypassDedup: true
+                        })
+                        return
+                    }
+
                     toastRef.current({
                         title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
                         status: 'error'
@@ -902,13 +1116,50 @@ const CommerceClientAgentWindow = ({
 
                 lastAuthLinkKeyRef.current = linkKey
                 lastCommerceClientJWTRef.current = commerceClientJWT
+                armRefreshTimer({isHttpOnly, token: slasAccessToken})
+                heartbeatArmed = true
             } catch (error) {
-                if (generation !== authLinkGenerationRef.current) return
+                if (!isMountedRef.current || generation !== authLinkGenerationRef.current) return
                 console.error(`[Commerce Client] performAuthLink(${reason}) threw`, error)
                 toastRef.current({
                     title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
                     status: 'error'
                 })
+            } finally {
+                // Fallback re-arm: every early return/throw above (missing org/site,
+                // unresolved my_domain, a stalled JWT poll, a non-token bridge error, a
+                // thrown exception) otherwise leaves no pending timer, permanently
+                // killing the self-refresh heartbeat until the next unrelated trigger
+                // (login/logout, new conversation). Re-arm on a fallback cadence instead,
+                // so a transient failure heals itself within SLAS_REFRESH_FALLBACK_DELAY_MS.
+                //
+                // Three exclusions:
+                // - heartbeatArmed: the success path above already armed a correct,
+                //   expiry-based timer. Re-arming here too would immediately clobber it
+                //   with a fallback-delay one (armRefreshTimer always clears+resets).
+                // - A superseded call (generation mismatch) must not stack a timer over
+                //   the newer call's own — this also naturally covers the case where this
+                //   very call just queued the SLAS_REFRESH_RETRY_REASON retry above, since
+                //   that queuing bumps authLinkGenerationRef.current synchronously before
+                //   this finally runs.
+                // - reason === SLAS_REFRESH_RETRY_REASON is the one-shot backstop's own
+                //   failure: the bridge already rejected this token twice, so the refresh
+                //   token is presumably dead. Re-arming here would retry (and re-toast)
+                //   forever instead of stopping once, as intended (see the retry-gate
+                //   comment above).
+                if (
+                    !heartbeatArmed &&
+                    isMountedRef.current &&
+                    generation === authLinkGenerationRef.current &&
+                    reason !== SLAS_REFRESH_RETRY_REASON
+                ) {
+                    armRefreshTimer({
+                        isHttpOnly,
+                        token: isHttpOnly
+                            ? undefined
+                            : slasAccessToken || slasAccessTokenRef.current
+                    })
+                }
             }
         }
 
@@ -921,6 +1172,17 @@ const CommerceClientAgentWindow = ({
     // latest performAuthLink closure (which reads current config/identity).
     const performAuthLinkRef = useRef(performAuthLink)
     performAuthLinkRef.current = performAuthLink
+
+    // Clear the pending Trigger-3 refresh timer on unmount so it can't fire
+    // after the widget is gone. Async continuation guards above also prevent an
+    // already-running link from bridging, toasting, or re-arming after unmount.
+    useEffect(() => {
+        isMountedRef.current = true
+        return () => {
+            isMountedRef.current = false
+            clearTimeout(refreshTimerRef.current)
+        }
+    }, [])
 
     /**
      * Trigger 1 — new Commerce Client conversation.
