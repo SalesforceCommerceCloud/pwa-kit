@@ -117,10 +117,17 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-miaw', () => ({
 // component can read getTokenWhenReady() during the conversation-started flow.
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useAccessToken: jest.fn(),
+    useBasketV2: jest.fn(),
+    useProduct: jest.fn(),
     useUsid: jest.fn(),
     useConfig: jest.fn(),
     useCustomerType: jest.fn(),
     useConfigurations: jest.fn()
+}))
+
+// Mock the current-basket hook so the Commerce Client widget can build its commerceProxy
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+    useCurrentBasket: jest.fn()
 }))
 
 // Mock the useMultiSite hook
@@ -139,11 +146,14 @@ import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
 import {
     useAccessToken,
+    useBasketV2,
+    useProduct,
     useConfig,
     useConfigurations,
     useCustomerType,
     useUsid
 } from '@salesforce/commerce-sdk-react'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
@@ -152,6 +162,9 @@ import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/u
 const mockedUseScript = useScript
 const mockedUseMiaw = useMiaw
 const mockedUseAccessToken = useAccessToken
+const mockedUseBasketV2 = useBasketV2
+const mockedUseProduct = useProduct
+const mockedUseCurrentBasket = useCurrentBasket
 const mockedUseUsid = useUsid
 const mockedUseConfig = useConfig
 const mockedUseConfigurations = useConfigurations
@@ -197,6 +210,17 @@ describe('ShopperAgent Component', () => {
         mockGetTokenWhenReady.mockReset()
         mockGetTokenWhenReady.mockResolvedValue('test-slas-access-token')
         mockedUseAccessToken.mockReturnValue({getTokenWhenReady: mockGetTokenWhenReady})
+
+        // Mock useBasketV2 + useCurrentBasket for the Commerce Client commerceProxy
+        mockedUseBasketV2.mockReturnValue({
+            refetch: jest.fn().mockResolvedValue({data: {basketId: 'test-basket-id'}})
+        })
+
+        // Mock useProduct (disabled query) for the Commerce Client commerceProxy.getProductDetail
+        mockedUseProduct.mockReturnValue({
+            refetch: jest.fn().mockResolvedValue({data: {id: 'test-product-id'}})
+        })
+        mockedUseCurrentBasket.mockReturnValue({data: {basketId: 'test-basket-id'}})
 
         // Mock useConfig hook
         mockedUseConfig.mockReturnValue({
@@ -1748,6 +1772,87 @@ describe('ShopperAgent Component', () => {
             const widgetOptions = calls[calls.length - 1][1]
 
             expect(widgetOptions).not.toHaveProperty('overrides')
+        })
+
+        describe('commerceProxy', () => {
+            test('forwards the current basket id and a getBasket accessor', () => {
+                mockedUseCurrentBasket.mockReturnValue({data: {basketId: 'abc-123'}})
+
+                renderCommerceClient()
+
+                const calls = mockedUseCommerceClientMessaging.mock.calls
+                const {commerceProxy} = calls[calls.length - 1][1]
+
+                expect(commerceProxy.basket).toEqual({id: 'abc-123'})
+                expect(typeof commerceProxy.getBasket).toBe('function')
+                // item is intentionally omitted until there's a concrete use for it.
+                expect(commerceProxy).not.toHaveProperty('item')
+            })
+
+            test('getBasket refetches the v2 basket and normalizes productItems to {id, count}', async () => {
+                // Auth is handled by the SDK's query hook (useBasketV2); the
+                // component just triggers refetch and normalizes the result.
+                const refetch = jest.fn().mockResolvedValue({
+                    data: {
+                        basketId: 'abc-123',
+                        productItems: [
+                            {itemId: 'item-1', quantity: 2},
+                            {itemId: 'item-2', quantity: 5}
+                        ]
+                    }
+                })
+                mockedUseBasketV2.mockReturnValue({refetch})
+                mockedUseCurrentBasket.mockReturnValue({data: {basketId: 'abc-123'}})
+
+                renderCommerceClient()
+
+                // The disabled query is keyed on the current basketId.
+                expect(mockedUseBasketV2).toHaveBeenCalledWith(
+                    {parameters: {basketId: 'abc-123'}},
+                    {enabled: false}
+                )
+
+                const calls = mockedUseCommerceClientMessaging.mock.calls
+                const {commerceProxy} = calls[calls.length - 1][1]
+
+                const result = await commerceProxy.getBasket()
+
+                expect(refetch).toHaveBeenCalledTimes(1)
+                expect(result).toEqual({
+                    basketId: 'abc-123',
+                    items: [
+                        {id: 'item-1', count: 2},
+                        {id: 'item-2', count: 5}
+                    ]
+                })
+            })
+
+            test('getBasket returns null (without refetching) when there is no current basket', async () => {
+                const refetch = jest.fn()
+                mockedUseBasketV2.mockReturnValue({refetch})
+                mockedUseCurrentBasket.mockReturnValue({data: undefined})
+
+                renderCommerceClient()
+
+                const calls = mockedUseCommerceClientMessaging.mock.calls
+                const {commerceProxy} = calls[calls.length - 1][1]
+
+                await expect(commerceProxy.getBasket()).resolves.toBeNull()
+                expect(refetch).not.toHaveBeenCalled()
+            })
+
+            test('getBasket returns null when the refetch yields no data', async () => {
+                const refetch = jest.fn().mockResolvedValue({data: undefined})
+                mockedUseBasketV2.mockReturnValue({refetch})
+                mockedUseCurrentBasket.mockReturnValue({data: {basketId: 'abc-123'}})
+
+                renderCommerceClient()
+
+                const calls = mockedUseCommerceClientMessaging.mock.calls
+                const {commerceProxy} = calls[calls.length - 1][1]
+
+                await expect(commerceProxy.getBasket()).resolves.toBeNull()
+            })
         })
 
         test('opens the widget automatically when cc_isOpen is true', () => {

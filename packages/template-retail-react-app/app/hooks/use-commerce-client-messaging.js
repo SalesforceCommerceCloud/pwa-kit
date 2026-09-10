@@ -47,6 +47,9 @@ const onClient = typeof window !== 'undefined'
  * @param {Object} [options.theme] - Partial theme merged over the defaults
  * @param {string} [options.overridesUrl] - URL to customer's component override script (sets window.CimulateOverrides)
  * @param {Object} [options.overrides] - Inline map of override keys (e.g. `ProductTile`) to registered custom element tag names. The widget takes a single override source, so callers should pass this or `overridesUrl`, not both
+ * @param {Object} [options.commerceProxy] - Host-injected accessor letting the widget read storefront basket state. See {@link https://github.com/SalesforceCommerceCloud/pwa-kit the Commerce Client `CommerceProxy` contract}
+ * @param {Object} [options.commerceProxy.basket] - Current basket snapshot (`{id}`) captured at injection time
+ * @param {Function} [options.commerceProxy.getBasket] - Async accessor that fetches the current basket and returns `{basketId, items: [{id, count}]}`
  * @returns {boolean} True when the widget injection was invoked, false otherwise
  */
 const injectCommerceClientWidget = ({
@@ -67,7 +70,8 @@ const injectCommerceClientWidget = ({
     componentConfig,
     theme,
     overridesUrl,
-    overrides
+    overrides,
+    commerceProxy
 } = {}) => {
     if (!onClient) return false
 
@@ -112,7 +116,8 @@ const injectCommerceClientWidget = ({
             },
             theme: {...DEFAULT_COMMERCE_CLIENT_THEME, ...theme},
             ...(overridesUrl ? {overridesUrl} : {}),
-            ...(overrides && typeof overrides === 'object' ? {overrides} : {})
+            ...(overrides && typeof overrides === 'object' ? {overrides} : {}),
+            ...(commerceProxy && typeof commerceProxy === 'object' ? {commerceProxy} : {})
         })
         return true
     } catch (err) {

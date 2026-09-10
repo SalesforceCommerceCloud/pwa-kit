@@ -256,6 +256,23 @@ describe('injectCommerceClientWidget', () => {
         expect(mockInject.mock.calls[0][0]).not.toHaveProperty('overrides')
     })
 
+    test('forwards commerceProxy when provided', () => {
+        const commerceProxy = {basket: {id: 'basket-1'}, getBasket: jest.fn()}
+        injectCommerceClientWidget({...messagingFields, commerceProxy})
+
+        expect(mockInject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                commerceProxy
+            })
+        )
+    })
+
+    test('omits commerceProxy when it is not an object', () => {
+        injectCommerceClientWidget({...messagingFields, commerceProxy: 'not-an-object'})
+
+        expect(mockInject.mock.calls[0][0]).not.toHaveProperty('commerceProxy')
+    })
+
     test('omits optional presentation fields when not provided', () => {
         injectCommerceClientWidget(messagingFields)
 
@@ -267,6 +284,7 @@ describe('injectCommerceClientWidget', () => {
         expect(config).not.toHaveProperty('globalClassName')
         expect(config).not.toHaveProperty('overridesUrl')
         expect(config).not.toHaveProperty('overrides')
+        expect(config).not.toHaveProperty('commerceProxy')
     })
 
     test('always forwards mode as "messaging"', () => {
