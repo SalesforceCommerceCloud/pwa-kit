@@ -108,7 +108,7 @@ describe('DeliveryEstimate', () => {
         })
     })
 
-    test('does not request or persist an invalid destination', async () => {
+    test('clears the previous estimate without persisting an invalid destination', async () => {
         const user = userEvent.setup()
         window.localStorage.setItem(
             'deliveryDestination_site-1',
@@ -116,14 +116,18 @@ describe('DeliveryEstimate', () => {
         )
         renderDeliveryEstimate()
 
+        expect(await screen.findByText(/ground/i)).toBeInTheDocument()
         await user.clear(screen.getByRole('textbox', {name: /postal code/i}))
         await user.click(screen.getByRole('button', {name: /check delivery/i}))
 
         expect(screen.getByText(/enter a postal code/i)).toBeInTheDocument()
-        expect(useDeliveryEstimates).toHaveBeenCalledWith(
-            expect.any(Object),
-            expect.objectContaining({enabled: false})
-        )
+        await waitFor(() => {
+            expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+                expect.any(Object),
+                expect.objectContaining({enabled: false})
+            )
+        })
+        expect(screen.queryByText(/ground/i)).not.toBeInTheDocument()
         expect(JSON.parse(window.localStorage.getItem('deliveryDestination_site-1'))).toEqual({
             countryCode: 'US',
             postalCode: '94105'
@@ -154,6 +158,26 @@ describe('DeliveryEstimate', () => {
         await user.click(screen.getByRole('button', {name: /check delivery/i}))
 
         expect(await screen.findByRole('status')).toHaveTextContent(/ground/i)
+    })
+
+    test('displays an estimate when browser storage cannot persist the destination', async () => {
+        const user = userEvent.setup()
+        const storageError = new Error('Storage unavailable')
+        const originalSetItem = Storage.prototype.setItem
+        Storage.prototype.setItem = jest.fn(() => {
+            throw storageError
+        })
+
+        try {
+            renderDeliveryEstimate()
+
+            await user.type(screen.getByRole('textbox', {name: /postal code/i}), '94105')
+            await user.click(screen.getByRole('button', {name: /check delivery/i}))
+
+            expect(await screen.findByText(/ground/i)).toBeInTheDocument()
+        } finally {
+            Storage.prototype.setItem = originalSetItem
+        }
     })
 
     test('clears an estimate that does not match the newly selected variant', async () => {

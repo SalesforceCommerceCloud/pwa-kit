@@ -85,10 +85,14 @@ const DeliveryEstimate = ({productId, siteId, defaultCountryCode}) => {
             return
         }
 
-        window.localStorage.setItem(
-            getStorageKey(siteId),
-            JSON.stringify(normalizeDestination(submittedDestination))
-        )
+        try {
+            window.localStorage.setItem(
+                getStorageKey(siteId),
+                JSON.stringify(normalizeDestination(submittedDestination))
+            )
+        } catch {
+            // Delivery estimates remain usable when browser storage is unavailable.
+        }
     }, [primaryEstimate, submittedDestination, siteId, isError, isLoading, isFetching])
 
     const handleSubmit = (event) => {
@@ -112,6 +116,7 @@ const DeliveryEstimate = ({productId, siteId, defaultCountryCode}) => {
         setValidationErrors(errors)
 
         if (!isValidDestination(normalizedDestination)) {
+            setSubmittedDestination(null)
             return
         }
 
