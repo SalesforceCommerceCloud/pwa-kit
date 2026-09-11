@@ -132,6 +132,7 @@ const GuestOrderLookupVerify = () => {
         setIsSubmitting(true)
         try {
             const token = await getTokenWhenReadyRef.current()
+            if (!token) throw new Error('No access token available')
             const res = await fetch('/api/order-lookup/verify', {
                 method: 'POST',
                 headers: {

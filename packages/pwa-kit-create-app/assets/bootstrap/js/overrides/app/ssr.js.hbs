@@ -660,9 +660,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         if (!orderNo || !email || !accessCode)
             return res.status(400).json({error: 'Missing required fields'})
         const siteIdForToken = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteIdForToken}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
+        const authorization = req.headers.authorization
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
         try {
             const shopperOrders = makeShopperOrders(appConfig.commerceAPI.parameters, authorization)
             const order = await shopperOrders.guestOrderLookup({
@@ -706,9 +705,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
+        const authorization = req.headers.authorization
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
         const orderNo = req.params.orderNo
@@ -758,9 +756,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         if (!appConfig?.guestOrderLookup?.enabled)
             return res.status(503).json({error: 'Feature not enabled'})
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
+        const authorization = req.headers.authorization
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
         if (!cookieData || Object.keys(cookieData).length === 0)
@@ -789,9 +786,8 @@ const {handler} = runtime.createHandler(options, (app) => {
             return res.status(503).json({error: 'Feature not enabled'})
 
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
+        const authorization = req.headers.authorization
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
 
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
@@ -839,9 +835,8 @@ const {handler} = runtime.createHandler(options, (app) => {
             return res.status(503).json({error: 'Feature not enabled'})
 
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
+        const authorization = req.headers.authorization
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
 
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)

@@ -48,7 +48,7 @@ var log = Logger.getLogger('pwakit-notify', 'pwakit-notify');
  * @returns {string|null} Validated hostname to use in magic-link URLs, or null when
  *   requestedHost was supplied but is not in the allowlist (caller should reject with 400).
  */
-module.exports = function resolveStorefrontHost(requestedHost) {
+function resolveStorefrontHost(requestedHost) {
     var allowedHosts = getAllowedHosts();
 
     if (requestedHost && requestedHost.trim()) {
@@ -82,7 +82,7 @@ module.exports = function resolveStorefrontHost(requestedHost) {
         Site.getCurrent().httpsHostName
     );
     return Site.getCurrent().httpsHostName;
-};
+}
 
 function getAllowedHosts() {
     try {
@@ -93,3 +93,5 @@ function getAllowedHosts() {
         return [];
     }
 }
+
+module.exports = resolveStorefrontHost;

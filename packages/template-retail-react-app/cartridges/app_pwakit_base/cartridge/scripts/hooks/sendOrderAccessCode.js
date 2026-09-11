@@ -76,6 +76,10 @@ function sendOrderAccessCode(order, accessCode) {
         return new Status(Status.ERROR, 'NULL_ORDER', 'Order or customer info is null');
     }
 
+    // Note: uses siteId.toLowerCase() as the URL path segment. If your storefront
+    // config defines a siteAlias (e.g. RefArchGlobal → "global"), the magic link
+    // will 404 unless you add a redirect at the CDN/router level or override this
+    // hook with an alias-aware implementation.
     var siteId = Site.getCurrent().ID.toLowerCase();
     var locale = (request.locale || Site.getCurrent().defaultLocale || 'en_US').replace(/_/g, '-');
     var magicLink = 'https://' + resolveStorefrontHost(null) + '/' + siteId + '/' + locale + '/order-lookup/verify/' + order.orderNo + '?token=' + encodeURIComponent(accessCode);
