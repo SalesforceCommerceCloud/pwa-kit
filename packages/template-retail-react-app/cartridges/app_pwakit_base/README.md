@@ -101,6 +101,41 @@ Check that the sfcc.app.order.sendOrderAccessCode hook is active on <instance>
 
 The plugin can also tail `pwakit-notify` log output in real time while you trigger a GLO or passwordless flow, making it easier to diagnose misconfigured preferences or template errors.
 
+## SLAS Admin configuration
+
+The `pwakit-notify` Custom REST API (passwordless login, OTP, password reset emails) is called by the PWA Kit SSR server using a **private SLAS client** token. The token must carry the `c_pwakit_notify` scope, which SCAPI enforces before invoking the endpoint.
+
+> **GLO email is not affected** — the `sendOrderAccessCode` hook is called directly by SCAPI and does not go through this token flow. Only the `pwakit-notify` Custom REST API requires the steps below.
+
+### 1. Add the scope to your SLAS private client
+
+In [Account Manager](https://account.demandware.com) → **API Client** for the private client used by your PWA Kit SSR server:
+
+1. Find or create the API client entry (the same `clientId` in `config/default.js`)
+2. Under **Allowed Scopes**, add: `c_pwakit_notify`
+3. Save
+
+### 2. Set the client secret on the SSR server
+
+The SSR server reads the private client secret from the environment variable `PWA_KIT_SLAS_CLIENT_SECRET`. Set this on your MRT environment:
+
+```bash
+# MRT managed runtime
+pwa-kit-dev push --set-env PWA_KIT_SLAS_CLIENT_SECRET=<your-client-secret> ...
+```
+
+Or set it via the MRT Admin UI under **Environments → <env> → Environment Variables**.
+
+### 3. Verify
+
+After deploying, trigger a passwordless login or password reset flow and confirm the email is delivered. If you see `401` errors in the `pwakit-notify` log, the most common causes are:
+
+- `c_pwakit_notify` not yet saved on the API client in Account Manager
+- `PWA_KIT_SLAS_CLIENT_SECRET` not set or incorrect on the MRT environment
+- The code version not yet activated (scope enforcement happens at the SCAPI gateway layer, which reads from the active code version)
+
+---
+
 ## Configuration
 
 | Preference | Type | Description |
