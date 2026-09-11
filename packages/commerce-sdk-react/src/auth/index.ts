@@ -316,21 +316,6 @@ const HTTPONLY_COOKIE_BACKED_KEYS: ReadonlySet<AuthDataKeys> = new Set([
 export const pendingRefreshTokens = new Map<string, Promise<AuthData>>()
 
 /**
- * Module-level fallback for `usid` values from the most recent SLAS token
- * response, keyed the same way as `pendingRefreshTokens`. Storefront Preview
- * embedded in a cross-site iframe (e.g. Managed Runtime preview domain hosted
- * inside Business Manager) sees `Set-Cookie` silently dropped for third-party
- * contexts, so the cookie-backed `this.get('usid')` returns empty even after a
- * successful SLAS 200. The keying also survives the cross-instance dedup in
- * `refreshAccessToken()`: an Auth instance that awaits a peer's in-flight
- * refresh promise still finds the `usid` this map stashed on completion.
- * Only `usid` is retained — never access/refresh/id tokens — to preserve the
- * XSS-mitigation intent of `enableHttpOnlySessionCookies`.
- * @internal — exported for test access only
- */
-export const lastUsidByDedupKey = new Map<string, string>()
-
-/**
  * This class is used to handle shopper authentication.
  * It is responsible for initializing shopper session, manage access
  * and refresh tokens on server/browser environments. As well as providing
@@ -899,15 +884,6 @@ class Auth {
      * store the data in storage.
      */
     private handleTokenResponse(res: TokenResponse, isGuest: boolean) {
-        // Stash `usid` in the module-level fallback map so cross-site-iframe
-        // callers (e.g. Storefront Preview, where Set-Cookie is silently dropped
-        // by the browser) can recover it via `getUsidForPreview()`. Keyed like
-        // `pendingRefreshTokens` so a second Auth instance that awaits this
-        // refresh via dedup still sees the value.
-        if (res.usid) {
-            lastUsidByDedupKey.set(this.refreshDedupKey, res.usid)
-        }
-
         // In httpOnly mode on the client, every value we'd otherwise persist
         // here is already set as a cookie by the SLAS proxy / eCOM (access
         // token, refresh token, customer_id, customer_type, usid, uido,
@@ -1774,12 +1750,7 @@ class Auth {
     async getUsidForPreview(): Promise<string> {
         await this.refreshAccessToken()
 
-        // Prefer the cookie-backed value; fall back to the module-level
-        // `usid` stash so cross-site iframes (where Set-Cookie is silently
-        // dropped) can still obtain a USID from the successful 200. The
-        // module-level map also survives React re-rendering the Auth
-        // instance mid-flight and the cross-instance refresh dedup.
-        const usid = this.get('usid') || lastUsidByDedupKey.get(this.refreshDedupKey)
+        const usid = this.get('usid')
         if (!usid) {
             throw new Error('SLAS refresh did not return a USID')
         }
