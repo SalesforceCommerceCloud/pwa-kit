@@ -298,7 +298,9 @@ const GuestOrderLookupVerify = () => {
                             type="submit"
                             colorScheme="blue"
                             isLoading={isSubmitting}
-                            isDisabled={!isComplete || isSubmitting || (needsEmailInput && !emailInput)}
+                            isDisabled={
+                                !isComplete || isSubmitting || (needsEmailInput && !emailInput)
+                            }
                             width="full"
                             size="lg"
                         >

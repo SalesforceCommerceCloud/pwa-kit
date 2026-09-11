@@ -39,14 +39,6 @@ function makeShopperOrders(apiParams, authorization) {
     })
 }
 
-function parseCookieValue(req, cookieName) {
-    const raw = req.headers?.cookie
-        ?.split(';')
-        .map((c) => c.trim())
-        .find((c) => c.startsWith(cookieName + '='))
-    return raw ? decodeURIComponent(raw.slice(cookieName.length + 1)) : null
-}
-
 export function parseGuestOrderCookie(req, cookieName) {
     try {
         const raw = req.headers?.cookie

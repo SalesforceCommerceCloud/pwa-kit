@@ -18,7 +18,12 @@
 
 import express from 'express'
 import helmet from 'helmet'
-import {createLocalJWKSet, createRemoteJWKSet as joseCreateRemoteJWKSet, jwtVerify, decodeJwt} from 'jose'
+import {
+    createLocalJWKSet,
+    createRemoteJWKSet as joseCreateRemoteJWKSet,
+    jwtVerify,
+    decodeJwt
+} from 'jose'
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
@@ -52,14 +57,6 @@ function makeShopperOrders(apiParams, authorization) {
         proxy,
         throwOnBadResponse: true
     })
-}
-
-function parseCookieValue(req, cookieName) {
-    const raw = req.headers?.cookie
-        ?.split(';')
-        .map((c) => c.trim())
-        .find((c) => c.startsWith(cookieName + '='))
-    return raw ? decodeURIComponent(raw.slice(cookieName.length + 1)) : null
 }
 
 export function parseGuestOrderCookie(req, cookieName) {
@@ -254,7 +251,9 @@ async function getNotifyToken(apiParams) {
         return _notifyToken
     }
     const {clientId, organizationId, shortCode, siteId} = apiParams
-    const proxy = `${getAppOrigin()}${getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
+    const proxy = `${getAppOrigin()}${
+        getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'
+    }`
     const slasClient = new ShopperLogin({
         parameters: {clientId, organizationId, shortCode, siteId},
         proxy,
@@ -274,8 +273,12 @@ async function getNotifyToken(apiParams) {
 async function sendViaB2cCartridge(type, recipient, data, apiParams) {
     const {organizationId, siteId} = apiParams
     const token = await getNotifyToken(apiParams)
-    const proxy = `${getAppOrigin()}${getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
-    const url = `${proxy}/custom/pwakit-notify/v1/organizations/${encodeURIComponent(organizationId)}/notify?siteId=${encodeURIComponent(siteId)}`
+    const proxy = `${getAppOrigin()}${
+        getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'
+    }`
+    const url = `${proxy}/custom/pwakit-notify/v1/organizations/${encodeURIComponent(
+        organizationId
+    )}/notify?siteId=${encodeURIComponent(siteId)}`
     const res = await fetch(url, {
         method: 'POST',
         headers: {
@@ -314,7 +317,12 @@ async function sendMagicLinkEmail(req, res, landingPath, notifyType, redirectUrl
     }
 
     const appConfig = getConfig()?.app
-    await sendViaB2cCartridge(notifyType, email_id, {magicLinkPath}, appConfig.commerceAPI.parameters)
+    await sendViaB2cCartridge(
+        notifyType,
+        email_id,
+        {magicLinkPath},
+        appConfig.commerceAPI.parameters
+    )
     res.json({success: true})
 }
 
