@@ -1,0 +1,131 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: PWA Kit Notify API
+components:
+  securitySchemes:
+    ShopperToken:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://{shortCode}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{organizationId}/oauth2/token
+          scopes:
+            c_pwakit_notify: Send transactional notifications via PWA Kit
+paths:
+  /notify:
+    post:
+      summary: Send a transactional notification
+      operationId: notify
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: locale
+          required: false
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required: [type, recipient, data]
+                  properties:
+                    type:
+                      type: string
+                      enum: [passwordless-magic-link]
+                    recipient:
+                      type: string
+                    host:
+                      type: string
+                    data:
+                      type: object
+                      required: [magicLinkPath]
+                      properties:
+                        magicLinkPath:
+                          type: string
+                          pattern: '^/'
+                          description: Path portion of the magic link (no hostname). The cartridge prepends the validated storefront hostname.
+                - type: object
+                  required: [type, recipient, data]
+                  properties:
+                    type:
+                      type: string
+                      enum: [password-reset]
+                    recipient:
+                      type: string
+                    host:
+                      type: string
+                    data:
+                      type: object
+                      required: [magicLinkPath]
+                      properties:
+                        magicLinkPath:
+                          type: string
+                          pattern: '^/'
+                          description: Path portion of the magic link (no hostname). The cartridge prepends the validated storefront hostname.
+                - type: object
+                  required: [type, recipient, data]
+                  properties:
+                    type:
+                      type: string
+                      enum: [otp]
+                    recipient:
+                      type: string
+                    host:
+                      type: string
+                    data:
+                      type: object
+                      required: [token]
+                      properties:
+                        token:
+                          type: string
+                - type: object
+                  required: [type, recipient, data]
+                  properties:
+                    type:
+                      type: string
+                      enum: [glo-access-code]
+                    recipient:
+                      type: string
+                    host:
+                      type: string
+                    data:
+                      type: object
+                      required: [orderNo, accessCode]
+                      properties:
+                        orderNo:
+                          type: string
+                        accessCode:
+                          type: string
+              discriminator:
+                propertyName: type
+      responses:
+        '200':
+          description: Notification sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      magicLink:
+                        type: string
+                        description: Fully qualified magic link URL constructed by the cartridge (only present for magic-link notification types)
+        '400':
+          description: Invalid request
+        '500':
+          description: Notification delivery failed
+      security:
+        - ShopperToken: [c_pwakit_notify]

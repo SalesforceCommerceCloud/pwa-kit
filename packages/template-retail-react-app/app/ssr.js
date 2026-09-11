@@ -16,10 +16,9 @@
 
 'use strict'
 
-import crypto from 'crypto'
 import express from 'express'
 import helmet from 'helmet'
-import {createRemoteJWKSet as joseCreateRemoteJWKSet, jwtVerify, decodeJwt} from 'jose'
+import {createLocalJWKSet, createRemoteJWKSet as joseCreateRemoteJWKSet, jwtVerify, decodeJwt} from 'jose'
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
@@ -30,7 +29,7 @@ import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
-import {ShopperOrders} from 'commerce-sdk-isomorphic'
+import {ShopperLogin, ShopperOrders, helpers} from 'commerce-sdk-isomorphic'
 
 const config = getConfig()
 
@@ -185,7 +184,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
     // To extend the SLAS private-client proxy allow-list, supply
     // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
@@ -211,7 +210,7 @@ const options = {
     // HYBRID PROXY REQUIREMENT:
     // - Hybrid Proxy requires this to be 'true' for SFCC session management to work properly
     // - Only enable Hybrid Proxy in development environments, never in production
-    localAllowCookies: false,
+    localAllowCookies: true,
 
     // Hybrid Proxy configuration for local development and MRT to ODS connection testing.
     //
@@ -245,115 +244,60 @@ const options = {
 
 const runtime = getRuntime()
 
-/**
- * Tokens are valid for 20 minutes. We store it at the top level scope to reuse
- * it during the lambda invocation. We'll refresh it after 15 minutes.
- */
-let marketingCloudToken = ''
-let marketingCloudTokenExpiration = new Date()
+// Module-level guest token cache for pwakit-notify SCAPI calls.
+// Warm Lambda reuse avoids a SLAS round-trip on every callback invocation.
+let _notifyToken = null
+let _notifyTokenExpiry = 0
 
-/**
- * Generates a unique ID for the email message.
- *
- * @return {string} A unique ID for the email message.
- */
-function generateUniqueId() {
-    return crypto.randomBytes(16).toString('hex')
+async function getNotifyToken(apiParams) {
+    if (_notifyToken && Date.now() < _notifyTokenExpiry) {
+        return _notifyToken
+    }
+    const {clientId, organizationId, shortCode, siteId} = apiParams
+    const proxy = `${getAppOrigin()}${getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
+    const slasClient = new ShopperLogin({
+        parameters: {clientId, organizationId, shortCode, siteId},
+        proxy,
+        throwOnBadResponse: true
+    })
+    const tokenResponse = await helpers.loginGuestUserPrivate({
+        slasClient,
+        parameters: {},
+        credentials: {clientSecret: process.env.PWA_KIT_SLAS_CLIENT_SECRET}
+    })
+    _notifyToken = tokenResponse.access_token
+    // Cache for 25 minutes — SLAS guest tokens last 30 min, 5 min buffer
+    _notifyTokenExpiry = Date.now() + 25 * 60 * 1000
+    return _notifyToken
 }
 
-/**
- * Sends an email to a specified contact using the Marketing Cloud API. The template email must have a
- * `%%magic-link%%` personalization string inserted.
- * https://help.salesforce.com/s/articleView?id=mktg.mc_es_personalization_strings.htm&type=5
- *
- * @param {string} email - The email address of the contact to whom the email will be sent.
- * @param {string} templateId - The ID of the email template to be used for the email.
- * @param {string} magicLink - The magic link to be included in the email.
- *
- * @return {Promise<object>} A promise that resolves to the response object received from the Marketing Cloud API.
- */
-async function sendMarketingCloudEmail(emailId, marketingCloudConfig) {
-    // Refresh token if expired
-    if (new Date() > marketingCloudTokenExpiration) {
-        const {clientId, clientSecret, subdomain} = marketingCloudConfig
-        const tokenUrl = `https://${subdomain}.auth.marketingcloudapis.com/v2/token`
-        const tokenResponse = await fetch(tokenUrl, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                grant_type: 'client_credentials',
-                client_id: clientId,
-                client_secret: clientSecret
-            })
-        })
-
-        if (!tokenResponse.ok)
-            throw new Error(
-                'Failed to fetch Marketing Cloud access token. Check your Marketing Cloud credentials and try again.'
-            )
-
-        const {access_token} = await tokenResponse.json()
-        marketingCloudToken = access_token
-        // Set expiration to 15 mins
-        marketingCloudTokenExpiration = new Date(Date.now() + 15 * 60 * 1000)
-    }
-
-    // Send the email
-    const emailUrl = `https://${
-        marketingCloudConfig.subdomain
-    }.rest.marketingcloudapis.com/messaging/v1/email/messages/${generateUniqueId()}`
-    const emailResponse = await fetch(emailUrl, {
+async function sendViaB2cCartridge(type, recipient, data, apiParams) {
+    const {organizationId, siteId} = apiParams
+    const token = await getNotifyToken(apiParams)
+    const proxy = `${getAppOrigin()}${getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
+    const url = `${proxy}/custom/pwakit-notify/v1/organizations/${encodeURIComponent(organizationId)}/notify?siteId=${encodeURIComponent(siteId)}`
+    const res = await fetch(url, {
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${marketingCloudToken}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-            definitionKey: marketingCloudConfig.templateId,
-            recipient: {
-                contactKey: emailId,
-                to: emailId,
-                attributes: {'magic-link': marketingCloudConfig.magicLink}
-            }
-        })
+        body: JSON.stringify({type, recipient, data, host: new URL(getAppOrigin()).hostname})
     })
-
-    if (!emailResponse.ok) throw new Error('Failed to send email to Marketing Cloud')
-
-    return await emailResponse.json()
-}
-
-/**
- * Generates a unique ID, constructs an email message URL, and sends the email to the specified contact
- * using the Marketing Cloud API.
- *
- * @param {string} email - The email address of the contact to whom the email will be sent.
- * @param {string} templateId - The ID of the email template to be used for the email.
- * @param {string} magicLink - The magic link to be included in the email.
- *
- * @return {Promise<object>} A promise that resolves to the response object received from the Marketing Cloud API.
- */
-export async function emailLink(emailId, templateId, magicLink) {
-    if (!process.env.MARKETING_CLOUD_CLIENT_ID) {
-        console.warn('MARKETING_CLOUD_CLIENT_ID is not set in the environment variables.')
+    if (!res.ok) {
+        if (res.status === 401) {
+            // Clear cached token so next call gets a fresh one
+            _notifyToken = null
+            _notifyTokenExpiry = 0
+        }
+        let body = ''
+        try {
+            body = await res.text()
+        } catch (_) {} // eslint-disable-line no-empty
+        logger.error(`pwakit-notify ${res.status} body: ${body} url: ${url}`)
+        throw new Error(`pwakit-notify returned ${res.status}`)
     }
-
-    if (!process.env.MARKETING_CLOUD_CLIENT_SECRET) {
-        console.warn(' MARKETING_CLOUD_CLIENT_SECRET is not set in the environment variables.')
-    }
-
-    if (!process.env.MARKETING_CLOUD_SUBDOMAIN) {
-        console.warn('MARKETING_CLOUD_SUBDOMAIN is not set in the environment variables.')
-    }
-
-    const marketingCloudConfig = {
-        clientId: process.env.MARKETING_CLOUD_CLIENT_ID,
-        clientSecret: process.env.MARKETING_CLOUD_CLIENT_SECRET,
-        magicLink: magicLink,
-        subdomain: process.env.MARKETING_CLOUD_SUBDOMAIN,
-        templateId: templateId
-    }
-    return await sendMarketingCloudEmail(emailId, marketingCloudConfig)
+    return await res.json()
 }
 
 const resetPasswordCallback =
@@ -361,30 +305,17 @@ const resetPasswordCallback =
 const passwordlessLoginCallback =
     config.app.login?.passwordless?.callbackURI || '/passwordless-login-callback'
 
-// Reusable function to handle sending a magic link email.
-// By default, this implementation uses Marketing Cloud.
-async function sendMagicLinkEmail(req, res, landingPath, emailTemplate, redirectUrl) {
-    // Extract the base URL from the request
-    const base = req.protocol + '://' + req.get('host')
-
-    // Extract the email_id and token from the request body
+async function sendMagicLinkEmail(req, res, landingPath, notifyType, redirectUrl) {
     const {email_id, token} = req.body
 
-    // Construct the magic link URL
-    let magicLink = `${base}${landingPath}?token=${encodeURIComponent(token)}`
-    if (landingPath === config.app.login?.resetPassword?.landingPath) {
-        // Add email query parameter for reset password flow
-        magicLink += `&email=${encodeURIComponent(email_id)}`
-    }
-    if (landingPath === config.app.login?.passwordless?.landingPath && redirectUrl) {
-        magicLink += `&redirect_url=${encodeURIComponent(redirectUrl)}`
+    let magicLinkPath = `${landingPath}?token=${encodeURIComponent(token)}`
+    if (notifyType === 'passwordless-magic-link' && redirectUrl) {
+        magicLinkPath += `&redirect_url=${encodeURIComponent(redirectUrl)}`
     }
 
-    // Call the emailLink function to send an email with the magic link using Marketing Cloud
-    const emailLinkResponse = await emailLink(email_id, emailTemplate, magicLink)
-
-    // Send the response
-    res.send(emailLinkResponse)
+    const appConfig = getConfig()?.app
+    await sendViaB2cCartridge(notifyType, email_id, {magicLinkPath}, appConfig.commerceAPI.parameters)
+    res.json({success: true})
 }
 
 const CLAIM = {
@@ -427,9 +358,23 @@ export const validateSlasCallbackToken = async (token) => {
     const tokens = subClaim.split(DELIMITER.ISSUER)
     const tenantId = tokens[2]
     try {
-        const jwks = createRemoteJWKSet(tenantId)
-        const {payload} = await jwtVerify(token, jwks, {})
-        return payload
+        let jwks
+        if (process.env.SLAS_JWKS_JSON) {
+            const parsed = JSON.parse(process.env.SLAS_JWKS_JSON)
+            if (!Array.isArray(parsed?.keys) || parsed.keys.length === 0) {
+                throwSlasTokenValidationError(
+                    'SLAS_JWKS_JSON must be a JSON object with a non-empty "keys" array',
+                    400
+                )
+            }
+            jwks = createLocalJWKSet(parsed)
+        } else {
+            jwks = createRemoteJWKSet(tenantId)
+        }
+        const {payload: validatedPayload} = await jwtVerify(token, jwks, {
+            algorithms: ['RS256', 'ES256']
+        })
+        return validatedPayload
     } catch (error) {
         throwSlasTokenValidationError(error.message, 401)
     }
@@ -653,34 +598,62 @@ const {handler} = runtime.createHandler(options, (app) => {
     // endpoint sending the email address and passwordless token. Then this endpoint calls
     // the sendMagicLinkEmail function to send an email with the passwordless login magic link.
     // https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-passwordless-login.html#receive-the-callback
-    app.post(passwordlessLoginCallback, (req, res) => {
+    app.post(passwordlessLoginCallback, async (req, res) => {
+        const appConfig = getConfig()?.app
+        if (appConfig?.login?.passwordless?.mode !== 'callback') {
+            return res.status(400).json({error: 'Passwordless callback mode not enabled'})
+        }
         const slasCallbackToken = req.headers['x-slas-callback-token']
+        if (!slasCallbackToken) {
+            return res.status(400).json({error: 'Missing x-slas-callback-token header'})
+        }
         const redirectUrl = req.query.redirectUrl
-        validateSlasCallbackToken(slasCallbackToken).then(() => {
-            sendMagicLinkEmail(
+        try {
+            await validateSlasCallbackToken(slasCallbackToken)
+            await sendMagicLinkEmail(
                 req,
                 res,
                 config.app.login?.passwordless?.landingPath,
-                process.env.MARKETING_CLOUD_PASSWORDLESS_LOGIN_TEMPLATE,
+                'passwordless-magic-link',
                 redirectUrl
             )
-        })
+        } catch (err) {
+            logger.error('passwordless callback failed', {
+                namespace: 'slas-callback',
+                additionalProperties: {error: err?.message}
+            })
+            res.status(500).json({error: 'Failed to send notification'})
+        }
     })
 
     // Handles the reset password callback route. SLAS makes a POST request to this
     // endpoint sending the email address and reset password token. Then this endpoint calls
     // the sendMagicLinkEmail function to send an email with the reset password magic link.
     // https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-password-reset.html#slas-password-reset-flow
-    app.post(resetPasswordCallback, (req, res) => {
+    app.post(resetPasswordCallback, async (req, res) => {
+        const appConfig = getConfig()?.app
+        if (appConfig?.login?.resetPassword?.mode !== 'callback') {
+            return res.status(400).json({error: 'Reset password callback mode not enabled'})
+        }
         const slasCallbackToken = req.headers['x-slas-callback-token']
-        validateSlasCallbackToken(slasCallbackToken).then(() => {
-            sendMagicLinkEmail(
+        if (!slasCallbackToken) {
+            return res.status(400).json({error: 'Missing x-slas-callback-token header'})
+        }
+        try {
+            await validateSlasCallbackToken(slasCallbackToken)
+            await sendMagicLinkEmail(
                 req,
                 res,
                 config.app.login?.resetPassword?.landingPath,
-                process.env.MARKETING_CLOUD_RESET_PASSWORD_TEMPLATE
+                'password-reset'
             )
-        })
+        } catch (err) {
+            logger.error('reset-password callback failed', {
+                namespace: 'slas-callback',
+                additionalProperties: {error: err?.message}
+            })
+            res.status(500).json({error: 'Failed to send notification'})
+        }
     })
 
     // Proxy endpoint for the shared maintenance page — fetches CDN content server-side
@@ -792,9 +765,10 @@ const {handler} = runtime.createHandler(options, (app) => {
             return res.status(400).json({error: 'Missing required fields'})
 
         const siteIdForToken = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteIdForToken}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
+        const authorization = req.headers.authorization
+        if (!authorization) {
+            return res.status(401).json({error: 'Missing authorization'})
+        }
 
         const correlationId = req.headers['x-correlation-id']
         const start = Date.now()
@@ -869,9 +843,8 @@ const {handler} = runtime.createHandler(options, (app) => {
             return res.status(503).json({error: 'Feature not enabled'})
 
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
+        const authorization = req.headers.authorization
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
 
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
@@ -950,9 +923,8 @@ const {handler} = runtime.createHandler(options, (app) => {
             return res.status(503).json({error: 'Feature not enabled'})
 
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
+        const authorization = req.headers.authorization
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
 
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
@@ -984,9 +956,8 @@ const {handler} = runtime.createHandler(options, (app) => {
             return res.status(503).json({error: 'Feature not enabled'})
 
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
+        const authorization = req.headers.authorization
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
 
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)
@@ -1035,9 +1006,8 @@ const {handler} = runtime.createHandler(options, (app) => {
             return res.status(503).json({error: 'Feature not enabled'})
 
         const siteId = getSiteIdFromRequest(req) || appConfig.commerceAPI.parameters.siteId
-        const slasToken = parseCookieValue(req, `cc-at_${siteId}`)
-        if (!slasToken) return res.status(401).json({error: 'Missing authorization'})
-        const authorization = `Bearer ${slasToken}`
+        const authorization = req.headers.authorization
+        if (!authorization) return res.status(401).json({error: 'Missing authorization'})
 
         const cookieName = `cc-goa_${siteId}`
         const cookieData = parseGuestOrderCookie(req, cookieName)

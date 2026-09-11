@@ -1,0 +1,63 @@
+<isinclude template="email/common/header"/>
+
+  <!-- Heading -->
+  <tr>
+    <td style="padding-bottom:20px;">
+      <h1 style="margin:0;font-size:22px;font-weight:600;color:#181818;line-height:1.3;">${Resource.msg('gloAccessCode.heading', 'email', null)}</h1>
+    </td>
+  </tr>
+
+  <!-- Instructions -->
+  <tr>
+    <td style="padding-bottom:32px;">
+      <p style="margin:0;font-size:15px;color:#444444;line-height:1.6;">${Resource.msg('gloAccessCode.instructionsPrefix', 'email', null)} <strong style="color:#181818;">${pdict.orderNo}</strong>.</p>
+    </td>
+  </tr>
+
+  <!-- Access code display -->
+  <tr>
+    <td style="padding-bottom:8px;">
+      <p style="margin:0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#747474;">${Resource.msg('gloAccessCode.accessCodeLabel', 'email', null)}</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding-bottom:32px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td style="background-color:#F3F3F3;border:1px solid #E5E5E5;padding:20px;text-align:center;">
+            <span style="font-size:32px;font-weight:700;letter-spacing:0.2em;color:#181818;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">${pdict.accessCode}</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- CTA button -->
+  <tr>
+    <td style="padding-bottom:32px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="background-color:#0176D3;">
+            <a href="${pdict.magicLink}" style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:600;color:#FFFFFF;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">${Resource.msg('gloAccessCode.buttonText', 'email', null)}</a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Disclaimer -->
+  <tr>
+    <td style="padding-bottom:16px;">
+      <p style="margin:0;font-size:12px;color:#747474;line-height:1.5;">${Resource.msg('gloAccessCode.disclaimer', 'email', null)}</p>
+    </td>
+  </tr>
+
+  <!-- Copy URL fallback -->
+  <tr>
+    <td>
+      <p style="margin:0;font-size:12px;color:#747474;line-height:1.5;">${Resource.msg('gloAccessCode.copyUrl', 'email', null)}<br>
+      <a href="${pdict.magicLink}" style="color:#0176D3 !important;word-break:break-all;text-decoration:underline;"><span style="color:#0176D3 !important;">${pdict.magicLink}</span></a></p>
+    </td>
+  </tr>
+
+<isinclude template="email/common/footer"/>

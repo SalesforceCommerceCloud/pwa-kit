@@ -35,8 +35,8 @@ const ResetPasswordLanding = () => {
     const {search} = useLocation()
     const navigate = useNavigation()
     const queryParams = new URLSearchParams(search)
-    const email = decodeURIComponent(queryParams.get('email'))
     const token = decodeURIComponent(queryParams.get('token'))
+    const {control} = form
     const fields = useUpdatePasswordFields({form})
     const password = form.watch('password')
     const {resetPassword} = usePasswordReset()
@@ -44,7 +44,7 @@ const ResetPasswordLanding = () => {
     const submit = async (values) => {
         form.clearErrors()
         try {
-            await resetPassword({email, token, newPassword: values.password})
+            await resetPassword({email: values.email, token, newPassword: values.password})
             navigate('/login')
         } catch (error) {
             const errorData = await error.response?.json()
@@ -78,6 +78,23 @@ const ResetPasswordLanding = () => {
                             </Alert>
                         )}
                         <Stack spacing={3} pb={2}>
+                            <Field
+                                name="email"
+                                label={formatMessage({
+                                    defaultMessage: 'Email',
+                                    id: 'reset_password_form.label.email'
+                                })}
+                                type="email"
+                                control={control}
+                                defaultValue=""
+                                rules={{
+                                    required: formatMessage({
+                                        defaultMessage: 'Please enter your email address.',
+                                        id: 'reset_password_form.error.required_email'
+                                    })
+                                }}
+                                autoComplete="email"
+                            />
                             <Field {...fields.password} />
                             <Field {...fields.confirmPassword} />
                             <PasswordRequirements value={password} />

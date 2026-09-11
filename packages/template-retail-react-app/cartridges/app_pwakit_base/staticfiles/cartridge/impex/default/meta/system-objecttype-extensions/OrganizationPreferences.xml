@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://www.demandware.com/xml/impex/metadata/2006-10-31">
+
+    <!--
+        PWA Kit global (organization-level) preferences.
+        Import via Business Manager: Administration > Site Development > Import & Export.
+    -->
+    <type-extension type-id="OrganizationPreferences">
+        <custom-attribute-definitions>
+
+            <!--
+                Set to false to disable the cartridge's built-in notification feature.
+                Use this if you have customized email delivery (e.g. Marketing Cloud, a
+                third-party provider, or your own hook) and do not want the cartridge's
+                default ISML-based emails to fire.
+
+                When unset or set to true, all notification types are active (the default
+                for new installs). Setting this to false causes the REST API to return 503
+                and the sendOrderAccessCode hook to no-op — no emails are sent by the cartridge.
+            -->
+            <attribute-definition attribute-id="pwakitNotifyEnabled">
+                <display-name xml:lang="x-default">Notifications Enabled</display-name>
+                <description xml:lang="x-default">
+                    Enable the built-in notification feature (email sending via ISML templates and dw/net/Mail).
+                    Set to false if you have a custom email provider.
+                    When unset, notifications are enabled by default.
+                </description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>true</default-value>
+            </attribute-definition>
+
+            <attribute-definition attribute-id="pwakitStorefrontHosts">
+                <display-name xml:lang="x-default">Allowed Storefront Hosts</display-name>
+                <description xml:lang="x-default">
+                    Comma-separated list of allowed public-facing storefront hostnames (no protocol, no trailing slash).
+                    Example: my-store.salesforcecommercecloudsites.com,staging.my-store.com
+                    The REST API caller (PWA Kit) passes its own hostname with each request; the cartridge
+                    validates it against this list before constructing magic-link URLs. If the caller supplies
+                    no host the first entry in this list is used. If the list is empty the cartridge falls back
+                    to the B2C instance hostname, which will not resolve correctly in headless deployments.
+                    Note: when the B2C Script API gains native access to the MRT/eCDN hostname this preference
+                    will be deprecated in favour of that API.
+                </description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+
+        </custom-attribute-definitions>
+
+        <group-definitions>
+            <attribute-group group-id="pwakit">
+                <display-name xml:lang="x-default">PWA Kit</display-name>
+                <attribute attribute-id="pwakitNotifyEnabled"/>
+                <attribute attribute-id="pwakitStorefrontHosts"/>
+            </attribute-group>
+        </group-definitions>
+    </type-extension>
+
+</metadata>

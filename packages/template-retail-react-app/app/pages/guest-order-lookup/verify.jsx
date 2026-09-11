@@ -18,7 +18,6 @@ import {
     HStack,
     Heading,
     Input,
-    Skeleton,
     Stack,
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -41,12 +40,42 @@ const GuestOrderLookupVerify = () => {
         getTokenWhenReadyRef.current = getTokenWhenReady
     })
 
-    // email arrives via router state when navigating from request.jsx; absent on hard refresh.
-    const email = location.state?.email || ''
+    // email arrives via router state when navigating from request.jsx within the same session.
+    // Absent on hard refresh or direct arrival from the magic link — user must enter it.
+    const emailFromContext = location.state?.email || ''
+    // When email is not available from context (magic link arrival), the user must type it.
+    const needsEmailInput = !emailFromContext
+    const [emailInput, setEmailInput] = useState('')
+    const email = emailFromContext || emailInput
+    // autoCode is set by the GLO magic link (?token=) so shoppers can auto-submit the OTP.
+    const autoCode = new URLSearchParams(location.search).get('token') || ''
     // Auth resolves asynchronously — null means not yet known.
     const authResolved = customerType !== null
 
     const [digits, setDigits] = useState(Array(ACCESS_CODE_LENGTH).fill(''))
+    const formRef = useRef(null)
+
+    useEffect(() => {
+        if (!autoCode) return
+        const cleaned = autoCode.replace(/\D/g, '').slice(0, ACCESS_CODE_LENGTH)
+        if (cleaned.length === 0) return
+        const next = Array(ACCESS_CODE_LENGTH).fill('')
+        for (let i = 0; i < cleaned.length; i++) {
+            next[i] = cleaned[i]
+        }
+        setDigits(next)
+    }, [autoCode])
+
+    useEffect(() => {
+        if (!autoCode) return
+        if (!email) return // wait for the user to enter their email before auto-submitting
+        const cleaned = autoCode.replace(/\D/g, '').slice(0, ACCESS_CODE_LENGTH)
+        if (cleaned.length !== ACCESS_CODE_LENGTH) return
+        const timer = setTimeout(() => {
+            formRef.current?.requestSubmit()
+        }, 100)
+        return () => clearTimeout(timer)
+    }, [autoCode, email])
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [serverError, setServerError] = useState(null)
     const inputRefs = useRef([])
@@ -167,7 +196,7 @@ const GuestOrderLookupVerify = () => {
                             defaultMessage: 'Verify Your Email'
                         })}
                     </Heading>
-                    {email ? (
+                    {email && (
                         <Text color="gray.600">
                             {formatMessage(
                                 {
@@ -178,16 +207,12 @@ const GuestOrderLookupVerify = () => {
                                 {email}
                             )}
                         </Text>
-                    ) : (
-                        <Stack spacing={2} alignItems="center">
-                            <Skeleton height="20px" width="88%" />
-                            <Skeleton height="20px" width="55%" />
-                        </Stack>
                     )}
                 </Box>
 
                 <Box
                     as="form"
+                    ref={formRef}
                     onSubmit={onSubmit}
                     noValidate
                     borderWidth="1px"
@@ -200,6 +225,26 @@ const GuestOrderLookupVerify = () => {
                                 <AlertIcon />
                                 {serverError}
                             </Alert>
+                        )}
+
+                        {needsEmailInput && (
+                            <FormControl isRequired>
+                                <FormLabel htmlFor="email-input">
+                                    {formatMessage({
+                                        id: 'guestOrderLookup.verify.label.email',
+                                        defaultMessage: 'Your email address'
+                                    })}
+                                </FormLabel>
+                                <Input
+                                    id="email-input"
+                                    type="email"
+                                    autoComplete="email"
+                                    value={emailInput}
+                                    onChange={(e) => setEmailInput(e.target.value)}
+                                    isDisabled={isSubmitting}
+                                    placeholder="you@example.com"
+                                />
+                            </FormControl>
                         )}
 
                         <FormControl isInvalid={!!serverError}>
@@ -252,7 +297,7 @@ const GuestOrderLookupVerify = () => {
                             type="submit"
                             colorScheme="blue"
                             isLoading={isSubmitting}
-                            isDisabled={!isComplete || isSubmitting}
+                            isDisabled={!isComplete || isSubmitting || (needsEmailInput && !emailInput)}
                             width="full"
                             size="lg"
                         >
