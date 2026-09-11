@@ -11,7 +11,68 @@ All emails are rendered from ISML templates in `cartridge/templates/default/emai
 
 ## Installation
 
-### 1. Upload the cartridge
+### Prerequisites
+
+You need the hostname, a valid Business Manager username/password (or client credentials), and the name of the target code version for your B2C instance.
+
+---
+
+### Option A — `sfcc-ci` CLI (recommended for CI/CD)
+
+Install the CLI once:
+
+```bash
+npm install -g sfcc-ci
+```
+
+#### 1. Package and upload the cartridge
+
+```bash
+# From the repo root — zip just the cartridge directory
+cd packages/template-retail-react-app/cartridges
+zip -r app_pwakit_base.zip app_pwakit_base/
+
+# Upload to the target code version
+sfcc-ci code:deploy \
+  --hostname <instance>.sandbox.us01.dx.commercecloud.salesforce.com \
+  --code-version <version> \
+  app_pwakit_base.zip
+```
+
+#### 2. Import Organization Preferences
+
+```bash
+sfcc-ci site:import \
+  --hostname <instance>.sandbox.us01.dx.commercecloud.salesforce.com \
+  --archive-path packages/template-retail-react-app/cartridges/app_pwakit_base/staticfiles/cartridge/impex/default/meta/system-objecttype-extensions/OrganizationPreferences.xml
+```
+
+#### 3. Add to cartridge path
+
+```bash
+sfcc-ci cartridge:add \
+  --hostname <instance>.sandbox.us01.dx.commercecloud.salesforce.com \
+  --cartridge app_pwakit_base \
+  --position before \
+  --target-cartridge app_storefront_base \
+  --site-id <siteId>
+```
+
+#### 4. Activate the code version
+
+```bash
+sfcc-ci code:activate \
+  --hostname <instance>.sandbox.us01.dx.commercecloud.salesforce.com \
+  --code-version <version>
+```
+
+SFCC only discovers hook registrations and Custom API endpoints at code version activation time — uploading to an already-active version is not sufficient.
+
+---
+
+### Option B — Manual WebDAV upload
+
+#### 1. Upload the cartridge
 
 Upload the `app_pwakit_base` directory to WebDAV:
 
@@ -19,7 +80,7 @@ Upload the `app_pwakit_base` directory to WebDAV:
 https://<instance>.demandware.net/on/demandware.servlet/webdav/Sites/Cartridges/<version>/app_pwakit_base/
 ```
 
-### 2. Add to cartridge path
+#### 2. Add to cartridge path
 
 In Business Manager: **Administration → Sites → Manage Sites → \<your site\> → Settings**
 
@@ -29,13 +90,13 @@ Add `app_pwakit_base` to the beginning of the cartridge path, before `app_storef
 app_pwakit_base:app_storefront_base:...
 ```
 
-### 3. Activate the code version
+#### 3. Activate the code version
 
 In Business Manager: **Administration → Code Deployment**
 
-Deactivate and reactivate the code version. SFCC only discovers hook registrations and Custom API endpoints at code version activation time — uploading to an already-active version is not sufficient.
+Deactivate and reactivate the code version.
 
-### 4. Import Organization Preferences
+#### 4. Import Organization Preferences
 
 In Business Manager: **Administration → Site Development → Import & Export**
 
@@ -45,6 +106,22 @@ staticfiles/cartridge/impex/default/meta/system-objecttype-extensions/Organizati
 ```
 
 This registers the `pwakitNotifyEnabled` and `pwakitStorefrontHosts` preferences under **Administration → Global Preferences → Custom Preferences → PWA Kit**.
+
+---
+
+### Verifying the deployment with Claude Code
+
+If you have the [B2C DX MCP plugin](https://github.com/SalesforceCommerceCloud/b2c-dx-mcp) configured in your Claude Code session, you can verify that the Custom REST API and hook are active after code version activation:
+
+```
+Check that the pwakit-notify Custom REST API is registered on <instance>
+```
+
+```
+Check that the sfcc.app.order.sendOrderAccessCode hook is active on <instance>
+```
+
+The plugin can also tail `pwakit-notify` log output in real time while you trigger a GLO or passwordless flow, making it easier to diagnose misconfigured preferences or template errors.
 
 ## Configuration
 
