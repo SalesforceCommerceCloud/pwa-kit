@@ -70,8 +70,18 @@ import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/us
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
 
-import {PageDesignerProvider} from '@salesforce/commerce-sdk-react/page-designer'
+import {PageDesignerProvider, useRouteEmitter} from '@salesforce/commerce-sdk-react/page-designer'
 import PageDesignerInit from '@salesforce/retail-react-app/app/components/page-designer-init'
+
+const RouteEmitter = () => {
+    const {pathname, search, hash} = useLocation()
+    const url =
+        typeof window !== 'undefined'
+            ? `${window.location.origin}${pathname}${search || ''}${hash || ''}`
+            : `${pathname}${search || ''}${hash || ''}`
+    useRouteEmitter(url)
+    return null
+}
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -156,7 +166,7 @@ const App = (props) => {
     })
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
-    const {usid} = useUsid()
+    const {usid, getUsidForPreview} = useUsid()
     const appOrigin = useAppOrigin()
     const activeData = useActiveData()
     const history = useHistory()
@@ -179,10 +189,39 @@ const App = (props) => {
     // Determine Page Designer mode from URL - use req for server-side detection
     const pageDesignerMode = useMemo(() => {
         const queryParams = location?.search || ''
-        if (queryParams.includes('mode=EDIT')) return 'EDIT'
-        else if (queryParams.includes('mode=PREVIEW')) return 'PREVIEW'
+        const mode = new URLSearchParams(queryParams).get('mode')
+        if (mode === 'EDIT') return 'EDIT'
+        if (mode === 'PREVIEW') return 'PREVIEW'
         return undefined
     }, [req?.url])
+
+    // When Page Designer mode is active, the runtime opens a postMessage channel to
+    // Business Manager and includes `usid` in the `ClientInitialized` handshake. BM
+    // keeps the iframe pinned to the edit URL until it sees a non-null `usid`, so we
+    // must resolve one before mounting `PageDesignerProvider`. `useUsid()` returns
+    // the cookie value synchronously (null on first render — see useUsid.ts note),
+    // and does NOT re-render when the cookie is populated. `getUsidForPreview()`
+    // resolves once SLAS auth has run, so we `await` it and stash the result.
+    const [resolvedUsid, setResolvedUsid] = useState(usid || null)
+    const previewGateActive = Boolean(pageDesignerMode)
+
+    useEffect(() => {
+        if (!previewGateActive) return
+        if (resolvedUsid) return
+        let cancelled = false
+        getUsidForPreview()
+            .then((value) => {
+                if (!cancelled && value) setResolvedUsid(value)
+            })
+            .catch(() => {
+                // getUsidForPreview owns its own retry/logging; on terminal failure
+                // we leave resolvedUsid null and the PageDesignerProvider unmounted,
+                // which is the safe default (BM keeps the iframe on the edit URL).
+            })
+        return () => {
+            cancelled = true
+        }
+    }, [previewGateActive, resolvedUsid, getUsidForPreview])
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -487,15 +526,24 @@ const App = (props) => {
                                             flex="1"
                                         >
                                             <OfflineBoundary isOnline={false}>
-                                                <PageDesignerProvider
-                                                    clientId="pwa-kit-client"
-                                                    targetOrigin="*"
-                                                    usid={usid}
-                                                    mode={pageDesignerMode}
-                                                >
-                                                    <PageDesignerInit />
-                                                    {children}
-                                                </PageDesignerProvider>
+                                                {previewGateActive && !resolvedUsid ? (
+                                                    // Wait for SLAS to hand back a usid before
+                                                    // mounting the provider — BM keeps the iframe
+                                                    // on the edit URL until ClientInitialized
+                                                    // carries a non-null usid.
+                                                    children
+                                                ) : (
+                                                    <PageDesignerProvider
+                                                        clientId="pwa-kit-client"
+                                                        targetOrigin="*"
+                                                        usid={resolvedUsid || usid}
+                                                        mode={pageDesignerMode}
+                                                    >
+                                                        <PageDesignerInit />
+                                                        <RouteEmitter />
+                                                        {children}
+                                                    </PageDesignerProvider>
+                                                )}
                                             </OfflineBoundary>
                                         </Box>
                                     </SkipNavContent>
