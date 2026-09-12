@@ -99,16 +99,30 @@ describe('buildSanitizedReferrer', () => {
         ).toBe('')
     })
 
-    test('keeps origin + path for an external referrer with no attribution params', () => {
+    test('keeps origin only (drops the path) for an external referrer with no attribution params', () => {
         expect(buildSanitizedReferrer('https://blog.com/post', 'shop.example.com')).toBe(
-            'https://blog.com/post'
+            'https://blog.com'
         )
     })
 
-    test('keeps only the allowlisted attribution params from the referrer', () => {
+    test('drops the path even when it carries identifiers or secrets', () => {
+        // A URL path is arbitrary external input: it can carry a reset token, order id,
+        // username, etc. Only the origin (+ allowlisted params) is retained.
+        expect(
+            buildSanitizedReferrer(
+                'https://blog.com/reset-password/secret-token?utm_source=news',
+                'shop.example.com'
+            )
+        ).toBe('https://blog.com?utm_source=news')
+        expect(
+            buildSanitizedReferrer('https://blog.com/users/shopper@example.com', 'shop.example.com')
+        ).toBe('https://blog.com')
+    })
+
+    test('keeps only the allowlisted attribution params from the referrer (path dropped)', () => {
         const referrer = 'https://blog.com/post?utm_source=news&freeText=secret&fbclid=xyz'
         expect(buildSanitizedReferrer(referrer, 'shop.example.com')).toBe(
-            'https://blog.com/post?utm_source=news&fbclid=xyz'
+            'https://blog.com?utm_source=news&fbclid=xyz'
         )
     })
 
@@ -118,7 +132,7 @@ describe('buildSanitizedReferrer', () => {
                 'https://blog.com/post?utm_source=news#section',
                 'shop.example.com'
             )
-        ).toBe('https://blog.com/post?utm_source=news')
+        ).toBe('https://blog.com?utm_source=news')
     })
 
     test('drops credentials (userinfo) from the referrer', () => {
@@ -127,12 +141,12 @@ describe('buildSanitizedReferrer', () => {
                 'https://user:pass@blog.com/post?utm_source=news',
                 'shop.example.com'
             )
-        ).toBe('https://blog.com/post?utm_source=news')
+        ).toBe('https://blog.com?utm_source=news')
     })
 
-    test('preserves the port on the origin', () => {
+    test('preserves the port on the origin (path still dropped)', () => {
         expect(buildSanitizedReferrer('https://blog.com:8443/post', 'shop.example.com')).toBe(
-            'https://blog.com:8443/post'
+            'https://blog.com:8443'
         )
     })
 })
@@ -145,7 +159,7 @@ describe('buildAttributionValue', () => {
             requestHostname: 'shop.example.com'
         })
         expect(value).toBe(
-            'utm_source=google&utm_medium=cpc&gclid=abc123&ref=https%3A%2F%2Fblog.com%2Fpost%3Futm_source%3Dnews'
+            'utm_source=google&utm_medium=cpc&gclid=abc123&ref=https%3A%2F%2Fblog.com%3Futm_source%3Dnews'
         )
     })
 
@@ -169,7 +183,7 @@ describe('buildAttributionValue', () => {
             referer: 'https://blog.com/post?utm_source=news',
             requestHostname: 'shop.example.com'
         })
-        expect(value).toBe('ref=https%3A%2F%2Fblog.com%2Fpost%3Futm_source%3Dnews')
+        expect(value).toBe('ref=https%3A%2F%2Fblog.com%3Futm_source%3Dnews')
     })
 
     test('captures fbclid and msclkid from the landing URL (where paid social/Bing put them)', () => {
@@ -205,10 +219,12 @@ describe('buildAttributionValue', () => {
     })
 
     test('drops ref first when the value exceeds the length cap', () => {
-        const longRefPath = '/'.padEnd(MAX_ATTRIBUTION_COOKIE_VALUE_LENGTH + 100, 'a')
+        // The path is dropped, so an over-long ref can only come from an allowlisted
+        // referrer param (kept verbatim). ref is dropped before the landing params.
+        const longVal = 'a'.repeat(MAX_ATTRIBUTION_COOKIE_VALUE_LENGTH + 100)
         const value = buildAttributionValue({
             query: {utm_source: 'google'},
-            referer: `https://blog.com${longRefPath}`,
+            referer: `https://blog.com?utm_content=${longVal}`,
             requestHostname: 'shop.example.com'
         })
         expect(value).toBe('utm_source=google')
@@ -298,7 +314,7 @@ describe('createAttributionCookieMiddleware', () => {
         expect(header).toBe('Set-Cookie')
         // Value is the agreed contract string, stored verbatim.
         expect(cookie).toContain(
-            'dw_attribution=utm_source=google&utm_medium=cpc&gclid=abc123&ref=https%3A%2F%2Fblog.com%2Fpost%3Futm_source%3Dnews'
+            'dw_attribution=utm_source=google&utm_medium=cpc&gclid=abc123&ref=https%3A%2F%2Fblog.com%3Futm_source%3Dnews'
         )
         expect(cookie).toContain('Path=/')
         expect(cookie).toContain(`Max-Age=${ATTRIBUTION_COOKIE_MAX_AGE_SECONDS}`)
@@ -369,7 +385,7 @@ describe('createAttributionCookieMiddleware', () => {
         expect(next).toHaveBeenCalledTimes(1)
     })
 
-    test('honours Do Not Track (dw_dnt=1)', () => {
+    test('honours Do Not Track (dw_dnt=1): no write, nothing to expire', () => {
         const req = makeReq({
             query: {utm_source: 'google'},
             headers: {cookie: 'dw_dnt=1'}
@@ -382,6 +398,68 @@ describe('createAttributionCookieMiddleware', () => {
         expect(res.append).not.toHaveBeenCalled()
         expect(res.getHeader('Cache-Control')).toBeUndefined()
         expect(next).toHaveBeenCalledTimes(1)
+    })
+
+    test('expires an existing attribution cookie when the shopper has opted out (dw_dnt=1)', () => {
+        // A first-touch cookie captured before opt-out must not keep riding along on
+        // orders. The cookie is HttpOnly, so only the server can clear it — emit a
+        // deletion (past Expires; note cookieAsString drops a falsy Max-Age=0).
+        const req = makeReq({
+            query: {utm_source: 'google'},
+            headers: {cookie: 'dw_dnt=1; dw_attribution=utm_source=old'}
+        })
+        const res = makeRes()
+        const next = jest.fn()
+
+        createAttributionCookieMiddleware({cookieDomain: '.example.com'})(req, res, next)
+
+        expect(res.append).toHaveBeenCalledTimes(1)
+        const [header, cookie] = res.append.mock.calls[0]
+        expect(header).toBe('Set-Cookie')
+        expect(cookie).toContain('dw_attribution=;') // empty value => deletion
+        expect(cookie).toMatch(/Expires=.*1970/) // in the past
+        expect(cookie).not.toContain('Max-Age') // falsy maxAge is not emitted
+        expect(cookie).toContain('Domain=.example.com') // must match the original write
+        // Deleting a cookie is still a Set-Cookie => response must not be shared-cached.
+        expect(res.getHeader('Cache-Control')).toBe('no-store')
+        expect(next).toHaveBeenCalledTimes(1)
+    })
+
+    test('still writes when the DNT cookie is absent (optimistic first-touch default)', () => {
+        // Consent is recorded client-side only AFTER the landing request, by which point
+        // the campaign params are gone from the URL. Requiring an explicit dw_dnt=0 would
+        // therefore never capture first touch, so an absent DNT cookie permits the write;
+        // an explicit opt-out (dw_dnt=1) is still honored (and expires any prior cookie).
+        const req = makeReq({query: {utm_source: 'google'}}) // no dw_dnt cookie
+        const res = makeRes()
+        const next = jest.fn()
+
+        createAttributionCookieMiddleware()(req, res, next)
+
+        expect(res.append).toHaveBeenCalledTimes(1)
+        expect(res.append.mock.calls[0][1]).toContain('dw_attribution=utm_source=google')
+        expect(res.getHeader('Cache-Control')).toBe('no-store')
+        expect(next).toHaveBeenCalledTimes(1)
+    })
+
+    test('ignores an invalid cookieDomain and falls back to a host-scoped cookie (warns once)', () => {
+        const logger = {warn: jest.fn()}
+        // Wildcards and separators are rejected by the runtime's shared validation; a
+        // stray `;` could otherwise be read as an extra cookie attribute.
+        const middleware = createAttributionCookieMiddleware({
+            cookieDomain: '*.evil.com; Path=/',
+            logger
+        })
+        // Validation runs once, at construction — not per request.
+        expect(logger.warn).toHaveBeenCalledTimes(1)
+
+        const req = makeReq({query: {utm_source: 'google'}})
+        const res = makeRes()
+        middleware(req, res, jest.fn())
+
+        const cookie = res.append.mock.calls[0][1]
+        expect(cookie).toContain('dw_attribution=utm_source=google')
+        expect(cookie).not.toContain('Domain=') // host-scoped fallback
     })
 
     test('leaves ordinary (non-campaign) traffic untouched and cacheable', () => {
@@ -405,7 +483,7 @@ describe('createAttributionCookieMiddleware', () => {
         createAttributionCookieMiddleware()(req, res, jest.fn())
 
         expect(res.append.mock.calls[0][1]).toContain(
-            'dw_attribution=ref=https%3A%2F%2Fblog.com%2Fpost%3Futm_source%3Dnews'
+            'dw_attribution=ref=https%3A%2F%2Fblog.com%3Futm_source%3Dnews'
         )
     })
 

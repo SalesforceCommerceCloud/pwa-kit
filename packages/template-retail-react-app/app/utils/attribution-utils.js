@@ -24,12 +24,14 @@
  * The cookie value is an allowlist only, sanitized at write time, so no raw URLs
  * or PII (emails/tokens that can appear in free-text query params) are ever stored.
  * It is percent-encoded `key=value` pairs joined with `&`, e.g.
- *   utm_source=google&utm_medium=cpc&gclid=abc123&ref=https%3A%2F%2Fblog.com%2Fpost%3Futm_source%3Dnews
- * which ECOM URL-decodes on read to `ref = https://blog.com/post?utm_source=news`
- * and emits as `sessionReferrer`.
+ *   utm_source=google&utm_medium=cpc&gclid=abc123&ref=https%3A%2F%2Fblog.com%3Futm_source%3Dnews
+ * which ECOM URL-decodes on read to `ref = https://blog.com?utm_source=news`
+ * and emits as `sessionReferrer`. The referrer is reduced to its origin (the path
+ * is dropped) so a URL path cannot leak PII into the cookie.
  */
 
 import {cookieAsString} from '@salesforce/pwa-kit-runtime/utils/ssr-proxying'
+import {INVALID_COOKIE_DOMAIN_PATTERN} from '@salesforce/pwa-kit-runtime/ssr/server/cookie-domain'
 
 export const ATTRIBUTION_COOKIE_NAME = 'dw_attribution'
 
@@ -107,10 +109,11 @@ export function getCookie(req, name) {
 /**
  * Build the sanitized `ref` component from the incoming `Referer` header.
  *
- * Keeps the referrer's origin + path and its own allowlisted attribution params.
- * Drops the referrer's free-text query params, fragment, and any credentials
- * (userinfo), so PII cannot leak into the cookie. Same-origin referrers are
- * dropped — they are internal navigation, not attribution.
+ * Keeps the referrer's origin and its own allowlisted attribution params. Drops
+ * the referrer's path, free-text query params, fragment, and any credentials
+ * (userinfo), so PII cannot leak into the cookie — a URL path routinely carries
+ * usernames, order IDs, or search terms. Same-origin referrers are dropped — they
+ * are internal navigation, not attribution.
  *
  * @param {string|undefined} refererHeader raw `Referer` header value
  * @param {string|undefined} requestHostname hostname of the current request (`req.hostname`)
@@ -142,8 +145,8 @@ export function buildSanitizedReferrer(refererHeader, requestHostname) {
     const qs = refParams.toString()
 
     // `url.origin` is protocol + host (+ port) only — it excludes any
-    // `user:password@` credentials, and we deliberately omit `url.hash`.
-    return `${url.origin}${url.pathname}${qs ? `?${qs}` : ''}`
+    // `user:password@` credentials, the path, and (deliberately) `url.hash`.
+    return `${url.origin}${qs ? `?${qs}` : ''}`
 }
 
 /**
@@ -205,8 +208,11 @@ export function buildAttributionValue({query = {}, referer, requestHostname} = {
  *    by `MRT_ALLOW_COOKIES` remotely / `localAllowCookies` locally). When cookies are
  *    disabled the runtime silently discards `Set-Cookie`, so writing one — and, worse,
  *    forcing `Cache-Control: no-store` — would only cost us caching with no benefit.
+ *  - Honours Do Not Track (`dw_dnt` = `1`): never writes while opted out, and
+ *    proactively expires any existing `dw_attribution` cookie so a first-touch value
+ *    captured before the shopper opted out is not forwarded on a later order (the
+ *    cookie is HttpOnly, so the client cannot clear it itself).
  *  - Write-once (first touch wins): skips when the cookie is already present.
- *  - Honours Do Not Track: skips when the `dw_dnt` cookie is `1`.
  *  - Skips when there is nothing to attribute, so ordinary (non-campaign) traffic is
  *    left untouched and fully cacheable.
  *  - When it does write, it forces `Cache-Control: no-store` at header-flush time
@@ -219,7 +225,8 @@ export function buildAttributionValue({query = {}, referer, requestHostname} = {
  *
  * @param {object} [options]
  * @param {string} [options.cookieDomain] value for the cookie's `Domain` attribute
- *   (from `config.app.commerceAPI.cookieDomain`); when unset the cookie is host-scoped
+ *   (from `config.app.commerceAPI.cookieDomain`); when unset — or when it contains
+ *   characters the browser rejects (wildcards, separators) — the cookie is host-scoped
  * @param {{warn: Function}} [options.logger] logger for the fail-open path; defaults to `console`
  * @returns {import('express').RequestHandler}
  */
@@ -251,17 +258,55 @@ function forceNoStore(res) {
 }
 
 export function createAttributionCookieMiddleware({cookieDomain, logger = console} = {}) {
+    // Validate the configured Domain once, up front (it is per-deploy config, not
+    // per-request), reusing the runtime's shared pattern. An invalid value — a wildcard
+    // or a stray `,`/`;`/`=`/whitespace, which a browser rejects and where a `;` could
+    // even be read as an extra cookie attribute — falls back to a host-scoped cookie.
+    let validatedCookieDomain = cookieDomain || undefined
+    if (validatedCookieDomain && INVALID_COOKIE_DOMAIN_PATTERN.test(validatedCookieDomain)) {
+        logger?.warn?.(
+            `dw_attribution: ignoring invalid cookieDomain "${validatedCookieDomain}"; ` +
+                'cookie domains must not contain wildcards or special characters ' +
+                '(e.g. ".example.com"). Falling back to a host-scoped cookie.'
+        )
+        validatedCookieDomain = undefined
+    }
+
     return function attributionCookieMiddleware(req, res, next) {
         try {
             // The runtime discards Set-Cookie unless cookies are allowed for this
             // deployment; do nothing (and don't disturb caching) when they are not.
             if (!req?.app?.options?.allowCookies) return next()
 
+            // Do Not Track: never write attribution while opted out. If a first-touch
+            // cookie was captured earlier (before the shopper opted out), proactively
+            // expire it here — it is HttpOnly, so the client cannot clear it itself, and
+            // we must not keep forwarding it on a later order. Checked before write-once
+            // so the expiry path is reached even when a cookie already exists.
+            if (getCookie(req, DNT_COOKIE_NAME) === '1') {
+                if (getCookie(req, ATTRIBUTION_COOKIE_NAME) != null) {
+                    const expired = cookieAsString({
+                        name: ATTRIBUTION_COOKIE_NAME,
+                        value: '',
+                        path: '/',
+                        // cookieAsString skips a falsy maxAge (`if (cookie.maxAge)`), so a
+                        // past `expires` is the only way to emit a deletion; Domain/Path
+                        // must match the original write for the browser to drop it.
+                        expires: new Date(0),
+                        domain: validatedCookieDomain || undefined,
+                        secure: true,
+                        httpOnly: true,
+                        sameSite: 'Lax'
+                    })
+                    // A Set-Cookie (even a deletion) must not be shared-cached.
+                    forceNoStore(res)
+                    res.append('Set-Cookie', expired)
+                }
+                return next()
+            }
+
             // First touch wins — never overwrite an existing attribution cookie.
             if (getCookie(req, ATTRIBUTION_COOKIE_NAME) != null) return next()
-
-            // Respect Do Not Track.
-            if (getCookie(req, DNT_COOKIE_NAME) === '1') return next()
 
             const referer =
                 (typeof req.get === 'function' ? req.get('referer') : undefined) ||
@@ -283,7 +328,7 @@ export function createAttributionCookieMiddleware({cookieDomain, logger = consol
                 value,
                 path: '/',
                 maxAge: ATTRIBUTION_COOKIE_MAX_AGE_SECONDS,
-                domain: cookieDomain || undefined,
+                domain: validatedCookieDomain || undefined,
                 secure: true,
                 httpOnly: true,
                 sameSite: 'Lax'

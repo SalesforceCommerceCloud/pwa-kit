@@ -16,10 +16,21 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 import {registerTokenBridgeRoute} from '@salesforce/retail-react-app/app/components/shopper-agent/token-bridge.js'
+import {createAttributionCookieMiddleware} from '@salesforce/retail-react-app/app/utils/attribution-utils.js'
 import {ShopperOrders} from 'commerce-sdk-isomorphic'
 
 const config = getConfig()
+
+// First-touch marketing-attribution cookie (`dw_attribution`, W-23493129). Writes a
+// sanitized, allowlist-only campaign cookie on SSR so CIP can attribute placed orders
+// back to the campaign that drove the visit. No-op unless the deployment allows cookies
+// (`MRT_ALLOW_COOKIES=true` remotely / `localAllowCookies: true` locally).
+const attributionCookieMiddleware = createAttributionCookieMiddleware({
+    cookieDomain: config?.app?.commerceAPI?.cookieDomain,
+    logger
+})
 
 // Guest order access helpers
 function getSiteIdFromRequest(req) {
@@ -947,7 +958,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
     })
 
-    app.get('*', runtime.render)
+    app.get('*', attributionCookieMiddleware, runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
