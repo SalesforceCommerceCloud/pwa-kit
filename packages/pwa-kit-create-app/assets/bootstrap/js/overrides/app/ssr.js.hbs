@@ -261,14 +261,22 @@ async function getNotifyToken(apiParams) {
         proxy,
         throwOnBadResponse: true
     })
-    const tokenResponse = await helpers.loginGuestUser({
-        slasClient,
-        parameters: {
-            redirectURI: `${getAppOrigin()}/callback`
-        }
-    })
+    // Private client: single round-trip via client_credentials grant.
+    // Public client: PKCE guest flow — loginGuestUser handles authorize + code exchange
+    // server-side; no browser needed, redirectURI just needs to be a registered value.
+    const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
+    const tokenResponse = clientSecret
+        ? await helpers.loginGuestUserPrivate({
+              slasClient,
+              parameters: {},
+              credentials: {clientSecret}
+          })
+        : await helpers.loginGuestUser({
+              slasClient,
+              parameters: {redirectURI: `${getAppOrigin()}/callback`}
+          })
     _notifyToken = tokenResponse.access_token
-    // Cache for 25 minutes — SLAS guest tokens last 30 min, 5 min buffer
+    // Cache for 25 min — SLAS guest tokens last 30 min, 5 min buffer
     _notifyTokenExpiry = Date.now() + 25 * 60 * 1000
     return _notifyToken
 }

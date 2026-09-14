@@ -105,35 +105,41 @@ The plugin can also tail `pwakit-notify` log output in real time while you trigg
 
 The `pwakit-notify` Custom REST API (passwordless login, OTP, password reset emails) is called by the PWA Kit SSR server using a **private SLAS client** token. The SSR server calls `loginGuestUserPrivate` with a client secret to mint a server-side guest token, then uses that token to call the Custom REST API endpoint. SCAPI enforces the `c_pwakit_notify` scope on that token before invoking the endpoint.
 
-**This is not the same as `enablePWAKitPrivateClient`.** That flag controls whether shoppers use a private client for their own auth flows. The `pwakit-notify` token is a separate server-side credential used only to call the notify endpoint. You can keep shoppers on the public client (`enablePWAKitPrivateClient=false`) and still configure `PWA_KIT_SLAS_CLIENT_SECRET` for notification delivery — the two are independent.
+**This is not the same as `enablePWAKitPrivateClient`.** That flag controls whether shoppers use a private client for their own auth flows. The `pwakit-notify` token is a separate server-side credential and the two are independent.
 
-The `commerce-sdk-isomorphic` public guest login (`loginGuestUser`) requires a `redirectURI` and is a browser PKCE flow — it cannot be used server-side. There is no public-client path for `pwakit-notify`.
+Both public and private SLAS client setups are supported:
+
+- **Public client** (`PWA_KIT_SLAS_CLIENT_SECRET` not set): the SSR server mints a guest token via the PKCE guest flow (`loginGuestUser`) using the existing public `clientId`. No secret required; the PKCE authorize + code exchange happens entirely server-side.
+- **Private client** (`PWA_KIT_SLAS_CLIENT_SECRET` set): uses `loginGuestUserPrivate` (client_credentials grant) — one fewer round-trip to SLAS on the first call. Prefer this if you already have a private client configured.
 
 > **GLO email is not affected** — the `sendOrderAccessCode` hook is invoked directly by SCAPI and does not use this token at all. If you only need GLO email, you can skip this section entirely.
 
-### 1. Create or identify a private SLAS client
+### 1. Add the scope to your SLAS client
 
-In [Account Manager](https://account.demandware.com) → **API Client**, find or create a client with **Token Endpoint Auth Method** set to `client_secret_post`. This can be the same client you use for `enablePWAKitPrivateClient`, or a dedicated one — either works.
+In [Account Manager](https://account.demandware.com) → **API Client**, find the client whose `clientId` matches `config/default.js` → `commerceAPI.parameters.clientId`.
 
 Under **Allowed Scopes**, add: `c_pwakit_notify`
 
-### 2. Set the client secret on the SSR server
+This applies to both public and private clients.
+
+### 2. (Private client only) Set the client secret on the SSR server
+
+If you are using a private client, set `PWA_KIT_SLAS_CLIENT_SECRET` on the MRT environment:
 
 ```bash
-# MRT managed runtime — set during push
 pwa-kit-dev push --set-env PWA_KIT_SLAS_CLIENT_SECRET=<your-client-secret> ...
 ```
 
-Or set it in the MRT Admin UI under **Environments → <env> → Environment Variables**.
+Or via the MRT Admin UI: **Environments → <env> → Environment Variables**.
 
-The `clientId` used is the one already in `config/default.js` → `commerceAPI.parameters.clientId`.
+If this variable is absent, the SSR server automatically falls back to the public PKCE guest flow.
 
 ### 3. Verify
 
 Trigger a passwordless login or password reset flow and confirm the email is delivered. If you see `401` errors in the `pwakit-notify` log, the most common causes are:
 
 - `c_pwakit_notify` not added to the API client's Allowed Scopes in Account Manager
-- `PWA_KIT_SLAS_CLIENT_SECRET` not set or mismatched on the MRT environment
+- `PWA_KIT_SLAS_CLIENT_SECRET` set but incorrect (private client path fails, public fallback not used because the variable is present)
 - Code version not yet activated after deploying the cartridge
 
 ---
