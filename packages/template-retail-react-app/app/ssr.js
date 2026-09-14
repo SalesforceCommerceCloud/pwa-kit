@@ -592,7 +592,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'www.gstatic.com',
                         '*.demandware.net', // Used to load a valid payment scripts in test environment
                         'maps.googleapis.com',
-                        'places.googleapis.com'
+                        'places.googleapis.com',
+                        "http://localhost:4173"
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
