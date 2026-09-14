@@ -27,6 +27,19 @@ jest.mock('../../page-designer/registry', () => ({
     initializeRegistry: jest.fn()
 }))
 
+const mockPageDesignerProviderSpy = jest.fn()
+jest.mock('@salesforce/commerce-sdk-react/page-designer', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react/page-designer')
+    return {
+        ...originalModule,
+        // eslint-disable-next-line react/prop-types
+        PageDesignerProvider: ({children, ...rest}) => {
+            mockPageDesignerProviderSpy({children, ...rest})
+            return <>{children}</>
+        }
+    }
+})
+
 let windowSpy
 
 const mockUpdateDnt = jest.fn()
@@ -39,12 +52,18 @@ const mockRegistry = {
     get: jest.fn()
 }
 
+const mockUseUsid = jest.fn(() => ({
+    usid: 'test-usid',
+    getUsidWhenReady: () => Promise.resolve('test-usid'),
+    getUsidForPreview: () => Promise.resolve('test-usid')
+}))
+
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
         useDNT: () => ({selectedDnt: undefined, updateDnt: mockUpdateDnt}),
-        useUsid: () => ({usid: 'test-usid', getUsidWhenReady: () => Promise.resolve('test-usid')}),
+        useUsid: (...args) => mockUseUsid(...args),
         useGlobalAnchorBlock: jest.fn(),
         registry: mockRegistry
     }
@@ -209,6 +228,126 @@ describe('App', () => {
         await waitFor(() => {
             expect(basket.currency).toBe('GBP')
             expect(basket.customerInfo.email).toBe(customerEmail)
+        })
+    })
+
+    describe('PageDesignerProvider preview gating (W-24089039)', () => {
+        const defaultTestUrl = 'https://www.domain.com/'
+
+        beforeEach(() => {
+            mockPageDesignerProviderSpy.mockClear()
+            global.jsdom.reconfigure({url: defaultTestUrl})
+        })
+
+        afterEach(() => {
+            global.jsdom.reconfigure({url: defaultTestUrl})
+            mockUseUsid.mockImplementation(() => ({
+                usid: 'test-usid',
+                getUsidWhenReady: () => Promise.resolve('test-usid'),
+                getUsidForPreview: () => Promise.resolve('test-usid')
+            }))
+        })
+
+        test('non-preview traffic mounts PageDesignerProvider without calling getUsidForPreview', async () => {
+            useMultiSite.mockImplementation(() => resultUseMultiSite)
+            const getUsidForPreview = jest.fn(() => Promise.resolve('later'))
+            mockUseUsid.mockImplementation(() => ({
+                usid: null,
+                getUsidWhenReady: () => Promise.resolve('later'),
+                getUsidForPreview
+            }))
+
+            renderWithProviders(
+                <App
+                    targetLocale={DEFAULT_LOCALE}
+                    defaultLocale={DEFAULT_LOCALE}
+                    messages={messages}
+                >
+                    <p>storefront body</p>
+                </App>
+            )
+
+            await waitFor(() => {
+                expect(screen.getByText('storefront body')).toBeInTheDocument()
+            })
+            expect(mockPageDesignerProviderSpy).toHaveBeenCalled()
+            expect(getUsidForPreview).not.toHaveBeenCalled()
+            const lastCall = mockPageDesignerProviderSpy.mock.calls.at(-1)[0]
+            expect(lastCall.mode).toBeUndefined()
+        })
+
+        test('preview traffic with usid null defers PageDesignerProvider mount until getUsidForPreview resolves', async () => {
+            useMultiSite.mockImplementation(() => resultUseMultiSite)
+            global.jsdom.reconfigure({url: 'https://www.domain.com/?mode=EDIT'})
+
+            let resolvePreviewUsid
+            const previewPromise = new Promise((resolve) => {
+                resolvePreviewUsid = resolve
+            })
+            const getUsidForPreview = jest.fn(() => previewPromise)
+            mockUseUsid.mockImplementation(() => ({
+                usid: null,
+                getUsidWhenReady: () => Promise.resolve('resolved-usid'),
+                getUsidForPreview
+            }))
+
+            renderWithProviders(
+                <App
+                    targetLocale={DEFAULT_LOCALE}
+                    defaultLocale={DEFAULT_LOCALE}
+                    messages={messages}
+                >
+                    <p>storefront body</p>
+                </App>
+            )
+
+            // While the async usid is unresolved the children still render (fallback branch),
+            // but PageDesignerProvider must NOT have been mounted yet.
+            await waitFor(() => {
+                expect(screen.getByText('storefront body')).toBeInTheDocument()
+            })
+            expect(getUsidForPreview).toHaveBeenCalled()
+            expect(mockPageDesignerProviderSpy).not.toHaveBeenCalled()
+
+            // Resolve the async usid — provider should now mount with the resolved value.
+            resolvePreviewUsid('resolved-usid')
+            await waitFor(() => {
+                expect(mockPageDesignerProviderSpy).toHaveBeenCalled()
+            })
+            const lastCall = mockPageDesignerProviderSpy.mock.calls.at(-1)[0]
+            expect(lastCall.mode).toBe('EDIT')
+            expect(lastCall.usid).toBe('resolved-usid')
+        })
+
+        test('preview traffic with a cookie-resident usid mounts PageDesignerProvider immediately with that usid', async () => {
+            useMultiSite.mockImplementation(() => resultUseMultiSite)
+            global.jsdom.reconfigure({url: 'https://www.domain.com/?mode=PREVIEW'})
+
+            const getUsidForPreview = jest.fn(() => Promise.resolve('should-not-be-used'))
+            mockUseUsid.mockImplementation(() => ({
+                usid: 'cookie-usid',
+                getUsidWhenReady: () => Promise.resolve('cookie-usid'),
+                getUsidForPreview
+            }))
+
+            renderWithProviders(
+                <App
+                    targetLocale={DEFAULT_LOCALE}
+                    defaultLocale={DEFAULT_LOCALE}
+                    messages={messages}
+                >
+                    <p>storefront body</p>
+                </App>
+            )
+
+            await waitFor(() => {
+                expect(screen.getByText('storefront body')).toBeInTheDocument()
+            })
+            expect(getUsidForPreview).not.toHaveBeenCalled()
+            expect(mockPageDesignerProviderSpy).toHaveBeenCalled()
+            const lastCall = mockPageDesignerProviderSpy.mock.calls.at(-1)[0]
+            expect(lastCall.mode).toBe('PREVIEW')
+            expect(lastCall.usid).toBe('cookie-usid')
         })
     })
 })

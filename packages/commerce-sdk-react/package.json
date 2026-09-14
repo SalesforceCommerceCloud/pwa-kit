@@ -22,10 +22,11 @@
     "!*.test*.{js,d.ts}",
     "!test*.*",
     "!+(jest|babel).config.js",
-    "!setup-jest.js"
+    "!setup-jest.js",
+    "vendored/**"
   ],
   "scripts": {
-    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly",
+    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly && node -e \"require('fs').cpSync('vendored','dist/vendored',{recursive:true})\"",
     "build:docs": "typedoc --plugin typedoc-plugin-missing-exports --hideGenerator",
     "build:watch": "nodemon --watch 'src/**' --ext 'tsx,ts' --exec  'npm run build'",
     "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\"",
@@ -40,7 +41,7 @@
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
-    "@salesforce/storefront-next-runtime": "0.4.2",
+    "@salesforce/storefront-next-runtime": "file:./vendored/salesforce-storefront-next-runtime-1.4.0-dev.tgz",
     "commerce-sdk-isomorphic": "5.5.0",
     "js-cookie": "^3.0.1",
     "jwt-decode": "^4.0.0"
