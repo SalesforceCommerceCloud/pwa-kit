@@ -2009,38 +2009,6 @@
       "value": "Estimated Delivery Date"
     }
   ],
-  "delivery_estimate.instructions.postal_code": [
-    {
-      "options": {
-        "GB": {
-          "value": [
-            {
-              "type": 0,
-              "value": "Enter your postcode (e.g. SW1A 1AA) to see delivery estimates."
-            }
-          ]
-        },
-        "US": {
-          "value": [
-            {
-              "type": 0,
-              "value": "Enter your ZIP code (e.g. 90210) to see delivery estimates."
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "Enter your postal code to see delivery estimates."
-            }
-          ]
-        }
-      },
-      "type": 5,
-      "value": "countryCode"
-    }
-  ],
   "delivery_estimate.label.postal_code": [
     {
       "options": {
@@ -2071,6 +2039,28 @@
       },
       "type": 5,
       "value": "countryCode"
+    }
+  ],
+  "delivery_estimate.link.view_all_shipping_options": [
+    {
+      "type": 0,
+      "value": "View All Shipping Options"
+    }
+  ],
+  "delivery_estimate.placeholder.postal_code": [
+    {
+      "type": 0,
+      "value": "Enter a postal code..."
+    }
+  ],
+  "delivery_estimate.status.estimated_arrival": [
+    {
+      "type": 0,
+      "value": "Estimated: "
+    },
+    {
+      "type": 1,
+      "value": "deliveryWindow"
     }
   ],
   "delivery_estimate.status.loading": [
@@ -4563,6 +4553,12 @@
       "value": "Update"
     }
   ],
+  "product_view.description.delivery_estimate": [
+    {
+      "type": 0,
+      "value": "Enter a postal code to get a delivery estimate"
+    }
+  ],
   "product_view.error.no_store_selected_for_pickup": [
     {
       "type": 0,
@@ -4604,19 +4600,19 @@
   "product_view.label.delivery": [
     {
       "type": 0,
-      "value": "Delivery:"
+      "value": "Delivery"
     }
   ],
-  "product_view.label.pickup_in_select_store_prefix": [
+  "product_view.label.fulfillment_method": [
     {
       "type": 0,
-      "value": "Pick up in"
+      "value": "Fulfillment method"
     }
   ],
   "product_view.label.pickup_in_store": [
     {
       "type": 0,
-      "value": "Pick Up in Store"
+      "value": "Free pickup in"
     }
   ],
   "product_view.label.quantity": [
@@ -4635,12 +4631,6 @@
     {
       "type": 0,
       "value": "+"
-    }
-  ],
-  "product_view.label.select_store_link": [
-    {
-      "type": 0,
-      "value": "Select Store"
     }
   ],
   "product_view.label.ship_to_address": [

@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
 import DeliveryEstimate from '@salesforce/retail-react-app/app/components/delivery-estimate'
@@ -68,6 +68,23 @@ const DeliveryEstimateVariantHarness = () => {
     )
 }
 
+const DeliveryEstimateResultContainerHarness = () => {
+    const [resultContainer, setResultContainer] = React.useState(null)
+
+    return (
+        <>
+            <div ref={setResultContainer} data-testid="delivery-estimate-result-container" />
+            <DeliveryEstimate
+                productId="sku-a"
+                siteId="site-1"
+                defaultCountryCode="US"
+                resultContainer={resultContainer}
+                showResultInCard={false}
+            />
+        </>
+    )
+}
+
 describe('DeliveryEstimate', () => {
     beforeEach(() => {
         window.localStorage.clear()
@@ -82,7 +99,7 @@ describe('DeliveryEstimate', () => {
 
     afterEach(() => jest.clearAllMocks())
 
-    test('submits a valid destination and displays the lowest-price estimate', async () => {
+    test('submits a valid destination and displays the slowest delivery window', async () => {
         const user = userEvent.setup()
         renderDeliveryEstimate()
 
@@ -103,23 +120,42 @@ describe('DeliveryEstimate', () => {
                 expect.objectContaining({enabled: true})
             )
         })
-        expect(await screen.findByText(/ground/i)).toBeInTheDocument()
+        expect(
+            await screen.findByText('Estimated: Sep 16, 2026 - Sep 18, 2026')
+        ).toBeInTheDocument()
+        expect(screen.queryByText(/ground/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/express/i)).not.toBeInTheDocument()
+        expect(screen.getByRole('link', {name: 'View All Shipping Options'})).toHaveAttribute(
+            'href',
+            '/uk/en-US/checkout'
+        )
+        expect(screen.getByRole('link', {name: 'View All Shipping Options'})).toHaveStyle(
+            'text-decoration: underline'
+        )
         expect(JSON.parse(window.localStorage.getItem('deliveryDestination_site-1'))).toEqual({
             countryCode: 'US',
             postalCode: '94105'
         })
     })
 
-    test('uses the localized postcode label and instructions for GB', () => {
+    test('uses the localized postcode label and Storefront Next placeholder for GB', () => {
         renderWithProviders(
             <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="GB" />
         )
 
         const input = screen.getByRole('textbox', {name: /postcode/i})
-        expect(input).toHaveAccessibleDescription(
-            'Enter your postcode (e.g. SW1A 1AA) to see delivery estimates.'
-        )
+        expect(input).toHaveAttribute('placeholder', 'Enter a postal code...')
+    })
+
+    test('renders the estimator as an accessible delivery section', () => {
+        renderDeliveryEstimate()
+
+        const section = screen.getByRole('region', {name: 'Estimated Delivery Date'})
+
+        expect(within(section).getByRole('textbox', {name: /zip code/i})).toBeInTheDocument()
+        expect(
+            within(section).getByRole('button', {name: /calculate delivery estimate/i})
+        ).toBeEnabled()
     })
 
     test('clears the previous estimate without persisting an invalid destination', async () => {
@@ -130,7 +166,9 @@ describe('DeliveryEstimate', () => {
         )
         renderDeliveryEstimate()
 
-        expect(await screen.findByText(/ground/i)).toBeInTheDocument()
+        expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(
+            /estimated:/i
+        )
         await user.clear(screen.getByRole('textbox', {name: /zip code/i}))
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
@@ -144,14 +182,14 @@ describe('DeliveryEstimate', () => {
                 expect.objectContaining({enabled: false})
             )
         })
-        expect(screen.queryByText(/ground/i)).not.toBeInTheDocument()
+        expect(screen.queryByTestId('delivery-estimate-result')).not.toBeInTheDocument()
         expect(JSON.parse(window.localStorage.getItem('deliveryDestination_site-1'))).toEqual({
             countryCode: 'US',
             postalCode: '94105'
         })
     })
 
-    test('announces and prevents duplicate submissions while calculating', async () => {
+    test('prevents duplicate submissions while calculating', async () => {
         window.localStorage.setItem(
             'deliveryDestination_site-1',
             JSON.stringify({countryCode: 'US', postalCode: '94105'})
@@ -166,7 +204,7 @@ describe('DeliveryEstimate', () => {
 
         const button = await screen.findByRole('button', {name: 'Calculating...'})
         expect(button).toBeDisabled()
-        expect(screen.getByRole('status')).toHaveTextContent('Calculating...')
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
     })
 
     test('uses the locale country code when restoring a saved postal code', async () => {
@@ -198,7 +236,20 @@ describe('DeliveryEstimate', () => {
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
-        expect(await screen.findByRole('status')).toHaveTextContent(/ground/i)
+        expect(await screen.findByRole('status')).toHaveTextContent(/estimated:/i)
+    })
+
+    test('renders a completed estimate in the supplied fulfillment option container', async () => {
+        const user = userEvent.setup()
+        renderWithProviders(<DeliveryEstimateResultContainerHarness />)
+
+        const calculator = screen.getByRole('region', {name: 'Estimated Delivery Date'})
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        const result = await screen.findByTestId('delivery-estimate-result')
+        expect(screen.getByTestId('delivery-estimate-result-container')).toContainElement(result)
+        expect(calculator).not.toContainElement(result)
     })
 
     test('displays an estimate when browser storage cannot persist the destination', async () => {
@@ -215,7 +266,9 @@ describe('DeliveryEstimate', () => {
             await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
             await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
-            expect(await screen.findByText(/ground/i)).toBeInTheDocument()
+            expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(
+                /estimated:/i
+            )
         } finally {
             Storage.prototype.setItem = originalSetItem
         }
@@ -227,11 +280,13 @@ describe('DeliveryEstimate', () => {
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
-        expect(await screen.findByText(/ground/i)).toBeInTheDocument()
+        expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(
+            /estimated:/i
+        )
 
         await user.click(screen.getByRole('button', {name: /select sku b/i}))
 
-        expect(screen.queryByText(/ground/i)).not.toBeInTheDocument()
+        expect(screen.queryByTestId('delivery-estimate-result')).not.toBeInTheDocument()
     })
 
     test('keeps a saved destination when the provider returns no eligible option', async () => {

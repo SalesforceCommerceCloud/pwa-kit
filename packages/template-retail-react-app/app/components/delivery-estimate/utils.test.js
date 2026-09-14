@@ -5,19 +5,19 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getPrimaryDeliveryEstimate} from '@salesforce/retail-react-app/app/components/delivery-estimate/utils'
+import {getSlowestDeliveryEstimate} from '@salesforce/retail-react-app/app/components/delivery-estimate/utils'
 
 const estimate = (productId, shippingOptions) => ({productId, shippingOptions})
 
-describe('getPrimaryDeliveryEstimate', () => {
-    test('chooses the lowest finite-priced option for the requested product', () => {
-        const result = getPrimaryDeliveryEstimate('sku-a', {
+describe('getSlowestDeliveryEstimate', () => {
+    test('chooses the option with the latest delivery-window start for the requested product', () => {
+        const result = getSlowestDeliveryEstimate('sku-a', {
             productDeliveryEstimates: [
                 estimate('sku-b', []),
                 estimate('sku-a', [
                     {
                         shippingMethodId: 'express',
-                        price: 12,
+                        price: 1,
                         deliveryWindow: {
                             startAt: '2026-09-15T14:00:00Z',
                             endAt: '2026-09-16T14:00:00Z'
@@ -25,7 +25,7 @@ describe('getPrimaryDeliveryEstimate', () => {
                     },
                     {
                         shippingMethodId: 'ground',
-                        price: 5,
+                        price: 99,
                         deliveryWindow: {
                             startAt: '2026-09-16T14:00:00Z',
                             endAt: '2026-09-18T14:00:00Z'
@@ -38,14 +38,14 @@ describe('getPrimaryDeliveryEstimate', () => {
         expect(result.shippingMethodId).toBe('ground')
     })
 
-    test('uses the earliest delivery end time when prices are unavailable', () => {
-        const result = getPrimaryDeliveryEstimate('sku-a', {
+    test('uses the latest delivery-window end time when start times match', () => {
+        const result = getSlowestDeliveryEstimate('sku-a', {
             productDeliveryEstimates: [
                 estimate('sku-a', [
                     {
                         shippingMethodId: 'ground',
                         deliveryWindow: {
-                            startAt: '2026-09-16T14:00:00Z',
+                            startAt: '2026-09-15T14:00:00Z',
                             endAt: '2026-09-18T14:00:00Z'
                         }
                     },
@@ -60,11 +60,11 @@ describe('getPrimaryDeliveryEstimate', () => {
             ]
         })
 
-        expect(result.shippingMethodId).toBe('express')
+        expect(result.shippingMethodId).toBe('ground')
     })
 
     test('ignores non-deliverable and malformed delivery windows', () => {
-        const result = getPrimaryDeliveryEstimate('sku-a', {
+        const result = getSlowestDeliveryEstimate('sku-a', {
             productDeliveryEstimates: [
                 estimate('sku-a', [
                     {

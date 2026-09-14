@@ -23,25 +23,23 @@ const isEligibleShippingOption = (shippingOption) => {
     )
 }
 
-const compareByDeliveryWindow = (first, second) => {
-    const endDifference = getTime(first.deliveryWindow.endAt) - getTime(second.deliveryWindow.endAt)
-    if (endDifference !== 0) return endDifference
-
+const compareBySlowestDeliveryWindow = (first, second) => {
     const startDifference =
-        getTime(first.deliveryWindow.startAt) - getTime(second.deliveryWindow.startAt)
+        getTime(second.deliveryWindow.startAt) - getTime(first.deliveryWindow.startAt)
     if (startDifference !== 0) return startDifference
+
+    const endDifference = getTime(second.deliveryWindow.endAt) - getTime(first.deliveryWindow.endAt)
+    if (endDifference !== 0) return endDifference
 
     return String(first.shippingMethodId || '').localeCompare(String(second.shippingMethodId || ''))
 }
 
 /**
- * Returns the primary eligible shipping option for the requested product.
- *
- * A priced option is always preferred. Among priced options, the lowest finite
- * price wins; delivery-window ordering makes ties deterministic. When every
- * eligible option has no price, the earliest delivery-window end wins.
+ * Returns the slowest eligible shipping option for the requested product.
+ * The PDP summary follows Storefront Next by selecting the latest window start,
+ * then the latest end time as a deterministic tie-breaker.
  */
-export const getPrimaryDeliveryEstimate = (productId, deliveryEstimates) => {
+export const getSlowestDeliveryEstimate = (productId, deliveryEstimates) => {
     const productEstimate = deliveryEstimates?.productDeliveryEstimates?.find(
         (estimate) => estimate.productId === productId
     )
@@ -49,15 +47,7 @@ export const getPrimaryDeliveryEstimate = (productId, deliveryEstimates) => {
 
     if (!eligibleOptions.length) return null
 
-    const pricedOptions = eligibleOptions.filter((option) => Number.isFinite(option.price))
-    if (!pricedOptions.length) {
-        return [...eligibleOptions].sort(compareByDeliveryWindow)[0]
-    }
-
-    return [...pricedOptions].sort((first, second) => {
-        const priceDifference = first.price - second.price
-        return priceDifference || compareByDeliveryWindow(first, second)
-    })[0]
+    return [...eligibleOptions].sort(compareBySlowestDeliveryWindow)[0]
 }
 
 export const normalizeDestination = (destination) => {
