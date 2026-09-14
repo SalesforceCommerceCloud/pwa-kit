@@ -9407,6 +9407,24 @@
       "value": "]"
     }
   ],
+  "product_view.action.change_delivery_destination": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈħȧȧƞɠḗḗ ḓḗḗŀīṽḗḗřẏ ḓḗḗşŧīƞȧȧŧīǿǿƞ ƒřǿǿḿ "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "product_view.button.add_bundle_to_cart": [
     {
       "type": 0,
@@ -9767,6 +9785,24 @@
     {
       "type": 1,
       "value": "storeName"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.text.delivery_to": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "ŧǿǿ "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
     },
     {
       "type": 0,

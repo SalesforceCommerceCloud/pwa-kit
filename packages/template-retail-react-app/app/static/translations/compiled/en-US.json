@@ -4511,6 +4511,16 @@
       "value": "Sale"
     }
   ],
+  "product_view.action.change_delivery_destination": [
+    {
+      "type": 0,
+      "value": "Change delivery destination from "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
   "product_view.button.add_bundle_to_cart": [
     {
       "type": 0,
@@ -4675,6 +4685,16 @@
     {
       "type": 1,
       "value": "storeName"
+    }
+  ],
+  "product_view.text.delivery_to": [
+    {
+      "type": 0,
+      "value": "to "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
     }
   ],
   "profile_card.info.profile_updated": [

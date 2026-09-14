@@ -221,12 +221,36 @@ const ProductView = forwardRef(
         const storeName = selectedStore?.name
         const inventoryId = selectedStore?.inventoryId
         const [deliveryEstimateResultContainer, setDeliveryEstimateResultContainer] = useState(null)
+        const [deliveryEstimateDestination, setDeliveryEstimateDestination] = useState(null)
+        const [isDeliveryEstimateOpen, setIsDeliveryEstimateOpen] = useState(true)
+        const [focusDeliveryEstimateInput, setFocusDeliveryEstimateInput] = useState(false)
+        const previousDeliveryEstimateProductId = useRef(null)
         const isDeliverySelected = !pickupInStore
         const isPickupDisabled = storeName && inventoryId && isSelectedStoreOutOfStock
         const {pdp: showExpressOnPDP} = useExpressCheckoutEnabled()
         const deliveryEstimateProductId =
             variant?.productId || (product?.type?.item ? product.id : null)
         const defaultCountryCode = locale?.id?.split('-')?.[1]
+
+        const hasResolvedDeliveryEstimate =
+            deliveryEstimateDestination?.productId === deliveryEstimateProductId
+
+        const handleResolvedDeliveryEstimate = useCallback(
+            (destination) => {
+                setDeliveryEstimateDestination({
+                    ...destination,
+                    productId: deliveryEstimateProductId
+                })
+                setIsDeliveryEstimateOpen(false)
+            },
+            [deliveryEstimateProductId]
+        )
+
+        const handleChangeDeliveryEstimateDestination = useCallback(() => {
+            setDeliveryEstimateDestination(null)
+            setIsDeliveryEstimateOpen(true)
+            setFocusDeliveryEstimateInput(true)
+        }, [])
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -581,6 +605,18 @@ const ProductView = forwardRef(
             }
         }, [pickupInStore, isSelectedStoreOutOfStock, selectedStore])
 
+        useEffect(() => {
+            if (
+                previousDeliveryEstimateProductId.current &&
+                previousDeliveryEstimateProductId.current !== deliveryEstimateProductId
+            ) {
+                setDeliveryEstimateDestination(null)
+                setIsDeliveryEstimateOpen(true)
+                setFocusDeliveryEstimateInput(false)
+            }
+            previousDeliveryEstimateProductId.current = deliveryEstimateProductId
+        }, [deliveryEstimateProductId])
+
         const handleDeliveryOptionChange = (value) => {
             if (value === DELIVERY_OPTIONS.PICKUP && !inventoryId) {
                 onOpenStoreLocator()
@@ -885,27 +921,73 @@ const ProductView = forwardRef(
                                                         data-testid="delivery-fulfillment-option"
                                                         data-selected={isDeliverySelected}
                                                     >
-                                                        <Radio
-                                                            value={DELIVERY_OPTIONS.DELIVERY}
-                                                            isDisabled={disableButton}
-                                                            aria-describedby="delivery-estimate-description"
-                                                        >
-                                                            <FormattedMessage
-                                                                defaultMessage="Delivery"
-                                                                id="product_view.label.delivery"
-                                                            />
-                                                        </Radio>
-                                                        <Text
-                                                            id="delivery-estimate-description"
-                                                            fontSize="sm"
-                                                            color="gray.600"
-                                                            mt={2}
-                                                        >
-                                                            <FormattedMessage
-                                                                defaultMessage="Enter a postal code to get a delivery estimate"
-                                                                id="product_view.description.delivery_estimate"
-                                                            />
-                                                        </Text>
+                                                        <Flex align="center" gap={2}>
+                                                            <Radio
+                                                                value={DELIVERY_OPTIONS.DELIVERY}
+                                                                isDisabled={disableButton}
+                                                                aria-describedby={
+                                                                    hasResolvedDeliveryEstimate
+                                                                        ? undefined
+                                                                        : 'delivery-estimate-description'
+                                                                }
+                                                            >
+                                                                <FormattedMessage
+                                                                    defaultMessage="Delivery"
+                                                                    id="product_view.label.delivery"
+                                                                />
+                                                            </Radio>
+                                                            {hasResolvedDeliveryEstimate && (
+                                                                <Text as="span" fontWeight={500}>
+                                                                    <FormattedMessage
+                                                                        defaultMessage="to {postalCode}"
+                                                                        id="product_view.text.delivery_to"
+                                                                        values={{
+                                                                            postalCode: (
+                                                                                <Button
+                                                                                    type="button"
+                                                                                    variant="link"
+                                                                                    color="blue.600"
+                                                                                    fontWeight="inherit"
+                                                                                    minWidth="auto"
+                                                                                    textDecoration="underline"
+                                                                                    onClick={
+                                                                                        handleChangeDeliveryEstimateDestination
+                                                                                    }
+                                                                                    aria-label={intl.formatMessage(
+                                                                                        {
+                                                                                            id: 'product_view.action.change_delivery_destination',
+                                                                                            defaultMessage:
+                                                                                                'Change delivery destination from {postalCode}'
+                                                                                        },
+                                                                                        {
+                                                                                            postalCode:
+                                                                                                deliveryEstimateDestination.postalCode
+                                                                                        }
+                                                                                    )}
+                                                                                >
+                                                                                    {
+                                                                                        deliveryEstimateDestination.postalCode
+                                                                                    }
+                                                                                </Button>
+                                                                            )
+                                                                        }}
+                                                                    />
+                                                                </Text>
+                                                            )}
+                                                        </Flex>
+                                                        {!hasResolvedDeliveryEstimate && (
+                                                            <Text
+                                                                id="delivery-estimate-description"
+                                                                fontSize="sm"
+                                                                color="gray.600"
+                                                                mt={2}
+                                                            >
+                                                                <FormattedMessage
+                                                                    defaultMessage="Enter a postal code to get a delivery estimate"
+                                                                    id="product_view.description.delivery_estimate"
+                                                                />
+                                                            </Text>
+                                                        )}
                                                         <Box
                                                             ref={setDeliveryEstimateResultContainer}
                                                             data-testid="delivery-estimate-result-container"
@@ -1022,6 +1104,19 @@ const ProductView = forwardRef(
                                                 : null
                                         }
                                         showResultInCard={!showDeliveryOptions}
+                                        showCalculator={
+                                            !showDeliveryOptions || isDeliveryEstimateOpen
+                                        }
+                                        showResult={!showDeliveryOptions || !isDeliveryEstimateOpen}
+                                        onResolvedDestination={
+                                            showDeliveryOptions
+                                                ? handleResolvedDeliveryEstimate
+                                                : undefined
+                                        }
+                                        focusPostalCode={focusDeliveryEstimateInput}
+                                        onPostalCodeFocusHandled={() =>
+                                            setFocusDeliveryEstimateInput(false)
+                                        }
                                     />
                                 )}
                                 <Box

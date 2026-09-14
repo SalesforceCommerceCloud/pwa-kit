@@ -1849,6 +1849,9 @@
     "product_tile.badge.label.sale": {
         "defaultMessage": "Sale"
     },
+    "product_view.action.change_delivery_destination": {
+        "defaultMessage": "Change delivery destination from {postalCode}"
+    },
     "product_view.button.add_bundle_to_cart": {
         "defaultMessage": "Add Bundle to Cart"
     },
@@ -1923,6 +1926,9 @@
     },
     "product_view.status.out_of_stock_at_store": {
         "defaultMessage": "Out of Stock at {storeName}"
+    },
+    "product_view.text.delivery_to": {
+        "defaultMessage": "to {postalCode}"
     },
     "profile_card.info.profile_updated": {
         "defaultMessage": "Profile updated"

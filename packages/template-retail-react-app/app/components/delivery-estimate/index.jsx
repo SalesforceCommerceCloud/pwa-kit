@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {createPortal} from 'react-dom'
 import PropTypes from 'prop-types'
 import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
@@ -47,7 +47,12 @@ const DeliveryEstimate = ({
     siteId,
     defaultCountryCode,
     resultContainer = null,
-    showResultInCard = true
+    showResultInCard = true,
+    showCalculator = true,
+    showResult = true,
+    onResolvedDestination,
+    focusPostalCode = false,
+    onPostalCodeFocusHandled
 }) => {
     const {formatDate, formatMessage} = useIntl()
     const [hydrated, setHydrated] = useState(false)
@@ -57,6 +62,8 @@ const DeliveryEstimate = ({
     })
     const [submittedDestination, setSubmittedDestination] = useState(null)
     const [validationErrors, setValidationErrors] = useState({})
+    const resolvedDestinationRef = useRef(null)
+    const postalCodeInputRef = useRef(null)
 
     useEffect(() => {
         const storedDestination = getStoredDestination(getStorageKey(siteId))
@@ -132,6 +139,7 @@ const DeliveryEstimate = ({
             return
         }
 
+        resolvedDestinationRef.current = null
         setSubmittedDestination(normalizedDestination)
     }
 
@@ -142,6 +150,30 @@ const DeliveryEstimate = ({
         id: 'delivery_estimate.status.loading',
         defaultMessage: 'Calculating...'
     })
+
+    useEffect(() => {
+        if (!hasResult || !submittedDestination || !onResolvedDestination) {
+            return
+        }
+
+        const normalizedDestination = normalizeDestination(submittedDestination)
+        const destinationKey = `${productId}:${normalizedDestination.countryCode}:${normalizedDestination.postalCode}`
+        if (resolvedDestinationRef.current === destinationKey) {
+            return
+        }
+
+        resolvedDestinationRef.current = destinationKey
+        onResolvedDestination(normalizedDestination)
+    }, [hasResult, onResolvedDestination, productId, submittedDestination])
+
+    useEffect(() => {
+        if (!showCalculator || !focusPostalCode) {
+            return
+        }
+
+        postalCodeInputRef.current?.focus()
+        onPostalCodeFocusHandled?.()
+    }, [focusPostalCode, onPostalCodeFocusHandled, showCalculator])
 
     const resultContent = (
         <>
@@ -194,7 +226,9 @@ const DeliveryEstimate = ({
             )}
         </>
     )
-    const renderedResult = resultContainer
+    const renderedResult = !showResult
+        ? null
+        : resultContainer
         ? createPortal(resultContent, resultContainer)
         : showResultInCard
         ? resultContent
@@ -202,96 +236,108 @@ const DeliveryEstimate = ({
 
     return (
         <>
-            <Box
-                as="section"
-                aria-labelledby="delivery-estimate-heading"
-                mt={4}
-                mb={4}
-                border="1px"
-                borderColor="gray.200"
-                borderRadius="base"
-                p={3}
-            >
-                <Text as="h2" id="delivery-estimate-heading" fontSize="sm" fontWeight={600} mb={3}>
-                    {formatMessage({
-                        id: 'delivery_estimate.heading',
-                        defaultMessage: 'Estimated Delivery Date'
-                    })}
-                </Text>
-                <Box as="form" onSubmit={handleSubmit} noValidate>
-                    <Stack
-                        direction={{base: 'column', md: 'row'}}
-                        align={{base: 'stretch', md: 'end'}}
+            {showCalculator && (
+                <Box
+                    as="section"
+                    aria-labelledby="delivery-estimate-heading"
+                    mt={4}
+                    mb={4}
+                    border="1px"
+                    borderColor="gray.200"
+                    borderRadius="base"
+                    p={3}
+                >
+                    <Text
+                        as="h2"
+                        id="delivery-estimate-heading"
+                        fontSize="sm"
+                        fontWeight={600}
+                        mb={3}
                     >
-                        <FormControl
-                            isInvalid={Boolean(validationErrors.postalCode)}
-                            flex={1}
-                            minW={0}
+                        {formatMessage({
+                            id: 'delivery_estimate.heading',
+                            defaultMessage: 'Estimated Delivery Date'
+                        })}
+                    </Text>
+                    <Box as="form" onSubmit={handleSubmit} noValidate>
+                        <Stack
+                            direction={{base: 'column', md: 'row'}}
+                            align={{base: 'stretch', md: 'end'}}
                         >
-                            <VisuallyHidden>
-                                <FormLabel htmlFor="delivery-estimate-postal-code">
-                                    {formatMessage(
-                                        {
-                                            id: 'delivery_estimate.label.postal_code',
-                                            defaultMessage:
-                                                '{countryCode, select, GB {Postcode} US {ZIP code} other {Postal code}}'
-                                        },
-                                        {countryCode: destination.countryCode}
-                                    )}
-                                </FormLabel>
-                            </VisuallyHidden>
-                            <Input
-                                id="delivery-estimate-postal-code"
-                                name="postalCode"
-                                autoComplete="postal-code"
-                                placeholder={formatMessage({
-                                    id: 'delivery_estimate.placeholder.postal_code',
-                                    defaultMessage: 'Enter a postal code...'
-                                })}
-                                aria-describedby={
-                                    validationErrors.postalCode
-                                        ? 'delivery-estimate-postal-code-error'
-                                        : undefined
+                            <FormControl
+                                isInvalid={Boolean(validationErrors.postalCode)}
+                                flex={1}
+                                minW={0}
+                            >
+                                <VisuallyHidden>
+                                    <FormLabel htmlFor="delivery-estimate-postal-code">
+                                        {formatMessage(
+                                            {
+                                                id: 'delivery_estimate.label.postal_code',
+                                                defaultMessage:
+                                                    '{countryCode, select, GB {Postcode} US {ZIP code} other {Postal code}}'
+                                            },
+                                            {countryCode: destination.countryCode}
+                                        )}
+                                    </FormLabel>
+                                </VisuallyHidden>
+                                <Input
+                                    ref={postalCodeInputRef}
+                                    id="delivery-estimate-postal-code"
+                                    name="postalCode"
+                                    autoComplete="postal-code"
+                                    placeholder={formatMessage({
+                                        id: 'delivery_estimate.placeholder.postal_code',
+                                        defaultMessage: 'Enter a postal code...'
+                                    })}
+                                    aria-describedby={
+                                        validationErrors.postalCode
+                                            ? 'delivery-estimate-postal-code-error'
+                                            : undefined
+                                    }
+                                    value={destination.postalCode}
+                                    onChange={(event) => {
+                                        setDestination((current) => ({
+                                            ...current,
+                                            postalCode: event.target.value
+                                        }))
+                                        setValidationErrors((current) => ({
+                                            ...current,
+                                            postalCode: ''
+                                        }))
+                                    }}
+                                />
+                                <FormErrorMessage id="delivery-estimate-postal-code-error">
+                                    {validationErrors.postalCode}
+                                </FormErrorMessage>
+                            </FormControl>
+                            <Button
+                                type="submit"
+                                variant="outline"
+                                isDisabled={!productId || isRequesting}
+                                width={{base: '100%', md: 'auto'}}
+                                aria-label={
+                                    isRequesting
+                                        ? calculatingLabel
+                                        : formatMessage({
+                                              id: 'delivery_estimate.action.calculate_aria_label',
+                                              defaultMessage: 'Calculate delivery estimate'
+                                          })
                                 }
-                                value={destination.postalCode}
-                                onChange={(event) => {
-                                    setDestination((current) => ({
-                                        ...current,
-                                        postalCode: event.target.value
-                                    }))
-                                    setValidationErrors((current) => ({...current, postalCode: ''}))
-                                }}
-                            />
-                            <FormErrorMessage id="delivery-estimate-postal-code-error">
-                                {validationErrors.postalCode}
-                            </FormErrorMessage>
-                        </FormControl>
-                        <Button
-                            type="submit"
-                            variant="outline"
-                            isDisabled={!productId || isRequesting}
-                            width={{base: '100%', md: 'auto'}}
-                            aria-label={
-                                isRequesting
+                            >
+                                {isRequesting
                                     ? calculatingLabel
                                     : formatMessage({
-                                          id: 'delivery_estimate.action.calculate_aria_label',
-                                          defaultMessage: 'Calculate delivery estimate'
-                                      })
-                            }
-                        >
-                            {isRequesting
-                                ? calculatingLabel
-                                : formatMessage({
-                                      id: 'delivery_estimate.action.calculate',
-                                      defaultMessage: 'Calculate'
-                                  })}
-                        </Button>
-                    </Stack>
-                </Box>
+                                          id: 'delivery_estimate.action.calculate',
+                                          defaultMessage: 'Calculate'
+                                      })}
+                            </Button>
+                        </Stack>
+                    </Box>
 
-                {!resultContainer && renderedResult}
-            </Box>
+                    {!resultContainer && renderedResult}
+                </Box>
+            )}
             {resultContainer && renderedResult}
         </>
     )
@@ -302,7 +348,12 @@ DeliveryEstimate.propTypes = {
     siteId: PropTypes.string.isRequired,
     defaultCountryCode: PropTypes.string,
     resultContainer: PropTypes.object,
-    showResultInCard: PropTypes.bool
+    showResultInCard: PropTypes.bool,
+    showCalculator: PropTypes.bool,
+    showResult: PropTypes.bool,
+    onResolvedDestination: PropTypes.func,
+    focusPostalCode: PropTypes.bool,
+    onPostalCodeFocusHandled: PropTypes.func
 }
 
 export default DeliveryEstimate

@@ -252,6 +252,31 @@ describe('DeliveryEstimate', () => {
         expect(calculator).not.toContainElement(result)
     })
 
+    test('reports a saved resolved destination while its calculator and result are hidden', async () => {
+        const onResolvedDestination = jest.fn()
+        window.localStorage.setItem(
+            'deliveryDestination_site-1',
+            JSON.stringify({countryCode: 'US', postalCode: '94105'})
+        )
+        renderDeliveryEstimate({
+            showCalculator: false,
+            showResult: false,
+            onResolvedDestination
+        })
+
+        expect(
+            screen.queryByRole('region', {name: 'Estimated Delivery Date'})
+        ).not.toBeInTheDocument()
+        expect(screen.queryByTestId('delivery-estimate-result')).not.toBeInTheDocument()
+
+        await waitFor(() => {
+            expect(onResolvedDestination).toHaveBeenCalledWith({
+                countryCode: 'US',
+                postalCode: '94105'
+            })
+        })
+    })
+
     test('displays an estimate when browser storage cannot persist the destination', async () => {
         const user = userEvent.setup()
         const storageError = new Error('Storage unavailable')

@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {fireEvent, screen, waitFor} from '@testing-library/react'
+import {fireEvent, screen, waitFor, within} from '@testing-library/react'
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import mockProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
 import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import frMessages from '@salesforce/retail-react-app/app/static/translations/compiled/fr-FR.json'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
 import {rest} from 'msw'
 
 // Ensure useMultiSite returns site.id = 'site-1' for all tests
@@ -28,9 +29,15 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     __esModule: true,
     default: () => ({
         site: {id: 'site-1'},
+        locale: {id: 'en-US'},
         buildUrl: (url) => url // identity function for tests
     })
 }))
+
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const actual = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {...actual, useDeliveryEstimates: jest.fn()}
+})
 
 // Mock useSelectedStore hook
 jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
@@ -39,10 +46,14 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
 
 const MockComponent = (props) => {
     const {data: customer} = useCurrentCustomer()
+    const defaultProps = {
+        pickupInStore: false,
+        setPickupInStore: jest.fn()
+    }
     return (
         <div>
             <div>customer: {customer?.authType}</div>
-            <ProductView {...props} />
+            <ProductView {...defaultProps} {...props} />
         </div>
     )
 }
@@ -61,6 +72,23 @@ const mockStoreData = {
     inventoryId: 'inventory_m_store_store1'
 }
 
+const deliveryEstimateResult = {
+    productDeliveryEstimates: [
+        {
+            productId: mockStandardProductOrderable.id,
+            shippingOptions: [
+                {
+                    shippingMethodId: 'ground',
+                    deliveryWindow: {
+                        startAt: '2026-09-16T14:00:00Z',
+                        endAt: '2026-09-18T14:00:00Z'
+                    }
+                }
+            ]
+        }
+    ]
+}
+
 // Set up and clean up
 beforeEach(() => {
     // Since we're testing some navigation logic, we are using a simple Router
@@ -73,6 +101,13 @@ beforeEach(() => {
         error: null,
         hasSelectedStore: true
     }))
+    useDeliveryEstimates.mockReturnValue({
+        data: deliveryEstimateResult,
+        isError: false,
+        isLoading: false,
+        isFetching: false
+    })
+    window.localStorage.clear()
 
     // Reset MSW handlers to avoid conflicts
     global.server.resetHandlers()
@@ -135,12 +170,6 @@ afterEach(() => {
     sessionStorage.clear()
 })
 
-// Update MockComponent default props for all tests
-MockComponent.defaultProps = {
-    pickupInStore: false,
-    setPickupInStore: jest.fn()
-}
-
 test('ProductView Component renders properly', async () => {
     const addToCart = jest.fn()
     renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
@@ -187,6 +216,33 @@ test('matches the Storefront Next fulfillment option labels', () => {
     )
     expect(screen.getByRole('radio', {name: 'Free pickup in'})).toHaveAccessibleDescription(
         'Select Store'
+    )
+})
+
+test('settles delivery to the postal-code control and reopens the calculator on request', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
+    )
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+    await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+    await user.click(screen.getByRole('button', {name: 'Calculate delivery estimate'}))
+
+    await waitFor(() => {
+        expect(deliveryOption).toHaveTextContent(/Delivery\s*to 94105/)
+    })
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(within(deliveryOption).getByTestId('delivery-estimate-result')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', {name: 'Change delivery destination from 94105'}))
+
+    expect(await screen.findByRole('region', {name: 'Estimated Delivery Date'})).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveFocus()
+    })
+    expect(screen.getByRole('radio', {name: 'Delivery'})).toHaveAccessibleDescription(
+        'Enter a postal code to get a delivery estimate'
     )
 })
 
