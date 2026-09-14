@@ -70,22 +70,8 @@ import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/us
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
 
-import {PageDesignerProvider, usePreviewContext} from '@salesforce/commerce-sdk-react/page-designer'
+import {PageDesignerProvider} from '@salesforce/commerce-sdk-react/page-designer'
 import PageDesignerInit from '@salesforce/retail-react-app/app/components/page-designer-init'
-
-const RouteEmitter = () => {
-    const {pathname, search, hash} = useLocation()
-    const {notifyClientRouteChanged, isConnected} = usePreviewContext()
-    const url =
-        typeof window !== 'undefined'
-            ? `${window.location.origin}${pathname}${search || ''}${hash || ''}`
-            : `${pathname}${search || ''}${hash || ''}`
-    useEffect(() => {
-        if (!isConnected) return
-        notifyClientRouteChanged(url)
-    }, [url, isConnected, notifyClientRouteChanged])
-    return null
-}
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -544,7 +530,6 @@ const App = (props) => {
                                                         mode={pageDesignerMode}
                                                     >
                                                         <PageDesignerInit />
-                                                        <RouteEmitter />
                                                         {children}
                                                     </PageDesignerProvider>
                                                 )}
