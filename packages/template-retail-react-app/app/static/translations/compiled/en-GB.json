@@ -4643,12 +4643,6 @@
       "value": "+"
     }
   ],
-  "product_view.label.ship_to_address": [
-    {
-      "type": 0,
-      "value": "Ship to Address"
-    }
-  ],
   "product_view.label.variant_type": [
     {
       "type": 1,

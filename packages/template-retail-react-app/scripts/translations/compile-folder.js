@@ -6,21 +6,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /* eslint @typescript-eslint/no-var-requires: "off" */
-const {exec} = require('child_process')
+const {execFileSync} = require('child_process')
 const {getOutputFolder} = require('./utils')
+
+const runFormatjs = (args) => {
+    execFileSync('formatjs', args, {stdio: 'inherit'})
+}
 
 const main = () => {
     const inputFolder = process.argv[2]
     const outputFolder = getOutputFolder()
-    const command = `formatjs compile-folder --ast ${inputFolder} ${outputFolder}`
-
     console.log('Compiling translations into the folder:', outputFolder)
-    exec(command, (err) => {
-        if (err) {
-            console.error(err)
-            return
-        }
-    })
+    runFormatjs(['compile-folder', '--ast', inputFolder, outputFolder])
 }
 
 main()
