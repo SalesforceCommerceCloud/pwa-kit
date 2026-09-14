@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {rest} from 'msw'
 import * as jose from 'jose'
 
 // Mock the runtime to prevent server startup during tests
@@ -99,10 +98,7 @@ jest.mock('jose', () => ({
 }))
 
 // Import only the functions we need to test
-import {
-    validateSlasCallbackToken,
-    handleCallback
-} from '@salesforce/retail-react-app/app/ssr.js'
+import {validateSlasCallbackToken, handleCallback} from '@salesforce/retail-react-app/app/ssr.js'
 
 // Mock environment variables
 const originalEnv = process.env
@@ -235,4 +231,3 @@ describe('handleCallback', () => {
         expect(res.send).toHaveBeenCalled()
     })
 })
-
