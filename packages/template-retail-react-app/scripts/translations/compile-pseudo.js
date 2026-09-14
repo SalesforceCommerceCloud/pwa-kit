@@ -18,7 +18,15 @@ const main = () => {
     const locale = 'en-XA'
     const outputFile = `${getOutputFolder()}/${locale}.json`
     console.log('Compiling pseudo translation into the file:', outputFile)
-    runFormatjs(['compile', '--ast', inputFile, '--out-file', outputFile, '--pseudo-locale', locale])
+    runFormatjs([
+        'compile',
+        '--ast',
+        inputFile,
+        '--out-file',
+        outputFile,
+        '--pseudo-locale',
+        locale
+    ])
 }
 
 main()
