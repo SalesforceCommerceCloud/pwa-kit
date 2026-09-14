@@ -6,6 +6,7 @@
  */
 
 import {useEffect, useRef, useState} from 'react'
+import {DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION} from '@salesforce/retail-react-app/app/constants'
 
 const SCRIPT_SRC = '/static/inline-agent-widget.umd.js'
 
@@ -67,6 +68,7 @@ const useInlineAgentWidget = (config) => {
         el.setAttribute('scrt2-url', config.scrt2Url)
         el.setAttribute('org-id', config.orgId)
         el.setAttribute('es-developer-name', config.esDeveloperName)
+        el.setAttribute('capabilities-version', DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION)
         if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
         if (config.persistSession !== false) el.setAttribute('persist-session', '')
         if (config.enableLogging) el.setAttribute('enable-logging', '')
