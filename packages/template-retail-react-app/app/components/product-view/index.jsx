@@ -7,6 +7,7 @@
 
 import React, {forwardRef, useEffect, useMemo, useRef, useState, useCallback} from 'react'
 import PropTypes from 'prop-types'
+import loadable from '@loadable/component'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
 
@@ -58,8 +59,12 @@ import SFPaymentsExpressButtons from '@salesforce/retail-react-app/app/component
 import {EXPRESS_BUY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useCleanupTemporaryBaskets} from '@salesforce/retail-react-app/app/hooks/use-cleanup-temporary-baskets'
-import DeliveryEstimate from '@salesforce/retail-react-app/app/components/delivery-estimate'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+
+// Delivery estimates are opt-in on the PDP, so defer their code until the feature renders.
+const DeliveryEstimate = loadable(() =>
+    import('@salesforce/retail-react-app/app/components/delivery-estimate')
+)
 
 const ProductViewHeader = ({
     name,

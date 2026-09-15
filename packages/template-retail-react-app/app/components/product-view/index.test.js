@@ -24,6 +24,12 @@ import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selec
 import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
 import {rest} from 'msw'
 
+jest.mock('@loadable/component', () => ({
+    __esModule: true,
+    default: () =>
+        jest.requireActual('@salesforce/retail-react-app/app/components/delivery-estimate').default
+}))
+
 // Ensure useMultiSite returns site.id = 'site-1' for all tests
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     __esModule: true,
@@ -180,21 +186,23 @@ test('ProductView Component renders properly', async () => {
     expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
 })
 
-test('renders delivery estimates only when explicitly enabled for the PDP', () => {
+test('renders delivery estimates only when explicitly enabled for the PDP', async () => {
     renderWithProviders(
         <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
     )
 
-    expect(screen.getByRole('heading', {name: 'Estimated Delivery Date'})).toBeInTheDocument()
+    expect(
+        await screen.findByRole('heading', {name: 'Estimated Delivery Date'})
+    ).toBeInTheDocument()
 })
 
-test('keeps the delivery estimate calculator separate from the delivery option', () => {
+test('keeps the delivery estimate calculator separate from the delivery option', async () => {
     renderWithProviders(
         <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
     )
 
     const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
-    const deliveryEstimate = screen.getByRole('region', {name: 'Estimated Delivery Date'})
+    const deliveryEstimate = await screen.findByRole('region', {name: 'Estimated Delivery Date'})
 
     expect(deliveryOption).toHaveAttribute('data-selected', 'true')
     expect(deliveryOption).not.toContainElement(deliveryEstimate)
@@ -693,7 +701,9 @@ describe('Product Bundles', () => {
         const pickupOption = screen.getByTestId('pickup-fulfillment-option')
 
         expect(pickupOption).toHaveAttribute('data-selected', 'true')
-        expect(screen.getByRole('region', {name: 'Estimated Delivery Date'})).toBeInTheDocument()
+        expect(
+            await screen.findByRole('region', {name: 'Estimated Delivery Date'})
+        ).toBeInTheDocument()
 
         await user.click(screen.getByRole('radio', {name: 'Delivery'}))
 
@@ -701,7 +711,9 @@ describe('Product Bundles', () => {
             'data-selected',
             'true'
         )
-        expect(screen.getByRole('region', {name: 'Estimated Delivery Date'})).toBeInTheDocument()
+        expect(
+            await screen.findByRole('region', {name: 'Estimated Delivery Date'})
+        ).toBeInTheDocument()
     })
 
     test('opens the store locator without selecting pickup when no store is selected', async () => {
