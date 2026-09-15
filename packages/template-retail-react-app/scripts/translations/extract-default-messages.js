@@ -16,10 +16,10 @@ const fs = require('fs')
 const path = require('path')
 const packagePath = path.join(process.cwd(), 'package.json')
 const pkgJSON = JSON.parse(fs.readFileSync(packagePath))
-const formatjs = process.platform === 'win32' ? 'formatjs.cmd' : 'formatjs'
+const formatjs = require.resolve('@formatjs/cli/bin/formatjs')
 
 const runFormatjs = (args) => {
-    execFileSync(formatjs, args, {stdio: 'inherit'})
+    execFileSync(process.execPath, [formatjs, ...args], {stdio: 'inherit'})
 }
 
 const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) => {
