@@ -30,6 +30,11 @@ import {
 import {mockStandardProductOrderable} from '@salesforce/retail-react-app/app/mocks/standard-product'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
+jest.mock('@loadable/component', () => ({
+    __esModule: true,
+    default: () => () => null
+}))
+
 jest.setTimeout(60000)
 
 jest.useFakeTimers()
