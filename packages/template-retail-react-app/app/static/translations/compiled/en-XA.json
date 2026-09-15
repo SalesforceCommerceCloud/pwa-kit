@@ -4091,6 +4091,46 @@
       "value": "]"
     }
   ],
+  "delivery_estimate.error.invalid_postal_code": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "options": {
+        "GB": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Ḗƞŧḗḗř ȧȧ ṽȧȧŀīḓ ƥǿǿşŧƈǿǿḓḗḗ."
+            }
+          ]
+        },
+        "US": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Ḗƞŧḗḗř ȧȧ ṽȧȧŀīḓ ẐĪƤ ƈǿǿḓḗḗ."
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Ḗƞŧḗḗř ȧȧ ṽȧȧŀīḓ ƥǿǿşŧȧȧŀ ƈǿǿḓḗḗ."
+            }
+          ]
+        }
+      },
+      "type": 5,
+      "value": "countryCode"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "delivery_estimate.heading": [
     {
       "type": 0,

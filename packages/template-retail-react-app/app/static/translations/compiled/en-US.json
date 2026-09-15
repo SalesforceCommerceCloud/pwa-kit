@@ -2003,6 +2003,38 @@
       "value": "countryCode"
     }
   ],
+  "delivery_estimate.error.invalid_postal_code": [
+    {
+      "options": {
+        "GB": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a valid postcode."
+            }
+          ]
+        },
+        "US": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a valid ZIP code."
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a valid postal code."
+            }
+          ]
+        }
+      },
+      "type": 5,
+      "value": "countryCode"
+    }
+  ],
   "delivery_estimate.heading": [
     {
       "type": 0,

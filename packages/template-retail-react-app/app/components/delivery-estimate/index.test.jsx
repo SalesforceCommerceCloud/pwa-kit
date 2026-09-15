@@ -12,6 +12,7 @@ import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
 import {getDefaultCookieAttributes} from '@salesforce/commerce-sdk-react/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import DeliveryEstimate from '@salesforce/retail-react-app/app/components/delivery-estimate'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import usMessages from '@salesforce/retail-react-app/app/static/translations/compiled/en-US.json'
@@ -28,6 +29,10 @@ jest.mock('@salesforce/commerce-sdk-react/utils', () => ({
 
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+    useCurrentCustomer: jest.fn()
 }))
 
 const deliveryResult = {
@@ -117,6 +122,7 @@ describe('DeliveryEstimate', () => {
         document.cookie = 'deliveryZipCode_site-1=; Max-Age=0; path=/'
         getConfig.mockReturnValue(mockConfig)
         getDefaultCookieAttributes.mockReturnValue({secure: false, sameSite: 'Lax'})
+        useCurrentCustomer.mockReturnValue({data: {isRegistered: false}})
         useDeliveryEstimates.mockReturnValue({
             data: deliveryResult,
             isError: false,
@@ -231,7 +237,7 @@ describe('DeliveryEstimate', () => {
         expect(screen.queryByRole('status')).not.toBeInTheDocument()
     })
 
-    test('uses the locale country code when restoring a structured delivery destination cookie', async () => {
+    test('retains the structured delivery destination cookie country when the locale changes', async () => {
         setDeliveryDestinationCookie({postalCode: '94105', countryCode: 'US'})
         renderDeliveryEstimate({defaultCountryCode: 'GB'})
 
@@ -241,7 +247,7 @@ describe('DeliveryEstimate', () => {
                     parameters: {
                         productIds: ['sku-a'],
                         postalCode: '94105',
-                        countryCode: 'GB',
+                        countryCode: 'US',
                         siteId: 'site-1'
                     }
                 },
@@ -268,6 +274,102 @@ describe('DeliveryEstimate', () => {
             )
         })
         expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveValue('94105')
+    })
+
+    test('uses a registered shopper preferred shipping address without persisting it', async () => {
+        useCurrentCustomer.mockReturnValue({
+            data: {
+                isRegistered: true,
+                addresses: [
+                    {
+                        addressId: 'billing-address',
+                        countryCode: 'US',
+                        postalCode: '10001',
+                        preferred: true
+                    },
+                    {
+                        addressId: 'shipping-address',
+                        countryCode: 'CA',
+                        postalCode: 'm5v3a8',
+                        preferred: true
+                    }
+                ]
+            }
+        })
+        renderDeliveryEstimate()
+
+        await waitFor(() => {
+            expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+                {
+                    parameters: {
+                        productIds: ['sku-a'],
+                        postalCode: 'M5V 3A8',
+                        countryCode: 'CA',
+                        siteId: 'site-1'
+                    }
+                },
+                expect.objectContaining({enabled: true})
+            )
+        })
+        expect(screen.getByRole('textbox', {name: /postal code/i})).toHaveValue('M5V 3A8')
+        expect(getDeliveryDestinationCookieValue()).toBeUndefined()
+    })
+
+    test('prefers a saved delivery destination over a registered shopper address', async () => {
+        setDeliveryDestinationCookie({postalCode: '94105', countryCode: 'US'})
+        useCurrentCustomer.mockReturnValue({
+            data: {
+                isRegistered: true,
+                addresses: [
+                    {
+                        addressId: 'shipping-address',
+                        countryCode: 'CA',
+                        postalCode: 'M5V3A8',
+                        preferred: true
+                    }
+                ]
+            }
+        })
+        renderDeliveryEstimate()
+
+        await waitFor(() => {
+            expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+                {
+                    parameters: {
+                        productIds: ['sku-a'],
+                        postalCode: '94105',
+                        countryCode: 'US',
+                        siteId: 'site-1'
+                    }
+                },
+                expect.objectContaining({enabled: true})
+            )
+        })
+        expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveValue('94105')
+    })
+
+    test('does not use a guest shopper address as the delivery destination', async () => {
+        useCurrentCustomer.mockReturnValue({
+            data: {
+                isRegistered: false,
+                addresses: [
+                    {
+                        addressId: 'guest-address',
+                        countryCode: 'US',
+                        postalCode: '94105'
+                    }
+                ]
+            }
+        })
+        renderDeliveryEstimate()
+
+        await waitFor(() => {
+            expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+                expect.any(Object),
+                expect.objectContaining({enabled: false})
+            )
+        })
+        expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveValue('')
     })
 
     test('ignores malformed delivery destination cookies', async () => {
@@ -323,6 +425,66 @@ describe('DeliveryEstimate', () => {
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
         expect(await screen.findByRole('status')).toHaveTextContent(/estimated:/i)
+    })
+
+    test('moves focus to a shopper-initiated estimate', async () => {
+        const user = userEvent.setup()
+        renderDeliveryEstimate()
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        await waitFor(() => {
+            expect(screen.getByTestId('delivery-estimate-result')).toHaveFocus()
+        })
+    })
+
+    test('normalizes postal codes and rejects values invalid for the locale country', async () => {
+        const user = userEvent.setup()
+        renderDeliveryEstimate({defaultCountryCode: 'GB'})
+
+        const input = screen.getByRole('textbox', {name: /postcode/i})
+        await user.type(input, 'sw1a1aa')
+        expect(input).toHaveValue('SW1A 1AA')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        await waitFor(() => {
+            expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    parameters: expect.objectContaining({postalCode: 'SW1A 1AA', countryCode: 'GB'})
+                }),
+                expect.objectContaining({enabled: true})
+            )
+        })
+
+        await user.clear(input)
+        await user.type(input, '12345')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        expect(screen.getByText(/enter a valid postcode/i)).toBeInTheDocument()
+        await waitFor(() => {
+            expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+                expect.any(Object),
+                expect.objectContaining({enabled: false})
+            )
+        })
+    })
+
+    test('clears a displayed estimate when the shopper edits its destination', async () => {
+        const user = userEvent.setup()
+        setDeliveryDestinationCookie({postalCode: '94105', countryCode: 'US'})
+        renderDeliveryEstimate()
+
+        expect(await screen.findByTestId('delivery-estimate-result')).toBeInTheDocument()
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '1')
+
+        expect(screen.queryByTestId('delivery-estimate-result')).not.toBeInTheDocument()
+        await waitFor(() => {
+            expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+                expect.any(Object),
+                expect.objectContaining({enabled: false})
+            )
+        })
     })
 
     test('renders a completed estimate in the supplied fulfillment option container', async () => {

@@ -786,6 +786,9 @@
   "delivery_estimate.error.enter_postal_code": {
     "defaultMessage": "{countryCode, select, GB {Enter a postcode.} US {Enter a ZIP code.} other {Enter a postal code.}}"
   },
+  "delivery_estimate.error.invalid_postal_code": {
+    "defaultMessage": "{countryCode, select, GB {Enter a valid postcode.} US {Enter a valid ZIP code.} other {Enter a valid postal code.}}"
+  },
   "delivery_estimate.heading": {
     "defaultMessage": "Estimated Delivery Date"
   },

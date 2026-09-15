@@ -32,12 +32,15 @@ import {
     VisuallyHidden
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
+    getPreferredDeliveryDestination,
     getSlowestDeliveryEstimate,
+    getPostalCodeFormat,
     isEligibleShippingOption,
     isValidDestination,
     normalizeDestination
 } from '@salesforce/retail-react-app/app/components/delivery-estimate/utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const getDeliveryZipCodeCookieName = (siteId) => `deliveryZipCode_${siteId}`
 const DELIVERY_DESTINATION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
@@ -150,6 +153,7 @@ const DeliveryEstimate = ({
 }) => {
     const {formatDate, formatMessage, formatNumber} = useIntl()
     const {currency: activeCurrency} = useCurrency()
+    const {data: customer} = useCurrentCustomer()
     const {isOpen, onOpen, onClose} = useDisclosure()
     const [hydrated, setHydrated] = useState(false)
     const [destination, setDestination] = useState({
@@ -160,22 +164,53 @@ const DeliveryEstimate = ({
     const [validationErrors, setValidationErrors] = useState({})
     const resolvedDestinationRef = useRef(null)
     const hasExplicitDestinationRef = useRef(false)
+    const hasEditedDestinationRef = useRef(false)
+    const shouldFocusResultRef = useRef(false)
     const postalCodeInputRef = useRef(null)
+    const estimateResultRef = useRef(null)
+    const postalCodeFormat = getPostalCodeFormat(destination.countryCode)
 
     useEffect(() => {
         hasExplicitDestinationRef.current = false
-        const countryCode = defaultCountryCode || ''
+        hasEditedDestinationRef.current = false
         const cookieDestination = parseDeliveryDestinationCookie(
             getDeliveryZipCodeCookieName(siteId)
         )
-        const postalCode = cookieDestination?.postalCode || ''
-        const restoredDestination = isValidDestination({countryCode, postalCode})
-            ? {countryCode, postalCode}
-            : null
-        setDestination({countryCode, postalCode})
-        setSubmittedDestination(restoredDestination)
+        const restoredDestination = normalizeDestination({
+            countryCode: cookieDestination?.countryCode || defaultCountryCode || '',
+            postalCode: cookieDestination?.postalCode || ''
+        })
+        const destination = isValidDestination(restoredDestination) ? restoredDestination : null
+        setDestination(restoredDestination)
+        setSubmittedDestination(destination)
+        shouldFocusResultRef.current = false
         setHydrated(true)
     }, [siteId, defaultCountryCode])
+
+    useEffect(() => {
+        if (!hydrated || submittedDestination || hasEditedDestinationRef.current) {
+            return
+        }
+
+        if (!customer?.isRegistered) {
+            return
+        }
+
+        const profileDestination = getPreferredDeliveryDestination(
+            customer?.addresses,
+            defaultCountryCode
+        )
+        if (!profileDestination) return
+
+        setDestination(profileDestination)
+        setSubmittedDestination(profileDestination)
+    }, [
+        customer?.addresses,
+        customer?.isRegistered,
+        defaultCountryCode,
+        hydrated,
+        submittedDestination
+    ])
 
     const validDestination = isValidDestination(submittedDestination)
     const canRequest = hydrated && Boolean(productId) && Boolean(siteId) && validDestination
@@ -218,9 +253,8 @@ const DeliveryEstimate = ({
         event.preventDefault()
         const normalizedDestination = normalizeDestination(destination)
         const errors = {
-            postalCode: normalizedDestination.postalCode
-                ? ''
-                : formatMessage(
+            postalCode: !normalizedDestination.postalCode
+                ? formatMessage(
                       {
                           id: 'delivery_estimate.error.enter_postal_code',
                           defaultMessage:
@@ -228,6 +262,16 @@ const DeliveryEstimate = ({
                       },
                       {countryCode: normalizedDestination.countryCode}
                   )
+                : !isValidDestination(normalizedDestination)
+                ? formatMessage(
+                      {
+                          id: 'delivery_estimate.error.invalid_postal_code',
+                          defaultMessage:
+                              '{countryCode, select, GB {Enter a valid postcode.} US {Enter a valid ZIP code.} other {Enter a valid postal code.}}'
+                      },
+                      {countryCode: normalizedDestination.countryCode}
+                  )
+                : ''
         }
         setDestination(normalizedDestination)
         setValidationErrors(errors)
@@ -239,6 +283,7 @@ const DeliveryEstimate = ({
 
         resolvedDestinationRef.current = null
         hasExplicitDestinationRef.current = true
+        shouldFocusResultRef.current = true
         setSubmittedDestination(normalizedDestination)
     }
 
@@ -270,6 +315,15 @@ const DeliveryEstimate = ({
     }, [hasResult, onResolvedDestination, productId, submittedDestination])
 
     useEffect(() => {
+        if (!hasResult || !shouldFocusResultRef.current) {
+            return
+        }
+
+        estimateResultRef.current?.focus()
+        shouldFocusResultRef.current = false
+    }, [hasResult])
+
+    useEffect(() => {
         if (!showCalculator || !focusPostalCode) {
             return
         }
@@ -283,8 +337,11 @@ const DeliveryEstimate = ({
             {hasResult && (
                 <>
                     <Text
+                        ref={estimateResultRef}
                         mt={3}
                         role="status"
+                        aria-live="polite"
+                        tabIndex={-1}
                         data-testid="delivery-estimate-result"
                         fontSize="xs"
                         color="gray.600"
@@ -392,6 +449,9 @@ const DeliveryEstimate = ({
                                     id="delivery-estimate-postal-code"
                                     name="postalCode"
                                     autoComplete="postal-code"
+                                    inputMode={postalCodeFormat.inputMode}
+                                    maxLength={postalCodeFormat.maxLength}
+                                    aria-invalid={Boolean(validationErrors.postalCode)}
                                     placeholder={formatMessage({
                                         id: 'delivery_estimate.placeholder.postal_code',
                                         defaultMessage: 'Enter a postal code...'
@@ -403,9 +463,13 @@ const DeliveryEstimate = ({
                                     }
                                     value={destination.postalCode}
                                     onChange={(event) => {
+                                        hasEditedDestinationRef.current = true
+                                        setSubmittedDestination(null)
                                         setDestination((current) => ({
                                             ...current,
-                                            postalCode: event.target.value
+                                            postalCode: postalCodeFormat.normalize(
+                                                event.target.value
+                                            )
                                         }))
                                         setValidationErrors((current) => ({
                                             ...current,

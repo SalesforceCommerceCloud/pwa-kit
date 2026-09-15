@@ -226,7 +226,12 @@ test('settles delivery to the postal-code control and reopens the calculator on 
     )
 
     const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
-    await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+    await user.click(
+        await screen.findByRole('button', {name: 'Change delivery destination from 33712'})
+    )
+    const postalCodeInput = await screen.findByRole('textbox', {name: /zip code/i})
+    await user.clear(postalCodeInput)
+    await user.type(postalCodeInput, '94105')
     await user.click(screen.getByRole('button', {name: 'Calculate delivery estimate'}))
 
     await waitFor(() => {
