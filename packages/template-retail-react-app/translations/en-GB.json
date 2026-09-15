@@ -795,6 +795,9 @@
   "delivery_estimate.link.view_all_shipping_options": {
     "defaultMessage": "View All Shipping Options"
   },
+  "delivery_estimate.modal.heading": {
+    "defaultMessage": "Shipping Options"
+  },
   "delivery_estimate.placeholder.postal_code": {
     "defaultMessage": "Enter a postal code..."
   },

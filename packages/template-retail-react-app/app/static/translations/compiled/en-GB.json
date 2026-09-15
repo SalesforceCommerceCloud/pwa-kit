@@ -2047,6 +2047,12 @@
       "value": "View All Shipping Options"
     }
   ],
+  "delivery_estimate.modal.heading": [
+    {
+      "type": 0,
+      "value": "Shipping Options"
+    }
+  ],
   "delivery_estimate.placeholder.postal_code": [
     {
       "type": 0,

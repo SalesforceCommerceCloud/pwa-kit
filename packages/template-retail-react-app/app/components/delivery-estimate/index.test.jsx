@@ -125,13 +125,15 @@ describe('DeliveryEstimate', () => {
         ).toBeInTheDocument()
         expect(screen.queryByText(/ground/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/express/i)).not.toBeInTheDocument()
-        expect(screen.getByRole('link', {name: 'View All Shipping Options'})).toHaveAttribute(
-            'href',
-            '/uk/en-US/checkout'
-        )
-        expect(screen.getByRole('link', {name: 'View All Shipping Options'})).toHaveStyle(
+        expect(screen.getByRole('button', {name: 'View All Shipping Options'})).toHaveStyle(
             'text-decoration: underline'
         )
+        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
+        const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
+        expect(within(shippingOptions).getByText('Ground')).toBeInTheDocument()
+        expect(within(shippingOptions).getByText('Express')).toBeInTheDocument()
+        expect(within(shippingOptions).getByText('$5.00')).toBeInTheDocument()
+        expect(within(shippingOptions).getByText('$12.00')).toBeInTheDocument()
         expect(JSON.parse(window.localStorage.getItem('deliveryDestination_site-1'))).toEqual({
             countryCode: 'US',
             postalCode: '94105'
@@ -364,5 +366,71 @@ describe('DeliveryEstimate', () => {
 
         expect(await screen.findByText(/delivery dates unavailable/i)).toBeInTheDocument()
         expect(screen.queryByText(/insufficient inventory/i)).not.toBeInTheDocument()
+    })
+
+    test('excludes non-deliverable shipping options from the modal', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: {
+                productDeliveryEstimates: [
+                    {
+                        productId: 'sku-a',
+                        shippingOptions: [
+                            ...deliveryResult.productDeliveryEstimates[0].shippingOptions,
+                            {
+                                shippingMethodId: 'unavailable',
+                                name: 'Unavailable',
+                                nonDeliverableReason: 'INSUFFICIENT_INVENTORY'
+                            }
+                        ]
+                    }
+                ]
+            },
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        })
+        renderDeliveryEstimate()
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
+
+        const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
+        expect(within(shippingOptions).queryByText('Unavailable')).not.toBeInTheDocument()
+    })
+
+    test('uses the active currency when an estimate omits its currency', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: {
+                productDeliveryEstimates: [
+                    {
+                        productId: 'sku-a',
+                        shippingOptions:
+                            deliveryResult.productDeliveryEstimates[0].shippingOptions.map(
+                                (shippingOption) => ({
+                                    ...shippingOption,
+                                    currency:
+                                        shippingOption.shippingMethodId === 'ground'
+                                            ? undefined
+                                            : shippingOption.currency
+                                })
+                            )
+                    }
+                ]
+            },
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        })
+        renderDeliveryEstimate()
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
+
+        const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
+        expect(within(shippingOptions).getByText('£5.00')).toBeInTheDocument()
     })
 })

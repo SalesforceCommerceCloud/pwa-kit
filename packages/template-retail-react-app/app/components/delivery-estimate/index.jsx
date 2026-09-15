@@ -13,21 +13,30 @@ import {useIntl} from 'react-intl'
 import {
     Box,
     Button,
+    Flex,
     FormControl,
     FormErrorMessage,
     FormLabel,
     Input,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalHeader,
+    ModalOverlay,
     Stack,
     Text,
+    useDisclosure,
     VisuallyHidden
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     getSlowestDeliveryEstimate,
     getStoredDestination,
+    isEligibleShippingOption,
     isValidDestination,
     normalizeDestination
 } from '@salesforce/retail-react-app/app/components/delivery-estimate/utils'
-import Link from '@salesforce/retail-react-app/app/components/link'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 const getStorageKey = (siteId) => `deliveryDestination_${siteId}`
 
@@ -42,6 +51,19 @@ const formatDeliveryWindow = (deliveryWindow, formatDate) => {
     return startLabel === endLabel ? startLabel : `${startLabel} - ${endLabel}`
 }
 
+const formatShippingCost = (shippingOption, formatNumber, freeLabel, fallbackCurrency) => {
+    if (shippingOption.price === undefined || shippingOption.price === null) {
+        return null
+    }
+
+    return shippingOption.price === 0
+        ? freeLabel
+        : formatNumber(shippingOption.price, {
+              style: 'currency',
+              currency: shippingOption.currency || fallbackCurrency
+          })
+}
+
 const DeliveryEstimate = ({
     productId,
     siteId,
@@ -54,7 +76,9 @@ const DeliveryEstimate = ({
     focusPostalCode = false,
     onPostalCodeFocusHandled
 }) => {
-    const {formatDate, formatMessage} = useIntl()
+    const {formatDate, formatMessage, formatNumber} = useIntl()
+    const {currency: activeCurrency} = useCurrency()
+    const {isOpen, onOpen, onClose} = useDisclosure()
     const [hydrated, setHydrated] = useState(false)
     const [destination, setDestination] = useState({
         countryCode: defaultCountryCode || '',
@@ -90,9 +114,11 @@ const DeliveryEstimate = ({
         {enabled: canRequest}
     )
     const slowestEstimate = canRequest ? getSlowestDeliveryEstimate(productId, data) : null
-    const hasMultipleOptions =
-        (data?.productDeliveryEstimates || []).find((estimate) => estimate.productId === productId)
-            ?.shippingOptions?.length > 1
+    const shippingOptions =
+        (data?.productDeliveryEstimates || [])
+            .find((estimate) => estimate.productId === productId)
+            ?.shippingOptions?.filter(isEligibleShippingOption) || []
+    const hasMultipleOptions = shippingOptions.length > 1
 
     useEffect(() => {
         if (
@@ -150,6 +176,10 @@ const DeliveryEstimate = ({
         id: 'delivery_estimate.status.loading',
         defaultMessage: 'Calculating...'
     })
+    const freeLabel = formatMessage({
+        id: 'checkout_confirmation.label.free',
+        defaultMessage: 'Free'
+    })
 
     useEffect(() => {
         if (!hasResult || !submittedDestination || !onResolvedDestination) {
@@ -200,18 +230,21 @@ const DeliveryEstimate = ({
                         )}
                     </Text>
                     {hasMultipleOptions && (
-                        <Link
-                            display="inline-block"
+                        <Button
+                            variant="link"
+                            display="block"
                             mt={2}
-                            to="/checkout"
                             fontSize="xs"
+                            fontWeight="normal"
+                            minWidth="auto"
                             textDecoration="underline"
+                            onClick={onOpen}
                         >
                             {formatMessage({
                                 id: 'delivery_estimate.link.view_all_shipping_options',
                                 defaultMessage: 'View All Shipping Options'
                             })}
-                        </Link>
+                        </Button>
                     )}
                 </>
             )}
@@ -339,6 +372,65 @@ const DeliveryEstimate = ({
                 </Box>
             )}
             {resultContainer && renderedResult}
+            <Modal isOpen={isOpen} onClose={onClose} isCentered>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>
+                        {formatMessage({
+                            id: 'delivery_estimate.modal.heading',
+                            defaultMessage: 'Shipping Options'
+                        })}
+                    </ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody pb={6}>
+                        <Stack spacing={3}>
+                            {shippingOptions.map((shippingOption) => {
+                                const shippingCost = formatShippingCost(
+                                    shippingOption,
+                                    formatNumber,
+                                    freeLabel,
+                                    activeCurrency
+                                )
+                                return (
+                                    <Box
+                                        key={shippingOption.shippingMethodId}
+                                        border="1px"
+                                        borderColor="gray.200"
+                                        borderRadius="base"
+                                        p={3}
+                                    >
+                                        <Flex align="start" justify="space-between" gap={4}>
+                                            <Box>
+                                                <Text fontWeight={600}>
+                                                    {shippingOption.name ||
+                                                        shippingOption.carrier ||
+                                                        shippingOption.shippingMethodId}
+                                                </Text>
+                                                {shippingOption.deliveryWindow && (
+                                                    <Text fontSize="sm" color="gray.600">
+                                                        {formatDeliveryWindow(
+                                                            shippingOption.deliveryWindow,
+                                                            formatDate
+                                                        )}
+                                                    </Text>
+                                                )}
+                                            </Box>
+                                            {shippingCost && (
+                                                <Text fontWeight={600}>{shippingCost}</Text>
+                                            )}
+                                        </Flex>
+                                        {shippingOption.description && (
+                                            <Text mt={2} fontSize="xs" color="gray.600">
+                                                {shippingOption.description}
+                                            </Text>
+                                        )}
+                                    </Box>
+                                )
+                            })}
+                        </Stack>
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
         </>
     )
 }

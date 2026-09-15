@@ -10,7 +10,7 @@ const getTime = (value) => {
     return Number.isFinite(time) ? time : null
 }
 
-const isEligibleShippingOption = (shippingOption) => {
+export const isEligibleShippingOption = (shippingOption) => {
     const deliveryWindow = shippingOption?.deliveryWindow
     const startAt = getTime(deliveryWindow?.startAt)
     const endAt = getTime(deliveryWindow?.endAt)

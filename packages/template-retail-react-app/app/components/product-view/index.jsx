@@ -937,7 +937,10 @@ const ProductView = forwardRef(
                                                                 />
                                                             </Radio>
                                                             {hasResolvedDeliveryEstimate && (
-                                                                <Text as="span" fontWeight={500}>
+                                                                <Text
+                                                                    as="span"
+                                                                    fontWeight="inherit"
+                                                                >
                                                                     <FormattedMessage
                                                                         defaultMessage="to {postalCode}"
                                                                         id="product_view.text.delivery_to"
