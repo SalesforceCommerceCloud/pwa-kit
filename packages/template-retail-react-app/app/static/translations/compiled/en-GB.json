@@ -4578,13 +4578,13 @@
   "product_view.error.select_pickup_in_store": [
     {
       "type": 0,
-      "value": "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
+      "value": "Select 'Free pickup in' to match the fulfillment method for the items in your cart."
     }
   ],
   "product_view.error.select_ship_to_address": [
     {
       "type": 0,
-      "value": "Select 'Ship to Address' to match the delivery method for the items in your cart."
+      "value": "Select 'Delivery' to match the fulfillment method for the items in your cart."
     }
   ],
   "product_view.label.assistive_msg.quantity_decrement": [

@@ -407,18 +407,18 @@ describe('product set', () => {
         const childProducts = await screen.findAllByTestId('child-product')
         expect(childProducts).toHaveLength(3) // 3 child products in the winter look set
 
-        // Check that each child product has pickup in store radio enabled
+        // Check that each child product has a pickup radio enabled.
         for (const childProduct of childProducts) {
             await waitFor(() => {
                 const pickupRadio = within(childProduct).getByRole('radio', {
-                    name: /pick up in store/i
+                    name: /free pickup in/i
                 })
                 expect(pickupRadio).toBeEnabled()
             })
         }
 
-        // Check that the parent product pickup in store radio is also enabled
-        const allPickupRadios = await screen.findAllByRole('radio', {name: /pick up in store/i})
+        // Check that the parent product pickup radio is also enabled.
+        const allPickupRadios = await screen.findAllByRole('radio', {name: /free pickup in/i})
         // Should have 4 pickup radios total: 1 parent + 3 children
         expect(allPickupRadios).toHaveLength(4)
 
@@ -723,9 +723,9 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
         })
-        // Select "Pick Up in Store"
-        const pickupLabel = await screen.findByLabelText(/Pick Up in Store/i)
-        fireEvent.click(pickupLabel)
+        // Select pickup.
+        const pickupRadio = await screen.findByRole('radio', {name: /free pickup in/i})
+        fireEvent.click(pickupRadio)
 
         // Click Add to Cart
         const addToCartButton = await screen.findByRole('button', {name: /add to cart/i})
@@ -734,7 +734,7 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(
                 screen.getByText(
-                    "Select 'Ship to Address' to match the delivery method for the items in your cart."
+                    "Select 'Delivery' to match the fulfillment method for the items in your cart."
                 )
             ).toBeInTheDocument()
         })
@@ -836,9 +836,9 @@ describe('Delivery Options Restrictions', () => {
             expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
         })
 
-        // Select "Pick Up in Store"
-        const pickupLabel = await screen.findByLabelText(/Pick Up in Store/i)
-        fireEvent.click(pickupLabel)
+        // Select pickup.
+        const pickupRadio = await screen.findByRole('radio', {name: /free pickup in/i})
+        fireEvent.click(pickupRadio)
 
         // Click Add to Cart
         const addToCartButton = await screen.findByRole('button', {name: /add to cart/i})
@@ -847,7 +847,7 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(
                 screen.getByText(
-                    "Select 'Ship to Address' to match the delivery method for the items in your cart."
+                    "Select 'Delivery' to match the fulfillment method for the items in your cart."
                 )
             ).toBeInTheDocument()
         })
@@ -890,9 +890,9 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
         })
-        // Select "Ship to Address" (not pickup)
-        const shipToAddressLabel = await screen.findByLabelText(/Ship to Address/i)
-        fireEvent.click(shipToAddressLabel)
+        // Select delivery rather than pickup.
+        const deliveryRadio = await screen.findByRole('radio', {name: 'Delivery'})
+        fireEvent.click(deliveryRadio)
 
         // Click Add to Cart
         const addToCartButton = await screen.findByRole('button', {name: /add to cart/i})
@@ -901,7 +901,7 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(
                 screen.getByText(
-                    "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
+                    "Select 'Free pickup in' to match the fulfillment method for the items in your cart."
                 )
             ).toBeInTheDocument()
         })
@@ -952,7 +952,7 @@ test('fetches product with inventoryIds when store is selected', async () => {
     })
 })
 
-test('Add to Cart (Pick Up in Store) includes inventoryId for the selected variant', async () => {
+test('Add to Cart (Free pickup in) includes inventoryId for the selected variant', async () => {
     // Mock useSelectedStore to return a store with inventoryId
     const inventoryId = 'inventory_m_store_store1'
     mockUseSelectedStore.mockImplementation(() => ({
@@ -997,9 +997,9 @@ test('Add to Cart (Pick Up in Store) includes inventoryId for the selected varia
     // Wait for page to load
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
 
-    // Select "Pick Up in Store"
-    const pickupLabel = await screen.findByLabelText(/Pick Up in Store/i)
-    fireEvent.click(pickupLabel)
+    // Select pickup.
+    const pickupRadio = await screen.findByRole('radio', {name: /free pickup in/i})
+    fireEvent.click(pickupRadio)
 
     // Click Add to Cart
     const addToCartButton = await screen.findByRole('button', {name: /add to cart/i})
