@@ -163,9 +163,9 @@ To use a third-party provider (SendGrid, Mailchimp, Postmark, etc.), replace the
 
 | Template | Context keys |
 |---|---|
-| `email/gloAccessCode` | `orderNo`, `accessCode`, `magicLink` |
-| `email/passwordlessMagicLink` | `magicLink` |
-| `email/otpVerification` | `token` |
-| `email/passwordResetMagicLink` | `magicLink` |
+| `email/guestOrderLookup` | `orderNo`, `accessCode`, `lookupLink` |
+| `email/passwordlessLogin` | `magicLink`, `accessCode` (extracted from token in magicLinkPath, may be null) |
+| `email/registrationVerification` | `token` |
+| `email/passwordReset` | `magicLink` |
 
 Set `pwakitNotifyEnabled` to `false` to prevent the default ISML/`dw/net/Mail` delivery from also firing.

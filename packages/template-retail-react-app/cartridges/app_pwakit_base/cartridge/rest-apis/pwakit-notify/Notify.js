@@ -19,6 +19,7 @@
 var RESTResponseMgr = require('dw/system/RESTResponseMgr');
 var Resource = require('dw/web/Resource');
 var System = require('dw/system/System');
+var Site = require('dw/system/Site');
 var Logger = require('dw/system/Logger');
 var resolveStorefrontHost = require('*/cartridge/scripts/helpers/storefrontHostProvider');
 
@@ -133,9 +134,19 @@ exports.notify = function () {
             return;
         }
         magicLink = 'https://' + storefrontHost + body.data.magicLinkPath;
-        subject = Resource.msg('passwordlessMagicLink.subject', 'email', 'Your Magic Sign-In Link');
-        templateName = 'email/passwordlessMagicLink';
-        context = { magicLink: magicLink, email: recipient };
+        // Extract the token from the magicLinkPath for inline display in the email
+        var tokenMatch = body.data.magicLinkPath.match(/[?&]token=([^&]+)/);
+        var inlineAccessCode = null;
+        if (tokenMatch) {
+            try {
+                inlineAccessCode = decodeURIComponent(tokenMatch[1]);
+            } catch (e) {
+                inlineAccessCode = tokenMatch[1];
+            }
+        }
+        subject = Resource.msg('passwordlessLogin.subject', 'email', 'Your Magic Sign-In Link');
+        templateName = 'email/passwordlessLogin';
+        context = { magicLink: magicLink, accessCode: inlineAccessCode };
     } else if (type === 'password-reset') {
         if (!body.data.magicLinkPath) {
             RESTResponseMgr.createError(
@@ -147,9 +158,9 @@ exports.notify = function () {
             return;
         }
         magicLink = 'https://' + storefrontHost + body.data.magicLinkPath;
-        subject = Resource.msg('passwordResetMagicLink.subject', 'email', 'Reset Your Password');
-        templateName = 'email/passwordResetMagicLink';
-        context = { magicLink: magicLink, email: recipient };
+        subject = Resource.msg('passwordReset.subject', 'email', 'Reset Your Password');
+        templateName = 'email/passwordReset';
+        context = { magicLink: magicLink };
     } else if (type === 'otp') {
         if (!body.data.token) {
             RESTResponseMgr.createError(
@@ -160,8 +171,8 @@ exports.notify = function () {
             ).render();
             return;
         }
-        subject = Resource.msg('otpVerification.subject', 'email', 'Your Verification Code');
-        templateName = 'email/otpVerification';
+        subject = Resource.msg('registrationVerification.subject', 'email', 'Your Verification Code');
+        templateName = 'email/registrationVerification';
         context = { token: body.data.token };
     } else if (type === 'glo-access-code') {
         if (!body.data.orderNo || !body.data.accessCode) {
@@ -173,9 +184,12 @@ exports.notify = function () {
             ).render();
             return;
         }
-        subject = Resource.msg('gloAccessCode.subject', 'email', 'Your Order Access Code');
-        templateName = 'email/gloAccessCode';
-        context = { orderNo: body.data.orderNo, accessCode: body.data.accessCode };
+        var siteId = Site.getCurrent().ID.toLowerCase();
+        var locale = (request.locale || Site.getCurrent().defaultLocale || 'en_US').replace(/_/g, '-');
+        var lookupLink = 'https://' + storefrontHost + '/' + siteId + '/' + locale + '/order-lookup/verify/' + body.data.orderNo + '?token=' + encodeURIComponent(body.data.accessCode);
+        subject = Resource.msg('guestOrderLookup.subject', 'email', 'Your Order Access Code');
+        templateName = 'email/guestOrderLookup';
+        context = { orderNo: body.data.orderNo, accessCode: body.data.accessCode, lookupLink: lookupLink };
     } else {
         RESTResponseMgr.createError(
             400,

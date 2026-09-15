@@ -21,7 +21,6 @@ var Logger = require('dw/system/Logger');
 var Resource = require('dw/web/Resource');
 var System = require('dw/system/System');
 var Site = require('dw/system/Site');
-var HookMgr = require('dw/system/HookMgr');
 var sendNotification = require('*/cartridge/scripts/helpers/sendNotification');
 var resolveStorefrontHost = require('*/cartridge/scripts/helpers/storefrontHostProvider');
 
@@ -60,6 +59,9 @@ function isNotifyEnabled() {
  * generated access code. Signature is (order, accessCode) per the platform
  * hook contract — not (recipient, orderNo, accessCode).
  *
+ * B2C handles hook chaining automatically; HookMgr.callNextHook() must not
+ * be called explicitly.
+ *
  * @param {dw.order.Order} order - The B2C Order object
  * @param {string} accessCode - The one-time access code
  * @returns {dw.system.Status}
@@ -67,8 +69,7 @@ function isNotifyEnabled() {
 function sendOrderAccessCode(order, accessCode) {
     if (!isNotifyEnabled()) {
         log.info('sendOrderAccessCode: pwakitNotifyEnabled is false — skipping (custom email provider in use)');
-        var skipped = HookMgr.callNextHook('sfcc.app.order.sendOrderAccessCode', 'sendOrderAccessCode', order, accessCode);
-        return skipped || new Status(Status.OK);
+        return new Status(Status.OK);
     }
     log.info('sendOrderAccessCode called: orderNo={0}', order ? order.orderNo : 'null');
     if (!order || !order.customerInfo) {
@@ -82,21 +83,20 @@ function sendOrderAccessCode(order, accessCode) {
     // hook with an alias-aware implementation.
     var siteId = Site.getCurrent().ID.toLowerCase();
     var locale = (request.locale || Site.getCurrent().defaultLocale || 'en_US').replace(/_/g, '-');
-    var magicLink = 'https://' + resolveStorefrontHost(null) + '/' + siteId + '/' + locale + '/order-lookup/verify/' + order.orderNo + '?token=' + encodeURIComponent(accessCode);
+    var lookupLink = 'https://' + resolveStorefrontHost(null) + '/' + siteId + '/' + locale + '/order-lookup/verify/' + order.orderNo + '?token=' + encodeURIComponent(accessCode);
 
     var result = sendNotification.send(
         order.customerInfo.email,
-        Resource.msg('gloAccessCode.subject', 'email', 'Your Order Access Code'),
-        'email/gloAccessCode',
-        { orderNo: order.orderNo, accessCode: accessCode, magicLink: magicLink }
+        Resource.msg('guestOrderLookup.subject', 'email', 'Your Order Access Code'),
+        'email/guestOrderLookup',
+        { orderNo: order.orderNo, accessCode: accessCode, lookupLink: lookupLink }
     );
 
     if (result.error) {
         return new Status(Status.ERROR, 'MAIL_FAILED', result.errorMessage || 'mail.send() failed');
     }
 
-    var next = HookMgr.callNextHook('sfcc.app.order.sendOrderAccessCode', 'sendOrderAccessCode', order, accessCode);
-    return next || new Status(Status.OK);
+    return new Status(Status.OK);
 }
 
 module.exports = { sendOrderAccessCode: sendOrderAccessCode };
