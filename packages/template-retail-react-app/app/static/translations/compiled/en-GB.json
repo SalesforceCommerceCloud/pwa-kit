@@ -2865,6 +2865,12 @@
       "value": "total"
     }
   ],
+  "guestOrderLookup.verify.label.email": [
+    {
+      "type": 0,
+      "value": "Your email address"
+    }
+  ],
   "guestOrderLookup.verify.subtext": [
     {
       "type": 0,
@@ -4721,6 +4727,18 @@
     {
       "type": 0,
       "value": "Reset Password"
+    }
+  ],
+  "reset_password_form.error.required_email": [
+    {
+      "type": 0,
+      "value": "Please enter your email address."
+    }
+  ],
+  "reset_password_form.label.email": [
+    {
+      "type": 0,
+      "value": "Email"
     }
   ],
   "reset_password_form.message.enter_your_email": [

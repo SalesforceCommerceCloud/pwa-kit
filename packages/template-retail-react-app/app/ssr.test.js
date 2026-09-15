@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {rest} from 'msw'
 import * as jose from 'jose'
 
 // Mock the runtime to prevent server startup during tests
@@ -99,11 +98,7 @@ jest.mock('jose', () => ({
 }))
 
 // Import only the functions we need to test
-import {
-    validateSlasCallbackToken,
-    emailLink,
-    handleCallback
-} from '@salesforce/retail-react-app/app/ssr.js'
+import {validateSlasCallbackToken, handleCallback} from '@salesforce/retail-react-app/app/ssr.js'
 
 // Mock environment variables
 const originalEnv = process.env
@@ -234,122 +229,5 @@ describe('handleCallback', () => {
         expect(next).not.toHaveBeenCalled()
         expect(res.set).toHaveBeenCalledWith('Cache-Control', 'max-age=31536000')
         expect(res.send).toHaveBeenCalled()
-    })
-})
-
-describe('emailLink function', () => {
-    beforeEach(() => {
-        // Set up MSW handlers for Marketing Cloud API
-        global.server.use(
-            rest.post(
-                'https://test-subdomain.auth.marketingcloudapis.com/v2/token',
-                (req, res, ctx) => {
-                    return res(
-                        ctx.delay(0),
-                        ctx.status(200),
-                        ctx.json({access_token: 'mc-access-token'})
-                    )
-                }
-            ),
-            rest.post(
-                'https://test-subdomain.rest.marketingcloudapis.com/messaging/v1/email/messages/:messageId',
-                (req, res, ctx) => {
-                    return res(
-                        ctx.delay(0),
-                        ctx.status(200),
-                        ctx.json({requestId: 'email-request-id', status: 'sent'})
-                    )
-                }
-            )
-        )
-    })
-
-    test('should send email via Marketing Cloud successfully', async () => {
-        const result = await emailLink(
-            'test@example.com',
-            'test-template',
-            'https://example.com/magic-link'
-        )
-
-        expect(result).toBeDefined()
-        expect(result.requestId).toBe('email-request-id')
-        expect(result.status).toBe('sent')
-    })
-
-    test('should handle Marketing Cloud token fetch failure', async () => {
-        // Reset all handlers and only add the failing token endpoint
-        global.server.resetHandlers(
-            rest.post(
-                'https://test-subdomain.auth.marketingcloudapis.com/v2/token',
-                (req, res, ctx) => {
-                    return res(ctx.delay(0), ctx.status(401), ctx.json({error: 'Unauthorized'}))
-                }
-            )
-        )
-
-        await expect(
-            emailLink('test@example.com', 'test-template', 'https://example.com/magic-link')
-        ).rejects.toThrow()
-    }, 10000)
-
-    test('should handle Marketing Cloud email send failure', async () => {
-        global.server.use(
-            rest.post(
-                'https://test-subdomain.auth.marketingcloudapis.com/v2/token',
-                (req, res, ctx) => {
-                    return res(
-                        ctx.delay(0),
-                        ctx.status(200),
-                        ctx.json({access_token: 'mc-access-token'})
-                    )
-                }
-            ),
-            rest.post(
-                'https://test-subdomain.rest.marketingcloudapis.com/messaging/v1/email/messages/:messageId',
-                (req, res, ctx) => {
-                    return res(ctx.delay(0), ctx.status(400), ctx.json({error: 'Bad Request'}))
-                }
-            )
-        )
-
-        await expect(
-            emailLink('test@example.com', 'test-template', 'https://example.com/magic-link')
-        ).rejects.toThrow('Failed to send email to Marketing Cloud')
-    })
-
-    test('should warn when Marketing Cloud environment variables are missing', () => {
-        const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
-
-        // Store current env vars
-        const originalClientId = process.env.MARKETING_CLOUD_CLIENT_ID
-        const originalClientSecret = process.env.MARKETING_CLOUD_CLIENT_SECRET
-        const originalSubdomain = process.env.MARKETING_CLOUD_SUBDOMAIN
-
-        // Temporarily remove env vars
-        delete process.env.MARKETING_CLOUD_CLIENT_ID
-        delete process.env.MARKETING_CLOUD_CLIENT_SECRET
-        delete process.env.MARKETING_CLOUD_SUBDOMAIN
-
-        // Call the function to trigger the warnings (but don't await it)
-        emailLink('test@example.com', 'test-template', 'https://example.com/magic-link').catch(
-            () => {}
-        )
-
-        expect(consoleSpy).toHaveBeenCalledWith(
-            'MARKETING_CLOUD_CLIENT_ID is not set in the environment variables.'
-        )
-        expect(consoleSpy).toHaveBeenCalledWith(
-            ' MARKETING_CLOUD_CLIENT_SECRET is not set in the environment variables.'
-        )
-        expect(consoleSpy).toHaveBeenCalledWith(
-            'MARKETING_CLOUD_SUBDOMAIN is not set in the environment variables.'
-        )
-
-        // Restore env vars
-        if (originalClientId) process.env.MARKETING_CLOUD_CLIENT_ID = originalClientId
-        if (originalClientSecret) process.env.MARKETING_CLOUD_CLIENT_SECRET = originalClientSecret
-        if (originalSubdomain) process.env.MARKETING_CLOUD_SUBDOMAIN = originalSubdomain
-
-        consoleSpy.mockRestore()
     })
 })
