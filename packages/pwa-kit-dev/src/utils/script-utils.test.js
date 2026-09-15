@@ -450,6 +450,136 @@ describe('scriptUtils', () => {
         )
     })
 
+    describe('MRT read-only (maintenance) mode', () => {
+        const makeHeaders = (readOnlyValue) => ({
+            get: (name) =>
+                name === scriptUtils.MRT_READ_ONLY_HEADER ? readOnlyValue ?? null : null
+        })
+
+        describe('isMrtReadOnlyResponse', () => {
+            it('is true when the header is "true"', () => {
+                expect(scriptUtils.isMrtReadOnlyResponse({headers: makeHeaders('true')})).toBe(true)
+            })
+
+            it('is true regardless of casing/whitespace', () => {
+                expect(scriptUtils.isMrtReadOnlyResponse({headers: makeHeaders('  TRUE ')})).toBe(
+                    true
+                )
+            })
+
+            it('is false when the header is not "true"', () => {
+                expect(scriptUtils.isMrtReadOnlyResponse({headers: makeHeaders('false')})).toBe(
+                    false
+                )
+            })
+
+            it('is false when the header is absent', () => {
+                expect(scriptUtils.isMrtReadOnlyResponse({headers: makeHeaders(undefined)})).toBe(
+                    false
+                )
+            })
+
+            it('is false when the response exposes no headers accessor', () => {
+                expect(scriptUtils.isMrtReadOnlyResponse({status: 503})).toBe(false)
+            })
+        })
+
+        it('blocks a write (push) with an actionable maintenance error', async () => {
+            readJson.mockReturnValue(pkg)
+            execSync.mockReturnValue(JSON.stringify(dependencyTreeMockData.noPwaKitPackages))
+
+            const projectSlug = 'project-slug'
+            const bundle = await scriptUtils.createBundle({
+                message: 'message',
+                ssr_parameters: {},
+                ssr_only: ['*.js'],
+                ssr_shared: ['**/*.*'],
+                buildDirectory: path.join(__dirname, 'test-fixtures', 'minimal-built-app'),
+                projectSlug
+            })
+
+            const fetchMock = jest.fn(async () => ({
+                status: 503,
+                headers: makeHeaders('true'),
+                text: () => Promise.resolve(''),
+                json: () => Promise.reject()
+            }))
+            const client = new scriptUtils.CloudAPIClient({
+                credentials: {username: 'user123', api_key: '123'},
+                fetch: fetchMock
+            })
+
+            const fn = async () => await client.push(bundle, projectSlug, 'production')
+
+            await expect(fn).rejects.toThrow(scriptUtils.MrtMaintenanceError)
+            await expect(fn).rejects.toThrow('Managed Runtime is in maintenance mode')
+            await expect(fn).rejects.toThrow(scriptUtils.MRT_MAINTENANCE_STATUS_URL)
+        })
+
+        it('does NOT block a successful (status < 400) response carrying the header', async () => {
+            // Guards the ordering invariant: the maintenance check must sit AFTER
+            // the `status < 400` early return, so healthy reads/writes are never blocked.
+            readJson.mockReturnValue(pkg)
+            execSync.mockReturnValue(JSON.stringify(dependencyTreeMockData.noPwaKitPackages))
+
+            const projectSlug = 'project-slug'
+            const bundle = await scriptUtils.createBundle({
+                message: 'message',
+                ssr_parameters: {},
+                ssr_only: ['*.js'],
+                ssr_shared: ['**/*.*'],
+                buildDirectory: path.join(__dirname, 'test-fixtures', 'minimal-built-app'),
+                projectSlug
+            })
+
+            const goodResponseBody = {anything: 'anything'}
+            const fetchMock = jest.fn(async () => ({
+                status: 200,
+                headers: makeHeaders('true'),
+                text: () => Promise.resolve(JSON.stringify(goodResponseBody)),
+                json: () => Promise.resolve(goodResponseBody)
+            }))
+            const client = new scriptUtils.CloudAPIClient({
+                credentials: {username: 'user123', api_key: '123'},
+                fetch: fetchMock
+            })
+
+            expect(await client.push(bundle, projectSlug, 'production')).toBe(goodResponseBody)
+        })
+
+        it('lets non-maintenance errors fall through to normal handling', async () => {
+            readJson.mockReturnValue(pkg)
+            execSync.mockReturnValue(JSON.stringify(dependencyTreeMockData.noPwaKitPackages))
+
+            const projectSlug = 'project-slug'
+            const bundle = await scriptUtils.createBundle({
+                message: 'message',
+                ssr_parameters: {},
+                ssr_only: ['*.js'],
+                ssr_shared: ['**/*.*'],
+                buildDirectory: path.join(__dirname, 'test-fixtures', 'minimal-built-app'),
+                projectSlug
+            })
+
+            // 503 without the read-only header must NOT be treated as maintenance mode.
+            const fetchMock = jest.fn(async () => ({
+                status: 503,
+                headers: makeHeaders('false'),
+                text: () => Promise.resolve('An error occurred'),
+                json: () => Promise.reject()
+            }))
+            const client = new scriptUtils.CloudAPIClient({
+                credentials: {username: 'user123', api_key: '123'},
+                fetch: fetchMock
+            })
+
+            const fn = async () => await client.push(bundle, projectSlug, 'production')
+
+            await expect(fn).rejects.toThrow('For more information visit')
+            await expect(fn).rejects.not.toThrow('maintenance mode')
+        })
+    })
+
     describe('createLoggingToken', () => {
         const username = 'user123'
         const api_key = '123'
