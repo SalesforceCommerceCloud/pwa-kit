@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {fireEvent, screen, waitFor} from '@testing-library/react'
+import {fireEvent, screen, waitFor, within} from '@testing-library/react'
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import mockProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
 import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
@@ -21,16 +21,29 @@ import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import frMessages from '@salesforce/retail-react-app/app/static/translations/compiled/fr-FR.json'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
 import {rest} from 'msw'
+
+jest.mock('@loadable/component', () => ({
+    __esModule: true,
+    default: () =>
+        jest.requireActual('@salesforce/retail-react-app/app/components/delivery-estimate').default
+}))
 
 // Ensure useMultiSite returns site.id = 'site-1' for all tests
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     __esModule: true,
     default: () => ({
         site: {id: 'site-1'},
+        locale: {id: 'en-US'},
         buildUrl: (url) => url // identity function for tests
     })
 }))
+
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const actual = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {...actual, useDeliveryEstimates: jest.fn()}
+})
 
 // Mock useSelectedStore hook
 jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
@@ -39,10 +52,14 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
 
 const MockComponent = (props) => {
     const {data: customer} = useCurrentCustomer()
+    const defaultProps = {
+        pickupInStore: false,
+        setPickupInStore: jest.fn()
+    }
     return (
         <div>
             <div>customer: {customer?.authType}</div>
-            <ProductView {...props} />
+            <ProductView {...defaultProps} {...props} />
         </div>
     )
 }
@@ -61,6 +78,23 @@ const mockStoreData = {
     inventoryId: 'inventory_m_store_store1'
 }
 
+const deliveryEstimateResult = {
+    productDeliveryEstimates: [
+        {
+            productId: mockStandardProductOrderable.id,
+            shippingOptions: [
+                {
+                    shippingMethodId: 'ground',
+                    deliveryWindow: {
+                        startAt: '2026-09-16T14:00:00Z',
+                        endAt: '2026-09-18T14:00:00Z'
+                    }
+                }
+            ]
+        }
+    ]
+}
+
 // Set up and clean up
 beforeEach(() => {
     // Since we're testing some navigation logic, we are using a simple Router
@@ -73,6 +107,13 @@ beforeEach(() => {
         error: null,
         hasSelectedStore: true
     }))
+    useDeliveryEstimates.mockReturnValue({
+        data: deliveryEstimateResult,
+        isError: false,
+        isLoading: false,
+        isFetching: false
+    })
+    window.localStorage.clear()
 
     // Reset MSW handlers to avoid conflicts
     global.server.resetHandlers()
@@ -135,12 +176,6 @@ afterEach(() => {
     sessionStorage.clear()
 })
 
-// Update MockComponent default props for all tests
-MockComponent.defaultProps = {
-    pickupInStore: false,
-    setPickupInStore: jest.fn()
-}
-
 test('ProductView Component renders properly', async () => {
     const addToCart = jest.fn()
     renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
@@ -149,6 +184,79 @@ test('ProductView Component renders properly', async () => {
     expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
     expect(screen.getAllByRole('radiogroup')).toHaveLength(4)
     expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
+})
+
+test('renders delivery estimates only when explicitly enabled for the PDP', async () => {
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
+    )
+
+    expect(
+        await screen.findByRole('heading', {name: 'Estimated Delivery Date'})
+    ).toBeInTheDocument()
+})
+
+test('keeps the delivery estimate calculator separate from the delivery option', async () => {
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
+    )
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+    const deliveryEstimate = await screen.findByRole('region', {name: 'Estimated Delivery Date'})
+
+    expect(deliveryOption).toHaveAttribute('data-selected', 'true')
+    expect(deliveryOption).not.toContainElement(deliveryEstimate)
+})
+
+test('matches the Storefront Next fulfillment option labels', () => {
+    useSelectedStore.mockReturnValue({
+        selectedStore: null,
+        isLoading: false,
+        error: null,
+        hasSelectedStore: false
+    })
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
+    )
+
+    expect(screen.getByRole('radio', {name: 'Delivery'})).toHaveAccessibleDescription(
+        'Enter a postal code to get a delivery estimate'
+    )
+    expect(screen.getByRole('radio', {name: 'Free pickup in'})).toHaveAccessibleDescription(
+        'Select Store'
+    )
+})
+
+test('settles delivery to the postal-code control and reopens the calculator on request', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
+    )
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+    await user.click(
+        await screen.findByRole('button', {name: 'Change delivery destination from 33712'})
+    )
+    const postalCodeInput = await screen.findByRole('textbox', {name: /zip code/i})
+    await user.clear(postalCodeInput)
+    await user.type(postalCodeInput, '94105')
+    await user.click(screen.getByRole('button', {name: 'Calculate delivery estimate'}))
+
+    await waitFor(() => {
+        expect(deliveryOption).toHaveTextContent(/Delivery\s*to 94105/)
+    })
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(within(deliveryOption).getByTestId('delivery-estimate-result')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', {name: 'Change delivery destination from 94105'}))
+
+    expect(await screen.findByRole('region', {name: 'Estimated Delivery Date'})).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveFocus()
+    })
+    expect(screen.getByRole('radio', {name: 'Delivery'})).toHaveAccessibleDescription(
+        'Enter a postal code to get a delivery estimate'
+    )
 })
 
 describe('Event Handlers', () => {
@@ -427,8 +535,8 @@ describe('Product Sets', () => {
             .queryAllByRole('radiogroup')
             .filter(
                 (rg) =>
-                    !rg.textContent.includes('Ship to Address') &&
-                    !rg.textContent.includes('Pickup in Store')
+                    !rg.textContent.includes('Delivery') &&
+                    !rg.textContent.includes('Free pickup in')
             )
         const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
 
@@ -457,8 +565,8 @@ describe('Product Sets', () => {
             .queryAllByRole('radiogroup')
             .filter(
                 (rg) =>
-                    !rg.textContent.includes('Ship to Address') &&
-                    !rg.textContent.includes('Pickup in Store')
+                    !rg.textContent.includes('Delivery') &&
+                    !rg.textContent.includes('Free pickup in')
             )
         const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
         const fromLabels = screen.queryAllByText(/from/i)
@@ -495,8 +603,8 @@ describe('Product Bundles', () => {
             .queryAllByRole('radiogroup')
             .filter(
                 (rg) =>
-                    !rg.textContent.includes('Ship to Address') &&
-                    !rg.textContent.includes('Pickup in Store')
+                    !rg.textContent.includes('Delivery') &&
+                    !rg.textContent.includes('Free pickup in')
             )
 
         // What should exist:
@@ -526,8 +634,8 @@ describe('Product Bundles', () => {
             .queryAllByRole('radiogroup')
             .filter(
                 (rg) =>
-                    !rg.textContent.includes('Ship to Address') &&
-                    !rg.textContent.includes('Pickup in Store')
+                    !rg.textContent.includes('Delivery') &&
+                    !rg.textContent.includes('Free pickup in')
             )
         const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
 
@@ -540,28 +648,102 @@ describe('Product Bundles', () => {
         expect(quantityPicker).toBeNull()
     })
 
-    test('Pickup in store radio is enabled when selected store is set', async () => {
+    test('selects pickup when the selected store has inventory', async () => {
+        const user = userEvent.setup()
+        const setPickupInStore = jest.fn()
+        const onOpenStoreLocator = jest.fn()
         // Ensure the product has inventory data for the store and is in stock
         const mockProduct = {
             ...mockProductDetail,
             inventories: [{id: mockStoreData.inventoryId, orderable: true, stockLevel: 10}]
         }
 
-        renderWithProviders(<MockComponent product={mockProduct} showDeliveryOptions={true} />)
-
-        // Assert: Radio is enabled
-        const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
-        expect(pickupRadio).toBeEnabled()
-    })
-
-    test('Pickup in store radio is disabled when inventoryId is NOT present in localStorage', async () => {
         renderWithProviders(
-            <MockComponent product={mockProductDetail} showDeliveryOptions={true} />
+            <MockComponent
+                product={mockProduct}
+                showDeliveryOptions={true}
+                setPickupInStore={setPickupInStore}
+                onOpenStoreLocator={onOpenStoreLocator}
+            />
         )
 
-        // Assert: Radio is disabled
-        const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
-        expect(pickupRadio).toBeDisabled()
+        const pickupRadio = await screen.findByRole('radio', {name: /free pickup in/i})
+        expect(pickupRadio).toBeEnabled()
+
+        await user.click(pickupRadio)
+
+        expect(setPickupInStore).toHaveBeenCalledWith(true)
+        expect(onOpenStoreLocator).not.toHaveBeenCalled()
+    })
+
+    test('keeps the delivery estimate calculator visible when pickup is selected', async () => {
+        const user = userEvent.setup()
+        const mockProduct = {
+            ...mockProductDetail,
+            inventories: [{id: mockStoreData.inventoryId, orderable: true, stockLevel: 10}]
+        }
+        const PickupStateHarness = () => {
+            const [pickupInStore, setPickupInStore] = React.useState(true)
+
+            return (
+                <MockComponent
+                    product={mockProduct}
+                    pickupInStore={pickupInStore}
+                    setPickupInStore={setPickupInStore}
+                    showDeliveryEstimate={true}
+                    showDeliveryOptions={true}
+                />
+            )
+        }
+
+        renderWithProviders(<PickupStateHarness />)
+
+        const pickupOption = screen.getByTestId('pickup-fulfillment-option')
+
+        expect(pickupOption).toHaveAttribute('data-selected', 'true')
+        expect(
+            await screen.findByRole('region', {name: 'Estimated Delivery Date'})
+        ).toBeInTheDocument()
+
+        await user.click(screen.getByRole('radio', {name: 'Delivery'}))
+
+        expect(screen.getByTestId('delivery-fulfillment-option')).toHaveAttribute(
+            'data-selected',
+            'true'
+        )
+        expect(
+            await screen.findByRole('region', {name: 'Estimated Delivery Date'})
+        ).toBeInTheDocument()
+    })
+
+    test('opens the store locator without selecting pickup when no store is selected', async () => {
+        const user = userEvent.setup()
+        const onOpenStoreLocator = jest.fn()
+        const setPickupInStore = jest.fn()
+        useSelectedStore.mockReturnValue({
+            selectedStore: null,
+            isLoading: false,
+            error: null,
+            hasSelectedStore: false
+        })
+
+        renderWithProviders(
+            <MockComponent
+                product={mockProductDetail}
+                showDeliveryOptions={true}
+                onOpenStoreLocator={onOpenStoreLocator}
+                setPickupInStore={setPickupInStore}
+            />
+        )
+
+        const pickupRadio = await screen.findByRole('radio', {name: /free pickup in/i})
+        expect(pickupRadio).toBeEnabled()
+
+        await user.click(pickupRadio)
+
+        expect(onOpenStoreLocator).toHaveBeenCalledTimes(1)
+        expect(setPickupInStore).not.toHaveBeenCalled()
+        expect(screen.getByRole('radio', {name: 'Delivery'})).toBeChecked()
     })
 
     test('Pickup in store radio is disabled when inventoryId is present but product is out of stock', async () => {
@@ -575,14 +757,14 @@ describe('Product Bundles', () => {
 
         renderWithProviders(<MockComponent product={mockProduct} showDeliveryOptions={true} />)
 
-        const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
+        const pickupRadio = await screen.findByRole('radio', {name: /free pickup in/i})
         // Chakra UI does not set a semantic disabled attribute, so we test for unclickability
         expect(pickupRadio).not.toBeChecked()
         await user.click(pickupRadio)
         expect(pickupRadio).not.toBeChecked()
     })
 
-    test('shows "Pickup in Select Store" label when pickup is disabled due to no store/inventoryId', async () => {
+    test('does not show a redundant select-store prompt when no store is selected', async () => {
         useSelectedStore.mockReturnValue({
             selectedStore: null,
             isLoading: false,
@@ -594,12 +776,11 @@ describe('Product Bundles', () => {
             <MockComponent product={mockProductDetail} showDeliveryOptions={true} />
         )
 
-        const label = await screen.findByTestId('pickup-select-store-msg')
-        expect(label).toBeInTheDocument()
-        expect(label).toHaveTextContent(/Pick up in/i)
-        const button = label.querySelector('button')
-        expect(button).toBeInTheDocument()
-        expect(button).toHaveTextContent(/Select Store/i)
+        expect(screen.queryByTestId('pickup-select-store-msg')).not.toBeInTheDocument()
+        expect(screen.getByText('Select Store')).toBeInTheDocument()
+        expect(screen.getByRole('radio', {name: /free pickup in/i})).toHaveAccessibleDescription(
+            'Select Store'
+        )
     })
 
     describe('ProductView stock status messages', () => {
@@ -645,9 +826,8 @@ describe('Product Bundles', () => {
             )
 
             // Delivery options should be visible
-            expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
-            expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
-            expect(screen.getByRole('radio', {name: /pick up in store/i})).toBeInTheDocument()
+            expect(screen.getByRole('radio', {name: 'Delivery'})).toBeInTheDocument()
+            expect(screen.getByRole('radio', {name: /free pickup in/i})).toBeInTheDocument()
         })
 
         test('hides delivery options when showDeliveryOptions is false', async () => {
@@ -656,9 +836,8 @@ describe('Product Bundles', () => {
             )
 
             // Delivery options should not be visible
-            expect(screen.queryByText(/Delivery:/i)).not.toBeInTheDocument()
-            expect(screen.queryByRole('radio', {name: /ship to address/i})).not.toBeInTheDocument()
-            expect(screen.queryByRole('radio', {name: /pick up in store/i})).not.toBeInTheDocument()
+            expect(screen.queryByRole('radio', {name: 'Delivery'})).not.toBeInTheDocument()
+            expect(screen.queryByRole('radio', {name: /free pickup in/i})).not.toBeInTheDocument()
             expect(screen.queryByTestId('store-stock-status-msg')).not.toBeInTheDocument()
             expect(screen.queryByTestId('pickup-select-store-msg')).not.toBeInTheDocument()
         })
@@ -667,9 +846,8 @@ describe('Product Bundles', () => {
             renderWithProviders(<MockComponent product={mockProductDetail} />)
 
             // Delivery options should be visible by default
-            expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
-            expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
-            expect(screen.getByRole('radio', {name: /pick up in store/i})).toBeInTheDocument()
+            expect(screen.getByRole('radio', {name: 'Delivery'})).toBeInTheDocument()
+            expect(screen.getByRole('radio', {name: /free pickup in/i})).toBeInTheDocument()
         })
     })
 })
@@ -685,16 +863,36 @@ test('Pick up in store radio is enabled when selected store is set', async () =>
     renderWithProviders(<MockComponent product={mockProduct} showDeliveryOptions={true} />)
 
     // Assert: Radio is enabled
-    const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
+    const pickupRadio = await screen.findByRole('radio', {name: /free pickup in/i})
     expect(pickupRadio).toBeEnabled()
 })
 
-test('Pick up in store radio is disabled when inventoryId is NOT present in selected store', async () => {
-    renderWithProviders(<MockComponent product={mockProductDetail} showDeliveryOptions={true} />)
+test('Pick up in store opens the locator on keyboard activation when no store is selected', async () => {
+    const user = userEvent.setup()
+    const onOpenStoreLocator = jest.fn()
+    const setPickupInStore = jest.fn()
+    useSelectedStore.mockReturnValue({
+        selectedStore: null,
+        isLoading: false,
+        error: null,
+        hasSelectedStore: false
+    })
 
-    // Assert: Radio is disabled
-    const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
-    expect(pickupRadio).toBeDisabled()
+    renderWithProviders(
+        <MockComponent
+            product={mockProductDetail}
+            showDeliveryOptions={true}
+            onOpenStoreLocator={onOpenStoreLocator}
+            setPickupInStore={setPickupInStore}
+        />
+    )
+
+    await user.click(await screen.findByRole('radio', {name: 'Delivery'}))
+    await user.keyboard('{ArrowDown}')
+
+    expect(onOpenStoreLocator).toHaveBeenCalledTimes(1)
+    expect(setPickupInStore).not.toHaveBeenCalled()
+    expect(screen.getByRole('radio', {name: 'Delivery'})).toBeChecked()
 })
 
 test('Pick up in store radio is disabled when inventoryId is present but product is out of stock', async () => {
@@ -708,14 +906,14 @@ test('Pick up in store radio is disabled when inventoryId is present but product
 
     renderWithProviders(<MockComponent product={mockProduct} showDeliveryOptions={true} />)
 
-    const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
+    const pickupRadio = await screen.findByRole('radio', {name: /free pickup in/i})
     // Chakra UI does not set a semantic disabled attribute, so we test for unclickability
     expect(pickupRadio).not.toBeChecked()
     await user.click(pickupRadio)
     expect(pickupRadio).not.toBeChecked()
 })
 
-test('shows "Pick up in Select Store" label when pickup is disabled due to no store/inventoryId', async () => {
+test('does not show a select-store prompt when no store is selected', async () => {
     useSelectedStore.mockReturnValue({
         selectedStore: null,
         isLoading: false,
@@ -725,12 +923,11 @@ test('shows "Pick up in Select Store" label when pickup is disabled due to no st
 
     renderWithProviders(<MockComponent product={mockProductDetail} showDeliveryOptions={true} />)
 
-    const label = await screen.findByTestId('pickup-select-store-msg')
-    expect(label).toBeInTheDocument()
-    expect(label).toHaveTextContent(/Pick up in/i)
-    const button = label.querySelector('button')
-    expect(button).toBeInTheDocument()
-    expect(button).toHaveTextContent(/Select Store/i)
+    expect(screen.queryByTestId('pickup-select-store-msg')).not.toBeInTheDocument()
+    expect(screen.getByText('Select Store')).toBeInTheDocument()
+    expect(screen.getByRole('radio', {name: /free pickup in/i})).toHaveAccessibleDescription(
+        'Select Store'
+    )
 })
 
 test('shows "In stock at {storeName}" when store has inventory', async () => {

@@ -1959,6 +1959,160 @@
       "value": "Security code info"
     }
   ],
+  "delivery_estimate.action.calculate": [
+    {
+      "type": 0,
+      "value": "Calculate"
+    }
+  ],
+  "delivery_estimate.action.calculate_aria_label": [
+    {
+      "type": 0,
+      "value": "Calculate delivery estimate"
+    }
+  ],
+  "delivery_estimate.error.enter_postal_code": [
+    {
+      "options": {
+        "GB": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a postcode."
+            }
+          ]
+        },
+        "US": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a ZIP code."
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a postal code."
+            }
+          ]
+        }
+      },
+      "type": 5,
+      "value": "countryCode"
+    }
+  ],
+  "delivery_estimate.error.invalid_postal_code": [
+    {
+      "options": {
+        "GB": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a valid postcode."
+            }
+          ]
+        },
+        "US": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a valid ZIP code."
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Enter a valid postal code."
+            }
+          ]
+        }
+      },
+      "type": 5,
+      "value": "countryCode"
+    }
+  ],
+  "delivery_estimate.heading": [
+    {
+      "type": 0,
+      "value": "Estimated Delivery Date"
+    }
+  ],
+  "delivery_estimate.label.postal_code": [
+    {
+      "options": {
+        "GB": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Postcode"
+            }
+          ]
+        },
+        "US": {
+          "value": [
+            {
+              "type": 0,
+              "value": "ZIP code"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "Postal code"
+            }
+          ]
+        }
+      },
+      "type": 5,
+      "value": "countryCode"
+    }
+  ],
+  "delivery_estimate.link.view_all_shipping_options": [
+    {
+      "type": 0,
+      "value": "View All Shipping Options"
+    }
+  ],
+  "delivery_estimate.modal.heading": [
+    {
+      "type": 0,
+      "value": "Shipping Options"
+    }
+  ],
+  "delivery_estimate.placeholder.postal_code": [
+    {
+      "type": 0,
+      "value": "Enter a postal code..."
+    }
+  ],
+  "delivery_estimate.status.estimated_arrival": [
+    {
+      "type": 0,
+      "value": "Estimated: "
+    },
+    {
+      "type": 1,
+      "value": "deliveryWindow"
+    }
+  ],
+  "delivery_estimate.status.loading": [
+    {
+      "type": 0,
+      "value": "Calculating..."
+    }
+  ],
+  "delivery_estimate.status.unavailable": [
+    {
+      "type": 0,
+      "value": "Delivery dates unavailable. See checkout for options and costs."
+    }
+  ],
   "display_price.assistive_msg.current_price": [
     {
       "type": 0,
@@ -4395,6 +4549,16 @@
       "value": "Sale"
     }
   ],
+  "product_view.action.change_delivery_destination": [
+    {
+      "type": 0,
+      "value": "Change delivery destination from "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
   "product_view.button.add_bundle_to_cart": [
     {
       "type": 0,
@@ -4437,6 +4601,12 @@
       "value": "Update"
     }
   ],
+  "product_view.description.delivery_estimate": [
+    {
+      "type": 0,
+      "value": "Enter a postal code to get a delivery estimate"
+    }
+  ],
   "product_view.error.no_store_selected_for_pickup": [
     {
       "type": 0,
@@ -4446,13 +4616,13 @@
   "product_view.error.select_pickup_in_store": [
     {
       "type": 0,
-      "value": "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
+      "value": "Select 'Free pickup in' to match the fulfillment method for the items in your cart."
     }
   ],
   "product_view.error.select_ship_to_address": [
     {
       "type": 0,
-      "value": "Select 'Ship to Address' to match the delivery method for the items in your cart."
+      "value": "Select 'Delivery' to match the fulfillment method for the items in your cart."
     }
   ],
   "product_view.label.assistive_msg.quantity_decrement": [
@@ -4478,19 +4648,19 @@
   "product_view.label.delivery": [
     {
       "type": 0,
-      "value": "Delivery:"
+      "value": "Delivery"
     }
   ],
-  "product_view.label.pickup_in_select_store_prefix": [
+  "product_view.label.fulfillment_method": [
     {
       "type": 0,
-      "value": "Pick up in"
+      "value": "Fulfillment method"
     }
   ],
   "product_view.label.pickup_in_store": [
     {
       "type": 0,
-      "value": "Pick Up in Store"
+      "value": "Free pickup in"
     }
   ],
   "product_view.label.quantity": [
@@ -4509,18 +4679,6 @@
     {
       "type": 0,
       "value": "+"
-    }
-  ],
-  "product_view.label.select_store_link": [
-    {
-      "type": 0,
-      "value": "Select Store"
-    }
-  ],
-  "product_view.label.ship_to_address": [
-    {
-      "type": 0,
-      "value": "Ship to Address"
     }
   ],
   "product_view.label.variant_type": [
@@ -4559,6 +4717,16 @@
     {
       "type": 1,
       "value": "storeName"
+    }
+  ],
+  "product_view.text.delivery_to": [
+    {
+      "type": 0,
+      "value": "to "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
     }
   ],
   "profile_card.info.profile_updated": [

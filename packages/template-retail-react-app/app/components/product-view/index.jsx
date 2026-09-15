@@ -7,6 +7,7 @@
 
 import React, {forwardRef, useEffect, useMemo, useRef, useState, useCallback} from 'react'
 import PropTypes from 'prop-types'
+import loadable from '@loadable/component'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
 
@@ -19,7 +20,6 @@ import {
     Text,
     VStack,
     Fade,
-    Stack,
     Radio,
     RadioGroup,
     useTheme
@@ -59,6 +59,12 @@ import SFPaymentsExpressButtons from '@salesforce/retail-react-app/app/component
 import {EXPRESS_BUY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useCleanupTemporaryBaskets} from '@salesforce/retail-react-app/app/hooks/use-cleanup-temporary-baskets'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+
+// Delivery estimates are opt-in on the PDP, so defer their code until the feature renders.
+const DeliveryEstimate = loadable(() =>
+    import('@salesforce/retail-react-app/app/components/delivery-estimate')
+)
 
 const ProductViewHeader = ({
     name,
@@ -162,11 +168,13 @@ const ProductView = forwardRef(
             imageGalleryFooter = null,
             controlledVariationValues = null,
             onVariationChange = null,
-            actionFooter = null
+            actionFooter = null,
+            showDeliveryEstimate = false
         },
         ref
     ) => {
         const {currency: activeCurrency} = useCurrency()
+        const {site, locale} = useMultiSite()
         const showToast = useToast()
         const intl = useIntl()
         const location = useLocation()
@@ -215,10 +223,39 @@ const ProductView = forwardRef(
         const isProductASet = product?.type?.set
         const isProductABundle = product?.type?.bundle
         const errorContainerRef = useRef(null)
-        const [pickupEnabled, setPickupEnabled] = useState(false)
         const storeName = selectedStore?.name
         const inventoryId = selectedStore?.inventoryId
+        const [deliveryEstimateResultContainer, setDeliveryEstimateResultContainer] = useState(null)
+        const [deliveryEstimateDestination, setDeliveryEstimateDestination] = useState(null)
+        const [isDeliveryEstimateOpen, setIsDeliveryEstimateOpen] = useState(true)
+        const [focusDeliveryEstimateInput, setFocusDeliveryEstimateInput] = useState(false)
+        const previousDeliveryEstimateProductId = useRef(null)
+        const isDeliverySelected = !pickupInStore
+        const isPickupDisabled = storeName && inventoryId && isSelectedStoreOutOfStock
         const {pdp: showExpressOnPDP} = useExpressCheckoutEnabled()
+        const deliveryEstimateProductId =
+            variant?.productId || (product?.type?.item ? product.id : null)
+        const defaultCountryCode = locale?.id?.split('-')?.[1]
+
+        const hasResolvedDeliveryEstimate =
+            deliveryEstimateDestination?.productId === deliveryEstimateProductId
+
+        const handleResolvedDeliveryEstimate = useCallback(
+            (destination) => {
+                setDeliveryEstimateDestination({
+                    ...destination,
+                    productId: deliveryEstimateProductId
+                })
+                setIsDeliveryEstimateOpen(false)
+            },
+            [deliveryEstimateProductId]
+        )
+
+        const handleChangeDeliveryEstimateDestination = useCallback(() => {
+            setDeliveryEstimateDestination(null)
+            setIsDeliveryEstimateOpen(true)
+            setFocusDeliveryEstimateInput(true)
+        }, [])
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -568,13 +605,29 @@ const ProductView = forwardRef(
 
         // Auto-switch off pickup in store when product becomes unavailable at selected store
         useEffect(() => {
-            setPickupEnabled(!!selectedStore?.inventoryId)
             if (pickupInStore && isSelectedStoreOutOfStock) {
                 setPickupInStore(false)
             }
-        }, [selectedStore])
+        }, [pickupInStore, isSelectedStoreOutOfStock, selectedStore])
+
+        useEffect(() => {
+            if (
+                previousDeliveryEstimateProductId.current &&
+                previousDeliveryEstimateProductId.current !== deliveryEstimateProductId
+            ) {
+                setDeliveryEstimateDestination(null)
+                setIsDeliveryEstimateOpen(true)
+                setFocusDeliveryEstimateInput(false)
+            }
+            previousDeliveryEstimateProductId.current = deliveryEstimateProductId
+        }, [deliveryEstimateProductId])
 
         const handleDeliveryOptionChange = (value) => {
+            if (value === DELIVERY_OPTIONS.PICKUP && !inventoryId) {
+                onOpenStoreLocator()
+                return
+            }
+
             setPickupInStore(value === DELIVERY_OPTIONS.PICKUP)
         }
 
@@ -846,12 +899,6 @@ const ProductView = forwardRef(
                                 {showDeliveryOptions && (
                                     <>
                                         <Box mb={4}>
-                                            <Text fontWeight={600} mb={3}>
-                                                <FormattedMessage
-                                                    defaultMessage="Delivery:"
-                                                    id="product_view.label.delivery"
-                                                />
-                                            </Text>
                                             <RadioGroup
                                                 value={
                                                     pickupInStore
@@ -860,120 +907,225 @@ const ProductView = forwardRef(
                                                 }
                                                 onChange={handleDeliveryOptionChange}
                                                 mb={1}
+                                                aria-label={intl.formatMessage({
+                                                    id: 'product_view.label.fulfillment_method',
+                                                    defaultMessage: 'Fulfillment method'
+                                                })}
                                             >
-                                                <Stack direction="column" spacing={2}>
-                                                    <Radio
-                                                        value={DELIVERY_OPTIONS.DELIVERY}
-                                                        isDisabled={disableButton}
+                                                <Flex gap={2}>
+                                                    <Box
+                                                        flex={1}
+                                                        border="1px"
+                                                        borderColor={
+                                                            isDeliverySelected
+                                                                ? 'blue.600'
+                                                                : 'gray.200'
+                                                        }
+                                                        borderRadius="base"
+                                                        p={3}
+                                                        data-testid="delivery-fulfillment-option"
+                                                        data-selected={isDeliverySelected}
                                                     >
-                                                        <FormattedMessage
-                                                            defaultMessage="Ship to Address"
-                                                            id="product_view.label.ship_to_address"
+                                                        <Flex align="center" gap={2}>
+                                                            <Radio
+                                                                value={DELIVERY_OPTIONS.DELIVERY}
+                                                                isDisabled={disableButton}
+                                                                aria-describedby={
+                                                                    hasResolvedDeliveryEstimate
+                                                                        ? undefined
+                                                                        : 'delivery-estimate-description'
+                                                                }
+                                                            >
+                                                                <FormattedMessage
+                                                                    defaultMessage="Delivery"
+                                                                    id="product_view.label.delivery"
+                                                                />
+                                                            </Radio>
+                                                            {hasResolvedDeliveryEstimate && (
+                                                                <Text
+                                                                    as="span"
+                                                                    fontWeight="inherit"
+                                                                >
+                                                                    <FormattedMessage
+                                                                        defaultMessage="to {postalCode}"
+                                                                        id="product_view.text.delivery_to"
+                                                                        values={{
+                                                                            postalCode: (
+                                                                                <Button
+                                                                                    type="button"
+                                                                                    variant="link"
+                                                                                    color="blue.600"
+                                                                                    fontWeight="inherit"
+                                                                                    minWidth="auto"
+                                                                                    textDecoration="underline"
+                                                                                    onClick={
+                                                                                        handleChangeDeliveryEstimateDestination
+                                                                                    }
+                                                                                    aria-label={intl.formatMessage(
+                                                                                        {
+                                                                                            id: 'product_view.action.change_delivery_destination',
+                                                                                            defaultMessage:
+                                                                                                'Change delivery destination from {postalCode}'
+                                                                                        },
+                                                                                        {
+                                                                                            postalCode:
+                                                                                                deliveryEstimateDestination.postalCode
+                                                                                        }
+                                                                                    )}
+                                                                                >
+                                                                                    {
+                                                                                        deliveryEstimateDestination.postalCode
+                                                                                    }
+                                                                                </Button>
+                                                                            )
+                                                                        }}
+                                                                    />
+                                                                </Text>
+                                                            )}
+                                                        </Flex>
+                                                        {!hasResolvedDeliveryEstimate && (
+                                                            <Text
+                                                                id="delivery-estimate-description"
+                                                                fontSize="sm"
+                                                                color="gray.600"
+                                                                mt={2}
+                                                            >
+                                                                <FormattedMessage
+                                                                    defaultMessage="Enter a postal code to get a delivery estimate"
+                                                                    id="product_view.description.delivery_estimate"
+                                                                />
+                                                            </Text>
+                                                        )}
+                                                        <Box
+                                                            ref={setDeliveryEstimateResultContainer}
+                                                            data-testid="delivery-estimate-result-container"
                                                         />
-                                                    </Radio>
+                                                    </Box>
                                                     {storeLocatorEnabled && (
-                                                        <Radio
-                                                            value={DELIVERY_OPTIONS.PICKUP}
-                                                            isDisabled={
-                                                                !pickupEnabled ||
-                                                                (storeName &&
-                                                                    inventoryId &&
-                                                                    isSelectedStoreOutOfStock)
+                                                        <Box
+                                                            flex={1}
+                                                            border="1px"
+                                                            borderColor={
+                                                                pickupInStore
+                                                                    ? 'blue.600'
+                                                                    : 'gray.200'
                                                             }
+                                                            borderRadius="base"
+                                                            p={3}
+                                                            data-testid="pickup-fulfillment-option"
+                                                            data-selected={pickupInStore}
                                                         >
-                                                            <FormattedMessage
-                                                                defaultMessage="Pick Up in Store"
-                                                                id="product_view.label.pickup_in_store"
-                                                            />
-                                                        </Radio>
+                                                            <Radio
+                                                                value={DELIVERY_OPTIONS.PICKUP}
+                                                                aria-describedby="pickup-store-description"
+                                                                isDisabled={isPickupDisabled}
+                                                            >
+                                                                <FormattedMessage
+                                                                    defaultMessage="Free pickup in"
+                                                                    id="product_view.label.pickup_in_store"
+                                                                />
+                                                            </Radio>
+                                                            <Text
+                                                                id="pickup-store-description"
+                                                                fontSize="sm"
+                                                                color="gray.600"
+                                                                mt={2}
+                                                            >
+                                                                {storeName || (
+                                                                    <FormattedMessage
+                                                                        defaultMessage="Select Store"
+                                                                        id="store_inventory_filter.action.select_store"
+                                                                    />
+                                                                )}
+                                                            </Text>
+                                                            {storeName && inventoryId && (
+                                                                <Text
+                                                                    color="black"
+                                                                    fontWeight={600}
+                                                                    mt={2}
+                                                                    data-testid="store-stock-status-msg"
+                                                                >
+                                                                    {!isSelectedStoreOutOfStock
+                                                                        ? intl.formatMessage(
+                                                                              {
+                                                                                  id: 'product_view.status.in_stock_at_store',
+                                                                                  defaultMessage:
+                                                                                      'In stock at {storeName}'
+                                                                              },
+                                                                              {
+                                                                                  storeName: (
+                                                                                      <Link
+                                                                                          as="button"
+                                                                                          color="blue.600"
+                                                                                          textDecoration="underline"
+                                                                                          onClick={
+                                                                                              onOpenStoreLocator
+                                                                                          }
+                                                                                      >
+                                                                                          {
+                                                                                              storeName
+                                                                                          }
+                                                                                      </Link>
+                                                                                  )
+                                                                              }
+                                                                          )
+                                                                        : intl.formatMessage(
+                                                                              {
+                                                                                  id: 'product_view.status.out_of_stock_at_store',
+                                                                                  defaultMessage:
+                                                                                      'Out of Stock at {storeName}'
+                                                                              },
+                                                                              {
+                                                                                  storeName: (
+                                                                                      <Link
+                                                                                          as="button"
+                                                                                          color="blue.600"
+                                                                                          textDecoration="underline"
+                                                                                          onClick={
+                                                                                              onOpenStoreLocator
+                                                                                          }
+                                                                                      >
+                                                                                          {
+                                                                                              storeName
+                                                                                          }
+                                                                                      </Link>
+                                                                                  )
+                                                                              }
+                                                                          )}
+                                                                </Text>
+                                                            )}
+                                                        </Box>
                                                     )}
-                                                </Stack>
+                                                </Flex>
                                             </RadioGroup>
                                         </Box>
-
-                                        {storeLocatorEnabled && (
-                                            <>
-                                                {storeName && inventoryId && (
-                                                    <Text
-                                                        color="black"
-                                                        fontWeight={600}
-                                                        mb={2}
-                                                        data-testid="store-stock-status-msg"
-                                                    >
-                                                        {!isSelectedStoreOutOfStock
-                                                            ? intl.formatMessage(
-                                                                  {
-                                                                      id: 'product_view.status.in_stock_at_store',
-                                                                      defaultMessage:
-                                                                          'In stock at {storeName}'
-                                                                  },
-                                                                  {
-                                                                      storeName: (
-                                                                          <Link
-                                                                              as="button"
-                                                                              color="blue.600"
-                                                                              textDecoration="underline"
-                                                                              onClick={
-                                                                                  onOpenStoreLocator
-                                                                              }
-                                                                          >
-                                                                              {storeName}
-                                                                          </Link>
-                                                                      )
-                                                                  }
-                                                              )
-                                                            : intl.formatMessage(
-                                                                  {
-                                                                      id: 'product_view.status.out_of_stock_at_store',
-                                                                      defaultMessage:
-                                                                          'Out of Stock at {storeName}'
-                                                                  },
-                                                                  {
-                                                                      storeName: (
-                                                                          <Link
-                                                                              as="button"
-                                                                              color="blue.600"
-                                                                              textDecoration="underline"
-                                                                              onClick={
-                                                                                  onOpenStoreLocator
-                                                                              }
-                                                                          >
-                                                                              {storeName}
-                                                                          </Link>
-                                                                      )
-                                                                  }
-                                                              )}
-                                                    </Text>
-                                                )}
-
-                                                {/* Show label if pickup is disabled due to no store/inventoryId */}
-                                                {!pickupEnabled && !storeName && !inventoryId && (
-                                                    <Text
-                                                        color="black"
-                                                        fontWeight={600}
-                                                        mb={3}
-                                                        data-testid="pickup-select-store-msg"
-                                                    >
-                                                        <FormattedMessage
-                                                            defaultMessage="Pick up in "
-                                                            id="product_view.label.pickup_in_select_store_prefix"
-                                                        />{' '}
-                                                        <Link
-                                                            as="button"
-                                                            color="blue.600"
-                                                            textDecoration="underline"
-                                                            onClick={onOpenStoreLocator}
-                                                        >
-                                                            <FormattedMessage
-                                                                defaultMessage="Select Store"
-                                                                id="product_view.label.select_store_link"
-                                                            />
-                                                        </Link>
-                                                    </Text>
-                                                )}
-                                            </>
-                                        )}
                                     </>
+                                )}
+                                {showDeliveryEstimate && site?.id && deliveryEstimateProductId && (
+                                    <DeliveryEstimate
+                                        productId={deliveryEstimateProductId}
+                                        siteId={site.id}
+                                        defaultCountryCode={defaultCountryCode}
+                                        resultContainer={
+                                            showDeliveryOptions && isDeliverySelected
+                                                ? deliveryEstimateResultContainer
+                                                : null
+                                        }
+                                        showResultInCard={!showDeliveryOptions}
+                                        showCalculator={
+                                            !showDeliveryOptions || isDeliveryEstimateOpen
+                                        }
+                                        showResult={!showDeliveryOptions || !isDeliveryEstimateOpen}
+                                        onResolvedDestination={
+                                            showDeliveryOptions
+                                                ? handleResolvedDeliveryEstimate
+                                                : undefined
+                                        }
+                                        focusPostalCode={focusDeliveryEstimateInput}
+                                        onPostalCodeFocusHandled={() =>
+                                            setFocusDeliveryEstimateInput(false)
+                                        }
+                                    />
                                 )}
                                 <Box
                                     display={
@@ -1051,7 +1203,8 @@ ProductView.propTypes = {
     alignItems: PropTypes.string,
     controlledVariationValues: PropTypes.object,
     onVariationChange: PropTypes.func,
-    actionFooter: PropTypes.node
+    actionFooter: PropTypes.node,
+    showDeliveryEstimate: PropTypes.bool
 }
 
 export default ProductView
