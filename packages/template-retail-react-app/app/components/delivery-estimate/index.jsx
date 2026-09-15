@@ -9,6 +9,8 @@ import React, {useEffect, useRef, useState} from 'react'
 import {createPortal} from 'react-dom'
 import PropTypes from 'prop-types'
 import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getDefaultCookieAttributes} from '@salesforce/commerce-sdk-react/utils'
 import {useIntl} from 'react-intl'
 import {
     Box,
@@ -31,14 +33,84 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     getSlowestDeliveryEstimate,
-    getStoredDestination,
     isEligibleShippingOption,
     isValidDestination,
     normalizeDestination
 } from '@salesforce/retail-react-app/app/components/delivery-estimate/utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
-const getStorageKey = (siteId) => `deliveryDestination_${siteId}`
+const getDeliveryZipCodeCookieName = (siteId) => `deliveryZipCode_${siteId}`
+const DELIVERY_DESTINATION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
+const POSTAL_CODE_SANITY_RE = /^[A-Z0-9](?:[A-Z0-9 -]{0,10}[A-Z0-9])?$/i
+const ISO_COUNTRY_CODES = new Set(
+    'AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW'.split(
+        ' '
+    )
+)
+
+const normalizePostalCode = (value) => {
+    const postalCode = value?.trim()
+    return postalCode && postalCode.length <= 12 && POSTAL_CODE_SANITY_RE.test(postalCode)
+        ? postalCode
+        : null
+}
+
+const normalizeCountryCode = (value) => {
+    if (typeof value !== 'string') return undefined
+    const countryCode = value.trim().toUpperCase()
+    return ISO_COUNTRY_CODES.has(countryCode) ? countryCode : undefined
+}
+
+const parseDeliveryDestinationCookie = (cookieName) => {
+    const escapedCookieName = cookieName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${escapedCookieName}=([^;]+)`))
+    if (!match) return null
+
+    try {
+        const value = decodeURIComponent(match[1])
+        const legacyPostalCode = normalizePostalCode(value)
+        if (legacyPostalCode) {
+            return {postalCode: legacyPostalCode}
+        }
+
+        const destination = JSON.parse(value)
+        if (typeof destination.postalCode !== 'string') return null
+
+        const postalCode = normalizePostalCode(destination.postalCode)
+        const countryCode = normalizeCountryCode(destination.countryCode)
+        if (!postalCode || (destination.countryCode !== undefined && !countryCode)) return null
+
+        return {postalCode, ...(countryCode ? {countryCode} : {})}
+    } catch {
+        return null
+    }
+}
+
+const persistDeliveryDestinationCookie = (siteId, destination) => {
+    const cookieName = getDeliveryZipCodeCookieName(siteId)
+    const postalCode = normalizePostalCode(destination?.postalCode)
+    const countryCode = normalizeCountryCode(destination?.countryCode)
+    if (!postalCode || (destination?.countryCode !== undefined && !countryCode)) return
+
+    const value = encodeURIComponent(
+        JSON.stringify({
+            postalCode,
+            ...(countryCode ? {countryCode} : {})
+        })
+    )
+    const cookieDomain = getConfig()?.app?.commerceAPI?.cookieDomain
+    const {secure, sameSite} = getDefaultCookieAttributes()
+    const attributes = [
+        ...(cookieDomain ? [`Domain=${cookieDomain}`] : []),
+        'Path=/',
+        `Max-Age=${DELIVERY_DESTINATION_COOKIE_MAX_AGE}`,
+        ...(secure ? ['Secure'] : []),
+        `SameSite=${sameSite}`,
+        ...(sameSite?.toLowerCase() === 'none' ? ['Partitioned'] : [])
+    ]
+
+    document.cookie = `${cookieName}=${value}; ${attributes.join('; ')}`
+}
 
 const formatDeliveryWindow = (deliveryWindow, formatDate) => {
     const startAt = new Date(deliveryWindow.startAt)
@@ -87,15 +159,20 @@ const DeliveryEstimate = ({
     const [submittedDestination, setSubmittedDestination] = useState(null)
     const [validationErrors, setValidationErrors] = useState({})
     const resolvedDestinationRef = useRef(null)
+    const hasExplicitDestinationRef = useRef(false)
     const postalCodeInputRef = useRef(null)
 
     useEffect(() => {
-        const storedDestination = getStoredDestination(getStorageKey(siteId))
+        hasExplicitDestinationRef.current = false
         const countryCode = defaultCountryCode || ''
-        const restoredDestination = storedDestination
-            ? {countryCode, postalCode: storedDestination.postalCode}
+        const cookieDestination = parseDeliveryDestinationCookie(
+            getDeliveryZipCodeCookieName(siteId)
+        )
+        const postalCode = cookieDestination?.postalCode || ''
+        const restoredDestination = isValidDestination({countryCode, postalCode})
+            ? {countryCode, postalCode}
             : null
-        setDestination({countryCode, postalCode: storedDestination?.postalCode || ''})
+        setDestination({countryCode, postalCode})
         setSubmittedDestination(restoredDestination)
         setHydrated(true)
     }, [siteId, defaultCountryCode])
@@ -127,19 +204,14 @@ const DeliveryEstimate = ({
             isError ||
             isLoading ||
             isFetching ||
+            !hasExplicitDestinationRef.current ||
             typeof window === 'undefined'
         ) {
             return
         }
 
-        try {
-            window.localStorage.setItem(
-                getStorageKey(siteId),
-                JSON.stringify(normalizeDestination(submittedDestination))
-            )
-        } catch {
-            // Delivery estimates remain usable when browser storage is unavailable.
-        }
+        persistDeliveryDestinationCookie(siteId, submittedDestination)
+        hasExplicitDestinationRef.current = false
     }, [slowestEstimate, submittedDestination, siteId, isError, isLoading, isFetching])
 
     const handleSubmit = (event) => {
@@ -166,6 +238,7 @@ const DeliveryEstimate = ({
         }
 
         resolvedDestinationRef.current = null
+        hasExplicitDestinationRef.current = true
         setSubmittedDestination(normalizedDestination)
     }
 

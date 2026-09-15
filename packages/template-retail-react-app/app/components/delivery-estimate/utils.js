@@ -62,15 +62,3 @@ export const isValidDestination = (destination) => {
     const {countryCode, postalCode} = destination || {}
     return /^[A-Z]{2}$/.test(countryCode) && typeof postalCode === 'string' && postalCode.length > 0
 }
-
-export const getStoredDestination = (storageKey) => {
-    try {
-        const value = window.localStorage.getItem(storageKey)
-        if (!value) return null
-
-        const destination = normalizeDestination(JSON.parse(value))
-        return isValidDestination(destination) ? destination : null
-    } catch {
-        return null
-    }
-}

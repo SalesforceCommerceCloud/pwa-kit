@@ -9,14 +9,26 @@ import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
+import {getDefaultCookieAttributes} from '@salesforce/commerce-sdk-react/utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import DeliveryEstimate from '@salesforce/retail-react-app/app/components/delivery-estimate'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import usMessages from '@salesforce/retail-react-app/app/static/translations/compiled/en-US.json'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
     return {...actual, useDeliveryEstimates: jest.fn()}
 })
+
+jest.mock('@salesforce/commerce-sdk-react/utils', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react/utils'),
+    getDefaultCookieAttributes: jest.fn(() => ({secure: false, sameSite: 'Lax'}))
+}))
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
 
 const deliveryResult = {
     productDeliveryEstimates: [
@@ -85,9 +97,26 @@ const DeliveryEstimateResultContainerHarness = () => {
     )
 }
 
+const setDeliveryDestinationCookie = (destination) => {
+    document.cookie = `deliveryZipCode_site-1=${encodeURIComponent(
+        JSON.stringify(destination)
+    )}; Path=/`
+}
+
+const getDeliveryDestinationCookieValue = () => {
+    const cookie = document.cookie
+        .split(';')
+        .map((value) => value.trim())
+        .find((value) => value.startsWith('deliveryZipCode_site-1='))
+
+    return cookie?.slice('deliveryZipCode_site-1='.length)
+}
+
 describe('DeliveryEstimate', () => {
     beforeEach(() => {
-        window.localStorage.clear()
+        document.cookie = 'deliveryZipCode_site-1=; Max-Age=0; path=/'
+        getConfig.mockReturnValue(mockConfig)
+        getDefaultCookieAttributes.mockReturnValue({secure: false, sameSite: 'Lax'})
         useDeliveryEstimates.mockReturnValue({
             data: deliveryResult,
             isError: false,
@@ -134,10 +163,10 @@ describe('DeliveryEstimate', () => {
         expect(within(shippingOptions).getByText('Express')).toBeInTheDocument()
         expect(within(shippingOptions).getByText('$5.00')).toBeInTheDocument()
         expect(within(shippingOptions).getByText('$12.00')).toBeInTheDocument()
-        expect(JSON.parse(window.localStorage.getItem('deliveryDestination_site-1'))).toEqual({
-            countryCode: 'US',
-            postalCode: '94105'
-        })
+        expect(decodeURIComponent(getDeliveryDestinationCookieValue())).toBe(
+            JSON.stringify({postalCode: '94105', countryCode: 'US'})
+        )
+        expect(getDefaultCookieAttributes).toHaveBeenCalled()
     })
 
     test('uses the localized postcode label and Storefront Next placeholder for GB', () => {
@@ -162,10 +191,7 @@ describe('DeliveryEstimate', () => {
 
     test('clears the previous estimate without persisting an invalid destination', async () => {
         const user = userEvent.setup()
-        window.localStorage.setItem(
-            'deliveryDestination_site-1',
-            JSON.stringify({countryCode: 'US', postalCode: '94105'})
-        )
+        setDeliveryDestinationCookie({postalCode: '94105', countryCode: 'US'})
         renderDeliveryEstimate()
 
         expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(
@@ -185,17 +211,13 @@ describe('DeliveryEstimate', () => {
             )
         })
         expect(screen.queryByTestId('delivery-estimate-result')).not.toBeInTheDocument()
-        expect(JSON.parse(window.localStorage.getItem('deliveryDestination_site-1'))).toEqual({
-            countryCode: 'US',
-            postalCode: '94105'
-        })
+        expect(decodeURIComponent(getDeliveryDestinationCookieValue())).toBe(
+            JSON.stringify({postalCode: '94105', countryCode: 'US'})
+        )
     })
 
     test('prevents duplicate submissions while calculating', async () => {
-        window.localStorage.setItem(
-            'deliveryDestination_site-1',
-            JSON.stringify({countryCode: 'US', postalCode: '94105'})
-        )
+        setDeliveryDestinationCookie({postalCode: '94105', countryCode: 'US'})
         useDeliveryEstimates.mockReturnValue({
             data: undefined,
             isError: false,
@@ -209,11 +231,8 @@ describe('DeliveryEstimate', () => {
         expect(screen.queryByRole('status')).not.toBeInTheDocument()
     })
 
-    test('uses the locale country code when restoring a saved postal code', async () => {
-        window.localStorage.setItem(
-            'deliveryDestination_site-1',
-            JSON.stringify({countryCode: 'US', postalCode: '94105'})
-        )
+    test('uses the locale country code when restoring a structured delivery destination cookie', async () => {
+        setDeliveryDestinationCookie({postalCode: '94105', countryCode: 'US'})
         renderDeliveryEstimate({defaultCountryCode: 'GB'})
 
         await waitFor(() => {
@@ -229,6 +248,71 @@ describe('DeliveryEstimate', () => {
                 expect.objectContaining({enabled: true})
             )
         })
+    })
+
+    test('uses a legacy delivery ZIP code cookie', async () => {
+        document.cookie = 'deliveryZipCode_site-1=94105; path=/'
+        renderDeliveryEstimate()
+
+        await waitFor(() => {
+            expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+                {
+                    parameters: {
+                        productIds: ['sku-a'],
+                        postalCode: '94105',
+                        countryCode: 'US',
+                        siteId: 'site-1'
+                    }
+                },
+                expect.objectContaining({enabled: true})
+            )
+        })
+        expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveValue('94105')
+    })
+
+    test('ignores malformed delivery destination cookies', async () => {
+        document.cookie = 'deliveryZipCode_site-1=%7Bbad; path=/'
+        renderDeliveryEstimate()
+
+        await waitFor(() => {
+            expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+                expect.any(Object),
+                expect.objectContaining({enabled: false})
+            )
+        })
+        expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveValue('')
+    })
+
+    test('uses the configured cookie domain and preview cookie attributes', async () => {
+        const cookieSetter = jest.spyOn(Document.prototype, 'cookie', 'set')
+        try {
+            getConfig.mockReturnValue({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    commerceAPI: {...mockConfig.app.commerceAPI, cookieDomain: '.example.com'}
+                }
+            })
+            getDefaultCookieAttributes.mockReturnValue({secure: true, sameSite: 'none'})
+            const user = userEvent.setup()
+            renderDeliveryEstimate()
+
+            await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+            await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+            await waitFor(() => {
+                expect(cookieSetter).toHaveBeenCalledWith(
+                    expect.stringContaining('deliveryZipCode_site-1=')
+                )
+            })
+            expect(cookieSetter).toHaveBeenLastCalledWith(
+                expect.stringContaining(
+                    'Domain=.example.com; Path=/; Max-Age=2592000; Secure; SameSite=none; Partitioned'
+                )
+            )
+        } finally {
+            cookieSetter.mockRestore()
+        }
     })
 
     test('announces a successful estimate', async () => {
@@ -256,10 +340,7 @@ describe('DeliveryEstimate', () => {
 
     test('reports a saved resolved destination while its calculator and result are hidden', async () => {
         const onResolvedDestination = jest.fn()
-        window.localStorage.setItem(
-            'deliveryDestination_site-1',
-            JSON.stringify({countryCode: 'US', postalCode: '94105'})
-        )
+        setDeliveryDestinationCookie({postalCode: '94105', countryCode: 'US'})
         renderDeliveryEstimate({
             showCalculator: false,
             showResult: false,
@@ -277,28 +358,6 @@ describe('DeliveryEstimate', () => {
                 postalCode: '94105'
             })
         })
-    })
-
-    test('displays an estimate when browser storage cannot persist the destination', async () => {
-        const user = userEvent.setup()
-        const storageError = new Error('Storage unavailable')
-        const originalSetItem = Storage.prototype.setItem
-        Storage.prototype.setItem = jest.fn(() => {
-            throw storageError
-        })
-
-        try {
-            renderDeliveryEstimate()
-
-            await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
-            await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
-
-            expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(
-                /estimated:/i
-            )
-        } finally {
-            Storage.prototype.setItem = originalSetItem
-        }
     })
 
     test('clears an estimate that does not match the newly selected variant', async () => {
@@ -324,19 +383,15 @@ describe('DeliveryEstimate', () => {
             isLoading: false,
             isFetching: false
         })
-        window.localStorage.setItem(
-            'deliveryDestination_site-1',
-            JSON.stringify({countryCode: 'US', postalCode: '94105'})
-        )
+        setDeliveryDestinationCookie({postalCode: '94105', countryCode: 'US'})
         renderDeliveryEstimate()
 
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
         expect(await screen.findByText(/delivery dates unavailable/i)).toBeInTheDocument()
-        expect(JSON.parse(window.localStorage.getItem('deliveryDestination_site-1'))).toEqual({
-            countryCode: 'US',
-            postalCode: '94105'
-        })
+        expect(decodeURIComponent(getDeliveryDestinationCookieValue())).toBe(
+            JSON.stringify({postalCode: '94105', countryCode: 'US'})
+        )
     })
 
     test('does not expose non-delivery provider reasons to shoppers', async () => {
