@@ -29,6 +29,11 @@ export const DEFAULT_CLOUD_ORIGIN = 'https://cloud.mobify.com'
 export const DEFAULT_DOCS_URL =
     'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
 
+// MRT sets this response header to "true" in read-only (maintenance) mode.
+export const MRT_READ_ONLY_HEADER = 'X-MRT-Read-Only'
+export const MRT_MAINTENANCE_STATUS_URL =
+    'https://status.salesforce.com/instances/MANAGEDRUNTIMEADMIN'
+
 interface Credentials {
     username: string
     api_key: string
@@ -210,6 +215,25 @@ export const getPwaKitDependencies = (dependencyTree: DependencyTree): {[key: st
     return nestedPwaKitDependencies
 }
 
+/** True when a response carries the MRT read-only header (optional chaining tolerates header-less mocks). */
+export function isMrtReadOnlyResponse(res: Response): boolean {
+    return res?.headers?.get?.(MRT_READ_ONLY_HEADER)?.trim().toLowerCase() === 'true'
+}
+
+/** Thrown when a write is rejected because MRT is in read-only (maintenance) mode. */
+export class MrtMaintenanceError extends Error {
+    constructor() {
+        super(
+            [
+                'Managed Runtime is in maintenance mode. This command was not run.',
+                'This command requires write access, which is temporarily disabled.',
+                `Check status and ETA: ${MRT_MAINTENANCE_STATUS_URL}`
+            ].join('\n')
+        )
+        this.name = 'MrtMaintenanceError'
+    }
+}
+
 export class CloudAPIClient {
     private opts: Required<CloudAPIClientOpts>
 
@@ -238,6 +262,11 @@ export class CloudAPIClient {
     private async throwForStatus(res: Response) {
         if (res.status < 400) {
             return
+        }
+
+        // A failing response with the read-only header means the write was rejected for maintenance.
+        if (isMrtReadOnlyResponse(res)) {
+            throw new MrtMaintenanceError()
         }
 
         const body = await res.text()
