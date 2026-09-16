@@ -235,6 +235,10 @@ const ProductView = forwardRef(
         const {pdp: showExpressOnPDP} = useExpressCheckoutEnabled()
         const deliveryEstimateProductId =
             variant?.productId || (product?.type?.item ? product.id : null)
+        const suppressDeferredDeliveryEstimate =
+            typeof product?.inventory?.ats === 'number' &&
+            product.inventory.ats <= 0 &&
+            (product.inventory.preorderable || product.inventory.backorderable)
         const defaultCountryCode = locale?.id?.split('-')?.[1]
 
         const hasResolvedDeliveryEstimate =
@@ -1101,32 +1105,38 @@ const ProductView = forwardRef(
                                         </Box>
                                     </>
                                 )}
-                                {showDeliveryEstimate && site?.id && deliveryEstimateProductId && (
-                                    <DeliveryEstimate
-                                        productId={deliveryEstimateProductId}
-                                        siteId={site.id}
-                                        defaultCountryCode={defaultCountryCode}
-                                        resultContainer={
-                                            showDeliveryOptions && isDeliverySelected
-                                                ? deliveryEstimateResultContainer
-                                                : null
-                                        }
-                                        showResultInCard={!showDeliveryOptions}
-                                        showCalculator={
-                                            !showDeliveryOptions || isDeliveryEstimateOpen
-                                        }
-                                        showResult={!showDeliveryOptions || !isDeliveryEstimateOpen}
-                                        onResolvedDestination={
-                                            showDeliveryOptions
-                                                ? handleResolvedDeliveryEstimate
-                                                : undefined
-                                        }
-                                        focusPostalCode={focusDeliveryEstimateInput}
-                                        onPostalCodeFocusHandled={() =>
-                                            setFocusDeliveryEstimateInput(false)
-                                        }
-                                    />
-                                )}
+                                {showDeliveryEstimate &&
+                                    !suppressDeferredDeliveryEstimate &&
+                                    site?.id &&
+                                    deliveryEstimateProductId && (
+                                        <DeliveryEstimate
+                                            productId={deliveryEstimateProductId}
+                                            siteId={site.id}
+                                            defaultCountryCode={defaultCountryCode}
+                                            resultContainer={
+                                                showDeliveryOptions && isDeliverySelected
+                                                    ? deliveryEstimateResultContainer
+                                                    : null
+                                            }
+                                            showResultInCard={!showDeliveryOptions}
+                                            showCalculator={
+                                                !showDeliveryOptions || isDeliveryEstimateOpen
+                                            }
+                                            showResult={
+                                                !showDeliveryOptions || !isDeliveryEstimateOpen
+                                            }
+                                            shippingMethods={product.shippingMethods}
+                                            onResolvedDestination={
+                                                showDeliveryOptions
+                                                    ? handleResolvedDeliveryEstimate
+                                                    : undefined
+                                            }
+                                            focusPostalCode={focusDeliveryEstimateInput}
+                                            onPostalCodeFocusHandled={() =>
+                                                setFocusDeliveryEstimateInput(false)
+                                            }
+                                        />
+                                    )}
                                 <Box
                                     display={
                                         isProductPartOfSet

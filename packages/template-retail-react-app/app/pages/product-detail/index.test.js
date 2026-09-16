@@ -913,7 +913,7 @@ describe('Delivery Options Restrictions', () => {
     })
 })
 
-test('fetches product with inventoryIds when store is selected', async () => {
+test('fetches product with shipping methods and inventoryIds when store is selected', async () => {
     // Mock useSelectedStore to return a store with inventoryId
     const inventoryId = 'inventory_m_store_store1'
     mockUseSelectedStore.mockImplementation(() => ({
@@ -930,9 +930,11 @@ test('fetches product with inventoryIds when store is selected', async () => {
     // Mock the product API to check for inventoryIds param
     let inventoryIdsParamDetail
     let inventoryIdsParamVariants
+    let productExpandParam
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
             inventoryIdsParamDetail = req.url.searchParams.get('inventoryIds')
+            productExpandParam = req.url.searchParams.get('expand')
             return res(ctx.delay(0), ctx.status(200), ctx.json(masterProduct))
         }),
         // Some SDK versions issue a batched products request with inventoryIds instead.
@@ -955,6 +957,7 @@ test('fetches product with inventoryIds when store is selected', async () => {
         // If present on either call, it must match; otherwise accept as optional.
         expect(capturedParams.length === 0 || capturedParams.includes(inventoryId)).toBe(true)
     })
+    expect(productExpandParam).toContain('shipping_methods')
 })
 
 test('Add to Cart (Free pickup in) includes inventoryId for the selected variant', async () => {

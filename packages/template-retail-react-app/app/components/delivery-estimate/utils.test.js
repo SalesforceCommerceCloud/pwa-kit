@@ -6,18 +6,19 @@
  */
 
 import {
+    getFallbackDeliveryDescription,
     getPostalCodeFormat,
     getPreferredDeliveryDestination,
-    getSlowestDeliveryEstimate,
+    getFastestDeliveryEstimate,
     isValidDestination,
     normalizeDestination
 } from '@salesforce/retail-react-app/app/components/delivery-estimate/utils'
 
 const estimate = (productId, shippingOptions) => ({productId, shippingOptions})
 
-describe('getSlowestDeliveryEstimate', () => {
-    test('chooses the option with the latest delivery-window start for the requested product', () => {
-        const result = getSlowestDeliveryEstimate('sku-a', {
+describe('getFastestDeliveryEstimate', () => {
+    test('chooses the option with the earliest delivery-window end for the requested product', () => {
+        const result = getFastestDeliveryEstimate('sku-a', {
             productDeliveryEstimates: [
                 estimate('sku-b', []),
                 estimate('sku-a', [
@@ -41,18 +42,18 @@ describe('getSlowestDeliveryEstimate', () => {
             ]
         })
 
-        expect(result.shippingMethodId).toBe('ground')
+        expect(result.shippingMethodId).toBe('express')
     })
 
-    test('uses the latest delivery-window end time when start times match', () => {
-        const result = getSlowestDeliveryEstimate('sku-a', {
+    test('uses the earliest delivery-window start time when end times match', () => {
+        const result = getFastestDeliveryEstimate('sku-a', {
             productDeliveryEstimates: [
                 estimate('sku-a', [
                     {
                         shippingMethodId: 'ground',
                         deliveryWindow: {
-                            startAt: '2026-09-15T14:00:00Z',
-                            endAt: '2026-09-18T14:00:00Z'
+                            startAt: '2026-09-16T14:00:00Z',
+                            endAt: '2026-09-16T14:00:00Z'
                         }
                     },
                     {
@@ -66,11 +67,11 @@ describe('getSlowestDeliveryEstimate', () => {
             ]
         })
 
-        expect(result.shippingMethodId).toBe('ground')
+        expect(result.shippingMethodId).toBe('express')
     })
 
     test('ignores non-deliverable and malformed delivery windows', () => {
-        const result = getSlowestDeliveryEstimate('sku-a', {
+        const result = getFastestDeliveryEstimate('sku-a', {
             productDeliveryEstimates: [
                 estimate('sku-a', [
                     {
@@ -96,6 +97,31 @@ describe('getSlowestDeliveryEstimate', () => {
         })
 
         expect(result).toBeNull()
+    })
+})
+
+describe('getFallbackDeliveryDescription', () => {
+    test('returns the first non-pickup shipping description', () => {
+        expect(
+            getFallbackDeliveryDescription([
+                {
+                    id: '005',
+                    c_storePickupEnabled: true,
+                    description: 'Ready for pickup today'
+                },
+                {id: '001', description: 'Order received within 7-10 business days'}
+            ])
+        ).toBe('Order received within 7-10 business days')
+    })
+
+    test('ignores empty descriptions and pickup methods', () => {
+        expect(
+            getFallbackDeliveryDescription([
+                {id: '001', description: '   '},
+                {id: '002', c_storePickupEnabled: true, description: 'Ready for pickup today'},
+                {id: '005', description: 'Legacy pickup method'}
+            ])
+        ).toBeNull()
     })
 })
 

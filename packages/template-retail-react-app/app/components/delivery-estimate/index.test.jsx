@@ -134,7 +134,7 @@ describe('DeliveryEstimate', () => {
 
     afterEach(() => jest.clearAllMocks())
 
-    test('submits a valid destination and displays the slowest delivery window', async () => {
+    test('submits a valid destination and displays the fastest delivery window', async () => {
         const user = userEvent.setup()
         renderDeliveryEstimate()
 
@@ -156,7 +156,7 @@ describe('DeliveryEstimate', () => {
             )
         })
         expect(
-            await screen.findByText('Estimated: Sep 16, 2026 - Sep 18, 2026')
+            await screen.findByText('Estimated: Sep 15, 2026 - Sep 16, 2026')
         ).toBeInTheDocument()
         expect(screen.queryByText(/ground/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/express/i)).not.toBeInTheDocument()
@@ -553,6 +553,50 @@ describe('DeliveryEstimate', () => {
         expect(await screen.findByText(/delivery dates unavailable/i)).toBeInTheDocument()
         expect(decodeURIComponent(getDeliveryDestinationCookieValue())).toBe(
             JSON.stringify({postalCode: '94105', countryCode: 'US'})
+        )
+    })
+
+    test('shows unavailable guidance in the calculator when a fulfillment-option lookup returns 403', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: undefined,
+            error: {response: {status: 403}},
+            isError: true,
+            isLoading: false,
+            isFetching: false
+        })
+        renderDeliveryEstimate({showResult: false})
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        expect(await screen.findByRole('status')).toHaveTextContent(
+            'Delivery dates unavailable. See checkout for options and costs.'
+        )
+    })
+
+    test('uses the catalog delivery description for a 403 delivery-estimate response', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: undefined,
+            error: {response: {status: 403}},
+            isError: true,
+            isLoading: false,
+            isFetching: false
+        })
+        renderDeliveryEstimate({
+            showResult: false,
+            shippingMethods: [
+                {id: '005', c_storePickupEnabled: true, description: 'Ready for pickup today'},
+                {id: '001', description: 'Order received within 7-10 business days'}
+            ]
+        })
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        expect(await screen.findByRole('status')).toHaveTextContent(
+            'Order received within 7-10 business days'
         )
     })
 

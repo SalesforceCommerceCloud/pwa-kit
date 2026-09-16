@@ -121,6 +121,7 @@ const ProductDetail = () => {
                     'images',
                     'prices',
                     'variations',
+                    'shipping_methods',
                     'set_products',
                     'bundled_products',
                     'page_meta_tags'

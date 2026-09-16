@@ -32,8 +32,9 @@ import {
     VisuallyHidden
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
+    getFallbackDeliveryDescription,
     getPreferredDeliveryDestination,
-    getSlowestDeliveryEstimate,
+    getFastestDeliveryEstimate,
     getPostalCodeFormat,
     isEligibleShippingOption,
     isValidDestination,
@@ -147,6 +148,7 @@ const DeliveryEstimate = ({
     showResultInCard = true,
     showCalculator = true,
     showResult = true,
+    shippingMethods,
     onResolvedDestination,
     focusPostalCode = false,
     onPostalCodeFocusHandled
@@ -225,7 +227,7 @@ const DeliveryEstimate = ({
         },
         {enabled: canRequest}
     )
-    const slowestEstimate = canRequest ? getSlowestDeliveryEstimate(productId, data) : null
+    const fastestEstimate = canRequest ? getFastestDeliveryEstimate(productId, data) : null
     const shippingOptions =
         (data?.productDeliveryEstimates || [])
             .find((estimate) => estimate.productId === productId)
@@ -234,7 +236,7 @@ const DeliveryEstimate = ({
 
     useEffect(() => {
         if (
-            !slowestEstimate ||
+            !fastestEstimate ||
             !submittedDestination ||
             isError ||
             isLoading ||
@@ -247,7 +249,7 @@ const DeliveryEstimate = ({
 
         persistDeliveryDestinationCookie(siteId, submittedDestination)
         hasExplicitDestinationRef.current = false
-    }, [slowestEstimate, submittedDestination, siteId, isError, isLoading, isFetching])
+    }, [fastestEstimate, submittedDestination, siteId, isError, isLoading, isFetching])
 
     const handleSubmit = (event) => {
         event.preventDefault()
@@ -288,8 +290,11 @@ const DeliveryEstimate = ({
     }
 
     const isRequesting = canRequest && (isLoading || isFetching)
-    const hasResult = Boolean(slowestEstimate) && !isRequesting && !isError
-    const isUnavailable = canRequest && !isRequesting && (isError || (data && !slowestEstimate))
+    const hasResult = Boolean(fastestEstimate) && !isRequesting && !isError
+    const isUnavailable = canRequest && !isRequesting && (isError || (data && !fastestEstimate))
+    const fallbackDeliveryDescription = isError
+        ? getFallbackDeliveryDescription(shippingMethods)
+        : null
     const calculatingLabel = formatMessage({
         id: 'delivery_estimate.status.loading',
         defaultMessage: 'Calculating...'
@@ -353,7 +358,7 @@ const DeliveryEstimate = ({
                             },
                             {
                                 deliveryWindow: formatDeliveryWindow(
-                                    slowestEstimate.deliveryWindow,
+                                    fastestEstimate.deliveryWindow,
                                     formatDate
                                 )
                             }
@@ -380,11 +385,12 @@ const DeliveryEstimate = ({
             )}
             {isUnavailable && (
                 <Text mt={3} role="status" fontSize="xs" color="gray.600">
-                    {formatMessage({
-                        id: 'delivery_estimate.status.unavailable',
-                        defaultMessage:
-                            'Delivery dates unavailable. See checkout for options and costs.'
-                    })}
+                    {fallbackDeliveryDescription ||
+                        formatMessage({
+                            id: 'delivery_estimate.status.unavailable',
+                            defaultMessage:
+                                'Delivery dates unavailable. See checkout for options and costs.'
+                        })}
                 </Text>
             )}
         </>
@@ -505,7 +511,8 @@ const DeliveryEstimate = ({
                         </Stack>
                     </Box>
 
-                    {!resultContainer && renderedResult}
+                    {(!resultContainer || !showResult) &&
+                        (renderedResult || (isUnavailable && resultContent))}
                 </Box>
             )}
             {resultContainer && renderedResult}
@@ -580,6 +587,7 @@ DeliveryEstimate.propTypes = {
     showResultInCard: PropTypes.bool,
     showCalculator: PropTypes.bool,
     showResult: PropTypes.bool,
+    shippingMethods: PropTypes.array,
     onResolvedDestination: PropTypes.func,
     focusPostalCode: PropTypes.bool,
     onPostalCodeFocusHandled: PropTypes.func

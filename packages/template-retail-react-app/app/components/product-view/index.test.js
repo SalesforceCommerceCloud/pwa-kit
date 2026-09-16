@@ -196,6 +196,31 @@ test('renders delivery estimates only when explicitly enabled for the PDP', asyn
     ).toBeInTheDocument()
 })
 
+test('suppresses delivery estimates for deferred-availability products', () => {
+    const deferredProduct = {
+        ...mockStandardProductOrderable,
+        inventory: {
+            ...mockStandardProductOrderable.inventory,
+            ats: 0,
+            backorderable: true,
+            stockLevel: 0
+        }
+    }
+
+    renderWithProviders(
+        <MockComponent
+            product={deferredProduct}
+            showDeliveryEstimate={true}
+            showDeliveryOptions={true}
+        />
+    )
+
+    expect(screen.getByRole('radio', {name: 'Delivery'})).toBeInTheDocument()
+    expect(screen.getByRole('radio', {name: /free pickup in/i})).toBeInTheDocument()
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(useDeliveryEstimates).not.toHaveBeenCalled()
+})
+
 test('keeps the delivery estimate calculator separate from the delivery option', async () => {
     renderWithProviders(
         <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />

@@ -10,6 +10,8 @@ const getTime = (value) => {
     return Number.isFinite(time) ? time : null
 }
 
+const PICKUP_SHIPPING_METHOD_ID = '005'
+
 const stripAndUpper = (maxLength) => (value) =>
     value
         .replace(/[^A-Za-z0-9]/g, '')
@@ -218,23 +220,23 @@ export const isEligibleShippingOption = (shippingOption) => {
     )
 }
 
-const compareBySlowestDeliveryWindow = (first, second) => {
-    const startDifference =
-        getTime(second.deliveryWindow.startAt) - getTime(first.deliveryWindow.startAt)
-    if (startDifference !== 0) return startDifference
-
-    const endDifference = getTime(second.deliveryWindow.endAt) - getTime(first.deliveryWindow.endAt)
+const compareByFastestDeliveryWindow = (first, second) => {
+    const endDifference = getTime(first.deliveryWindow.endAt) - getTime(second.deliveryWindow.endAt)
     if (endDifference !== 0) return endDifference
+
+    const startDifference =
+        getTime(first.deliveryWindow.startAt) - getTime(second.deliveryWindow.startAt)
+    if (startDifference !== 0) return startDifference
 
     return String(first.shippingMethodId || '').localeCompare(String(second.shippingMethodId || ''))
 }
 
 /**
- * Returns the slowest eligible shipping option for the requested product.
- * The PDP summary follows Storefront Next by selecting the latest window start,
- * then the latest end time as a deterministic tie-breaker.
+ * Returns the fastest eligible shipping option for the requested product.
+ * The PDP summary follows Storefront Next by selecting the earliest window end,
+ * then the earliest start time as a deterministic tie-breaker.
  */
-export const getSlowestDeliveryEstimate = (productId, deliveryEstimates) => {
+export const getFastestDeliveryEstimate = (productId, deliveryEstimates) => {
     const productEstimate = deliveryEstimates?.productDeliveryEstimates?.find(
         (estimate) => estimate.productId === productId
     )
@@ -242,8 +244,18 @@ export const getSlowestDeliveryEstimate = (productId, deliveryEstimates) => {
 
     if (!eligibleOptions.length) return null
 
-    return [...eligibleOptions].sort(compareBySlowestDeliveryWindow)[0]
+    return [...eligibleOptions].sort(compareByFastestDeliveryWindow)[0]
 }
+
+export const getFallbackDeliveryDescription = (shippingMethods) =>
+    shippingMethods
+        ?.find(
+            (method) =>
+                method.id !== PICKUP_SHIPPING_METHOD_ID &&
+                method.c_storePickupEnabled !== true &&
+                method.description?.trim()
+        )
+        ?.description?.trim() || null
 
 export const normalizeDestination = (destination) => {
     const {countryCode, postalCode} = destination || {}
