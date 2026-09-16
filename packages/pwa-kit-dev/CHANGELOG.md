@@ -1,4 +1,5 @@
 ## v3.21.0-dev (Aug 12, 2026)
+- `pwa-kit-dev push` now detects Managed Runtime read-only (maintenance) mode via the `X-MRT-Read-Only` response header and fails with an actionable message pointing to the MRT status page, instead of a generic HTTP error.
 ## v3.20.0 (Aug 12, 2026)
 - The dev server's `app.sendMetric()` is now a backwards-compatible no-op, following removal of custom per-request CloudWatch metrics in `pwa-kit-runtime`.
 ## v3.19.0 (Jul 13, 2026)
