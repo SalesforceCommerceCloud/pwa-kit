@@ -34,7 +34,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
+              anyOf:
                 - type: object
                   required: [type, recipient, data]
                   properties:
@@ -109,8 +109,6 @@ paths:
                           type: string
                         accessCode:
                           type: string
-              discriminator:
-                propertyName: type
       responses:
         '200':
           description: Notification sent successfully
