@@ -5,6 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {getCountryCodeFromLocale} from '@salesforce/retail-react-app/app/components/delivery-estimate/locale'
+
+export {getCountryCodeFromLocale}
+
 const getTime = (value) => {
     const time = new Date(value).getTime()
     return Number.isFinite(time) ? time : null
@@ -258,26 +262,6 @@ export const normalizeCountryCode = (value) => {
     if (typeof value !== 'string') return undefined
     const countryCode = value.trim().toUpperCase()
     return ISO_COUNTRY_CODES.has(countryCode) ? countryCode : undefined
-}
-
-export const getCountryCodeFromLocale = (locale) => {
-    if (typeof locale !== 'string') return undefined
-
-    const normalizedLocale = locale.trim()
-    if (!normalizedLocale) return undefined
-
-    try {
-        if (typeof Intl !== 'undefined' && Intl.Locale) {
-            return normalizeCountryCode(new Intl.Locale(normalizedLocale).region)
-        }
-    } catch {
-        // Use the BCP-47 region subtag when Intl.Locale is unavailable in older browsers.
-    }
-
-    const region = normalizedLocale.match(
-        /^[A-Za-z]{2,8}(?:-[A-Za-z]{4})?-([A-Za-z]{2}|\d{3})(?:-|$)/
-    )?.[1]
-    return normalizeCountryCode(region)
 }
 
 export const getPostalCodeFormat = (countryOrLocale) => {

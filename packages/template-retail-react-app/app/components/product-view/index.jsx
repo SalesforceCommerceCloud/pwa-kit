@@ -60,7 +60,7 @@ import {EXPRESS_BUY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-pay
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useCleanupTemporaryBaskets} from '@salesforce/retail-react-app/app/hooks/use-cleanup-temporary-baskets'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {getCountryCodeFromLocale} from '@salesforce/retail-react-app/app/components/delivery-estimate/utils'
+import {getCountryCodeFromLocale} from '@salesforce/retail-react-app/app/components/delivery-estimate/locale'
 
 // Delivery estimates are opt-in on the PDP, so defer their code until the feature renders.
 const DeliveryEstimate = loadable(() =>
