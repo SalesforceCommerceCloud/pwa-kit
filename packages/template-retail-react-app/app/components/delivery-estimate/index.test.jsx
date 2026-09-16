@@ -8,7 +8,7 @@
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
+import {useDeliveryEstimates, useProduct} from '@salesforce/commerce-sdk-react'
 import {getDefaultCookieAttributes} from '@salesforce/commerce-sdk-react/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import DeliveryEstimate from '@salesforce/retail-react-app/app/components/delivery-estimate'
@@ -19,7 +19,7 @@ import usMessages from '@salesforce/retail-react-app/app/static/translations/com
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {...actual, useDeliveryEstimates: jest.fn()}
+    return {...actual, useDeliveryEstimates: jest.fn(), useProduct: jest.fn()}
 })
 
 jest.mock('@salesforce/commerce-sdk-react/utils', () => ({
@@ -130,6 +130,7 @@ describe('DeliveryEstimate', () => {
             isFetching: false,
             refetch: jest.fn()
         })
+        useProduct.mockReturnValue({data: undefined})
     })
 
     afterEach(() => jest.clearAllMocks())
@@ -584,19 +585,75 @@ describe('DeliveryEstimate', () => {
             isLoading: false,
             isFetching: false
         })
-        renderDeliveryEstimate({
-            showResult: false,
-            shippingMethods: [
-                {id: '005', c_storePickupEnabled: true, description: 'Ready for pickup today'},
-                {id: '001', description: 'Order received within 7-10 business days'}
-            ]
+        useProduct.mockReturnValue({
+            data: {
+                shippingMethods: [
+                    {id: '005', c_storePickupEnabled: true, description: 'Ready for pickup today'},
+                    {id: '001', description: 'Order received within 7-10 business days'}
+                ]
+            }
         })
+        renderDeliveryEstimate({showResult: false})
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
         expect(await screen.findByRole('status')).toHaveTextContent(
             'Order received within 7-10 business days'
+        )
+        expect(useProduct).toHaveBeenLastCalledWith(
+            {
+                parameters: {
+                    id: 'sku-a',
+                    expand: ['shipping_methods']
+                }
+            },
+            {enabled: true}
+        )
+    })
+
+    test('uses the catalog delivery description for a 500 delivery-estimate response', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: undefined,
+            error: {response: {status: 500}},
+            isError: true,
+            isLoading: false,
+            isFetching: false
+        })
+        useProduct.mockReturnValue({
+            data: {
+                shippingMethods: [
+                    {id: '001', description: 'Order received within 7-10 business days'}
+                ]
+            }
+        })
+        renderDeliveryEstimate({showResult: false})
+
+        expect(useProduct).toHaveBeenLastCalledWith(
+            {
+                parameters: {
+                    id: undefined,
+                    expand: undefined
+                }
+            },
+            {enabled: false}
+        )
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        expect(await screen.findByRole('status')).toHaveTextContent(
+            'Order received within 7-10 business days'
+        )
+        expect(useProduct).toHaveBeenLastCalledWith(
+            {
+                parameters: {
+                    id: 'sku-a',
+                    expand: ['shipping_methods']
+                }
+            },
+            {enabled: true}
         )
     })
 

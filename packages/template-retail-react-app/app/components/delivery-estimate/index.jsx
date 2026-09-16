@@ -8,7 +8,7 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {createPortal} from 'react-dom'
 import PropTypes from 'prop-types'
-import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
+import {useDeliveryEstimates, useProduct} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getDefaultCookieAttributes} from '@salesforce/commerce-sdk-react/utils'
 import {useIntl} from 'react-intl'
@@ -148,7 +148,6 @@ const DeliveryEstimate = ({
     showResultInCard = true,
     showCalculator = true,
     showResult = true,
-    shippingMethods,
     onResolvedDestination,
     focusPostalCode = false,
     onPostalCodeFocusHandled
@@ -216,7 +215,7 @@ const DeliveryEstimate = ({
 
     const validDestination = isValidDestination(submittedDestination)
     const canRequest = hydrated && Boolean(productId) && Boolean(siteId) && validDestination
-    const {data, isError, isLoading, isFetching} = useDeliveryEstimates(
+    const {data, error, isError, isLoading, isFetching} = useDeliveryEstimates(
         {
             parameters: {
                 productIds: canRequest ? [productId] : undefined,
@@ -292,8 +291,19 @@ const DeliveryEstimate = ({
     const isRequesting = canRequest && (isLoading || isFetching)
     const hasResult = Boolean(fastestEstimate) && !isRequesting && !isError
     const isUnavailable = canRequest && !isRequesting && (isError || (data && !fastestEstimate))
-    const fallbackDeliveryDescription = isError
-        ? getFallbackDeliveryDescription(shippingMethods)
+    const shouldFetchFallbackDeliveryDescription =
+        isUnavailable && [403, 500].includes(error?.response?.status)
+    const {data: fallbackProduct} = useProduct(
+        {
+            parameters: {
+                id: shouldFetchFallbackDeliveryDescription ? productId : undefined,
+                expand: shouldFetchFallbackDeliveryDescription ? ['shipping_methods'] : undefined
+            }
+        },
+        {enabled: shouldFetchFallbackDeliveryDescription}
+    )
+    const fallbackDeliveryDescription = shouldFetchFallbackDeliveryDescription
+        ? getFallbackDeliveryDescription(fallbackProduct?.shippingMethods)
         : null
     const calculatingLabel = formatMessage({
         id: 'delivery_estimate.status.loading',
@@ -587,7 +597,6 @@ DeliveryEstimate.propTypes = {
     showResultInCard: PropTypes.bool,
     showCalculator: PropTypes.bool,
     showResult: PropTypes.bool,
-    shippingMethods: PropTypes.array,
     onResolvedDestination: PropTypes.func,
     focusPostalCode: PropTypes.bool,
     onPostalCodeFocusHandled: PropTypes.func

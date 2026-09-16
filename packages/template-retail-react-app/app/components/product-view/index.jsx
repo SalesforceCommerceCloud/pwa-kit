@@ -1125,7 +1125,6 @@ const ProductView = forwardRef(
                                             showResult={
                                                 !showDeliveryOptions || !isDeliveryEstimateOpen
                                             }
-                                            shippingMethods={product.shippingMethods}
                                             onResolvedDestination={
                                                 showDeliveryOptions
                                                     ? handleResolvedDeliveryEstimate

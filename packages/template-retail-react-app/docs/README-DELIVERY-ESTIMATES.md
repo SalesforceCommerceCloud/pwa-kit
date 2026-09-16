@@ -95,9 +95,9 @@ remains available, does not show a delivery date, and does not persist the
 newly entered destination.
 
 The same shopper-facing unavailable state is used when the response contains
-no eligible delivery window. On an upstream error, the PDP shows the first
-non-pickup product shipping-method description when the catalog provides one;
-otherwise it uses this neutral fallback:
+no eligible delivery window. For a delivery-estimate HTTP 403 or 500 response,
+the PDP retrieves the product's shipping methods and shows the first non-pickup
+catalog description when available; otherwise it uses this neutral fallback:
 
 > Delivery dates unavailable. See checkout for options and costs.
 
