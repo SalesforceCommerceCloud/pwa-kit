@@ -1932,5 +1932,24 @@
   },
   "guestOrderLookup.order.return.success": {
     "defaultMessage": "Your return has been submitted."
-  }
+  },
+  "delivery_estimate.action.calculate": {"defaultMessage": "Laske"},
+  "delivery_estimate.action.calculate_aria_label": {"defaultMessage": "Laske toimitusarvio"},
+  "delivery_estimate.error.invalid_postal_code": {"defaultMessage": "Anna kelvollinen {term} (esim. {example})."},
+  "delivery_estimate.error.invalid_postal_code_no_example": {"defaultMessage": "Anna kelvollinen {term}."},
+  "delivery_estimate.heading": {"defaultMessage": "Arvioitu toimituspäivä"},
+  "delivery_estimate.instructions.postal_code": {"defaultMessage": "Anna {term} (esim. {example}) nähdäksesi toimitusarviot."},
+  "delivery_estimate.instructions.postal_code_no_example": {"defaultMessage": "Anna {term} nähdäksesi toimitusarviot."},
+  "delivery_estimate.link.view_all_shipping_options": {"defaultMessage": "Lisää toimitusvaihtoehtoja"},
+  "delivery_estimate.modal.heading": {"defaultMessage": "Toimitusvaihtoehdot"},
+  "delivery_estimate.placeholder.postal_code": {"defaultMessage": "Anna {term}"},
+  "delivery_estimate.placeholder.postal_code_example": {"defaultMessage": "Anna {term} (esim. {example})"},
+  "delivery_estimate.postal_term.cap": {"defaultMessage": "CAP"},
+  "delivery_estimate.postal_term.eircode": {"defaultMessage": "Eircode"},
+  "delivery_estimate.postal_term.postal_code": {"defaultMessage": "postinumero"},
+  "delivery_estimate.postal_term.postcode": {"defaultMessage": "postinumero"},
+  "delivery_estimate.postal_term.zip": {"defaultMessage": "postinumero"},
+  "delivery_estimate.status.estimated_arrival": {"defaultMessage": "Saapuu {deliveryWindow}"},
+  "delivery_estimate.status.loading": {"defaultMessage": "Lasketaan..."},
+  "delivery_estimate.status.unavailable": {"defaultMessage": "Toimituspäiviä ei ole saatavilla. Tarkista vaihtoehdot ja hinnat kassalla."}
 }

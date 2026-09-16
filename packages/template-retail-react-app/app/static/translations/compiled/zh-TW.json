@@ -1127,6 +1127,196 @@
       "value": "安全碼資訊"
     }
   ],
+  "delivery_estimate.action.calculate": [
+    {
+      "type": 0,
+      "value": "計算"
+    }
+  ],
+  "delivery_estimate.action.calculate_aria_label": [
+    {
+      "type": 0,
+      "value": "計算送達估計"
+    }
+  ],
+  "delivery_estimate.error.invalid_postal_code": [
+    {
+      "type": 0,
+      "value": "請輸入有效的"
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": "(例如 "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": ")。"
+    }
+  ],
+  "delivery_estimate.error.invalid_postal_code_no_example": [
+    {
+      "type": 0,
+      "value": "請輸入有效的"
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": "。"
+    }
+  ],
+  "delivery_estimate.heading": [
+    {
+      "type": 0,
+      "value": "預計送達日期"
+    }
+  ],
+  "delivery_estimate.instructions.postal_code": [
+    {
+      "type": 0,
+      "value": "請輸入"
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": "(例如 "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": ")以查看送達估計。"
+    }
+  ],
+  "delivery_estimate.instructions.postal_code_no_example": [
+    {
+      "type": 0,
+      "value": "請輸入"
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": "以查看送達估計。"
+    }
+  ],
+  "delivery_estimate.link.view_all_shipping_options": [
+    {
+      "type": 0,
+      "value": "更多配送選項"
+    }
+  ],
+  "delivery_estimate.modal.heading": [
+    {
+      "type": 0,
+      "value": "運送選項"
+    }
+  ],
+  "delivery_estimate.placeholder.postal_code": [
+    {
+      "type": 0,
+      "value": "輸入"
+    },
+    {
+      "type": 1,
+      "value": "term"
+    }
+  ],
+  "delivery_estimate.placeholder.postal_code_example": [
+    {
+      "type": 0,
+      "value": "輸入"
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": "(例如 "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "delivery_estimate.postal_term.cap": [
+    {
+      "type": 0,
+      "value": "CAP"
+    }
+  ],
+  "delivery_estimate.postal_term.eircode": [
+    {
+      "type": 0,
+      "value": "Eircode"
+    }
+  ],
+  "delivery_estimate.postal_term.postal_code": [
+    {
+      "type": 0,
+      "value": "郵遞區號"
+    }
+  ],
+  "delivery_estimate.postal_term.postcode": [
+    {
+      "type": 0,
+      "value": "郵遞區號"
+    }
+  ],
+  "delivery_estimate.postal_term.zip": [
+    {
+      "type": 0,
+      "value": "郵遞區號"
+    }
+  ],
+  "delivery_estimate.status.estimated_arrival": [
+    {
+      "type": 0,
+      "value": "預計 "
+    },
+    {
+      "type": 1,
+      "value": "deliveryWindow"
+    },
+    {
+      "type": 0,
+      "value": " 送達"
+    }
+  ],
+  "delivery_estimate.status.loading": [
+    {
+      "type": 0,
+      "value": "計算中..."
+    }
+  ],
+  "delivery_estimate.status.unavailable": [
+    {
+      "type": 0,
+      "value": "無法提供送達日期。請在結帳時查看選項和費用。"
+    }
+  ],
   "display_price.assistive_msg.current_price": [
     {
       "type": 0,

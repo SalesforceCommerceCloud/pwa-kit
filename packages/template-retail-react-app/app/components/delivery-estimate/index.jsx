@@ -38,6 +38,7 @@ import {
     getPostalCodeFormat,
     isEligibleShippingOption,
     isValidDestination,
+    normalizeCountryCode,
     normalizeDestination
 } from '@salesforce/retail-react-app/app/components/delivery-estimate/utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
@@ -46,23 +47,14 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 const getDeliveryZipCodeCookieName = (siteId) => `deliveryZipCode_${siteId}`
 const DELIVERY_DESTINATION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
 const POSTAL_CODE_SANITY_RE = /^[A-Z0-9](?:[A-Z0-9 -]{0,10}[A-Z0-9])?$/i
-const ISO_COUNTRY_CODES = new Set(
-    'AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW'.split(
-        ' '
-    )
-)
+const DELIVERY_ESTIMATE_INSTRUCTIONS_ID = 'delivery-estimate-postal-code-instructions'
+const DELIVERY_ESTIMATE_ERROR_ID = 'delivery-estimate-postal-code-error'
 
 const normalizePostalCode = (value) => {
     const postalCode = value?.trim()
     return postalCode && postalCode.length <= 12 && POSTAL_CODE_SANITY_RE.test(postalCode)
         ? postalCode
         : null
-}
-
-const normalizeCountryCode = (value) => {
-    if (typeof value !== 'string') return undefined
-    const countryCode = value.trim().toUpperCase()
-    return ISO_COUNTRY_CODES.has(countryCode) ? countryCode : undefined
 }
 
 const parseDeliveryDestinationCookie = (cookieName) => {
@@ -119,12 +111,12 @@ const persistDeliveryDestinationCookie = (siteId, destination) => {
 const formatDeliveryWindow = (deliveryWindow, formatDate) => {
     const startAt = new Date(deliveryWindow.startAt)
     const endAt = new Date(deliveryWindow.endAt)
-    const dateFormat = {year: 'numeric', month: 'short', day: 'numeric'}
+    const dateFormat = {weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC'}
 
     const startLabel = formatDate(startAt, dateFormat)
     const endLabel = formatDate(endAt, dateFormat)
 
-    return startLabel === endLabel ? startLabel : `${startLabel} - ${endLabel}`
+    return startLabel === endLabel ? startLabel : `${startLabel} \u2013 ${endLabel}`
 }
 
 const formatShippingCost = (shippingOption, formatNumber, freeLabel, fallbackCurrency) => {
@@ -138,6 +130,41 @@ const formatShippingCost = (shippingOption, formatNumber, freeLabel, fallbackCur
               style: 'currency',
               currency: shippingOption.currency || fallbackCurrency
           })
+}
+
+const postalCodeTermMessages = {
+    zip: {id: 'delivery_estimate.postal_term.zip', defaultMessage: 'ZIP code'},
+    postalCode: {id: 'delivery_estimate.postal_term.postal_code', defaultMessage: 'postal code'},
+    postcode: {id: 'delivery_estimate.postal_term.postcode', defaultMessage: 'postcode'},
+    cap: {id: 'delivery_estimate.postal_term.cap', defaultMessage: 'CAP'},
+    eircode: {id: 'delivery_estimate.postal_term.eircode', defaultMessage: 'Eircode'}
+}
+
+const postalCodeMessages = {
+    placeholder: {
+        id: 'delivery_estimate.placeholder.postal_code',
+        defaultMessage: 'Enter {term}'
+    },
+    placeholderExample: {
+        id: 'delivery_estimate.placeholder.postal_code_example',
+        defaultMessage: 'Enter {term} (e.g. {example})'
+    },
+    instructions: {
+        id: 'delivery_estimate.instructions.postal_code',
+        defaultMessage: 'Enter your {term} (e.g. {example}) to see delivery estimates.'
+    },
+    instructionsNoExample: {
+        id: 'delivery_estimate.instructions.postal_code_no_example',
+        defaultMessage: 'Enter your {term} to see delivery estimates.'
+    },
+    invalid: {
+        id: 'delivery_estimate.error.invalid_postal_code',
+        defaultMessage: 'Enter a valid {term} (e.g. {example}).'
+    },
+    invalidNoExample: {
+        id: 'delivery_estimate.error.invalid_postal_code_no_example',
+        defaultMessage: 'Enter a valid {term}.'
+    }
 }
 
 const DeliveryEstimate = ({
@@ -169,7 +196,27 @@ const DeliveryEstimate = ({
     const shouldFocusResultRef = useRef(false)
     const postalCodeInputRef = useRef(null)
     const estimateResultRef = useRef(null)
-    const postalCodeFormat = getPostalCodeFormat(destination.countryCode)
+    const postalCodeFormat = getPostalCodeFormat(destination.countryCode || defaultCountryCode)
+    const postalCodeTerm = formatMessage(
+        postalCodeTermMessages[postalCodeFormat.termKey] || postalCodeTermMessages.postalCode
+    )
+    const postalCodeMessageValues = {term: postalCodeTerm, example: postalCodeFormat.example}
+    const postalCodePlaceholder = formatMessage(
+        postalCodeFormat.example
+            ? postalCodeMessages.placeholderExample
+            : postalCodeMessages.placeholder,
+        postalCodeMessageValues
+    )
+    const postalCodeInstructions = formatMessage(
+        postalCodeFormat.example
+            ? postalCodeMessages.instructions
+            : postalCodeMessages.instructionsNoExample,
+        postalCodeMessageValues
+    )
+    const postalCodeInvalid = formatMessage(
+        postalCodeFormat.example ? postalCodeMessages.invalid : postalCodeMessages.invalidNoExample,
+        postalCodeMessageValues
+    )
 
     useEffect(() => {
         hasExplicitDestinationRef.current = false
@@ -254,25 +301,7 @@ const DeliveryEstimate = ({
         event.preventDefault()
         const normalizedDestination = normalizeDestination(destination)
         const errors = {
-            postalCode: !normalizedDestination.postalCode
-                ? formatMessage(
-                      {
-                          id: 'delivery_estimate.error.enter_postal_code',
-                          defaultMessage:
-                              '{countryCode, select, GB {Enter a postcode.} US {Enter a ZIP code.} other {Enter a postal code.}}'
-                      },
-                      {countryCode: normalizedDestination.countryCode}
-                  )
-                : !isValidDestination(normalizedDestination)
-                ? formatMessage(
-                      {
-                          id: 'delivery_estimate.error.invalid_postal_code',
-                          defaultMessage:
-                              '{countryCode, select, GB {Enter a valid postcode.} US {Enter a valid ZIP code.} other {Enter a valid postal code.}}'
-                      },
-                      {countryCode: normalizedDestination.countryCode}
-                  )
-                : ''
+            postalCode: isValidDestination(normalizedDestination) ? '' : postalCodeInvalid
         }
         setDestination(normalizedDestination)
         setValidationErrors(errors)
@@ -291,6 +320,8 @@ const DeliveryEstimate = ({
     const isRequesting = canRequest && (isLoading || isFetching)
     const hasResult = Boolean(fastestEstimate) && !isRequesting && !isError
     const isUnavailable = canRequest && !isRequesting && (isError || (data && !fastestEstimate))
+    const showPostalCodeInstructions =
+        !isRequesting && !hasResult && !isUnavailable && !validationErrors.postalCode
     const shouldFetchFallbackDeliveryDescription =
         isUnavailable && [403, 500].includes(error?.response?.status)
     const {data: fallbackProduct} = useProduct(
@@ -364,7 +395,7 @@ const DeliveryEstimate = ({
                         {formatMessage(
                             {
                                 id: 'delivery_estimate.status.estimated_arrival',
-                                defaultMessage: 'Estimated: {deliveryWindow}'
+                                defaultMessage: 'Arrives {deliveryWindow}'
                             },
                             {
                                 deliveryWindow: formatDeliveryWindow(
@@ -387,7 +418,7 @@ const DeliveryEstimate = ({
                         >
                             {formatMessage({
                                 id: 'delivery_estimate.link.view_all_shipping_options',
-                                defaultMessage: 'View All Shipping Options'
+                                defaultMessage: 'More Delivery Options'
                             })}
                         </Button>
                     )}
@@ -450,14 +481,7 @@ const DeliveryEstimate = ({
                             >
                                 <VisuallyHidden>
                                     <FormLabel htmlFor="delivery-estimate-postal-code">
-                                        {formatMessage(
-                                            {
-                                                id: 'delivery_estimate.label.postal_code',
-                                                defaultMessage:
-                                                    '{countryCode, select, GB {Postcode} US {ZIP code} other {Postal code}}'
-                                            },
-                                            {countryCode: destination.countryCode}
-                                        )}
+                                        {postalCodeTerm}
                                     </FormLabel>
                                 </VisuallyHidden>
                                 <Input
@@ -468,13 +492,12 @@ const DeliveryEstimate = ({
                                     inputMode={postalCodeFormat.inputMode}
                                     maxLength={postalCodeFormat.maxLength}
                                     aria-invalid={Boolean(validationErrors.postalCode)}
-                                    placeholder={formatMessage({
-                                        id: 'delivery_estimate.placeholder.postal_code',
-                                        defaultMessage: 'Enter a postal code...'
-                                    })}
+                                    placeholder={postalCodePlaceholder}
                                     aria-describedby={
                                         validationErrors.postalCode
-                                            ? 'delivery-estimate-postal-code-error'
+                                            ? DELIVERY_ESTIMATE_ERROR_ID
+                                            : showPostalCodeInstructions
+                                            ? DELIVERY_ESTIMATE_INSTRUCTIONS_ID
                                             : undefined
                                     }
                                     value={destination.postalCode}
@@ -493,7 +516,7 @@ const DeliveryEstimate = ({
                                         }))
                                     }}
                                 />
-                                <FormErrorMessage id="delivery-estimate-postal-code-error">
+                                <FormErrorMessage id={DELIVERY_ESTIMATE_ERROR_ID}>
                                     {validationErrors.postalCode}
                                 </FormErrorMessage>
                             </FormControl>
@@ -520,6 +543,17 @@ const DeliveryEstimate = ({
                             </Button>
                         </Stack>
                     </Box>
+
+                    {showPostalCodeInstructions && (
+                        <Text
+                            id={DELIVERY_ESTIMATE_INSTRUCTIONS_ID}
+                            mt={3}
+                            fontSize="xs"
+                            color="gray.600"
+                        >
+                            {postalCodeInstructions}
+                        </Text>
+                    )}
 
                     {(!resultContainer || !showResult) &&
                         (renderedResult || (isUnavailable && resultContent))}

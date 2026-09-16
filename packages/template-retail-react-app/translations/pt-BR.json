@@ -1932,5 +1932,24 @@
   },
   "guestOrderLookup.order.return.success": {
     "defaultMessage": "Your return has been submitted."
-  }
+  },
+  "delivery_estimate.action.calculate": {"defaultMessage": "Calcular"},
+  "delivery_estimate.action.calculate_aria_label": {"defaultMessage": "Calcular estimativa de entrega"},
+  "delivery_estimate.error.invalid_postal_code": {"defaultMessage": "Introduza um {term} válido (ex. {example})."},
+  "delivery_estimate.error.invalid_postal_code_no_example": {"defaultMessage": "Introduza um {term} válido."},
+  "delivery_estimate.heading": {"defaultMessage": "Data estimada de entrega"},
+  "delivery_estimate.instructions.postal_code": {"defaultMessage": "Introduza o seu {term} (ex. {example}) para ver as estimativas de entrega."},
+  "delivery_estimate.instructions.postal_code_no_example": {"defaultMessage": "Introduza o seu {term} para ver as estimativas de entrega."},
+  "delivery_estimate.link.view_all_shipping_options": {"defaultMessage": "Mais opções de entrega"},
+  "delivery_estimate.modal.heading": {"defaultMessage": "Opções de envio"},
+  "delivery_estimate.placeholder.postal_code": {"defaultMessage": "Introduza o seu {term}"},
+  "delivery_estimate.placeholder.postal_code_example": {"defaultMessage": "Introduza o seu {term} (ex. {example})"},
+  "delivery_estimate.postal_term.cap": {"defaultMessage": "CAP"},
+  "delivery_estimate.postal_term.eircode": {"defaultMessage": "Eircode"},
+  "delivery_estimate.postal_term.postal_code": {"defaultMessage": "código postal"},
+  "delivery_estimate.postal_term.postcode": {"defaultMessage": "código postal"},
+  "delivery_estimate.postal_term.zip": {"defaultMessage": "código postal"},
+  "delivery_estimate.status.estimated_arrival": {"defaultMessage": "Chega {deliveryWindow}"},
+  "delivery_estimate.status.loading": {"defaultMessage": "A calcular..."},
+  "delivery_estimate.status.unavailable": {"defaultMessage": "Datas de entrega indisponíveis. Consulte as opções e os custos no checkout."}
 }

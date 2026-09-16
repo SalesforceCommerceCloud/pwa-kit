@@ -1959,5 +1959,62 @@
   },
   "guestOrderLookup.order.return.success": {
     "defaultMessage": "Your return has been submitted."
+  },
+  "delivery_estimate.action.calculate": {
+    "defaultMessage": "Calcular"
+  },
+  "delivery_estimate.action.calculate_aria_label": {
+    "defaultMessage": "Calcular estimación de entrega"
+  },
+  "delivery_estimate.error.invalid_postal_code": {
+    "defaultMessage": "Introduce un {term} válido (ej. {example})."
+  },
+  "delivery_estimate.error.invalid_postal_code_no_example": {
+    "defaultMessage": "Introduce un {term} válido."
+  },
+  "delivery_estimate.heading": {
+    "defaultMessage": "Fecha de entrega estimada"
+  },
+  "delivery_estimate.instructions.postal_code": {
+    "defaultMessage": "Introduce tu {term} (ej. {example}) para ver las estimaciones de entrega."
+  },
+  "delivery_estimate.instructions.postal_code_no_example": {
+    "defaultMessage": "Introduce tu {term} para ver las estimaciones de entrega."
+  },
+  "delivery_estimate.link.view_all_shipping_options": {
+    "defaultMessage": "Más opciones de entrega"
+  },
+  "delivery_estimate.modal.heading": {
+    "defaultMessage": "Opciones de envío"
+  },
+  "delivery_estimate.placeholder.postal_code": {
+    "defaultMessage": "Introduce tu {term}"
+  },
+  "delivery_estimate.placeholder.postal_code_example": {
+    "defaultMessage": "Introduce tu {term} (ej. {example})"
+  },
+  "delivery_estimate.postal_term.cap": {
+    "defaultMessage": "CAP"
+  },
+  "delivery_estimate.postal_term.eircode": {
+    "defaultMessage": "Eircode"
+  },
+  "delivery_estimate.postal_term.postal_code": {
+    "defaultMessage": "código postal"
+  },
+  "delivery_estimate.postal_term.postcode": {
+    "defaultMessage": "código postal"
+  },
+  "delivery_estimate.postal_term.zip": {
+    "defaultMessage": "código postal"
+  },
+  "delivery_estimate.status.estimated_arrival": {
+    "defaultMessage": "Llega {deliveryWindow}"
+  },
+  "delivery_estimate.status.loading": {
+    "defaultMessage": "Calculando..."
+  },
+  "delivery_estimate.status.unavailable": {
+    "defaultMessage": "Fechas de entrega no disponibles. Consulta las opciones y los costes al finalizar la compra."
   }
 }

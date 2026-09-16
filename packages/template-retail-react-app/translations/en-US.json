@@ -783,29 +783,17 @@
   "delivery_estimate.action.calculate_aria_label": {
     "defaultMessage": "Calculate delivery estimate"
   },
-  "delivery_estimate.error.enter_postal_code": {
-    "defaultMessage": "{countryCode, select, GB {Enter a postcode.} US {Enter a ZIP code.} other {Enter a postal code.}}"
-  },
-  "delivery_estimate.error.invalid_postal_code": {
-    "defaultMessage": "{countryCode, select, GB {Enter a valid postcode.} US {Enter a valid ZIP code.} other {Enter a valid postal code.}}"
-  },
   "delivery_estimate.heading": {
     "defaultMessage": "Estimated Delivery Date"
   },
-  "delivery_estimate.label.postal_code": {
-    "defaultMessage": "{countryCode, select, GB {Postcode} US {ZIP code} other {Postal code}}"
-  },
   "delivery_estimate.link.view_all_shipping_options": {
-    "defaultMessage": "View All Shipping Options"
+    "defaultMessage": "More Delivery Options"
   },
   "delivery_estimate.modal.heading": {
     "defaultMessage": "Shipping Options"
   },
-  "delivery_estimate.placeholder.postal_code": {
-    "defaultMessage": "Enter a postal code..."
-  },
   "delivery_estimate.status.estimated_arrival": {
-    "defaultMessage": "Estimated: {deliveryWindow}"
+    "defaultMessage": "Arrives {deliveryWindow}"
   },
   "delivery_estimate.status.loading": {
     "defaultMessage": "Calculating..."

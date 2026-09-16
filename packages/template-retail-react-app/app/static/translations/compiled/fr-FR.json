@@ -1145,6 +1145,192 @@
       "value": "Cryptogramme"
     }
   ],
+  "delivery_estimate.action.calculate": [
+    {
+      "type": 0,
+      "value": "Calculer"
+    }
+  ],
+  "delivery_estimate.action.calculate_aria_label": [
+    {
+      "type": 0,
+      "value": "Calculer l’estimation de livraison"
+    }
+  ],
+  "delivery_estimate.error.invalid_postal_code": [
+    {
+      "type": 0,
+      "value": "Saisissez un "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " valide (ex. "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": ")."
+    }
+  ],
+  "delivery_estimate.error.invalid_postal_code_no_example": [
+    {
+      "type": 0,
+      "value": "Saisissez un "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " valide."
+    }
+  ],
+  "delivery_estimate.heading": [
+    {
+      "type": 0,
+      "value": "Date de livraison prévue"
+    }
+  ],
+  "delivery_estimate.instructions.postal_code": [
+    {
+      "type": 0,
+      "value": "Saisissez votre "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " (ex. "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": ") pour voir les estimations de livraison."
+    }
+  ],
+  "delivery_estimate.instructions.postal_code_no_example": [
+    {
+      "type": 0,
+      "value": "Saisissez votre "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " pour voir les estimations de livraison."
+    }
+  ],
+  "delivery_estimate.link.view_all_shipping_options": [
+    {
+      "type": 0,
+      "value": "Plus d’options de livraison"
+    }
+  ],
+  "delivery_estimate.modal.heading": [
+    {
+      "type": 0,
+      "value": "Options de livraison"
+    }
+  ],
+  "delivery_estimate.placeholder.postal_code": [
+    {
+      "type": 0,
+      "value": "Saisissez votre "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    }
+  ],
+  "delivery_estimate.placeholder.postal_code_example": [
+    {
+      "type": 0,
+      "value": "Saisissez votre "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " (ex. "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "delivery_estimate.postal_term.cap": [
+    {
+      "type": 0,
+      "value": "CAP"
+    }
+  ],
+  "delivery_estimate.postal_term.eircode": [
+    {
+      "type": 0,
+      "value": "Eircode"
+    }
+  ],
+  "delivery_estimate.postal_term.postal_code": [
+    {
+      "type": 0,
+      "value": "code postal"
+    }
+  ],
+  "delivery_estimate.postal_term.postcode": [
+    {
+      "type": 0,
+      "value": "code postal"
+    }
+  ],
+  "delivery_estimate.postal_term.zip": [
+    {
+      "type": 0,
+      "value": "code postal"
+    }
+  ],
+  "delivery_estimate.status.estimated_arrival": [
+    {
+      "type": 0,
+      "value": "Arrive "
+    },
+    {
+      "type": 1,
+      "value": "deliveryWindow"
+    }
+  ],
+  "delivery_estimate.status.loading": [
+    {
+      "type": 0,
+      "value": "Calcul en cours..."
+    }
+  ],
+  "delivery_estimate.status.unavailable": [
+    {
+      "type": 0,
+      "value": "Dates de livraison indisponibles. Consultez les options et les frais lors du paiement."
+    }
+  ],
   "display_price.assistive_msg.current_price": [
     {
       "type": 0,

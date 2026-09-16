@@ -1932,5 +1932,62 @@
   },
   "guestOrderLookup.order.return.success": {
     "defaultMessage": "Your return has been submitted."
+  },
+  "delivery_estimate.action.calculate": {
+    "defaultMessage": "Berechnen"
+  },
+  "delivery_estimate.action.calculate_aria_label": {
+    "defaultMessage": "Lieferschätzung berechnen"
+  },
+  "delivery_estimate.error.invalid_postal_code": {
+    "defaultMessage": "Bitte geben Sie eine gültige {term} ein (z. B. {example})."
+  },
+  "delivery_estimate.error.invalid_postal_code_no_example": {
+    "defaultMessage": "Bitte geben Sie eine gültige {term} ein."
+  },
+  "delivery_estimate.heading": {
+    "defaultMessage": "Voraussichtliches Lieferdatum"
+  },
+  "delivery_estimate.instructions.postal_code": {
+    "defaultMessage": "Geben Sie Ihre {term} (z. B. {example}) ein, um die Lieferschätzungen anzuzeigen."
+  },
+  "delivery_estimate.instructions.postal_code_no_example": {
+    "defaultMessage": "Geben Sie Ihre {term} ein, um die Lieferschätzungen anzuzeigen."
+  },
+  "delivery_estimate.link.view_all_shipping_options": {
+    "defaultMessage": "Weitere Lieferoptionen"
+  },
+  "delivery_estimate.modal.heading": {
+    "defaultMessage": "Versandoptionen"
+  },
+  "delivery_estimate.placeholder.postal_code": {
+    "defaultMessage": "{term} eingeben"
+  },
+  "delivery_estimate.placeholder.postal_code_example": {
+    "defaultMessage": "{term} eingeben (z. B. {example})"
+  },
+  "delivery_estimate.postal_term.cap": {
+    "defaultMessage": "CAP"
+  },
+  "delivery_estimate.postal_term.eircode": {
+    "defaultMessage": "Eircode"
+  },
+  "delivery_estimate.postal_term.postal_code": {
+    "defaultMessage": "PLZ"
+  },
+  "delivery_estimate.postal_term.postcode": {
+    "defaultMessage": "PLZ"
+  },
+  "delivery_estimate.postal_term.zip": {
+    "defaultMessage": "PLZ"
+  },
+  "delivery_estimate.status.estimated_arrival": {
+    "defaultMessage": "Ankunft {deliveryWindow}"
+  },
+  "delivery_estimate.status.loading": {
+    "defaultMessage": "Berechnung läuft..."
+  },
+  "delivery_estimate.status.unavailable": {
+    "defaultMessage": "Liefertermine nicht verfügbar. Optionen und Kosten finden Sie an der Kasse."
   }
 }

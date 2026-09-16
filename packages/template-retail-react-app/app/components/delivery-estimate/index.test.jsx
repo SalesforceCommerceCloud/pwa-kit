@@ -16,6 +16,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import usMessages from '@salesforce/retail-react-app/app/static/translations/compiled/en-US.json'
+import deMessages from '@salesforce/retail-react-app/app/static/translations/compiled/de-DE.json'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -157,14 +158,14 @@ describe('DeliveryEstimate', () => {
             )
         })
         expect(
-            await screen.findByText('Estimated: Sep 15, 2026 - Sep 16, 2026')
+            await screen.findByText('Arrives Tue, Sep 15 \u2013 Wed, Sep 16')
         ).toBeInTheDocument()
         expect(screen.queryByText(/ground/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/express/i)).not.toBeInTheDocument()
-        expect(screen.getByRole('button', {name: 'View All Shipping Options'})).toHaveStyle(
+        expect(screen.getByRole('button', {name: 'More Delivery Options'})).toHaveStyle(
             'text-decoration: underline'
         )
-        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
+        await user.click(screen.getByRole('button', {name: 'More Delivery Options'}))
         const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
         expect(within(shippingOptions).getByText('Ground')).toBeInTheDocument()
         expect(within(shippingOptions).getByText('Express')).toBeInTheDocument()
@@ -176,13 +177,34 @@ describe('DeliveryEstimate', () => {
         expect(getDefaultCookieAttributes).toHaveBeenCalled()
     })
 
-    test('uses the localized postcode label and Storefront Next placeholder for GB', () => {
+    test('uses the localized postcode label, example, and instructions for GB', () => {
         renderWithProviders(
             <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="GB" />
         )
 
         const input = screen.getByRole('textbox', {name: /postcode/i})
-        expect(input).toHaveAttribute('placeholder', 'Enter a postal code...')
+        expect(input).toHaveAttribute('placeholder', 'Enter postcode (e.g. SW1A 1AA)')
+        expect(input).toHaveAccessibleDescription(
+            'Enter your postcode (e.g. SW1A 1AA) to see delivery estimates.'
+        )
+    })
+
+    test('uses localized delivery-estimate messages for supported locales', () => {
+        renderWithProviders(
+            <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="DE" />,
+            {wrapperProps: {locale: {id: 'de-DE'}, messages: deMessages}}
+        )
+
+        expect(
+            screen.getByRole('region', {name: 'Voraussichtliches Lieferdatum'})
+        ).toBeInTheDocument()
+        expect(screen.getByRole('textbox', {name: 'PLZ'})).toHaveAttribute(
+            'placeholder',
+            'PLZ eingeben (z. B. 10115)'
+        )
+        expect(screen.getByRole('button', {name: 'Lieferschätzung berechnen'})).toHaveTextContent(
+            'Berechnen'
+        )
     })
 
     test('renders the estimator as an accessible delivery section', () => {
@@ -201,15 +223,13 @@ describe('DeliveryEstimate', () => {
         setDeliveryDestinationCookie({postalCode: '94105', countryCode: 'US'})
         renderDeliveryEstimate()
 
-        expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(
-            /estimated:/i
-        )
+        expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(/arrives/i)
         await user.clear(screen.getByRole('textbox', {name: /zip code/i}))
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
-        expect(screen.getByText(/enter a zip code/i)).toBeInTheDocument()
+        expect(screen.getByText(/enter a valid zip code/i)).toBeInTheDocument()
         expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveAccessibleDescription(
-            'Enter a ZIP code.'
+            'Enter a valid ZIP code (e.g. 90210).'
         )
         await waitFor(() => {
             expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
@@ -425,7 +445,7 @@ describe('DeliveryEstimate', () => {
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
-        expect(await screen.findByRole('status')).toHaveTextContent(/estimated:/i)
+        expect(await screen.findByRole('status')).toHaveTextContent(/arrives/i)
     })
 
     test('moves focus to a shopper-initiated estimate', async () => {
@@ -529,9 +549,7 @@ describe('DeliveryEstimate', () => {
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
-        expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(
-            /estimated:/i
-        )
+        expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(/arrives/i)
 
         await user.click(screen.getByRole('button', {name: /select sku b/i}))
 
@@ -712,7 +730,7 @@ describe('DeliveryEstimate', () => {
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
-        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
+        await user.click(screen.getByRole('button', {name: 'More Delivery Options'}))
 
         const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
         expect(within(shippingOptions).queryByText('Unavailable')).not.toBeInTheDocument()
@@ -746,7 +764,7 @@ describe('DeliveryEstimate', () => {
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
-        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
+        await user.click(screen.getByRole('button', {name: 'More Delivery Options'}))
 
         const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
         expect(within(shippingOptions).getByText('£5.00')).toBeInTheDocument()

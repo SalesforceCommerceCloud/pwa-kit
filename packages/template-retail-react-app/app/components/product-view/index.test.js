@@ -22,6 +22,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import frMessages from '@salesforce/retail-react-app/app/static/translations/compiled/fr-FR.json'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {rest} from 'msw'
 
 jest.mock('@loadable/component', () => ({
@@ -33,11 +34,11 @@ jest.mock('@loadable/component', () => ({
 // Ensure useMultiSite returns site.id = 'site-1' for all tests
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     __esModule: true,
-    default: () => ({
+    default: jest.fn(() => ({
         site: {id: 'site-1'},
         locale: {id: 'en-US'},
         buildUrl: (url) => url // identity function for tests
-    })
+    }))
 }))
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
@@ -107,12 +108,18 @@ beforeEach(() => {
         error: null,
         hasSelectedStore: true
     }))
+    useMultiSite.mockReturnValue({
+        site: {id: 'site-1'},
+        locale: {id: 'en-US'},
+        buildUrl: (url) => url
+    })
     useDeliveryEstimates.mockReturnValue({
         data: deliveryEstimateResult,
         isError: false,
         isLoading: false,
         isFetching: false
     })
+    document.cookie = 'deliveryZipCode_site-1=; Max-Age=0; path=/'
     window.localStorage.clear()
 
     // Reset MSW handlers to avoid conflicts
@@ -194,6 +201,31 @@ test('renders delivery estimates only when explicitly enabled for the PDP', asyn
     expect(
         await screen.findByRole('heading', {name: 'Estimated Delivery Date'})
     ).toBeInTheDocument()
+})
+
+test('uses the full locale country code for delivery estimates', async () => {
+    useMultiSite.mockReturnValue({
+        site: {id: 'site-1'},
+        locale: {id: 'zh-Hans-CN'},
+        buildUrl: (url) => url
+    })
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />,
+        {wrapperProps: {isGuest: true}}
+    )
+
+    const user = userEvent.setup()
+    await user.type(await screen.findByRole('textbox', {name: /postal code/i}), '100000')
+    await user.click(screen.getByRole('button', {name: 'Calculate delivery estimate'}))
+
+    await waitFor(() => {
+        expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({countryCode: 'CN', postalCode: '100000'})
+            }),
+            expect.objectContaining({enabled: true})
+        )
+    })
 })
 
 test('suppresses delivery estimates for deferred-availability products', () => {

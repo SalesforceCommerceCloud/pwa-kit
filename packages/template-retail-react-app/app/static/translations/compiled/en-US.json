@@ -1971,112 +1971,16 @@
       "value": "Calculate delivery estimate"
     }
   ],
-  "delivery_estimate.error.enter_postal_code": [
-    {
-      "options": {
-        "GB": {
-          "value": [
-            {
-              "type": 0,
-              "value": "Enter a postcode."
-            }
-          ]
-        },
-        "US": {
-          "value": [
-            {
-              "type": 0,
-              "value": "Enter a ZIP code."
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "Enter a postal code."
-            }
-          ]
-        }
-      },
-      "type": 5,
-      "value": "countryCode"
-    }
-  ],
-  "delivery_estimate.error.invalid_postal_code": [
-    {
-      "options": {
-        "GB": {
-          "value": [
-            {
-              "type": 0,
-              "value": "Enter a valid postcode."
-            }
-          ]
-        },
-        "US": {
-          "value": [
-            {
-              "type": 0,
-              "value": "Enter a valid ZIP code."
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "Enter a valid postal code."
-            }
-          ]
-        }
-      },
-      "type": 5,
-      "value": "countryCode"
-    }
-  ],
   "delivery_estimate.heading": [
     {
       "type": 0,
       "value": "Estimated Delivery Date"
     }
   ],
-  "delivery_estimate.label.postal_code": [
-    {
-      "options": {
-        "GB": {
-          "value": [
-            {
-              "type": 0,
-              "value": "Postcode"
-            }
-          ]
-        },
-        "US": {
-          "value": [
-            {
-              "type": 0,
-              "value": "ZIP code"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "Postal code"
-            }
-          ]
-        }
-      },
-      "type": 5,
-      "value": "countryCode"
-    }
-  ],
   "delivery_estimate.link.view_all_shipping_options": [
     {
       "type": 0,
-      "value": "View All Shipping Options"
+      "value": "More Delivery Options"
     }
   ],
   "delivery_estimate.modal.heading": [
@@ -2085,16 +1989,10 @@
       "value": "Shipping Options"
     }
   ],
-  "delivery_estimate.placeholder.postal_code": [
-    {
-      "type": 0,
-      "value": "Enter a postal code..."
-    }
-  ],
   "delivery_estimate.status.estimated_arrival": [
     {
       "type": 0,
-      "value": "Estimated: "
+      "value": "Arrives "
     },
     {
       "type": 1,

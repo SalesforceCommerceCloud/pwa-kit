@@ -1127,6 +1127,192 @@
       "value": "Informacje o kodzie zabezpieczającym"
     }
   ],
+  "delivery_estimate.action.calculate": [
+    {
+      "type": 0,
+      "value": "Oblicz"
+    }
+  ],
+  "delivery_estimate.action.calculate_aria_label": [
+    {
+      "type": 0,
+      "value": "Oblicz szacowaną dostawę"
+    }
+  ],
+  "delivery_estimate.error.invalid_postal_code": [
+    {
+      "type": 0,
+      "value": "Wpisz prawidłowy "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " (np. "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": ")."
+    }
+  ],
+  "delivery_estimate.error.invalid_postal_code_no_example": [
+    {
+      "type": 0,
+      "value": "Wpisz prawidłowy "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "delivery_estimate.heading": [
+    {
+      "type": 0,
+      "value": "Szacowana data dostawy"
+    }
+  ],
+  "delivery_estimate.instructions.postal_code": [
+    {
+      "type": 0,
+      "value": "Wpisz swój "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " (np. "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": "), aby zobaczyć szacowaną dostawę."
+    }
+  ],
+  "delivery_estimate.instructions.postal_code_no_example": [
+    {
+      "type": 0,
+      "value": "Wpisz swój "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": ", aby zobaczyć szacowaną dostawę."
+    }
+  ],
+  "delivery_estimate.link.view_all_shipping_options": [
+    {
+      "type": 0,
+      "value": "Więcej opcji dostawy"
+    }
+  ],
+  "delivery_estimate.modal.heading": [
+    {
+      "type": 0,
+      "value": "Opcje dostawy"
+    }
+  ],
+  "delivery_estimate.placeholder.postal_code": [
+    {
+      "type": 0,
+      "value": "Wpisz "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    }
+  ],
+  "delivery_estimate.placeholder.postal_code_example": [
+    {
+      "type": 0,
+      "value": "Wpisz "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " (np. "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "delivery_estimate.postal_term.cap": [
+    {
+      "type": 0,
+      "value": "CAP"
+    }
+  ],
+  "delivery_estimate.postal_term.eircode": [
+    {
+      "type": 0,
+      "value": "Eircode"
+    }
+  ],
+  "delivery_estimate.postal_term.postal_code": [
+    {
+      "type": 0,
+      "value": "kod pocztowy"
+    }
+  ],
+  "delivery_estimate.postal_term.postcode": [
+    {
+      "type": 0,
+      "value": "kod pocztowy"
+    }
+  ],
+  "delivery_estimate.postal_term.zip": [
+    {
+      "type": 0,
+      "value": "kod pocztowy"
+    }
+  ],
+  "delivery_estimate.status.estimated_arrival": [
+    {
+      "type": 0,
+      "value": "Dotrze "
+    },
+    {
+      "type": 1,
+      "value": "deliveryWindow"
+    }
+  ],
+  "delivery_estimate.status.loading": [
+    {
+      "type": 0,
+      "value": "Obliczanie..."
+    }
+  ],
+  "delivery_estimate.status.unavailable": [
+    {
+      "type": 0,
+      "value": "Daty dostawy są niedostępne. Zobacz opcje i koszty w kasie."
+    }
+  ],
   "display_price.assistive_msg.current_price": [
     {
       "type": 0,
