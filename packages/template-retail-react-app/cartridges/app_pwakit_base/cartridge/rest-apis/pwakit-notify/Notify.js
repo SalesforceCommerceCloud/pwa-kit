@@ -22,6 +22,7 @@ var System = require('dw/system/System');
 var Site = require('dw/system/Site');
 var Logger = require('dw/system/Logger');
 var resolveStorefrontHost = require('*/cartridge/scripts/helpers/storefrontHostProvider');
+var buildOrderLookupUrl = require('*/cartridge/scripts/helpers/buildOrderLookupUrl');
 
 var log = Logger.getLogger('pwakit-notify', 'pwakit-notify');
 
@@ -81,6 +82,7 @@ exports.notify = function () {
 
     var type = body.type;
     var recipient = body.recipient;
+    var callerHost = body.callerHost || null;
 
     if (!type || !recipient) {
         RESTResponseMgr.createError(
@@ -107,17 +109,6 @@ exports.notify = function () {
         return;
     }
 
-    var storefrontHost = resolveStorefrontHost(body.host || null);
-    if (storefrontHost === null) {
-        RESTResponseMgr.createError(
-            400,
-            'invalid-host',
-            'Bad Request',
-            'Supplied host is not in the pwakitStorefrontHosts allowed-hosts list'
-        ).render();
-        return;
-    }
-
     var subject;
     var templateName;
     var context;
@@ -133,7 +124,17 @@ exports.notify = function () {
             ).render();
             return;
         }
-        magicLink = 'https://' + storefrontHost + body.data.magicLinkPath;
+        var plHost = resolveStorefrontHost(callerHost);
+        if (!plHost) {
+            RESTResponseMgr.createError(
+                503,
+                'host-not-configured',
+                'Service Unavailable',
+                'pwakitStorefrontHosts is not configured or callerHost is not in the allowlist'
+            ).render();
+            return;
+        }
+        magicLink = 'https://' + plHost + body.data.magicLinkPath;
         // Extract the token from the magicLinkPath for inline display in the email
         var tokenMatch = body.data.magicLinkPath.match(/[?&]token=([^&]+)/);
         var inlineAccessCode = null;
@@ -157,7 +158,17 @@ exports.notify = function () {
             ).render();
             return;
         }
-        magicLink = 'https://' + storefrontHost + body.data.magicLinkPath;
+        var prHost = resolveStorefrontHost(callerHost);
+        if (!prHost) {
+            RESTResponseMgr.createError(
+                503,
+                'host-not-configured',
+                'Service Unavailable',
+                'pwakitStorefrontHosts is not configured or callerHost is not in the allowlist'
+            ).render();
+            return;
+        }
+        magicLink = 'https://' + prHost + body.data.magicLinkPath;
         subject = Resource.msg('passwordReset.subject', 'email', 'Reset Your Password');
         templateName = 'email/passwordReset';
         context = { magicLink: magicLink };
@@ -184,12 +195,22 @@ exports.notify = function () {
             ).render();
             return;
         }
-        var siteId = Site.getCurrent().ID.toLowerCase();
-        var locale = (request.locale || Site.getCurrent().defaultLocale || 'en_US').replace(/_/g, '-');
-        var lookupLink = 'https://' + storefrontHost + '/' + siteId + '/' + locale + '/order-lookup/verify/' + body.data.orderNo + '?token=' + encodeURIComponent(body.data.accessCode);
         subject = Resource.msg('guestOrderLookup.subject', 'email', 'Your Order Access Code');
         templateName = 'email/guestOrderLookup';
-        context = { orderNo: body.data.orderNo, accessCode: body.data.accessCode, lookupLink: lookupLink };
+        var gloHost = resolveStorefrontHost(callerHost);
+        if (!gloHost) {
+            RESTResponseMgr.createError(
+                503,
+                'host-not-configured',
+                'Service Unavailable',
+                'pwakitStorefrontHosts is not configured or callerHost is not in the allowlist'
+            ).render();
+            return;
+        }
+        var gloSiteId = Site.getCurrent().ID.toLowerCase();
+        var gloLocale = (request.locale || Site.getCurrent().defaultLocale || 'en_US').replace(/_/g, '-');
+        var gloLink = buildOrderLookupUrl(gloHost, gloSiteId, gloLocale, body.data.orderNo, body.data.accessCode);
+        context = { orderNo: body.data.orderNo, accessCode: body.data.accessCode, lookupLink: gloLink };
     } else {
         RESTResponseMgr.createError(
             400,

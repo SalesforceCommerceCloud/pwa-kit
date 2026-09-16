@@ -43,8 +43,9 @@ paths:
                       enum: [passwordless-magic-link]
                     recipient:
                       type: string
-                    host:
+                    callerHost:
                       type: string
+                      description: Public hostname of the storefront making the request (e.g. my-store.salesforcecommercecloudsites.com). Validated against the pwakitStorefrontHosts allowlist before being used to construct magic-link URLs.
                     data:
                       type: object
                       required: [magicLinkPath]
@@ -61,8 +62,9 @@ paths:
                       enum: [password-reset]
                     recipient:
                       type: string
-                    host:
+                    callerHost:
                       type: string
+                      description: Public hostname of the storefront making the request (e.g. my-store.salesforcecommercecloudsites.com). Validated against the pwakitStorefrontHosts allowlist before being used to construct magic-link URLs.
                     data:
                       type: object
                       required: [magicLinkPath]
@@ -79,8 +81,9 @@ paths:
                       enum: [otp]
                     recipient:
                       type: string
-                    host:
+                    callerHost:
                       type: string
+                      description: Public hostname of the storefront making the request (e.g. my-store.salesforcecommercecloudsites.com). Validated against the pwakitStorefrontHosts allowlist before being used to construct magic-link URLs.
                     data:
                       type: object
                       required: [token]
@@ -95,8 +98,9 @@ paths:
                       enum: [glo-access-code]
                     recipient:
                       type: string
-                    host:
+                    callerHost:
                       type: string
+                      description: Public hostname of the storefront making the request (e.g. my-store.salesforcecommercecloudsites.com). Validated against the pwakitStorefrontHosts allowlist before being used to construct magic-link URLs.
                     data:
                       type: object
                       required: [orderNo, accessCode]

@@ -61,8 +61,8 @@ function resolveStorefrontHost(requestedHost) {
             );
             return normalizedHost;
         }
-        if (allowedHosts.indexOf(normalizedHost) !== -1) {
-            return normalizedHost;
+        if (allowedHosts.indexOf(normalizedHost.toLowerCase()) !== -1) {
+            return normalizedHost.toLowerCase();
         }
         log.error(
             'Rejecting magic-link request: host "{0}" is not in the pwakitStorefrontHosts allowlist ({1})',

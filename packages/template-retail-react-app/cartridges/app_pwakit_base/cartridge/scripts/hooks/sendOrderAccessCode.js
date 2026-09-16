@@ -23,6 +23,7 @@ var System = require('dw/system/System');
 var Site = require('dw/system/Site');
 var sendNotification = require('*/cartridge/scripts/helpers/sendNotification');
 var resolveStorefrontHost = require('*/cartridge/scripts/helpers/storefrontHostProvider');
+var buildOrderLookupUrl = require('*/cartridge/scripts/helpers/buildOrderLookupUrl');
 
 var log = Logger.getLogger('pwakit-notify', 'pwakit-notify');
 
@@ -77,13 +78,20 @@ function sendOrderAccessCode(order, accessCode) {
         return new Status(Status.ERROR, 'NULL_ORDER', 'Order or customer info is null');
     }
 
+    var storefrontHost = resolveStorefrontHost(null);
+    if (!storefrontHost) {
+        log.warn('sendOrderAccessCode: pwakitStorefrontHosts is not configured — sending email without lookup link');
+    }
+
     // Note: uses siteId.toLowerCase() as the URL path segment. If your storefront
     // config defines a siteAlias (e.g. RefArchGlobal → "global"), the magic link
     // will 404 unless you add a redirect at the CDN/router level or override this
     // hook with an alias-aware implementation.
     var siteId = Site.getCurrent().ID.toLowerCase();
     var locale = (request.locale || Site.getCurrent().defaultLocale || 'en_US').replace(/_/g, '-');
-    var lookupLink = 'https://' + resolveStorefrontHost(null) + '/' + siteId + '/' + locale + '/order-lookup/verify/' + order.orderNo + '?token=' + encodeURIComponent(accessCode);
+    var lookupLink = storefrontHost
+        ? buildOrderLookupUrl(storefrontHost, siteId, locale, order.orderNo, accessCode)
+        : null;
 
     var result = sendNotification.send(
         order.customerInfo.email,

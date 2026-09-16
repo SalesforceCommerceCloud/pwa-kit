@@ -294,7 +294,7 @@ async function sendViaB2cCartridge(type, recipient, data, apiParams) {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({type, recipient, data, host: new URL(getAppOrigin()).hostname})
+        body: JSON.stringify({type, recipient, data, callerHost: new URL(getAppOrigin()).hostname})
     })
     if (!res.ok) {
         if (res.status === 401) {
