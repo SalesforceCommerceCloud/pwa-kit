@@ -783,14 +783,47 @@
   "delivery_estimate.action.calculate_aria_label": {
     "defaultMessage": "Calculate delivery estimate"
   },
+  "delivery_estimate.error.invalid_postal_code": {
+    "defaultMessage": "Enter a valid {term} (e.g. {example})."
+  },
+  "delivery_estimate.error.invalid_postal_code_no_example": {
+    "defaultMessage": "Enter a valid {term}."
+  },
   "delivery_estimate.heading": {
     "defaultMessage": "Estimated Delivery Date"
+  },
+  "delivery_estimate.instructions.postal_code": {
+    "defaultMessage": "Enter your {term} (e.g. {example}) to see delivery estimates."
+  },
+  "delivery_estimate.instructions.postal_code_no_example": {
+    "defaultMessage": "Enter your {term} to see delivery estimates."
   },
   "delivery_estimate.link.view_all_shipping_options": {
     "defaultMessage": "More Delivery Options"
   },
   "delivery_estimate.modal.heading": {
     "defaultMessage": "Shipping Options"
+  },
+  "delivery_estimate.placeholder.postal_code": {
+    "defaultMessage": "Enter {term}"
+  },
+  "delivery_estimate.placeholder.postal_code_example": {
+    "defaultMessage": "Enter {term} (e.g. {example})"
+  },
+  "delivery_estimate.postal_term.cap": {
+    "defaultMessage": "CAP"
+  },
+  "delivery_estimate.postal_term.eircode": {
+    "defaultMessage": "Eircode"
+  },
+  "delivery_estimate.postal_term.postal_code": {
+    "defaultMessage": "postal code"
+  },
+  "delivery_estimate.postal_term.postcode": {
+    "defaultMessage": "postcode"
+  },
+  "delivery_estimate.postal_term.zip": {
+    "defaultMessage": "ZIP code"
   },
   "delivery_estimate.status.estimated_arrival": {
     "defaultMessage": "Arrives {deliveryWindow}"

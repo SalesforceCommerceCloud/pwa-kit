@@ -1959,24 +1959,5 @@
   },
   "guestOrderLookup.order.return.success": {
     "defaultMessage": "Your return has been submitted."
-  },
-  "delivery_estimate.action.calculate": {"defaultMessage": "计算"},
-  "delivery_estimate.action.calculate_aria_label": {"defaultMessage": "计算配送预估"},
-  "delivery_estimate.error.invalid_postal_code": {"defaultMessage": "请输入有效的{term}(例如 {example})。"},
-  "delivery_estimate.error.invalid_postal_code_no_example": {"defaultMessage": "请输入有效的{term}。"},
-  "delivery_estimate.heading": {"defaultMessage": "预计送达日期"},
-  "delivery_estimate.instructions.postal_code": {"defaultMessage": "请输入{term}(例如 {example})以查看配送估算。"},
-  "delivery_estimate.instructions.postal_code_no_example": {"defaultMessage": "请输入{term}以查看配送估算。"},
-  "delivery_estimate.link.view_all_shipping_options": {"defaultMessage": "更多配送选项"},
-  "delivery_estimate.modal.heading": {"defaultMessage": "配送选项"},
-  "delivery_estimate.placeholder.postal_code": {"defaultMessage": "输入{term}"},
-  "delivery_estimate.placeholder.postal_code_example": {"defaultMessage": "输入{term}(例如 {example})"},
-  "delivery_estimate.postal_term.cap": {"defaultMessage": "CAP"},
-  "delivery_estimate.postal_term.eircode": {"defaultMessage": "Eircode"},
-  "delivery_estimate.postal_term.postal_code": {"defaultMessage": "邮政编码"},
-  "delivery_estimate.postal_term.postcode": {"defaultMessage": "邮政编码"},
-  "delivery_estimate.postal_term.zip": {"defaultMessage": "邮政编码"},
-  "delivery_estimate.status.estimated_arrival": {"defaultMessage": "预计 {deliveryWindow} 送达"},
-  "delivery_estimate.status.loading": {"defaultMessage": "计算中..."},
-  "delivery_estimate.status.unavailable": {"defaultMessage": "无法提供配送日期。请在结账时查看配送选项和费用。"}
+  }
 }

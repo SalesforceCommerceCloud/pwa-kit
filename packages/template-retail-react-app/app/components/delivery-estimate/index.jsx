@@ -11,7 +11,7 @@ import PropTypes from 'prop-types'
 import {useDeliveryEstimates, useProduct} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getDefaultCookieAttributes} from '@salesforce/commerce-sdk-react/utils'
-import {useIntl} from 'react-intl'
+import {defineMessages, useIntl} from 'react-intl'
 import {
     Box,
     Button,
@@ -132,15 +132,15 @@ const formatShippingCost = (shippingOption, formatNumber, freeLabel, fallbackCur
           })
 }
 
-const postalCodeTermMessages = {
+const postalCodeTermMessages = defineMessages({
     zip: {id: 'delivery_estimate.postal_term.zip', defaultMessage: 'ZIP code'},
     postalCode: {id: 'delivery_estimate.postal_term.postal_code', defaultMessage: 'postal code'},
     postcode: {id: 'delivery_estimate.postal_term.postcode', defaultMessage: 'postcode'},
     cap: {id: 'delivery_estimate.postal_term.cap', defaultMessage: 'CAP'},
     eircode: {id: 'delivery_estimate.postal_term.eircode', defaultMessage: 'Eircode'}
-}
+})
 
-const postalCodeMessages = {
+const postalCodeMessages = defineMessages({
     placeholder: {
         id: 'delivery_estimate.placeholder.postal_code',
         defaultMessage: 'Enter {term}'
@@ -165,7 +165,7 @@ const postalCodeMessages = {
         id: 'delivery_estimate.error.invalid_postal_code_no_example',
         defaultMessage: 'Enter a valid {term}.'
     }
-}
+})
 
 const DeliveryEstimate = ({
     productId,

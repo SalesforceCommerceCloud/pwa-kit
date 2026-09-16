@@ -189,22 +189,28 @@ describe('DeliveryEstimate', () => {
         )
     })
 
-    test('uses localized delivery-estimate messages for supported locales', () => {
-        renderWithProviders(
-            <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="DE" />,
-            {wrapperProps: {locale: {id: 'de-DE'}, messages: deMessages}}
-        )
+    test('falls back to default delivery-estimate messages for untranslated locales', () => {
+        const consoleError = jest.spyOn(console, 'error').mockImplementation()
 
-        expect(
-            screen.getByRole('region', {name: 'Voraussichtliches Lieferdatum'})
-        ).toBeInTheDocument()
-        expect(screen.getByRole('textbox', {name: 'PLZ'})).toHaveAttribute(
-            'placeholder',
-            'PLZ eingeben (z. B. 10115)'
-        )
-        expect(screen.getByRole('button', {name: 'Lieferschätzung berechnen'})).toHaveTextContent(
-            'Berechnen'
-        )
+        try {
+            renderWithProviders(
+                <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="DE" />,
+                {wrapperProps: {locale: {id: 'de-DE'}, messages: deMessages}}
+            )
+
+            expect(
+                screen.getByRole('region', {name: 'Estimated Delivery Date'})
+            ).toBeInTheDocument()
+            expect(screen.getByRole('textbox', {name: 'postal code'})).toHaveAttribute(
+                'placeholder',
+                'Enter postal code (e.g. 10115)'
+            )
+            expect(
+                screen.getByRole('button', {name: 'Calculate delivery estimate'})
+            ).toHaveTextContent('Calculate')
+        } finally {
+            consoleError.mockRestore()
+        }
     })
 
     test('renders the estimator as an accessible delivery section', () => {

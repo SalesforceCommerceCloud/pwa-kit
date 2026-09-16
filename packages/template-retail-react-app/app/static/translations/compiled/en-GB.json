@@ -1971,10 +1971,82 @@
       "value": "Calculate delivery estimate"
     }
   ],
+  "delivery_estimate.error.invalid_postal_code": [
+    {
+      "type": 0,
+      "value": "Enter a valid "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " (e.g. "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": ")."
+    }
+  ],
+  "delivery_estimate.error.invalid_postal_code_no_example": [
+    {
+      "type": 0,
+      "value": "Enter a valid "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
   "delivery_estimate.heading": [
     {
       "type": 0,
       "value": "Estimated Delivery Date"
+    }
+  ],
+  "delivery_estimate.instructions.postal_code": [
+    {
+      "type": 0,
+      "value": "Enter your "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " (e.g. "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": ") to see delivery estimates."
+    }
+  ],
+  "delivery_estimate.instructions.postal_code_no_example": [
+    {
+      "type": 0,
+      "value": "Enter your "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " to see delivery estimates."
     }
   ],
   "delivery_estimate.link.view_all_shipping_options": [
@@ -1987,6 +2059,68 @@
     {
       "type": 0,
       "value": "Shipping Options"
+    }
+  ],
+  "delivery_estimate.placeholder.postal_code": [
+    {
+      "type": 0,
+      "value": "Enter "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    }
+  ],
+  "delivery_estimate.placeholder.postal_code_example": [
+    {
+      "type": 0,
+      "value": "Enter "
+    },
+    {
+      "type": 1,
+      "value": "term"
+    },
+    {
+      "type": 0,
+      "value": " (e.g. "
+    },
+    {
+      "type": 1,
+      "value": "example"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "delivery_estimate.postal_term.cap": [
+    {
+      "type": 0,
+      "value": "CAP"
+    }
+  ],
+  "delivery_estimate.postal_term.eircode": [
+    {
+      "type": 0,
+      "value": "Eircode"
+    }
+  ],
+  "delivery_estimate.postal_term.postal_code": [
+    {
+      "type": 0,
+      "value": "postal code"
+    }
+  ],
+  "delivery_estimate.postal_term.postcode": [
+    {
+      "type": 0,
+      "value": "postcode"
+    }
+  ],
+  "delivery_estimate.postal_term.zip": [
+    {
+      "type": 0,
+      "value": "ZIP code"
     }
   ],
   "delivery_estimate.status.estimated_arrival": [
