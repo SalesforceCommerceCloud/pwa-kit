@@ -23,7 +23,7 @@ export const getCountryCodeFromLocale = (locale) => {
     }
 
     const region = normalizedLocale.match(
-        /^[A-Za-z]{2,8}(?:-[A-Za-z]{4})?-([A-Za-z]{2}|\d{3})(?:-|$)/
+        /^[A-Za-z]{2,8}(?:-[A-Za-z]{4})?-([A-Za-z]{2})(?:-|$)/
     )?.[1]
     return normalizeLocaleRegion(region)
 }

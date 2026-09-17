@@ -130,6 +130,7 @@ describe('delivery destination validation', () => {
     test('resolves locale country codes like Storefront Next', () => {
         expect(getCountryCodeFromLocale('zh-Hans-CN')).toBe('CN')
         expect(getCountryCodeFromLocale(' en-US-u-ca-gregory ')).toBe('US')
+        expect(getCountryCodeFromLocale('en-419')).toBeUndefined()
         expect(getCountryCodeFromLocale('en')).toBeUndefined()
         expect(getCountryCodeFromLocale('not_a_locale')).toBeUndefined()
     })

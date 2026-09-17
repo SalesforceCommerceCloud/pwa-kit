@@ -111,7 +111,13 @@ const persistDeliveryDestinationCookie = (siteId, destination) => {
 const formatDeliveryWindow = (deliveryWindow, formatDate) => {
     const startAt = new Date(deliveryWindow.startAt)
     const endAt = new Date(deliveryWindow.endAt)
-    const dateFormat = {weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC'}
+    const dateFormat = {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        ...(startAt.getUTCFullYear() !== endAt.getUTCFullYear() ? {year: 'numeric'} : {}),
+        timeZone: 'UTC'
+    }
 
     const startLabel = formatDate(startAt, dateFormat)
     const endLabel = formatDate(endAt, dateFormat)

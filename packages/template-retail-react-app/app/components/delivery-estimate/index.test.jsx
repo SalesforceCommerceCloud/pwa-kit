@@ -177,6 +177,39 @@ describe('DeliveryEstimate', () => {
         expect(getDefaultCookieAttributes).toHaveBeenCalled()
     })
 
+    test('includes years in delivery windows that cross New Year', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: {
+                productDeliveryEstimates: [
+                    {
+                        productId: 'sku-a',
+                        shippingOptions: [
+                            {
+                                shippingMethodId: 'ground',
+                                deliveryWindow: {
+                                    startAt: '2026-12-30T14:00:00Z',
+                                    endAt: '2027-01-03T14:00:00Z'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        })
+        renderDeliveryEstimate()
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        expect(
+            await screen.findByText('Arrives Wed, Dec 30, 2026 \u2013 Sun, Jan 3, 2027')
+        ).toBeInTheDocument()
+    })
+
     test('uses the localized postcode label, example, and instructions for GB', () => {
         renderWithProviders(
             <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="GB" />
