@@ -11,7 +11,7 @@
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
     "build": "npm run build-translations && pwa-kit-dev build",
-    "deploy:cartridge": "b2c code deploy cartridges -c app_pwakit_base --config dw.json",
+    "deploy:cartridge": "b2c code deploy cartridges -c app_pwakit_base --config dw.json --activate",
     "build-translations": "npm run extract-default-translations && npm run compile-translations && npm run compile-translations:pseudo",
     "compile-translations": "node ./scripts/translations/compile-folder.js translations",
     "compile-translations:pseudo": "node ./scripts/translations/compile-pseudo.js translations/en-US.json",

@@ -44,7 +44,8 @@ Create a **flat** `dw.json` in `packages/template-retail-react-app/`:
     "password": "<password>",
     "code-version": "<version>",
     "account-manager-host": "<account-manager-host>",
-    "client-id": "<client-id>"
+    "client-id": "<client-id>",
+    "client-secret": "<client-secret>"
 }
 ```
 
