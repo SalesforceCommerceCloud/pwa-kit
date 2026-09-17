@@ -118,7 +118,8 @@ import {
     handleCallback,
     getNotifyToken,
     sendViaB2cCartridge,
-    _resetNotifyTokenCacheForTest
+    _resetNotifyTokenCacheForTest,
+    extractLocaleFromUrl
 } from '@salesforce/retail-react-app/app/ssr.js'
 import {helpers} from 'commerce-sdk-isomorphic'
 
@@ -434,5 +435,52 @@ describe('sendViaB2cCartridge', () => {
         mockFetchOk()
         await sendViaB2cCartridge('otp', 'user@example.com', {token: '111'}, TEST_API_PARAMS)
         expect(helpers.loginGuestUser).not.toHaveBeenCalled()
+    })
+
+    test('appends locale to URL when provided in apiParams', async () => {
+        mockFetchOk()
+
+        await sendViaB2cCartridge('otp', 'user@example.com', {token: '123'}, {
+            ...TEST_API_PARAMS,
+            locale: 'fr-FR'
+        })
+
+        const [url] = fetchSpy.mock.calls[0]
+        expect(url).toContain('&locale=fr-FR')
+    })
+
+    test('omits locale from URL when not provided', async () => {
+        mockFetchOk()
+
+        await sendViaB2cCartridge('otp', 'user@example.com', {token: '123'}, TEST_API_PARAMS)
+
+        const [url] = fetchSpy.mock.calls[0]
+        expect(url).not.toContain('locale')
+    })
+})
+
+describe('extractLocaleFromUrl', () => {
+    test('extracts locale from absolute URL', () => {
+        expect(extractLocaleFromUrl('https://mystore.com/en-US/account')).toBe('en-US')
+    })
+
+    test('extracts locale from relative path', () => {
+        expect(extractLocaleFromUrl('/fr-FR/login')).toBe('fr-FR')
+    })
+
+    test('extracts locale from root locale path', () => {
+        expect(extractLocaleFromUrl('/en-US')).toBe('en-US')
+    })
+
+    test('returns null for path without locale', () => {
+        expect(extractLocaleFromUrl('/account')).toBeNull()
+    })
+
+    test('returns null for null input', () => {
+        expect(extractLocaleFromUrl(null)).toBeNull()
+    })
+
+    test('returns null for empty string', () => {
+        expect(extractLocaleFromUrl('')).toBeNull()
     })
 })

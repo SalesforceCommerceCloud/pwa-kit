@@ -285,14 +285,14 @@ export async function getNotifyToken(apiParams) {
 }
 
 export async function sendViaB2cCartridge(type, recipient, data, apiParams) {
-    const {organizationId, siteId} = apiParams
+    const {organizationId, siteId, locale} = apiParams
     const token = await getNotifyToken(apiParams)
     const proxy = `${getAppOrigin()}${
         getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'
     }`
     const url = `${proxy}/custom/pwakit-notify/v1/organizations/${encodeURIComponent(
         organizationId
-    )}/notify?siteId=${encodeURIComponent(siteId)}`
+    )}/notify?siteId=${encodeURIComponent(siteId)}${locale ? `&locale=${encodeURIComponent(locale)}` : ''}`
     const requestBody = JSON.stringify({
         type,
         recipient,
@@ -333,6 +333,17 @@ const resetPasswordCallback =
 const passwordlessLoginCallback =
     config.app.login?.passwordless?.callbackURI || '/passwordless-login-callback'
 
+export function extractLocaleFromUrl(urlString) {
+    if (!urlString) return null
+    try {
+        const path = new URL(urlString, 'https://placeholder').pathname
+        const match = path.match(/^\/([a-z]{2}-[A-Z]{2})(\/|$)/)
+        return match ? match[1] : null
+    } catch (_) {
+        return null
+    }
+}
+
 async function sendMagicLinkEmail(req, res, landingPath, notifyType, redirectUrl) {
     const {email_id, token} = req.body
 
@@ -342,11 +353,12 @@ async function sendMagicLinkEmail(req, res, landingPath, notifyType, redirectUrl
     }
 
     const appConfig = getConfig()?.app
+    const locale = extractLocaleFromUrl(redirectUrl)
     await sendViaB2cCartridge(
         notifyType,
         email_id,
         {magicLinkPath},
-        appConfig.commerceAPI.parameters
+        {...appConfig.commerceAPI.parameters, ...(locale && {locale})}
     )
     res.json({success: true})
 }
