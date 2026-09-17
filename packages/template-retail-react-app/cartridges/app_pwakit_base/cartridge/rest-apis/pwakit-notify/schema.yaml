@@ -12,14 +12,14 @@ components:
           scopes:
             c_pwakit_notify: Send transactional notifications via PWA Kit
 paths:
-  /sites/{siteId}/notify:
+  /notify:
     post:
       summary: Send a transactional notification
       operationId: notify
       parameters:
-        - in: path
+        - in: query
           name: siteId
-          required: true
+          required: false
           schema:
             type: string
             minLength: 1
