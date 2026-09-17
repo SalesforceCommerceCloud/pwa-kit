@@ -348,7 +348,7 @@ describe('sendViaB2cCartridge', () => {
 
         expect(result).toEqual({success: true, data: {magicLink: 'https://example.com/magic'}})
         const [url, opts] = fetchSpy.mock.calls[0]
-        expect(url).toContain('/f_ecom_test_001/notify')
+        expect(url).toContain('/f_ecom_test_001/sites/RefArch/notify')
         const sentBody = JSON.parse(opts.body)
         expect(sentBody.type).toBe('passwordless-magic-link')
         expect(sentBody.recipient).toBe('user@example.com')

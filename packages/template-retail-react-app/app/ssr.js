@@ -292,7 +292,7 @@ export async function sendViaB2cCartridge(type, recipient, data, apiParams) {
     }`
     const url = `${proxy}/custom/pwakit-notify/v1/organizations/${encodeURIComponent(
         organizationId
-    )}/notify?siteId=${encodeURIComponent(siteId)}`
+    )}/sites/${encodeURIComponent(siteId)}/notify`
     const requestBody = JSON.stringify({
         type,
         recipient,

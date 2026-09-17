@@ -84,11 +84,7 @@ This registers `pwakitNotifyEnabled` and `pwakitStorefrontHosts` under **Adminis
 
 **4. Activate the code version**
 
-```bash
-b2c code activate <version> --config packages/template-retail-react-app/dw.json
-```
-
-Activation triggers SFCC's hook and Custom API discovery.
+The `deploy:cartridge` script uses `--reload`, which handles activation automatically. No separate activation step is needed after the first deploy.
 
 ---
 
@@ -96,8 +92,9 @@ Activation triggers SFCC's hook and Custom API discovery.
 
 ```bash
 npm run deploy:cartridge
-b2c code activate <version> --config packages/template-retail-react-app/dw.json
 ```
+
+The `deploy:cartridge` script uses `--reload`, which deactivates and re-activates the code version in one step. SFCC rescans for Custom REST APIs and hooks on every (re-)activation, so a separate `b2c code activate` call is not needed.
 
 ---
 

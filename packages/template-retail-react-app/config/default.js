@@ -141,7 +141,7 @@ module.exports = {
                 callbackURI: '/registration-verification-callback'
             }
         },
-        defaultSite: 'RefArchGlobal',
+        defaultSite: 'RefArch',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -153,7 +153,7 @@ module.exports = {
                 clientId: '11deeece-0b48-4b60-bf1b-d96649faec43',
                 organizationId: 'f_ecom_zysg_001',
                 shortCode: 'sandbox-001',
-                siteId: 'RefArchGlobal'
+                siteId: 'RefArch'
             }
             // Optional: Set the domain for auth cookies to share them across subdomains.
             // If not set, cookies default to the current host.
@@ -194,7 +194,7 @@ module.exports = {
         },
         storeLocatorEnabled: true,
         guestOrderLookup: {
-            enabled: false,
+            enabled: true,
             orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$',
             requestCodeThrottle: {
                 windowMs: 60000,
