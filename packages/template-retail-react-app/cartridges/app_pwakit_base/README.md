@@ -29,22 +29,31 @@ Each URI can be customized in `config/default.js`. Update the SLAS allowlist whe
 
 ---
 
-Install the `sfcc-ci` CLI and configure it with your instance credentials:
+Install the `b2c` CLI:
 
 ```bash
-npm install -g sfcc-ci
-sfcc-ci auth:login <instance>.sandbox.us01.dx.commercecloud.salesforce.com
+npm install -g @salesforce/b2c-cli
 ```
 
-Or configure via `dw.json` at the repo root:
+Create a **flat** `dw.json` in `packages/template-retail-react-app/`:
 
 ```json
 {
-    "hostname": "<instance>.sandbox.us01.dx.commercecloud.salesforce.com",
+    "hostname": "<instance>.demandware.net",
     "username": "<bm-user@example.com>",
     "password": "<password>",
-    "code-version": "<version>"
+    "code-version": "<version>",
+    "account-manager-host": "<account-manager-host>",
+    "client-id": "<client-id>"
 }
+```
+
+> **Note:** `b2c code deploy` requires the flat single-object format for WebDAV authentication. The multi-config `configs` array format works for `b2c setup inspect` but not for actual deployments (known issue in `b2c-cli` ≤ 1.23.1).
+
+Verify the CLI resolves your instance correctly:
+
+```bash
+b2c setup inspect
 ```
 
 ---
@@ -54,20 +63,12 @@ Or configure via `dw.json` at the repo root:
 **1. Deploy the cartridge**
 
 ```bash
-cd packages/template-retail-react-app/cartridges
-zip -r app_pwakit_base.zip app_pwakit_base/
-sfcc-ci code:deploy --instance <instance> --code-version <version> app_pwakit_base.zip
+npm run deploy:cartridge
 ```
 
-**2. Add to cartridge path** (one-time)
+**2. Add to cartridge path** (one-time, via Business Manager)
 
-```bash
-sfcc-ci cartridge:add app_pwakit_base \
-  --instance <instance> \
-  --position before \
-  --target app_storefront_base \
-  --siteid <siteId>
-```
+In Business Manager → **Administration → Sites → Manage Sites → <site> → Settings**, add `app_pwakit_base` to the cartridge path before `app_storefront_base`.
 
 **3. Import Organization Preferences** (one-time)
 
@@ -83,19 +84,18 @@ This registers `pwakitNotifyEnabled` and `pwakitStorefrontHosts` under **Adminis
 **4. Activate the code version**
 
 ```bash
-sfcc-ci code:activate --instance <instance> <version>
+b2c code activate <version> --config packages/template-retail-react-app/dw.json
 ```
 
-`code:activate` triggers SFCC's hook and Custom API discovery. There is no need to manually deactivate and reactivate through Business Manager.
+Activation triggers SFCC's hook and Custom API discovery.
 
 ---
 
 ### Redeploying (subsequent updates)
 
 ```bash
-zip -r app_pwakit_base.zip app_pwakit_base/
-sfcc-ci code:deploy --instance <instance> --code-version <version> app_pwakit_base.zip
-sfcc-ci code:activate --instance <instance> <version>
+npm run deploy:cartridge
+b2c code activate <version> --config packages/template-retail-react-app/dw.json
 ```
 
 ---

@@ -26,7 +26,8 @@ tmp/
 node_modules
 
 # Generated files
-cartridges/app_pwakit_base.zip
+dw.json
+cartridges/dw.json
 app/cache-hash-manifest.json
 app/loader-cache-hash-manifest.json
 
