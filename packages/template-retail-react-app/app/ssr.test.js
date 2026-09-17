@@ -440,10 +440,15 @@ describe('sendViaB2cCartridge', () => {
     test('appends locale to URL when provided in apiParams', async () => {
         mockFetchOk()
 
-        await sendViaB2cCartridge('otp', 'user@example.com', {token: '123'}, {
-            ...TEST_API_PARAMS,
-            locale: 'fr-FR'
-        })
+        await sendViaB2cCartridge(
+            'otp',
+            'user@example.com',
+            {token: '123'},
+            {
+                ...TEST_API_PARAMS,
+                locale: 'fr-FR'
+            }
+        )
 
         const [url] = fetchSpy.mock.calls[0]
         expect(url).toContain('&locale=fr-FR')
