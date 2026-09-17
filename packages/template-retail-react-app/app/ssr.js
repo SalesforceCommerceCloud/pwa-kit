@@ -234,7 +234,7 @@ const options = {
         // * https://developer.salesforce.com/docs/commerce/commerce-api/references/cdn-api-process-apis?meta=MrtRules
         // * https://developer.salesforce.com/docs/commerce/commerce-api/guide/ecdn-rules-for-phased-headless-rollout.html
         routingRules: [
-            'http.request.uri.path eq "/" or http.request.uri.path matches "^/callback" or http.request.uri.path matches "^/mobify" or http.request.uri.path matches "^/worker.js" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/$" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/login" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/reset-password" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/registration" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account/orders" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account/orders/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account/wishlist" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/product/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/search" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/category/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/order-status" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/page/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/page-viewer/(\\\\w+)"'
+            'http.request.uri.path eq "/" or http.request.uri.path matches "^/callback" or http.request.uri.path matches "^/mobify" or http.request.uri.path matches "^/worker.js" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/$" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/login" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/reset-password" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/registration" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account/orders" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account/orders/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/account/wishlist" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/product/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/search" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/category/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/order-status" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/page/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/page-viewer/(\\\\w+)" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/order-lookup$" or http.request.uri.path matches "^/(\\\\w+)/([-\\\\w]+)/order-lookup/verify/([^/]+)"'
         ]
     }
 }
@@ -246,7 +246,12 @@ const runtime = getRuntime()
 let _notifyToken = null
 let _notifyTokenExpiry = 0
 
-async function getNotifyToken(apiParams) {
+export function _resetNotifyTokenCacheForTest() {
+    _notifyToken = null
+    _notifyTokenExpiry = 0
+}
+
+export async function getNotifyToken(apiParams) {
     if (_notifyToken && Date.now() < _notifyTokenExpiry) {
         return _notifyToken
     }
@@ -279,7 +284,7 @@ async function getNotifyToken(apiParams) {
     return _notifyToken
 }
 
-async function sendViaB2cCartridge(type, recipient, data, apiParams) {
+export async function sendViaB2cCartridge(type, recipient, data, apiParams) {
     const {organizationId, siteId} = apiParams
     const token = await getNotifyToken(apiParams)
     const proxy = `${getAppOrigin()}${
@@ -287,21 +292,32 @@ async function sendViaB2cCartridge(type, recipient, data, apiParams) {
     }`
     const url = `${proxy}/custom/pwakit-notify/v1/organizations/${encodeURIComponent(
         organizationId
-    )}/notify?siteId=${encodeURIComponent(siteId)}`
-    const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({type, recipient, data, callerHost: new URL(getAppOrigin()).hostname})
+    )}/sites/${encodeURIComponent(siteId)}/notify?siteId=${encodeURIComponent(siteId)}`
+    const requestBody = JSON.stringify({
+        type,
+        recipient,
+        data,
+        callerHost: new URL(getAppOrigin()).hostname
     })
+    let res = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', Authorization: `Bearer ${token}`},
+        body: requestBody
+    })
+    if (!res.ok && res.status === 401) {
+        // The cached SLAS guest token expired between calls (Lambda warm reuse). Clear it and
+        // retry once with a fresh token — without this the calling route would return 500 and
+        // the email would not be delivered even though the credentials are still valid.
+        _notifyToken = null
+        _notifyTokenExpiry = 0
+        const freshToken = await getNotifyToken(apiParams)
+        res = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', Authorization: `Bearer ${freshToken}`},
+            body: requestBody
+        })
+    }
     if (!res.ok) {
-        if (res.status === 401) {
-            // Clear cached token so next call gets a fresh one
-            _notifyToken = null
-            _notifyTokenExpiry = 0
-        }
         let body = ''
         try {
             body = await res.text()
@@ -666,6 +682,38 @@ const {handler} = runtime.createHandler(options, (app) => {
             )
         } catch (err) {
             logger.error('reset-password callback failed', {
+                namespace: 'slas-callback',
+                additionalProperties: {error: err?.message}
+            })
+            res.status(500).json({error: 'Failed to send notification'})
+        }
+    })
+
+    // Handles the registration verification callback route. SLAS makes a POST request to
+    // this endpoint with the shopper's email and a short TOTP when register_customer=true
+    // and mode=callback is used (e.g. one-click checkout registration). Sends a branded
+    // verification email via the pwakit-notify cartridge using the registrationVerification
+    // ISML template. The callbackURI must be registered in SLAS client allowed redirect URIs.
+    const registrationVerificationCallback =
+        getConfig()?.app?.login?.registrationVerification?.callbackURI ??
+        '/registration-verification-callback'
+    app.post(registrationVerificationCallback, async (req, res) => {
+        const slasCallbackToken = req.headers['x-slas-callback-token']
+        if (!slasCallbackToken) {
+            return res.status(400).json({error: 'Missing x-slas-callback-token header'})
+        }
+        const {email_id, token} = req.body
+        try {
+            await validateSlasCallbackToken(slasCallbackToken)
+            await sendViaB2cCartridge(
+                'otp',
+                email_id,
+                {token},
+                getConfig().app.commerceAPI.parameters
+            )
+            res.json({success: true})
+        } catch (err) {
+            logger.error('registration-verification callback failed', {
                 namespace: 'slas-callback',
                 additionalProperties: {error: err?.message}
             })

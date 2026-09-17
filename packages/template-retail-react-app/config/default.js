@@ -136,6 +136,9 @@ module.exports = {
                 mode: 'callback',
                 landingPath: '/reset-password-landing',
                 callbackURI: '/reset-password-callback'
+            },
+            registrationVerification: {
+                callbackURI: '/registration-verification-callback'
             }
         },
         defaultSite: 'RefArchGlobal',

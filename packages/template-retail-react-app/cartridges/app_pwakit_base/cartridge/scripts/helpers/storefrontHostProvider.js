@@ -17,7 +17,6 @@
 'use strict';
 
 var System = require('dw/system/System');
-var Site = require('dw/system/Site');
 var Logger = require('dw/system/Logger');
 
 var log = Logger.getLogger('pwakit-notify', 'pwakit-notify');
@@ -25,49 +24,35 @@ var log = Logger.getLogger('pwakit-notify', 'pwakit-notify');
 /**
  * Resolves the public storefront hostname for magic-link URL construction.
  *
- * Current implementation: validates a caller-supplied hostname against the
- * comma-separated `pwakitStorefrontHosts` global preference allowlist, then
- * falls back to the first configured host, then to the B2C instance hostname.
+ * Validates a caller-supplied hostname against the comma-separated
+ * `pwakitStorefrontHosts` global preference allowlist. When no callerHost is
+ * provided, returns the first configured host.
  *
- * TODO: replace this module body with a single Script API call once B2C exposes
- * the MRT/eCDN hostname natively, e.g.:
+ * Returns null when:
+ * - callerHost is provided but not in the allowlist (including when the allowlist is empty)
+ * - callerHost is not provided and the allowlist is empty or unset
  *
- *   var ComposableStorefrontMgr = require('dw/mrt/ComposableStorefrontMgr');
- *   module.exports = function resolveStorefrontHost() {
- *       return ComposableStorefrontMgr.getStorefrontHostname(Site.getCurrent().getID())
- *           || Site.getCurrent().httpsHostName;
- *   };
+ * Callers treat a null return as "no host available" — magic-link CTA buttons
+ * are omitted from the email but the email is still sent (e.g. with an inline
+ * access code). Templates must guard all magic-link usage with
+ * <isif condition="${!empty(pdict.magicLink)}"> / lookupLink equivalent.
  *
- * The export signature (requestedHost: string|null) → string|null is intentionally
- * preserved so callers require no changes after the swap. The future implementation
- * ignores `requestedHost` and the null return path becomes unreachable.
- *
- * @param {string|null} requestedHost Hostname supplied by the API caller (no protocol,
+ * @param {string|null} callerHost Hostname supplied by the API caller (no protocol,
  *   no trailing slash). Pass null when calling from a server-side hook that has no
  *   incoming host to validate (e.g. sendOrderAccessCode).
- * @returns {string|null} Validated hostname to use in magic-link URLs, or null when
- *   requestedHost was supplied but is not in the allowlist (caller should reject with 400).
+ * @returns {string|null} Validated hostname, or null if unresolvable.
  */
-function resolveStorefrontHost(requestedHost) {
+function resolveStorefrontHost(callerHost) {
     var allowedHosts = getAllowedHosts();
 
-    if (requestedHost && requestedHost.trim()) {
-        var normalizedHost = requestedHost.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
-        if (allowedHosts.length === 0) {
-            log.warn(
-                'pwakitStorefrontHosts allowlist is not configured. Accepting host from request ({0}). ' +
-                    'Configure pwakitStorefrontHosts in Business Manager to restrict allowed hosts.',
-                normalizedHost
-            );
-            return normalizedHost;
-        }
+    if (callerHost && callerHost.trim()) {
+        var normalizedHost = callerHost.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
         if (allowedHosts.indexOf(normalizedHost.toLowerCase()) !== -1) {
             return normalizedHost.toLowerCase();
         }
-        log.error(
-            'Rejecting magic-link request: host "{0}" is not in the pwakitStorefrontHosts allowlist ({1})',
-            normalizedHost,
-            allowedHosts.join(', ')
+        log.warn(
+            'storefrontHostProvider: caller-supplied host "{0}" is not in the pwakitStorefrontHosts allowlist — email sent without magic link.',
+            normalizedHost
         );
         return null;
     }
@@ -77,11 +62,10 @@ function resolveStorefrontHost(requestedHost) {
     }
 
     log.warn(
-        'pwakitStorefrontHosts is not configured. Magic-link emails will use the B2C instance hostname ({0}), ' +
-            'which is incorrect for headless storefronts.',
-        Site.getCurrent().httpsHostName
+        'storefrontHostProvider: no callerHost provided and pwakitStorefrontHosts is not configured — email sent without magic link. ' +
+            'Configure pwakitStorefrontHosts in Business Manager > Global Preferences > Custom Preferences > pwakit.'
     );
-    return Site.getCurrent().httpsHostName;
+    return null;
 }
 
 function getAllowedHosts() {

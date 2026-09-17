@@ -27,6 +27,10 @@
  * @returns {string} Full verification URL
  */
 function buildOrderLookupUrl(host, siteId, locale, orderNo, token) {
+    // The access code is intentionally included as a query param so customers can click
+    // directly through without manually entering it. The code alone is not sufficient to
+    // access an order — it must be paired with a matching email address, which is never
+    // present in this URL. The code is also displayed inline in the email body as a fallback.
     return 'https://' + host + '/' + siteId + '/' + locale + '/order-lookup/verify/' + orderNo + '?token=' + encodeURIComponent(token);
 }
 

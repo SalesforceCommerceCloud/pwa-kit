@@ -13,6 +13,22 @@ All emails are rendered from ISML templates in `cartridge/templates/default/emai
 
 ### Prerequisites
 
+#### SLAS allowed redirect URIs
+
+Each PWA Kit SSR callback route that uses `mode: 'callback'` must be pre-registered in your SLAS client's **Allowed Redirect URIs** (Admin Center → SLAS → your client → Redirect URIs). SLAS silently rejects callback flows if the URI is not on the allowlist.
+
+The default callback URIs that must be registered (relative to your storefront origin):
+
+| Flow | Default URI | Config key |
+|---|---|---|
+| Passwordless login | `/passwordless-login-callback` | `app.login.passwordless.callbackURI` |
+| Password reset | `/reset-password-callback` | `app.login.resetPassword.callbackURI` |
+| Registration verification | `/registration-verification-callback` | `app.login.registrationVerification.callbackURI` |
+
+Each URI can be customized in `config/default.js`. Update the SLAS allowlist whenever a URI changes.
+
+---
+
 Install the `sfcc-ci` CLI and configure it with your instance credentials:
 
 ```bash
@@ -56,13 +72,10 @@ sfcc-ci cartridge:add app_pwakit_base \
 **3. Import Organization Preferences** (one-time)
 
 ```bash
-sfcc-ci instance:upload \
+sfcc-ci meta:import \
   --instance <instance> \
-  staticfiles/cartridge/impex/default/meta/system-objecttype-extensions/OrganizationPreferences.xml
-
-sfcc-ci instance:import \
-  --instance <instance> \
-  OrganizationPreferences.xml
+  --meta-path cartridges/app_pwakit_base/staticfiles/cartridge/impex/default/meta \
+  --directory meta
 ```
 
 This registers `pwakitNotifyEnabled` and `pwakitStorefrontHosts` under **Administration → Global Preferences → Custom Preferences → PWA Kit**.

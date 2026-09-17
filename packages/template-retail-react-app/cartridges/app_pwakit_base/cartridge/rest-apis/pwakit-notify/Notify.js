@@ -173,6 +173,10 @@ exports.notify = function () {
         templateName = 'email/passwordReset';
         context = { magicLink: magicLink };
     } else if (type === 'otp') {
+        // Used by the account registration / email verification flow. The `token`
+        // field is a short 6-8 digit SLAS TOTP (not a JWT). The ssr.js caller for
+        // this type has not yet been implemented in pwa-kit — see sf-next's
+        // otp-callback.server.ts for the reference implementation.
         if (!body.data.token) {
             RESTResponseMgr.createError(
                 400,

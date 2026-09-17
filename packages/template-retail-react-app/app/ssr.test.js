@@ -31,12 +31,18 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
                 resetPassword: {
                     callbackURI: '/reset-password-callback',
                     landingPath: '/reset-password'
+                },
+                registrationVerification: {
+                    callbackURI: '/registration-verification-callback'
                 }
             },
             commerceAPI: {
+                proxyPath: '/mobify/proxy/api',
                 parameters: {
+                    clientId: 'test-client-id',
                     shortCode: 'test-shortcode',
-                    organizationId: 'f_ecom_test_001'
+                    organizationId: 'f_ecom_test_001',
+                    siteId: 'RefArch'
                 }
             }
         }
@@ -61,6 +67,15 @@ jest.mock('express', () => {
     mockExpress.json = jest.fn()
     mockExpress.urlencoded = jest.fn()
     return mockExpress
+})
+
+jest.mock('commerce-sdk-isomorphic', () => {
+    const mockShopperLogin = jest.fn()
+    const mockHelpers = {
+        loginGuestUser: jest.fn(),
+        loginGuestUserPrivate: jest.fn()
+    }
+    return {ShopperLogin: mockShopperLogin, helpers: mockHelpers}
 })
 
 jest.mock('jose', () => ({
@@ -98,7 +113,14 @@ jest.mock('jose', () => ({
 }))
 
 // Import only the functions we need to test
-import {validateSlasCallbackToken, handleCallback} from '@salesforce/retail-react-app/app/ssr.js'
+import {
+    validateSlasCallbackToken,
+    handleCallback,
+    getNotifyToken,
+    sendViaB2cCartridge,
+    _resetNotifyTokenCacheForTest
+} from '@salesforce/retail-react-app/app/ssr.js'
+import {helpers} from 'commerce-sdk-isomorphic'
 
 // Mock environment variables
 const originalEnv = process.env
@@ -229,5 +251,188 @@ describe('handleCallback', () => {
         expect(next).not.toHaveBeenCalled()
         expect(res.set).toHaveBeenCalledWith('Cache-Control', 'max-age=31536000')
         expect(res.send).toHaveBeenCalled()
+    })
+})
+
+const TEST_API_PARAMS = {
+    clientId: 'test-client-id',
+    organizationId: 'f_ecom_test_001',
+    shortCode: 'test-shortcode',
+    siteId: 'RefArch'
+}
+
+describe('getNotifyToken', () => {
+    beforeEach(() => {
+        _resetNotifyTokenCacheForTest()
+        delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
+    })
+
+    test('fetches a new token via public client (no secret)', async () => {
+        helpers.loginGuestUser.mockResolvedValueOnce({access_token: 'guest-token-abc'})
+
+        const token = await getNotifyToken(TEST_API_PARAMS)
+
+        expect(token).toBe('guest-token-abc')
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
+        expect(helpers.loginGuestUserPrivate).not.toHaveBeenCalled()
+    })
+
+    test('fetches a new token via private client when secret is set', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'super-secret'
+        helpers.loginGuestUserPrivate.mockResolvedValueOnce({access_token: 'private-token-xyz'})
+
+        const token = await getNotifyToken(TEST_API_PARAMS)
+
+        expect(token).toBe('private-token-xyz')
+        expect(helpers.loginGuestUserPrivate).toHaveBeenCalledTimes(1)
+        expect(helpers.loginGuestUser).not.toHaveBeenCalled()
+    })
+
+    test('returns cached token without making a new SLAS call', async () => {
+        helpers.loginGuestUser.mockResolvedValue({access_token: 'cached-token'})
+
+        const first = await getNotifyToken(TEST_API_PARAMS)
+        const second = await getNotifyToken(TEST_API_PARAMS)
+
+        expect(first).toBe('cached-token')
+        expect(second).toBe('cached-token')
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
+    })
+})
+
+describe('sendViaB2cCartridge', () => {
+    let fetchSpy
+
+    beforeEach(() => {
+        _resetNotifyTokenCacheForTest()
+        delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
+        helpers.loginGuestUser.mockResolvedValue({access_token: 'notify-token'})
+        fetchSpy = jest.spyOn(global, 'fetch').mockImplementation(() =>
+            Promise.resolve({
+                ok: true,
+                json: jest.fn().mockResolvedValue({success: true}),
+                text: jest.fn().mockResolvedValue('')
+            })
+        )
+    })
+
+    afterEach(() => {
+        fetchSpy.mockRestore()
+    })
+
+    const mockFetchOk = (body = {success: true}) => {
+        fetchSpy.mockResolvedValueOnce({
+            ok: true,
+            json: jest.fn().mockResolvedValue(body),
+            text: jest.fn().mockResolvedValue(JSON.stringify(body))
+        })
+    }
+
+    const mockFetchError = (status, body = '') => {
+        fetchSpy.mockResolvedValueOnce({
+            ok: false,
+            status,
+            text: jest.fn().mockResolvedValue(body)
+        })
+    }
+
+    test('sends passwordless-magic-link with correct payload', async () => {
+        mockFetchOk({success: true, data: {magicLink: 'https://example.com/magic'}})
+
+        const result = await sendViaB2cCartridge(
+            'passwordless-magic-link',
+            'user@example.com',
+            {magicLinkPath: '/en-US/passwordless?token=abc'},
+            TEST_API_PARAMS
+        )
+
+        expect(result).toEqual({success: true, data: {magicLink: 'https://example.com/magic'}})
+        const [url, opts] = fetchSpy.mock.calls[0]
+        expect(url).toContain('/f_ecom_test_001/sites/RefArch/notify')
+        const sentBody = JSON.parse(opts.body)
+        expect(sentBody.type).toBe('passwordless-magic-link')
+        expect(sentBody.recipient).toBe('user@example.com')
+        expect(sentBody.data.magicLinkPath).toBe('/en-US/passwordless?token=abc')
+        expect(opts.headers['Authorization']).toBe('Bearer notify-token')
+    })
+
+    test('sends password-reset with correct payload', async () => {
+        mockFetchOk()
+
+        await sendViaB2cCartridge(
+            'password-reset',
+            'user@example.com',
+            {magicLinkPath: '/en-US/reset-password?token=xyz'},
+            TEST_API_PARAMS
+        )
+
+        const sentBody = JSON.parse(fetchSpy.mock.calls[0][1].body)
+        expect(sentBody.type).toBe('password-reset')
+    })
+
+    test('sends otp with correct payload', async () => {
+        mockFetchOk()
+
+        await sendViaB2cCartridge('otp', 'user@example.com', {token: '123456'}, TEST_API_PARAMS)
+
+        const sentBody = JSON.parse(fetchSpy.mock.calls[0][1].body)
+        expect(sentBody.type).toBe('otp')
+        expect(sentBody.data.token).toBe('123456')
+    })
+
+    test('sends glo-access-code with correct payload', async () => {
+        mockFetchOk()
+
+        await sendViaB2cCartridge(
+            'glo-access-code',
+            'user@example.com',
+            {orderNo: 'ORDER123', accessCode: 'ABCD1234'},
+            TEST_API_PARAMS
+        )
+
+        const sentBody = JSON.parse(fetchSpy.mock.calls[0][1].body)
+        expect(sentBody.type).toBe('glo-access-code')
+        expect(sentBody.data.orderNo).toBe('ORDER123')
+        expect(sentBody.data.accessCode).toBe('ABCD1234')
+    })
+
+    test('retries with a fresh token on 401 and succeeds', async () => {
+        helpers.loginGuestUser
+            .mockResolvedValueOnce({access_token: 'stale-token'})
+            .mockResolvedValueOnce({access_token: 'fresh-token'})
+        // First fetch: 401 with stale token; second fetch: 200 with fresh token
+        fetchSpy
+            .mockResolvedValueOnce({ok: false, status: 401, text: jest.fn().mockResolvedValue('')})
+            .mockResolvedValueOnce({
+                ok: true,
+                json: jest.fn().mockResolvedValue({success: true}),
+                text: jest.fn().mockResolvedValue('')
+            })
+
+        const result = await sendViaB2cCartridge(
+            'otp',
+            'user@example.com',
+            {token: '654321'},
+            TEST_API_PARAMS
+        )
+
+        expect(result).toEqual({success: true})
+        expect(fetchSpy).toHaveBeenCalledTimes(2)
+        const [, retryOpts] = fetchSpy.mock.calls[1]
+        expect(retryOpts.headers['Authorization']).toBe('Bearer fresh-token')
+    })
+
+    test('throws on 5xx without clearing token cache', async () => {
+        mockFetchError(503, 'Service Unavailable')
+
+        await expect(
+            sendViaB2cCartridge('otp', 'user@example.com', {token: '999'}, TEST_API_PARAMS)
+        ).rejects.toThrow('pwakit-notify returned 503')
+
+        // Token should still be cached (503 is not 401)
+        helpers.loginGuestUser.mockClear()
+        mockFetchOk()
+        await sendViaB2cCartridge('otp', 'user@example.com', {token: '111'}, TEST_API_PARAMS)
+        expect(helpers.loginGuestUser).not.toHaveBeenCalled()
     })
 })
