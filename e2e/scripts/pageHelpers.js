@@ -700,7 +700,13 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
     await advanceToPayment(page)
 
     const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']")
-    await expect(step2Card.getByRole('button', {name: /Edit Shipping Options/i})).toBeVisible()
+    // After advancing to Payment, step 2 collapses to its summary with an Edit button.
+    // A transient basket refetch can briefly disable the card (hiding the edit button),
+    // so allow the same checkout-transition window the rest of this file uses instead of
+    // the default 5s assertion timeout.
+    await expect(step2Card.getByRole('button', {name: /Edit Shipping Options/i})).toBeVisible({
+        timeout: CHECKOUT_TRANSITION_TIMEOUT
+    })
 
     await expect(page.getByRole('heading', {name: /Payment/i})).toBeVisible()
 
