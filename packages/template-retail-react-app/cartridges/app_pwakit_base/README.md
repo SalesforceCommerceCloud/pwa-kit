@@ -129,9 +129,9 @@ Both public and private SLAS client setups are supported:
 
 In [Account Manager](https://account.demandware.com) → **API Client**, find the client whose `clientId` matches `config/default.js` → `commerceAPI.parameters.clientId`.
 
-Under **Allowed Scopes**, add: `c_pwakit_notify`
+Under **Scopes** (the default scopes list, not just the allowed scopes), add: `c_pwakit_notify`
 
-This applies to both public and private clients.
+Adding it to the default scopes list ensures every guest token issued for this client includes it automatically. This applies to both public and private clients. The `commerce-sdk-isomorphic` guest-login helpers do not accept a `scope` parameter, so the scope must be configured as a default on the client — requesting it at call time is not possible through the SDK.
 
 ### 2. (Private client only) Set the client secret on the SSR server
 
