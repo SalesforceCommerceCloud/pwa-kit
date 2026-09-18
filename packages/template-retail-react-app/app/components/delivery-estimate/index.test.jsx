@@ -612,6 +612,40 @@ describe('DeliveryEstimate', () => {
         )
     })
 
+    test('uses the catalog delivery description for an empty delivery-estimate response', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: {},
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        })
+        useProduct.mockReturnValue({
+            data: {
+                shippingMethods: [
+                    {id: '001', description: 'Order received within 7-10 business days'}
+                ]
+            }
+        })
+        renderDeliveryEstimate({showResult: false})
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        expect(await screen.findByRole('status')).toHaveTextContent(
+            'Order received within 7-10 business days'
+        )
+        expect(useProduct).toHaveBeenLastCalledWith(
+            {
+                parameters: {
+                    id: 'sku-a',
+                    expand: ['shipping_methods']
+                }
+            },
+            {enabled: true}
+        )
+    })
+
     test('shows unavailable guidance in the calculator when a fulfillment-option lookup returns 403', async () => {
         const user = userEvent.setup()
         useDeliveryEstimates.mockReturnValue({

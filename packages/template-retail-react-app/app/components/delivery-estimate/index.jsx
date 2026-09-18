@@ -328,7 +328,8 @@ const DeliveryEstimate = ({
     const showPostalCodeInstructions =
         !isRequesting && !hasResult && !isUnavailable && !validationErrors.postalCode
     const shouldFetchFallbackDeliveryDescription =
-        isUnavailable && [403, 500].includes(error?.response?.status)
+        isUnavailable &&
+        ([403, 500].includes(error?.response?.status) || Boolean(data && !slowestEstimate))
     const {data: fallbackProduct} = useProduct(
         {
             parameters: {
