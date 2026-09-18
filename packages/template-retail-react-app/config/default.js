@@ -123,8 +123,9 @@ module.exports = {
             tokenLength: validateOtpTokenLength(process.env.OTP_TOKEN_LENGTH),
             passwordless: {
                 enabled: false,
-                mode: 'email',
-                landingPath: '/passwordless-login-landing'
+                mode: 'callback',
+                landingPath: '/passwordless-login-landing',
+                callbackURI: '/passwordless-login-callback'
             },
             social: {
                 enabled: false,
@@ -132,8 +133,12 @@ module.exports = {
                 redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
             },
             resetPassword: {
-                mode: 'email',
-                landingPath: '/reset-password-landing'
+                mode: 'callback',
+                landingPath: '/reset-password-landing',
+                callbackURI: '/reset-password-callback'
+            },
+            registrationVerification: {
+                callbackURI: '/registration-verification-callback'
             }
         },
         defaultSite: 'RefArchGlobal',
