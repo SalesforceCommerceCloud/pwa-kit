@@ -8,7 +8,7 @@
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
+import {useDeliveryEstimates, useProduct} from '@salesforce/commerce-sdk-react'
 import {getDefaultCookieAttributes} from '@salesforce/commerce-sdk-react/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import DeliveryEstimate from '@salesforce/retail-react-app/app/components/delivery-estimate'
@@ -16,10 +16,11 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import usMessages from '@salesforce/retail-react-app/app/static/translations/compiled/en-US.json'
+import deMessages from '@salesforce/retail-react-app/app/static/translations/compiled/de-DE.json'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {...actual, useDeliveryEstimates: jest.fn()}
+    return {...actual, useDeliveryEstimates: jest.fn(), useProduct: jest.fn()}
 })
 
 jest.mock('@salesforce/commerce-sdk-react/utils', () => ({
@@ -130,6 +131,7 @@ describe('DeliveryEstimate', () => {
             isFetching: false,
             refetch: jest.fn()
         })
+        useProduct.mockReturnValue({data: undefined})
     })
 
     afterEach(() => jest.clearAllMocks())
@@ -156,14 +158,14 @@ describe('DeliveryEstimate', () => {
             )
         })
         expect(
-            await screen.findByText('Estimated: Sep 16, 2026 - Sep 18, 2026')
+            await screen.findByText('Arrives Wed, Sep 16 \u2013 Fri, Sep 18')
         ).toBeInTheDocument()
         expect(screen.queryByText(/ground/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/express/i)).not.toBeInTheDocument()
-        expect(screen.getByRole('button', {name: 'View All Shipping Options'})).toHaveStyle(
+        expect(screen.getByRole('button', {name: 'More Delivery Options'})).toHaveStyle(
             'text-decoration: underline'
         )
-        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
+        await user.click(screen.getByRole('button', {name: 'More Delivery Options'}))
         const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
         expect(within(shippingOptions).getByText('Ground')).toBeInTheDocument()
         expect(within(shippingOptions).getByText('Express')).toBeInTheDocument()
@@ -175,13 +177,71 @@ describe('DeliveryEstimate', () => {
         expect(getDefaultCookieAttributes).toHaveBeenCalled()
     })
 
-    test('uses the localized postcode label and Storefront Next placeholder for GB', () => {
+    test('omits years in delivery windows that cross New Year to match Storefront Next', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: {
+                productDeliveryEstimates: [
+                    {
+                        productId: 'sku-a',
+                        shippingOptions: [
+                            {
+                                shippingMethodId: 'ground',
+                                deliveryWindow: {
+                                    startAt: '2026-12-30T14:00:00Z',
+                                    endAt: '2027-01-03T14:00:00Z'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        })
+        renderDeliveryEstimate()
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        expect(await screen.findByText('Arrives Wed, Dec 30 \u2013 Sun, Jan 3')).toBeInTheDocument()
+    })
+
+    test('uses the localized postcode label, example, and instructions for GB', () => {
         renderWithProviders(
             <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="GB" />
         )
 
         const input = screen.getByRole('textbox', {name: /postcode/i})
-        expect(input).toHaveAttribute('placeholder', 'Enter a postal code...')
+        expect(input).toHaveAttribute('placeholder', 'Enter postcode (e.g. SW1A 1AA)')
+        expect(input).toHaveAccessibleDescription(
+            'Enter your postcode (e.g. SW1A 1AA) to see delivery estimates.'
+        )
+    })
+
+    test('falls back to default delivery-estimate messages for untranslated locales', () => {
+        const consoleError = jest.spyOn(console, 'error').mockImplementation()
+
+        try {
+            renderWithProviders(
+                <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="DE" />,
+                {wrapperProps: {locale: {id: 'de-DE'}, messages: deMessages}}
+            )
+
+            expect(
+                screen.getByRole('region', {name: 'Estimated Delivery Date'})
+            ).toBeInTheDocument()
+            expect(screen.getByRole('textbox', {name: 'postal code'})).toHaveAttribute(
+                'placeholder',
+                'Enter postal code (e.g. 10115)'
+            )
+            expect(
+                screen.getByRole('button', {name: 'Calculate delivery estimate'})
+            ).toHaveTextContent('Calculate')
+        } finally {
+            consoleError.mockRestore()
+        }
     })
 
     test('renders the estimator as an accessible delivery section', () => {
@@ -200,15 +260,13 @@ describe('DeliveryEstimate', () => {
         setDeliveryDestinationCookie({postalCode: '94105', countryCode: 'US'})
         renderDeliveryEstimate()
 
-        expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(
-            /estimated:/i
-        )
+        expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(/arrives/i)
         await user.clear(screen.getByRole('textbox', {name: /zip code/i}))
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
-        expect(screen.getByText(/enter a zip code/i)).toBeInTheDocument()
+        expect(screen.getByText(/enter a valid zip code/i)).toBeInTheDocument()
         expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveAccessibleDescription(
-            'Enter a ZIP code.'
+            'Enter a valid ZIP code (e.g. 90210).'
         )
         await waitFor(() => {
             expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
@@ -424,7 +482,7 @@ describe('DeliveryEstimate', () => {
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
-        expect(await screen.findByRole('status')).toHaveTextContent(/estimated:/i)
+        expect(await screen.findByRole('status')).toHaveTextContent(/arrives/i)
     })
 
     test('moves focus to a shopper-initiated estimate', async () => {
@@ -515,10 +573,13 @@ describe('DeliveryEstimate', () => {
         expect(screen.queryByTestId('delivery-estimate-result')).not.toBeInTheDocument()
 
         await waitFor(() => {
-            expect(onResolvedDestination).toHaveBeenCalledWith({
-                countryCode: 'US',
-                postalCode: '94105'
-            })
+            expect(onResolvedDestination).toHaveBeenCalledWith(
+                {
+                    countryCode: 'US',
+                    postalCode: '94105'
+                },
+                {focusDeliveryOption: false}
+            )
         })
     })
 
@@ -528,9 +589,7 @@ describe('DeliveryEstimate', () => {
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
-        expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(
-            /estimated:/i
-        )
+        expect(await screen.findByTestId('delivery-estimate-result')).toHaveTextContent(/arrives/i)
 
         await user.click(screen.getByRole('button', {name: /select sku b/i}))
 
@@ -553,6 +612,140 @@ describe('DeliveryEstimate', () => {
         expect(await screen.findByText(/delivery dates unavailable/i)).toBeInTheDocument()
         expect(decodeURIComponent(getDeliveryDestinationCookieValue())).toBe(
             JSON.stringify({postalCode: '94105', countryCode: 'US'})
+        )
+    })
+
+    test('uses the catalog delivery description for an empty delivery-estimate response', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: {},
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        })
+        useProduct.mockReturnValue({
+            data: {
+                shippingMethods: [
+                    {id: '001', description: 'Order received within 7-10 business days'}
+                ]
+            }
+        })
+        renderDeliveryEstimate({showResult: false})
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        expect(await screen.findByRole('status')).toHaveTextContent(
+            'Order received within 7-10 business days'
+        )
+        expect(useProduct).toHaveBeenLastCalledWith(
+            {
+                parameters: {
+                    id: 'sku-a',
+                    expand: ['shipping_methods']
+                }
+            },
+            {enabled: true}
+        )
+    })
+
+    test('shows unavailable guidance in the calculator when a fulfillment-option lookup returns 403', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: undefined,
+            error: {response: {status: 403}},
+            isError: true,
+            isLoading: false,
+            isFetching: false
+        })
+        renderDeliveryEstimate({showResult: false})
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        expect(await screen.findByRole('status')).toHaveTextContent(
+            'Delivery dates unavailable. See checkout for options and costs.'
+        )
+    })
+
+    test('uses the catalog delivery description for a 403 delivery-estimate response', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: undefined,
+            error: {response: {status: 403}},
+            isError: true,
+            isLoading: false,
+            isFetching: false
+        })
+        useProduct.mockReturnValue({
+            data: {
+                shippingMethods: [
+                    {id: '005', c_storePickupEnabled: true, description: 'Ready for pickup today'},
+                    {id: '001', description: 'Order received within 7-10 business days'}
+                ]
+            }
+        })
+        renderDeliveryEstimate({showResult: false})
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        expect(await screen.findByRole('status')).toHaveTextContent(
+            'Order received within 7-10 business days'
+        )
+        expect(useProduct).toHaveBeenLastCalledWith(
+            {
+                parameters: {
+                    id: 'sku-a',
+                    expand: ['shipping_methods']
+                }
+            },
+            {enabled: true}
+        )
+    })
+
+    test('uses the catalog delivery description for a 500 delivery-estimate response', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: undefined,
+            error: {response: {status: 500}},
+            isError: true,
+            isLoading: false,
+            isFetching: false
+        })
+        useProduct.mockReturnValue({
+            data: {
+                shippingMethods: [
+                    {id: '001', description: 'Order received within 7-10 business days'}
+                ]
+            }
+        })
+        renderDeliveryEstimate({showResult: false})
+
+        expect(useProduct).toHaveBeenLastCalledWith(
+            {
+                parameters: {
+                    id: undefined,
+                    expand: undefined
+                }
+            },
+            {enabled: false}
+        )
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+
+        expect(await screen.findByRole('status')).toHaveTextContent(
+            'Order received within 7-10 business days'
+        )
+        expect(useProduct).toHaveBeenLastCalledWith(
+            {
+                parameters: {
+                    id: 'sku-a',
+                    expand: ['shipping_methods']
+                }
+            },
+            {enabled: true}
         )
     })
 
@@ -611,7 +804,7 @@ describe('DeliveryEstimate', () => {
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
-        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
+        await user.click(screen.getByRole('button', {name: 'More Delivery Options'}))
 
         const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
         expect(within(shippingOptions).queryByText('Unavailable')).not.toBeInTheDocument()
@@ -645,7 +838,7 @@ describe('DeliveryEstimate', () => {
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
-        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
+        await user.click(screen.getByRole('button', {name: 'More Delivery Options'}))
 
         const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
         expect(within(shippingOptions).getByText('£5.00')).toBeInTheDocument()

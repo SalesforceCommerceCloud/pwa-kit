@@ -6,6 +6,8 @@
  */
 
 import {
+    getFallbackDeliveryDescription,
+    getCountryCodeFromLocale,
     getPostalCodeFormat,
     getPreferredDeliveryDestination,
     getSlowestDeliveryEstimate,
@@ -99,7 +101,40 @@ describe('getSlowestDeliveryEstimate', () => {
     })
 })
 
+describe('getFallbackDeliveryDescription', () => {
+    test('returns the first non-pickup shipping description', () => {
+        expect(
+            getFallbackDeliveryDescription([
+                {
+                    id: '005',
+                    c_storePickupEnabled: true,
+                    description: 'Ready for pickup today'
+                },
+                {id: '001', description: 'Order received within 7-10 business days'}
+            ])
+        ).toBe('Order received within 7-10 business days')
+    })
+
+    test('ignores empty descriptions and pickup methods', () => {
+        expect(
+            getFallbackDeliveryDescription([
+                {id: '001', description: '   '},
+                {id: '002', c_storePickupEnabled: true, description: 'Ready for pickup today'},
+                {id: '005', description: 'Legacy pickup method'}
+            ])
+        ).toBeNull()
+    })
+})
+
 describe('delivery destination validation', () => {
+    test('resolves locale country codes like Storefront Next', () => {
+        expect(getCountryCodeFromLocale('zh-Hans-CN')).toBe('CN')
+        expect(getCountryCodeFromLocale(' en-US-u-ca-gregory ')).toBe('US')
+        expect(getCountryCodeFromLocale('en-419')).toBeUndefined()
+        expect(getCountryCodeFromLocale('en')).toBeUndefined()
+        expect(getCountryCodeFromLocale('not_a_locale')).toBeUndefined()
+    })
+
     test('normalizes postal codes using the destination country format', () => {
         expect(normalizeDestination({countryCode: 'ca', postalCode: 'm5v3a8'})).toEqual({
             countryCode: 'CA',
@@ -117,6 +152,11 @@ describe('delivery destination validation', () => {
         expect(isValidDestination({countryCode: 'GB', postalCode: 'SW1A 1AA'})).toBe(true)
         expect(isValidDestination({countryCode: 'GB', postalCode: '12345'})).toBe(false)
         expect(getPostalCodeFormat('JP')).toMatchObject({inputMode: 'numeric', maxLength: 8})
+        expect(getPostalCodeFormat('fr-CA')).toMatchObject({
+            example: 'M5V 3A8',
+            termKey: 'postalCode'
+        })
+        expect(getPostalCodeFormat('it-IT')).toMatchObject({example: '00100', termKey: 'cap'})
     })
 
     test('follows Storefront Next address precedence', () => {
