@@ -1015,6 +1015,7 @@ describe('GET /api/order-lookup/order — real handler', () => {
 
         const req = makeMockReq({
             headers: {
+                authorization: 'Bearer test-token',
                 cookie: makeCookieHeader({[orderNo]: {email, verifiedCode: accessCode}})
             },
             params: {orderNo}
@@ -1116,6 +1117,7 @@ describe('GET /api/order-lookup/oms-meta — real handler', () => {
     test('401: empty GOA cookie {}', async () => {
         const req = makeMockReq({
             headers: {
+                authorization: 'Bearer test-token',
                 cookie: makeCookieHeader({})
             }
         })
@@ -1285,7 +1287,7 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
 
     test('401: orderNo not in cookie', async () => {
         const req = makeMockReq({
-            headers: {cookie: VALID_COOKIE},
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
             body: {orderNo: 'UNKNOWN_ORDER'}
         })
         const res = makeMockRes()
@@ -1299,7 +1301,7 @@ describe('POST /api/order-lookup/cancel — real handler', () => {
 
     test('400: missing orderNo', async () => {
         const req = makeMockReq({
-            headers: {cookie: VALID_COOKIE},
+            headers: {authorization: 'Bearer test-token', cookie: VALID_COOKIE},
             body: {reason: 'SOME_REASON'}
         })
         const res = makeMockRes()
@@ -1510,7 +1512,10 @@ describe('POST /api/order-lookup/return — real handler', () => {
     test('401: orderNo not in cookie', async () => {
         // VALID_COOKIE only has VALID_ORDER_NO, but we request a different orderNo
         const req2 = makeMockReq({
-            headers: {cookie: makeCookieHeader({OTHER: {email: 'a@b.com', verifiedCode: 'code'}})},
+            headers: {
+                authorization: 'Bearer test-token',
+                cookie: makeCookieHeader({OTHER: {email: 'a@b.com', verifiedCode: 'code'}})
+            },
             body: {orderNo: VALID_ORDER_NO, productItems: VALID_ITEMS}
         })
         const res = makeMockRes()

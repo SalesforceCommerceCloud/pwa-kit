@@ -5921,6 +5921,20 @@
       "value": "]"
     }
   ],
+  "guestOrderLookup.verify.label.email": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẏǿǿŭŭř ḗḗḿȧȧīŀ ȧȧḓḓřḗḗşş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "guestOrderLookup.verify.subtext": [
     {
       "type": 0,
@@ -9917,6 +9931,34 @@
     {
       "type": 0,
       "value": "Řḗḗşḗḗŧ Ƥȧȧşşẇǿǿřḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "reset_password_form.error.required_email": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥŀḗḗȧȧşḗḗ ḗḗƞŧḗḗř ẏǿǿŭŭř ḗḗḿȧȧīŀ ȧȧḓḓřḗḗşş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "reset_password_form.label.email": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗḿȧȧīŀ"
     },
     {
       "type": 0,

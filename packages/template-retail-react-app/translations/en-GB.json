@@ -1149,6 +1149,9 @@
   "guestOrderLookup.verify.label.digitN": {
     "defaultMessage": "Digit {n} of {total}"
   },
+  "guestOrderLookup.verify.label.email": {
+    "defaultMessage": "Your email address"
+  },
   "guestOrderLookup.verify.subtext": {
     "defaultMessage": "We've sent a verification code to {email}. Please enter it below."
   },
@@ -1962,6 +1965,12 @@
   },
   "reset_password_form.button.reset_password": {
     "defaultMessage": "Reset Password"
+  },
+  "reset_password_form.error.required_email": {
+    "defaultMessage": "Please enter your email address."
+  },
+  "reset_password_form.label.email": {
+    "defaultMessage": "Email"
   },
   "reset_password_form.message.enter_your_email": {
     "defaultMessage": "Enter your email to receive instructions on how to reset your password"
