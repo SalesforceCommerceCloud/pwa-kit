@@ -230,7 +230,10 @@ const ProductView = forwardRef(
         const [deliveryEstimateDestination, setDeliveryEstimateDestination] = useState(null)
         const [isDeliveryEstimateOpen, setIsDeliveryEstimateOpen] = useState(true)
         const [focusDeliveryEstimateInput, setFocusDeliveryEstimateInput] = useState(false)
+        const [focusDeliveryEstimateDestination, setFocusDeliveryEstimateDestination] =
+            useState(false)
         const previousDeliveryEstimateProductId = useRef(null)
+        const deliveryEstimateDestinationButtonRef = useRef(null)
         const isDeliverySelected = !pickupInStore
         const isPickupDisabled = storeName && inventoryId && isSelectedStoreOutOfStock
         const {pdp: showExpressOnPDP} = useExpressCheckoutEnabled()
@@ -248,15 +251,25 @@ const ProductView = forwardRef(
             deliveryEstimateDestination?.productId === deliveryEstimateProductId
 
         const handleResolvedDeliveryEstimate = useCallback(
-            (destination) => {
+            (destination, {focusDeliveryOption = false} = {}) => {
                 setDeliveryEstimateDestination({
                     ...destination,
                     productId: deliveryEstimateProductId
                 })
                 setIsDeliveryEstimateOpen(false)
+                setFocusDeliveryEstimateDestination(focusDeliveryOption)
             },
             [deliveryEstimateProductId]
         )
+
+        useEffect(() => {
+            if (!focusDeliveryEstimateDestination) {
+                return
+            }
+
+            deliveryEstimateDestinationButtonRef.current?.focus()
+            setFocusDeliveryEstimateDestination(false)
+        }, [focusDeliveryEstimateDestination])
 
         const handleChangeDeliveryEstimateDestination = useCallback(() => {
             setDeliveryEstimateDestination(null)
@@ -959,6 +972,9 @@ const ProductView = forwardRef(
                                                                         values={{
                                                                             postalCode: (
                                                                                 <Button
+                                                                                    ref={
+                                                                                        deliveryEstimateDestinationButtonRef
+                                                                                    }
                                                                                     type="button"
                                                                                     variant="link"
                                                                                     color="blue.600"

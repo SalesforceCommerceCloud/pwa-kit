@@ -342,6 +342,7 @@ const DeliveryEstimate = ({
     const fallbackDeliveryDescription = shouldFetchFallbackDeliveryDescription
         ? getFallbackDeliveryDescription(fallbackProduct?.shippingMethods)
         : null
+    const hasDeliveryOptionContent = hasResult || Boolean(fallbackDeliveryDescription)
     const calculatingLabel = formatMessage({
         id: 'delivery_estimate.status.loading',
         defaultMessage: 'Calculating...'
@@ -352,7 +353,7 @@ const DeliveryEstimate = ({
     })
 
     useEffect(() => {
-        if (!hasResult || !submittedDestination || !onResolvedDestination) {
+        if (!hasDeliveryOptionContent || !submittedDestination || !onResolvedDestination) {
             return
         }
 
@@ -363,8 +364,16 @@ const DeliveryEstimate = ({
         }
 
         resolvedDestinationRef.current = destinationKey
-        onResolvedDestination(normalizedDestination)
-    }, [hasResult, onResolvedDestination, productId, submittedDestination])
+        onResolvedDestination(normalizedDestination, {
+            focusDeliveryOption: !hasResult && hasExplicitDestinationRef.current
+        })
+    }, [
+        hasDeliveryOptionContent,
+        hasResult,
+        onResolvedDestination,
+        productId,
+        submittedDestination
+    ])
 
     useEffect(() => {
         if (!hasResult || !shouldFocusResultRef.current) {

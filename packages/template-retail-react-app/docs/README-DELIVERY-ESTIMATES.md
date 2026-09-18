@@ -90,14 +90,14 @@ region does not provide a country for the estimate request.
 ## Empty And Unavailable Results
 
 An unconfigured estimate provider can respond with HTTP 200 and an empty
-response. This is a **no-estimate state**, not a PDP failure. The calculator
-remains available, does not show a delivery date, and does not persist the
-newly entered destination.
+response. The same shopper-facing unavailable state is used when the response
+contains no eligible delivery window or returns HTTP 403 or 500. In each case,
+the PDP retrieves the product's shipping methods. If a non-pickup catalog
+description is available, it is shown in the selected **Delivery** option and
+the calculator closes. The newly entered destination is not persisted.
 
-The same shopper-facing unavailable state is used when the response contains
-no eligible delivery window. For a delivery-estimate HTTP 403 or 500 response,
-the PDP retrieves the product's shipping methods and shows the first non-pickup
-catalog description when available; otherwise it uses this neutral fallback:
+If no usable catalog description is available, the calculator remains
+available, does not show a delivery date, and uses this neutral fallback:
 
 > Delivery dates unavailable. See checkout for options and costs.
 
@@ -123,9 +123,12 @@ or production customer data.
    returns to the trigger. Confirm it only shows options with valid delivery
    windows.
 5. Verify an HTTP-200 empty response or a response with no eligible delivery
-   options shows the no-estimate state without displaying provider reason text.
-   When valid and invalid/non-deliverable options are returned together, confirm
-   the valid options remain available and the other options are omitted.
+    options shows a non-pickup catalog shipping-method description in the
+    selected **Delivery** option when one is configured. Confirm the newly
+    entered destination is not persisted. Without a usable catalog description,
+    confirm the calculator remains available without displaying provider reason
+    text. When valid and invalid/non-deliverable options are returned together,
+    confirm the valid options remain available and the other options are omitted.
 6. Verify a controlled provider or API failure leaves the PDP usable and shows
     the unavailable state rather than failing the product page.
 7. Verify a preorderable or backorderable product with zero available-to-sell

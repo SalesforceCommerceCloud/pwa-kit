@@ -573,10 +573,13 @@ describe('DeliveryEstimate', () => {
         expect(screen.queryByTestId('delivery-estimate-result')).not.toBeInTheDocument()
 
         await waitFor(() => {
-            expect(onResolvedDestination).toHaveBeenCalledWith({
-                countryCode: 'US',
-                postalCode: '94105'
-            })
+            expect(onResolvedDestination).toHaveBeenCalledWith(
+                {
+                    countryCode: 'US',
+                    postalCode: '94105'
+                },
+                {focusDeliveryOption: false}
+            )
         })
     })
 

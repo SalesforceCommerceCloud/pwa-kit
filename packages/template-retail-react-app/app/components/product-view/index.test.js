@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import frMessages from '@salesforce/retail-react-app/app/static/translations/compiled/fr-FR.json'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
-import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
+import {useDeliveryEstimates, useProduct} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {rest} from 'msw'
 
@@ -43,7 +43,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {...actual, useDeliveryEstimates: jest.fn()}
+    return {...actual, useDeliveryEstimates: jest.fn(), useProduct: jest.fn()}
 })
 
 // Mock useSelectedStore hook
@@ -143,6 +143,7 @@ beforeEach(() => {
         isLoading: false,
         isFetching: false
     })
+    useProduct.mockReturnValue({data: undefined})
     document.cookie = 'deliveryZipCode_site-1=; Max-Age=0; path=/'
     window.localStorage.clear()
 
@@ -322,6 +323,69 @@ test('keeps the delivery estimate calculator separate from the delivery option',
 
     expect(deliveryOption).toHaveAttribute('data-selected', 'true')
     expect(deliveryOption).not.toContainElement(deliveryEstimate)
+})
+
+test('folds catalog delivery guidance into the delivery option when an estimate response is empty', async () => {
+    const user = userEvent.setup()
+    useDeliveryEstimates.mockReturnValue({
+        data: {productDeliveryEstimates: []},
+        isError: false,
+        isLoading: false,
+        isFetching: false
+    })
+    useProduct.mockReturnValue({
+        data: {
+            shippingMethods: [{id: '001', description: 'Order received within 7-10 business days'}]
+        }
+    })
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />,
+        {wrapperProps: {isGuest: true}}
+    )
+
+    await user.type(await screen.findByRole('textbox', {name: /zip code/i}), '94105')
+    await user.click(screen.getByRole('button', {name: 'Calculate delivery estimate'}))
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+    const changeDestinationButton = await within(deliveryOption).findByRole('button', {
+        name: 'Change delivery destination from 94105'
+    })
+
+    expect(deliveryOption).toHaveTextContent('Order received within 7-10 business days')
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(document.cookie).not.toContain('deliveryZipCode_site-1=')
+    expect(changeDestinationButton).toHaveFocus()
+})
+
+test('keeps the calculator open when an empty estimate response has no usable catalog guidance', async () => {
+    const user = userEvent.setup()
+    useDeliveryEstimates.mockReturnValue({
+        data: {productDeliveryEstimates: []},
+        isError: false,
+        isLoading: false,
+        isFetching: false
+    })
+    useProduct.mockReturnValue({
+        data: {
+            shippingMethods: [{id: '005', description: 'Pickup at a store'}]
+        }
+    })
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />,
+        {wrapperProps: {isGuest: true}}
+    )
+
+    await user.type(await screen.findByRole('textbox', {name: /zip code/i}), '94105')
+    await user.click(screen.getByRole('button', {name: 'Calculate delivery estimate'}))
+
+    expect(
+        await screen.findByText('Delivery dates unavailable. See checkout for options and costs.')
+    ).toBeInTheDocument()
+    expect(screen.getByRole('region', {name: 'Estimated Delivery Date'})).toBeInTheDocument()
+    expect(
+        screen.queryByRole('button', {name: /change delivery destination/i})
+    ).not.toBeInTheDocument()
+    expect(document.cookie).not.toContain('deliveryZipCode_site-1=')
 })
 
 test('matches the Storefront Next fulfillment option labels', () => {
