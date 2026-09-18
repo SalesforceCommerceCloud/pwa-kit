@@ -45,8 +45,8 @@ The PDP displays only delivery options that:
 - Have a delivery-window start that is not after its end.
 
 The summary and detail view use this same eligible-option set. The summary
-selects the fastest eligible delivery window: earliest end date, then earliest
-start date, then shipping-method ID as a deterministic tie-breaker. When more
+selects the slowest eligible delivery window: latest start date, then latest
+end date, then shipping-method ID as a deterministic tie-breaker. When more
 than one eligible option exists, **View All Shipping Options** opens an accessible
 dialog with every eligible option, including its shipping method, estimated
 window, price when supplied, and description when supplied.

@@ -34,7 +34,7 @@ import {
 import {
     getFallbackDeliveryDescription,
     getPreferredDeliveryDestination,
-    getFastestDeliveryEstimate,
+    getSlowestDeliveryEstimate,
     getPostalCodeFormat,
     isEligibleShippingOption,
     isValidDestination,
@@ -115,7 +115,6 @@ const formatDeliveryWindow = (deliveryWindow, formatDate) => {
         weekday: 'short',
         month: 'short',
         day: 'numeric',
-        ...(startAt.getUTCFullYear() !== endAt.getUTCFullYear() ? {year: 'numeric'} : {}),
         timeZone: 'UTC'
     }
 
@@ -279,7 +278,7 @@ const DeliveryEstimate = ({
         },
         {enabled: canRequest}
     )
-    const fastestEstimate = canRequest ? getFastestDeliveryEstimate(productId, data) : null
+    const slowestEstimate = canRequest ? getSlowestDeliveryEstimate(productId, data) : null
     const shippingOptions =
         (data?.productDeliveryEstimates || [])
             .find((estimate) => estimate.productId === productId)
@@ -288,7 +287,7 @@ const DeliveryEstimate = ({
 
     useEffect(() => {
         if (
-            !fastestEstimate ||
+            !slowestEstimate ||
             !submittedDestination ||
             isError ||
             isLoading ||
@@ -301,7 +300,7 @@ const DeliveryEstimate = ({
 
         persistDeliveryDestinationCookie(siteId, submittedDestination)
         hasExplicitDestinationRef.current = false
-    }, [fastestEstimate, submittedDestination, siteId, isError, isLoading, isFetching])
+    }, [slowestEstimate, submittedDestination, siteId, isError, isLoading, isFetching])
 
     const handleSubmit = (event) => {
         event.preventDefault()
@@ -324,8 +323,8 @@ const DeliveryEstimate = ({
     }
 
     const isRequesting = canRequest && (isLoading || isFetching)
-    const hasResult = Boolean(fastestEstimate) && !isRequesting && !isError
-    const isUnavailable = canRequest && !isRequesting && (isError || (data && !fastestEstimate))
+    const hasResult = Boolean(slowestEstimate) && !isRequesting && !isError
+    const isUnavailable = canRequest && !isRequesting && (isError || (data && !slowestEstimate))
     const showPostalCodeInstructions =
         !isRequesting && !hasResult && !isUnavailable && !validationErrors.postalCode
     const shouldFetchFallbackDeliveryDescription =
@@ -405,7 +404,7 @@ const DeliveryEstimate = ({
                             },
                             {
                                 deliveryWindow: formatDeliveryWindow(
-                                    fastestEstimate.deliveryWindow,
+                                    slowestEstimate.deliveryWindow,
                                     formatDate
                                 )
                             }

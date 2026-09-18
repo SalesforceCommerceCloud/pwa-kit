@@ -136,7 +136,7 @@ describe('DeliveryEstimate', () => {
 
     afterEach(() => jest.clearAllMocks())
 
-    test('submits a valid destination and displays the fastest delivery window', async () => {
+    test('submits a valid destination and displays the slowest delivery window', async () => {
         const user = userEvent.setup()
         renderDeliveryEstimate()
 
@@ -158,7 +158,7 @@ describe('DeliveryEstimate', () => {
             )
         })
         expect(
-            await screen.findByText('Arrives Tue, Sep 15 \u2013 Wed, Sep 16')
+            await screen.findByText('Arrives Wed, Sep 16 \u2013 Fri, Sep 18')
         ).toBeInTheDocument()
         expect(screen.queryByText(/ground/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/express/i)).not.toBeInTheDocument()
@@ -177,7 +177,7 @@ describe('DeliveryEstimate', () => {
         expect(getDefaultCookieAttributes).toHaveBeenCalled()
     })
 
-    test('includes years in delivery windows that cross New Year', async () => {
+    test('omits years in delivery windows that cross New Year to match Storefront Next', async () => {
         const user = userEvent.setup()
         useDeliveryEstimates.mockReturnValue({
             data: {
@@ -205,9 +205,7 @@ describe('DeliveryEstimate', () => {
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
 
-        expect(
-            await screen.findByText('Arrives Wed, Dec 30, 2026 \u2013 Sun, Jan 3, 2027')
-        ).toBeInTheDocument()
+        expect(await screen.findByText('Arrives Wed, Dec 30 \u2013 Sun, Jan 3')).toBeInTheDocument()
     })
 
     test('uses the localized postcode label, example, and instructions for GB', () => {

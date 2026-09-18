@@ -285,23 +285,23 @@ export const isEligibleShippingOption = (shippingOption) => {
     )
 }
 
-const compareByFastestDeliveryWindow = (first, second) => {
-    const endDifference = getTime(first.deliveryWindow.endAt) - getTime(second.deliveryWindow.endAt)
-    if (endDifference !== 0) return endDifference
-
+const compareBySlowestDeliveryWindow = (first, second) => {
     const startDifference =
-        getTime(first.deliveryWindow.startAt) - getTime(second.deliveryWindow.startAt)
+        getTime(second.deliveryWindow.startAt) - getTime(first.deliveryWindow.startAt)
     if (startDifference !== 0) return startDifference
+
+    const endDifference = getTime(second.deliveryWindow.endAt) - getTime(first.deliveryWindow.endAt)
+    if (endDifference !== 0) return endDifference
 
     return String(first.shippingMethodId || '').localeCompare(String(second.shippingMethodId || ''))
 }
 
 /**
- * Returns the fastest eligible shipping option for the requested product.
- * The PDP summary follows Storefront Next by selecting the earliest window end,
- * then the earliest start time as a deterministic tie-breaker.
+ * Returns the slowest eligible shipping option for the requested product.
+ * The PDP summary follows Storefront Next by selecting the latest window start,
+ * then the latest end time as a deterministic tie-breaker.
  */
-export const getFastestDeliveryEstimate = (productId, deliveryEstimates) => {
+export const getSlowestDeliveryEstimate = (productId, deliveryEstimates) => {
     const productEstimate = deliveryEstimates?.productDeliveryEstimates?.find(
         (estimate) => estimate.productId === productId
     )
@@ -309,7 +309,7 @@ export const getFastestDeliveryEstimate = (productId, deliveryEstimates) => {
 
     if (!eligibleOptions.length) return null
 
-    return [...eligibleOptions].sort(compareByFastestDeliveryWindow)[0]
+    return [...eligibleOptions].sort(compareBySlowestDeliveryWindow)[0]
 }
 
 export const getFallbackDeliveryDescription = (shippingMethods) =>
