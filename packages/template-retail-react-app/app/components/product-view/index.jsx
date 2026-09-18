@@ -236,11 +236,13 @@ const ProductView = forwardRef(
         const {pdp: showExpressOnPDP} = useExpressCheckoutEnabled()
         const deliveryEstimateProductId =
             variant?.productId || (product?.type?.item ? product.id : null)
+        const hasCurrentDeliveryEstimateProduct = product?.id === deliveryEstimateProductId
         const suppressDeferredDeliveryEstimate =
+            hasCurrentDeliveryEstimateProduct &&
             typeof product?.inventory?.ats === 'number' &&
             product.inventory.ats <= 0 &&
             (product.inventory.preorderable || product.inventory.backorderable)
-        const defaultCountryCode = getCountryCodeFromLocale(locale?.id) || 'US'
+        const defaultCountryCode = getCountryCodeFromLocale(locale?.id)
 
         const hasResolvedDeliveryEstimate =
             deliveryEstimateDestination?.productId === deliveryEstimateProductId
@@ -1107,6 +1109,8 @@ const ProductView = forwardRef(
                                     </>
                                 )}
                                 {showDeliveryEstimate &&
+                                    defaultCountryCode &&
+                                    hasCurrentDeliveryEstimateProduct &&
                                     !suppressDeferredDeliveryEstimate &&
                                     site?.id &&
                                     deliveryEstimateProductId && (

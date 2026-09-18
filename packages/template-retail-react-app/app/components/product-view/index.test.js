@@ -65,6 +65,30 @@ const MockComponent = (props) => {
     )
 }
 
+const DeferredVariantHarness = () => {
+    const [variationValues, setVariationValues] = React.useState({
+        color: 'BLACKFB',
+        size: '038',
+        width: 'V'
+    })
+
+    return (
+        <>
+            <button
+                type="button"
+                onClick={() => setVariationValues((values) => ({...values, size: '039'}))}
+            >
+                Select size 39
+            </button>
+            <MockComponent
+                product={mockProductDetail}
+                showDeliveryEstimate={true}
+                controlledVariationValues={variationValues}
+            />
+        </>
+    )
+}
+
 MockComponent.propTypes = {
     product: PropTypes.object,
     addToCart: PropTypes.func,
@@ -228,6 +252,21 @@ test('uses the full locale country code for delivery estimates', async () => {
     })
 })
 
+test('does not render delivery estimates for a locale without a country region', () => {
+    useMultiSite.mockReturnValue({
+        site: {id: 'site-1'},
+        locale: {id: 'en'},
+        buildUrl: (url) => url
+    })
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />,
+        {wrapperProps: {isGuest: true}}
+    )
+
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(useDeliveryEstimates).not.toHaveBeenCalled()
+})
+
 test('suppresses delivery estimates for deferred-availability products', () => {
     const deferredProduct = {
         ...mockStandardProductOrderable,
@@ -251,6 +290,26 @@ test('suppresses delivery estimates for deferred-availability products', () => {
     expect(screen.getByRole('radio', {name: /free pickup in/i})).toBeInTheDocument()
     expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
     expect(useDeliveryEstimates).not.toHaveBeenCalled()
+})
+
+test('does not request an estimate for a selected variant while its product data is stale', async () => {
+    document.cookie = `deliveryZipCode_site-1=${encodeURIComponent(
+        JSON.stringify({postalCode: '94105', countryCode: 'US'})
+    )}; Path=/`
+    const user = userEvent.setup()
+    renderWithProviders(<DeferredVariantHarness />, {wrapperProps: {isGuest: true}})
+
+    expect(await screen.findByRole('region', {name: 'Estimated Delivery Date'})).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', {name: 'Select size 39'}))
+
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(useDeliveryEstimates).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+            parameters: expect.objectContaining({productIds: ['750518699585M']})
+        }),
+        expect.anything()
+    )
 })
 
 test('keeps the delivery estimate calculator separate from the delivery option', async () => {
