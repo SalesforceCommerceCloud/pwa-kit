@@ -260,7 +260,7 @@ export function _resetNotifyTokenCacheForTest() {
     _notifyTokenExpiry = 0
 }
 
-async function getNotifyToken(apiParams) {
+export async function getNotifyToken(apiParams) {
     if (_notifyToken && Date.now() < _notifyTokenExpiry) {
         return _notifyToken
     }
@@ -293,7 +293,7 @@ async function getNotifyToken(apiParams) {
     return _notifyToken
 }
 
-async function sendViaB2cCartridge(type, recipient, data, apiParams) {
+export async function sendViaB2cCartridge(type, recipient, data, apiParams) {
     const {organizationId, siteId, locale} = apiParams
     const token = await getNotifyToken(apiParams)
     const proxy = `${getAppOrigin()}${
@@ -402,6 +402,16 @@ export const validateSlasCallbackToken = async (token) => {
     const subClaim = payload[CLAIM.ISSUER]
     const tokens = subClaim.split(DELIMITER.ISSUER)
     const tenantId = tokens[2]
+    const configTenantId = getConfig()?.app?.commerceAPI?.parameters?.organizationId?.replace(
+        /^f_ecom_/,
+        ''
+    )
+    if (tenantId !== configTenantId) {
+        throwSlasTokenValidationError(
+            `The tenant ID in your PWA Kit configuration ("${configTenantId}") does not match the tenant ID in the SLAS callback token ("${tenantId}").`,
+            401
+        )
+    }
     try {
         let jwks
         if (process.env.SLAS_JWKS_JSON) {
