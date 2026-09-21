@@ -21,7 +21,8 @@ import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import frMessages from '@salesforce/retail-react-app/app/static/translations/compiled/fr-FR.json'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
-import {useDeliveryEstimates} from '@salesforce/commerce-sdk-react'
+import {useDeliveryEstimates, useProduct} from '@salesforce/commerce-sdk-react'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {rest} from 'msw'
 
 jest.mock('@loadable/component', () => ({
@@ -33,16 +34,16 @@ jest.mock('@loadable/component', () => ({
 // Ensure useMultiSite returns site.id = 'site-1' for all tests
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     __esModule: true,
-    default: () => ({
+    default: jest.fn(() => ({
         site: {id: 'site-1'},
         locale: {id: 'en-US'},
         buildUrl: (url) => url // identity function for tests
-    })
+    }))
 }))
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {...actual, useDeliveryEstimates: jest.fn()}
+    return {...actual, useDeliveryEstimates: jest.fn(), useProduct: jest.fn()}
 })
 
 // Mock useSelectedStore hook
@@ -61,6 +62,30 @@ const MockComponent = (props) => {
             <div>customer: {customer?.authType}</div>
             <ProductView {...defaultProps} {...props} />
         </div>
+    )
+}
+
+const DeferredVariantHarness = () => {
+    const [variationValues, setVariationValues] = React.useState({
+        color: 'BLACKFB',
+        size: '038',
+        width: 'V'
+    })
+
+    return (
+        <>
+            <button
+                type="button"
+                onClick={() => setVariationValues((values) => ({...values, size: '039'}))}
+            >
+                Select size 39
+            </button>
+            <MockComponent
+                product={mockProductDetail}
+                showDeliveryEstimate={true}
+                controlledVariationValues={variationValues}
+            />
+        </>
     )
 }
 
@@ -107,12 +132,19 @@ beforeEach(() => {
         error: null,
         hasSelectedStore: true
     }))
+    useMultiSite.mockReturnValue({
+        site: {id: 'site-1'},
+        locale: {id: 'en-US'},
+        buildUrl: (url) => url
+    })
     useDeliveryEstimates.mockReturnValue({
         data: deliveryEstimateResult,
         isError: false,
         isLoading: false,
         isFetching: false
     })
+    useProduct.mockReturnValue({data: undefined})
+    document.cookie = 'deliveryZipCode_site-1=; Max-Age=0; path=/'
     window.localStorage.clear()
 
     // Reset MSW handlers to avoid conflicts
@@ -196,6 +228,91 @@ test('renders delivery estimates only when explicitly enabled for the PDP', asyn
     ).toBeInTheDocument()
 })
 
+test('uses the full locale country code for delivery estimates', async () => {
+    useMultiSite.mockReturnValue({
+        site: {id: 'site-1'},
+        locale: {id: 'zh-Hans-CN'},
+        buildUrl: (url) => url
+    })
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />,
+        {wrapperProps: {isGuest: true}}
+    )
+
+    const user = userEvent.setup()
+    await user.type(await screen.findByRole('textbox', {name: /postal code/i}), '100000')
+    await user.click(screen.getByRole('button', {name: 'Calculate delivery estimate'}))
+
+    await waitFor(() => {
+        expect(useDeliveryEstimates).toHaveBeenLastCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({countryCode: 'CN', postalCode: '100000'})
+            }),
+            expect.objectContaining({enabled: true})
+        )
+    })
+})
+
+test('does not render delivery estimates for a locale without a country region', () => {
+    useMultiSite.mockReturnValue({
+        site: {id: 'site-1'},
+        locale: {id: 'en'},
+        buildUrl: (url) => url
+    })
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />,
+        {wrapperProps: {isGuest: true}}
+    )
+
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(useDeliveryEstimates).not.toHaveBeenCalled()
+})
+
+test('suppresses delivery estimates for deferred-availability products', () => {
+    const deferredProduct = {
+        ...mockStandardProductOrderable,
+        inventory: {
+            ...mockStandardProductOrderable.inventory,
+            ats: 0,
+            backorderable: true,
+            stockLevel: 0
+        }
+    }
+
+    renderWithProviders(
+        <MockComponent
+            product={deferredProduct}
+            showDeliveryEstimate={true}
+            showDeliveryOptions={true}
+        />
+    )
+
+    expect(screen.getByRole('radio', {name: 'Delivery'})).toBeInTheDocument()
+    expect(screen.getByRole('radio', {name: /free pickup in/i})).toBeInTheDocument()
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(useDeliveryEstimates).not.toHaveBeenCalled()
+})
+
+test('does not request an estimate for a selected variant while its product data is stale', async () => {
+    document.cookie = `deliveryZipCode_site-1=${encodeURIComponent(
+        JSON.stringify({postalCode: '94105', countryCode: 'US'})
+    )}; Path=/`
+    const user = userEvent.setup()
+    renderWithProviders(<DeferredVariantHarness />, {wrapperProps: {isGuest: true}})
+
+    expect(await screen.findByRole('region', {name: 'Estimated Delivery Date'})).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', {name: 'Select size 39'}))
+
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(useDeliveryEstimates).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+            parameters: expect.objectContaining({productIds: ['750518699585M']})
+        }),
+        expect.anything()
+    )
+})
+
 test('keeps the delivery estimate calculator separate from the delivery option', async () => {
     renderWithProviders(
         <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
@@ -206,6 +323,69 @@ test('keeps the delivery estimate calculator separate from the delivery option',
 
     expect(deliveryOption).toHaveAttribute('data-selected', 'true')
     expect(deliveryOption).not.toContainElement(deliveryEstimate)
+})
+
+test('folds catalog delivery guidance into the delivery option when an estimate response is empty', async () => {
+    const user = userEvent.setup()
+    useDeliveryEstimates.mockReturnValue({
+        data: {productDeliveryEstimates: []},
+        isError: false,
+        isLoading: false,
+        isFetching: false
+    })
+    useProduct.mockReturnValue({
+        data: {
+            shippingMethods: [{id: '001', description: 'Order received within 7-10 business days'}]
+        }
+    })
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />,
+        {wrapperProps: {isGuest: true}}
+    )
+
+    await user.type(await screen.findByRole('textbox', {name: /zip code/i}), '94105')
+    await user.click(screen.getByRole('button', {name: 'Calculate delivery estimate'}))
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+    const changeDestinationButton = await within(deliveryOption).findByRole('button', {
+        name: 'Change delivery destination from 94105'
+    })
+
+    expect(deliveryOption).toHaveTextContent('Order received within 7-10 business days')
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(document.cookie).not.toContain('deliveryZipCode_site-1=')
+    expect(changeDestinationButton).toHaveFocus()
+})
+
+test('keeps the calculator open when an empty estimate response has no usable catalog guidance', async () => {
+    const user = userEvent.setup()
+    useDeliveryEstimates.mockReturnValue({
+        data: {productDeliveryEstimates: []},
+        isError: false,
+        isLoading: false,
+        isFetching: false
+    })
+    useProduct.mockReturnValue({
+        data: {
+            shippingMethods: [{id: '005', description: 'Pickup at a store'}]
+        }
+    })
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />,
+        {wrapperProps: {isGuest: true}}
+    )
+
+    await user.type(await screen.findByRole('textbox', {name: /zip code/i}), '94105')
+    await user.click(screen.getByRole('button', {name: 'Calculate delivery estimate'}))
+
+    expect(
+        await screen.findByText('Delivery dates unavailable. See checkout for options and costs.')
+    ).toBeInTheDocument()
+    expect(screen.getByRole('region', {name: 'Estimated Delivery Date'})).toBeInTheDocument()
+    expect(
+        screen.queryByRole('button', {name: /change delivery destination/i})
+    ).not.toBeInTheDocument()
+    expect(document.cookie).not.toContain('deliveryZipCode_site-1=')
 })
 
 test('matches the Storefront Next fulfillment option labels', () => {

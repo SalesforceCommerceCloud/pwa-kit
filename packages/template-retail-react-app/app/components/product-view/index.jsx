@@ -60,6 +60,7 @@ import {EXPRESS_BUY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-pay
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useCleanupTemporaryBaskets} from '@salesforce/retail-react-app/app/hooks/use-cleanup-temporary-baskets'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {getCountryCodeFromLocale} from '@salesforce/retail-react-app/app/components/delivery-estimate/locale'
 
 // Delivery estimates are opt-in on the PDP, so defer their code until the feature renders.
 const DeliveryEstimate = loadable(() =>
@@ -229,27 +230,46 @@ const ProductView = forwardRef(
         const [deliveryEstimateDestination, setDeliveryEstimateDestination] = useState(null)
         const [isDeliveryEstimateOpen, setIsDeliveryEstimateOpen] = useState(true)
         const [focusDeliveryEstimateInput, setFocusDeliveryEstimateInput] = useState(false)
+        const [focusDeliveryEstimateDestination, setFocusDeliveryEstimateDestination] =
+            useState(false)
         const previousDeliveryEstimateProductId = useRef(null)
+        const deliveryEstimateDestinationButtonRef = useRef(null)
         const isDeliverySelected = !pickupInStore
         const isPickupDisabled = storeName && inventoryId && isSelectedStoreOutOfStock
         const {pdp: showExpressOnPDP} = useExpressCheckoutEnabled()
         const deliveryEstimateProductId =
             variant?.productId || (product?.type?.item ? product.id : null)
-        const defaultCountryCode = locale?.id?.split('-')?.[1]
+        const hasCurrentDeliveryEstimateProduct = product?.id === deliveryEstimateProductId
+        const suppressDeferredDeliveryEstimate =
+            hasCurrentDeliveryEstimateProduct &&
+            typeof product?.inventory?.ats === 'number' &&
+            product.inventory.ats <= 0 &&
+            (product.inventory.preorderable || product.inventory.backorderable)
+        const defaultCountryCode = getCountryCodeFromLocale(locale?.id)
 
         const hasResolvedDeliveryEstimate =
             deliveryEstimateDestination?.productId === deliveryEstimateProductId
 
         const handleResolvedDeliveryEstimate = useCallback(
-            (destination) => {
+            (destination, {focusDeliveryOption = false} = {}) => {
                 setDeliveryEstimateDestination({
                     ...destination,
                     productId: deliveryEstimateProductId
                 })
                 setIsDeliveryEstimateOpen(false)
+                setFocusDeliveryEstimateDestination(focusDeliveryOption)
             },
             [deliveryEstimateProductId]
         )
+
+        useEffect(() => {
+            if (!focusDeliveryEstimateDestination) {
+                return
+            }
+
+            deliveryEstimateDestinationButtonRef.current?.focus()
+            setFocusDeliveryEstimateDestination(false)
+        }, [focusDeliveryEstimateDestination])
 
         const handleChangeDeliveryEstimateDestination = useCallback(() => {
             setDeliveryEstimateDestination(null)
@@ -952,6 +972,9 @@ const ProductView = forwardRef(
                                                                         values={{
                                                                             postalCode: (
                                                                                 <Button
+                                                                                    ref={
+                                                                                        deliveryEstimateDestinationButtonRef
+                                                                                    }
                                                                                     type="button"
                                                                                     variant="link"
                                                                                     color="blue.600"
@@ -1101,32 +1124,39 @@ const ProductView = forwardRef(
                                         </Box>
                                     </>
                                 )}
-                                {showDeliveryEstimate && site?.id && deliveryEstimateProductId && (
-                                    <DeliveryEstimate
-                                        productId={deliveryEstimateProductId}
-                                        siteId={site.id}
-                                        defaultCountryCode={defaultCountryCode}
-                                        resultContainer={
-                                            showDeliveryOptions && isDeliverySelected
-                                                ? deliveryEstimateResultContainer
-                                                : null
-                                        }
-                                        showResultInCard={!showDeliveryOptions}
-                                        showCalculator={
-                                            !showDeliveryOptions || isDeliveryEstimateOpen
-                                        }
-                                        showResult={!showDeliveryOptions || !isDeliveryEstimateOpen}
-                                        onResolvedDestination={
-                                            showDeliveryOptions
-                                                ? handleResolvedDeliveryEstimate
-                                                : undefined
-                                        }
-                                        focusPostalCode={focusDeliveryEstimateInput}
-                                        onPostalCodeFocusHandled={() =>
-                                            setFocusDeliveryEstimateInput(false)
-                                        }
-                                    />
-                                )}
+                                {showDeliveryEstimate &&
+                                    defaultCountryCode &&
+                                    hasCurrentDeliveryEstimateProduct &&
+                                    !suppressDeferredDeliveryEstimate &&
+                                    site?.id &&
+                                    deliveryEstimateProductId && (
+                                        <DeliveryEstimate
+                                            productId={deliveryEstimateProductId}
+                                            siteId={site.id}
+                                            defaultCountryCode={defaultCountryCode}
+                                            resultContainer={
+                                                showDeliveryOptions && isDeliverySelected
+                                                    ? deliveryEstimateResultContainer
+                                                    : null
+                                            }
+                                            showResultInCard={!showDeliveryOptions}
+                                            showCalculator={
+                                                !showDeliveryOptions || isDeliveryEstimateOpen
+                                            }
+                                            showResult={
+                                                !showDeliveryOptions || !isDeliveryEstimateOpen
+                                            }
+                                            onResolvedDestination={
+                                                showDeliveryOptions
+                                                    ? handleResolvedDeliveryEstimate
+                                                    : undefined
+                                            }
+                                            focusPostalCode={focusDeliveryEstimateInput}
+                                            onPostalCodeFocusHandled={() =>
+                                                setFocusDeliveryEstimateInput(false)
+                                            }
+                                        />
+                                    )}
                                 <Box
                                     display={
                                         isProductPartOfSet

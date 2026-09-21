@@ -5,10 +5,22 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {getCountryCodeFromLocale} from '@salesforce/retail-react-app/app/components/delivery-estimate/locale'
+
+export {getCountryCodeFromLocale}
+
 const getTime = (value) => {
     const time = new Date(value).getTime()
     return Number.isFinite(time) ? time : null
 }
+
+const PICKUP_SHIPPING_METHOD_ID = '005'
+
+const ISO_COUNTRY_CODES = new Set(
+    'AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW'.split(
+        ' '
+    )
+)
 
 const stripAndUpper = (maxLength) => (value) =>
     value
@@ -26,6 +38,8 @@ const normalizeGB = (value) => {
 const postalCodeFormats = {
     US: {
         regex: /^\d{5}(-\d{4})?$/,
+        example: '90210',
+        termKey: 'zip',
         normalize: (value) =>
             value
                 .replace(/[^\d-]/g, '')
@@ -36,6 +50,8 @@ const postalCodeFormats = {
     },
     CA: {
         regex: /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJKLMNPRSTVXY] \d[ABCEGHJKLMNPRSTVXY]\d$/,
+        example: 'M5V 3A8',
+        termKey: 'postalCode',
         normalize: (value) => {
             const postalCode = stripAndUpper(6)(value)
             return postalCode.length > 3
@@ -47,12 +63,16 @@ const postalCodeFormats = {
     },
     GB: {
         regex: /^[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}$/,
+        example: 'SW1A 1AA',
+        termKey: 'postcode',
         normalize: normalizeGB,
         inputMode: 'text',
         maxLength: 8
     },
     IE: {
         regex: /^[A-Z]\d{2} [A-Z\d]{4}$/,
+        example: 'D02 X285',
+        termKey: 'eircode',
         normalize: (value) => {
             const postalCode = stripAndUpper(7)(value)
             return postalCode.length > 3
@@ -64,30 +84,40 @@ const postalCodeFormats = {
     },
     IT: {
         regex: /^\d{5}$/,
+        example: '00100',
+        termKey: 'cap',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 5),
         inputMode: 'numeric',
         maxLength: 5
     },
     DE: {
         regex: /^\d{5}$/,
+        example: '10115',
+        termKey: 'postalCode',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 5),
         inputMode: 'numeric',
         maxLength: 5
     },
     FR: {
         regex: /^\d{5}$/,
+        example: '75001',
+        termKey: 'postalCode',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 5),
         inputMode: 'numeric',
         maxLength: 5
     },
     ES: {
         regex: /^\d{5}$/,
+        example: '28001',
+        termKey: 'postalCode',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 5),
         inputMode: 'numeric',
         maxLength: 5
     },
     NL: {
         regex: /^\d{4} [A-Z]{2}$/,
+        example: '1011 AA',
+        termKey: 'postalCode',
         normalize: (value) => {
             const postalCode = stripAndUpper(6)(value)
             return postalCode.length > 4
@@ -99,6 +129,8 @@ const postalCodeFormats = {
     },
     JP: {
         regex: /^\d{3}-\d{4}$/,
+        example: '100-0001',
+        termKey: 'postalCode',
         normalize: (value) => {
             const postalCode = value.replace(/\D/g, '').slice(0, 7)
             return postalCode.length > 3
@@ -110,24 +142,32 @@ const postalCodeFormats = {
     },
     CN: {
         regex: /^\d{6}$/,
+        example: '100000',
+        termKey: 'postalCode',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 6),
         inputMode: 'numeric',
         maxLength: 6
     },
     TW: {
         regex: /^\d{3}(\d{2})?$/,
+        example: '100',
+        termKey: 'postalCode',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 5),
         inputMode: 'numeric',
         maxLength: 5
     },
     KR: {
         regex: /^\d{5}$/,
+        example: '04524',
+        termKey: 'postalCode',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 5),
         inputMode: 'numeric',
         maxLength: 5
     },
     PL: {
         regex: /^\d{2}-\d{3}$/,
+        example: '00-001',
+        termKey: 'postalCode',
         normalize: (value) => {
             const postalCode = value.replace(/\D/g, '').slice(0, 5)
             return postalCode.length > 2
@@ -139,6 +179,8 @@ const postalCodeFormats = {
     },
     PT: {
         regex: /^\d{4}-\d{3}$/,
+        example: '1000-001',
+        termKey: 'postalCode',
         normalize: (value) => {
             const postalCode = value.replace(/\D/g, '').slice(0, 7)
             return postalCode.length > 4
@@ -150,6 +192,8 @@ const postalCodeFormats = {
     },
     SE: {
         regex: /^\d{3} \d{2}$/,
+        example: '111 22',
+        termKey: 'postalCode',
         normalize: (value) => {
             const postalCode = value.replace(/\D/g, '').slice(0, 5)
             return postalCode.length > 3
@@ -161,30 +205,40 @@ const postalCodeFormats = {
     },
     DK: {
         regex: /^\d{4}$/,
+        example: '1050',
+        termKey: 'postalCode',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 4),
         inputMode: 'numeric',
         maxLength: 4
     },
     FI: {
         regex: /^\d{5}$/,
+        example: '00100',
+        termKey: 'postalCode',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 5),
         inputMode: 'numeric',
         maxLength: 5
     },
     NO: {
         regex: /^\d{4}$/,
+        example: '0150',
+        termKey: 'postalCode',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 4),
         inputMode: 'numeric',
         maxLength: 4
     },
     AU: {
         regex: /^\d{4}$/,
+        example: '2000',
+        termKey: 'postcode',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 4),
         inputMode: 'numeric',
         maxLength: 4
     },
     NZ: {
         regex: /^\d{4}$/,
+        example: '6011',
+        termKey: 'postcode',
         normalize: (value) => value.replace(/\D/g, '').slice(0, 4),
         inputMode: 'numeric',
         maxLength: 4
@@ -193,6 +247,8 @@ const postalCodeFormats = {
 
 const fallbackPostalCodeFormat = {
     regex: /^[A-Z0-9][A-Z0-9 -]{1,8}[A-Z0-9]$/,
+    example: '',
+    termKey: 'postalCode',
     normalize: (value) =>
         value
             .replace(/[^A-Za-z0-9 -]/g, '')
@@ -202,8 +258,19 @@ const fallbackPostalCodeFormat = {
     maxLength: 10
 }
 
-export const getPostalCodeFormat = (countryCode) =>
-    postalCodeFormats[countryCode] || fallbackPostalCodeFormat
+export const normalizeCountryCode = (value) => {
+    if (typeof value !== 'string') return undefined
+    const countryCode = value.trim().toUpperCase()
+    return ISO_COUNTRY_CODES.has(countryCode) ? countryCode : undefined
+}
+
+export const getPostalCodeFormat = (countryOrLocale) => {
+    const countryCode =
+        normalizeCountryCode(countryOrLocale) || getCountryCodeFromLocale(countryOrLocale)
+    return countryCode
+        ? postalCodeFormats[countryCode] || fallbackPostalCodeFormat
+        : fallbackPostalCodeFormat
+}
 
 export const isEligibleShippingOption = (shippingOption) => {
     const deliveryWindow = shippingOption?.deliveryWindow
@@ -245,9 +312,19 @@ export const getSlowestDeliveryEstimate = (productId, deliveryEstimates) => {
     return [...eligibleOptions].sort(compareBySlowestDeliveryWindow)[0]
 }
 
+export const getFallbackDeliveryDescription = (shippingMethods) =>
+    shippingMethods
+        ?.find(
+            (method) =>
+                method.id !== PICKUP_SHIPPING_METHOD_ID &&
+                method.c_storePickupEnabled !== true &&
+                method.description?.trim()
+        )
+        ?.description?.trim() || null
+
 export const normalizeDestination = (destination) => {
     const {countryCode, postalCode} = destination || {}
-    const normalizedCountryCode = countryCode?.trim().toUpperCase() || ''
+    const normalizedCountryCode = normalizeCountryCode(countryCode) || ''
     return {
         countryCode: normalizedCountryCode,
         postalCode: getPostalCodeFormat(normalizedCountryCode).normalize(postalCode || '')
