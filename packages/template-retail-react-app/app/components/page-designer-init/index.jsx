@@ -6,10 +6,11 @@
  */
 
 import React, {useEffect} from 'react'
-import {Prompt} from 'react-router-dom'
+import {Prompt, useLocation} from 'react-router-dom'
 import {
     usePageDesignerMode,
-    useGlobalAnchorBlock
+    useGlobalAnchorBlock,
+    usePreviewContext
 } from '@salesforce/commerce-sdk-react/page-designer'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
@@ -55,6 +56,8 @@ import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
  */
 export function PageDesignerInit() {
     const {isDesignMode} = usePageDesignerMode()
+    const {pathname, search, hash} = useLocation()
+    const {notifyClientRouteChanged, isConnected} = usePreviewContext()
 
     // Block anchor navigation when in design mode
     // Pass isDesignMode to control when navigation blocking is active
@@ -80,6 +83,18 @@ export function PageDesignerInit() {
 
         return () => link.remove()
     }, [isDesignMode])
+
+    // Push client-side route changes back to Business Manager so the preview URL bar
+    // tracks navigation. Gated on isConnected so we don't emit before the messaging
+    // channel handshake completes.
+    useEffect(() => {
+        if (!isConnected) return
+        const url =
+            typeof window !== 'undefined'
+                ? `${window.location.origin}${pathname}${search || ''}${hash || ''}`
+                : `${pathname}${search || ''}${hash || ''}`
+        notifyClientRouteChanged(url)
+    }, [pathname, search, hash, isConnected, notifyClientRouteChanged])
 
     // When the message function returns false, navigation is completely blocked (no dialog shown)
     return (
