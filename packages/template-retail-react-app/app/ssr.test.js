@@ -177,6 +177,25 @@ describe('validateSlasCallbackToken', () => {
         )
     })
 
+    test('rejects wrong-tenant token even when SLAS_JWKS_JSON is set', async () => {
+        const originalEnvSlas = process.env.SLAS_JWKS_JSON
+        process.env.SLAS_JWKS_JSON = JSON.stringify({keys: [{kty: 'RSA', kid: 'local-key'}]})
+        jose.decodeJwt.mockReturnValueOnce({
+            iss: 'prefix/prefix2/wrong_tenant/oauth2'
+        })
+        try {
+            await expect(validateSlasCallbackToken('wrong-tenant-local-jwks')).rejects.toThrow(
+                'The tenant ID in your PWA Kit configuration ("test_001") does not match the tenant ID in the SLAS callback token ("wrong_tenant")'
+            )
+        } finally {
+            if (originalEnvSlas === undefined) {
+                delete process.env.SLAS_JWKS_JSON
+            } else {
+                process.env.SLAS_JWKS_JSON = originalEnvSlas
+            }
+        }
+    })
+
     test('should handle token with malformed issuer claim', async () => {
         const testToken = 'token-with-malformed-issuer'
 

@@ -152,7 +152,7 @@ describe('UserRegistration', () => {
         await waitFor(() => {
             expect(authorizePasswordlessLogin.mutateAsync).toHaveBeenCalledWith({
                 userid: 'test@example.com',
-                mode: 'email',
+                mode: 'callback',
                 locale: 'en-US',
                 register_customer: true,
                 last_name: 'test@example.com',
