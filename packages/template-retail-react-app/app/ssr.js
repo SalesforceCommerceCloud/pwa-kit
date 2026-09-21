@@ -207,7 +207,7 @@ const options = {
     // HYBRID PROXY REQUIREMENT:
     // - Hybrid Proxy requires this to be 'true' for SFCC session management to work properly
     // - Only enable Hybrid Proxy in development environments, never in production
-    localAllowCookies: true,
+    localAllowCookies: false,
 
     // Hybrid Proxy configuration for local development and MRT to ODS connection testing.
     //
@@ -404,6 +404,16 @@ export const validateSlasCallbackToken = async (token) => {
     const subClaim = payload[CLAIM.ISSUER]
     const tokens = subClaim.split(DELIMITER.ISSUER)
     const tenantId = tokens[2]
+    const configTenantId = getConfig()?.app?.commerceAPI?.parameters?.organizationId?.replace(
+        /^f_ecom_/,
+        ''
+    )
+    if (tenantId !== configTenantId) {
+        throwSlasTokenValidationError(
+            `The tenant ID in your PWA Kit configuration ("${configTenantId}") does not match the tenant ID in the SLAS callback token ("${tenantId}").`,
+            401
+        )
+    }
     try {
         let jwks
         if (process.env.SLAS_JWKS_JSON) {
