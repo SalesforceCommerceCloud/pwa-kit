@@ -179,8 +179,9 @@ const App = (props) => {
     // Determine Page Designer mode from URL - use req for server-side detection
     const pageDesignerMode = useMemo(() => {
         const queryParams = location?.search || ''
-        if (queryParams.includes('mode=EDIT')) return 'EDIT'
-        else if (queryParams.includes('mode=PREVIEW')) return 'PREVIEW'
+        const mode = new URLSearchParams(queryParams).get('mode')
+        if (mode === 'EDIT') return 'EDIT'
+        if (mode === 'PREVIEW') return 'PREVIEW'
         return undefined
     }, [req?.url])
 
