@@ -255,6 +255,11 @@ const runtime = getRuntime()
 let _notifyToken = null
 let _notifyTokenExpiry = 0
 
+export function _resetNotifyTokenCacheForTest() {
+    _notifyToken = null
+    _notifyTokenExpiry = 0
+}
+
 async function getNotifyToken(apiParams) {
     if (_notifyToken && Date.now() < _notifyTokenExpiry) {
         return _notifyToken
@@ -336,7 +341,7 @@ const resetPasswordCallback =
 const passwordlessLoginCallback =
     config.app.login?.passwordless?.callbackURI || '/passwordless-login-callback'
 
-function extractLocaleFromUrl(urlString) {
+export function extractLocaleFromUrl(urlString) {
     if (!urlString) return null
     try {
         const path = new URL(urlString, 'https://placeholder').pathname
