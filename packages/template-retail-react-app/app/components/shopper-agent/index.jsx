@@ -588,16 +588,22 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
 /**
  * Normalizes an optional storefront boolean config into a real boolean for the
  * widget. Storefront settings arrive as strings ('true'/'false'), but the widget
- * expects actual booleans. Returns `undefined` when the value is unset (undefined,
- * null, or ''), so callers can pass it straight through and let the injection hook
- * omit the option — leaving the widget's own default in place rather than forcing `false`.
+ * expects actual booleans. Strings are trimmed and lowercased so values like
+ * 'True' and ' true ' still match. Returns `undefined` when the value is unset
+ * (undefined, null, or blank), so callers can pass it straight through and let the
+ * injection hook omit the option — leaving the widget's own default in place rather
+ * than forcing `false`.
  *
- * @param {string|boolean|undefined} value - Raw config value ('true'/'false'/boolean)
+ * @param {string|boolean|null|undefined} value - Raw config value ('true'/'false'/boolean)
  * @returns {boolean|undefined} `true`/`false` when set, otherwise `undefined`
  */
 const toOptionalWidgetBoolean = (value) => {
-    if (value === undefined || value === null || value === '') return undefined
-    return value === true || value === 'true'
+    if (value === undefined || value === null) return undefined
+    if (typeof value === 'boolean') return value
+    if (typeof value !== 'string') return false
+    const normalized = value.trim().toLowerCase()
+    if (normalized === '') return undefined
+    return normalized === 'true'
 }
 
 /**

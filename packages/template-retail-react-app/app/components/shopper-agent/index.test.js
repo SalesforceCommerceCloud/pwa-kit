@@ -1986,6 +1986,25 @@ describe('ShopperAgent Component', () => {
             )
         })
 
+        test('trims and lowercases the string boolean widget flags', () => {
+            renderCommerceClient({
+                cc_autoScroll: ' True ',
+                cc_openLinksInNewTab: 'FALSE',
+                cc_showProductDescription: '   ',
+                cc_showProductCaptions: true
+            })
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    autoScroll: true,
+                    openLinksInNewTab: false,
+                    showProductDescription: undefined,
+                    showProductCaptions: true
+                })
+            )
+        })
+
         test('converts the string boolean widget flags when set to false', () => {
             renderCommerceClient({
                 cc_autoScroll: 'false',
