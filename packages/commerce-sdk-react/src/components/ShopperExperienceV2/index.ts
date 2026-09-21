@@ -14,7 +14,8 @@ export * from './registry'
 // Re-export Page Designer utilities from runtime package for convenience
 export {
     PageDesignerProvider,
-    usePageDesignerMode
+    usePageDesignerMode,
+    usePreviewContext
 } from '@salesforce/storefront-next-runtime/design/react/core'
 
 // Re-export mode detection utilities
