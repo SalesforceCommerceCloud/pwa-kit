@@ -15,6 +15,7 @@ import {
     removeQueryParamsFromPath,
     createUrlTemplate,
     removeSiteLocaleFromPath,
+    toStorefrontNavigatePath,
     serverSafeEncode,
     ensureExternalUrl
 } from '@salesforce/retail-react-app/app/utils/url'
@@ -433,6 +434,27 @@ describe('removeSiteLocaleFromPath', function () {
     test('return empty string when no path name is passed', () => {
         const pathName = removeSiteLocaleFromPath()
         expect(pathName).toBe('')
+    })
+})
+
+describe('toStorefrontNavigatePath', function () {
+    test('returns pathname, search, and hash from an absolute URL', () => {
+        expect(toStorefrontNavigatePath('https://www.example.com/uk/en-GB/product/sku-1?color=red#reviews')).toBe(
+            '/uk/en-GB/product/sku-1?color=red#reviews'
+        )
+    })
+
+    test('returns a relative path unchanged', () => {
+        expect(toStorefrontNavigatePath('/product/sku-1')).toBe('/product/sku-1')
+    })
+
+    test('returns null for an empty value', () => {
+        expect(toStorefrontNavigatePath('')).toBeNull()
+        expect(toStorefrontNavigatePath()).toBeNull()
+    })
+
+    test('returns null for an unparsable value', () => {
+        expect(toStorefrontNavigatePath('https://')).toBeNull()
     })
 })
 
