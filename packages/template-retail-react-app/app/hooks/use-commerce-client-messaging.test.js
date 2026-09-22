@@ -277,6 +277,7 @@ describe('injectCommerceClientWidget', () => {
             messageAlignment: 'end',
             autoScroll: true,
             openLinksInNewTab: true,
+            onNavigate: jest.fn(),
             showProductDescription: true,
             promptsConfig: {isOpen: true, isInline: false, elementId: 'prompts-root'}
         })
@@ -288,10 +289,17 @@ describe('injectCommerceClientWidget', () => {
                 messageAlignment: 'end',
                 autoScroll: true,
                 openLinksInNewTab: true,
+                onNavigate: expect.any(Function),
                 showProductDescription: true,
                 promptsConfig: {isOpen: true, isInline: false, elementId: 'prompts-root'}
             })
         )
+    })
+
+    test('omits onNavigate when it is not a function', () => {
+        injectCommerceClientWidget({...messagingFields, onNavigate: 'not-a-function'})
+
+        expect(mockInject.mock.calls[0][0]).not.toHaveProperty('onNavigate')
     })
 
     test('nests showProductCaptions inside messagingConfig when provided', () => {
@@ -365,6 +373,7 @@ describe('injectCommerceClientWidget', () => {
         expect(config).not.toHaveProperty('messageAlignment')
         expect(config).not.toHaveProperty('autoScroll')
         expect(config).not.toHaveProperty('openLinksInNewTab')
+        expect(config).not.toHaveProperty('onNavigate')
         expect(config).not.toHaveProperty('showProductDescription')
         expect(config).not.toHaveProperty('promptsConfig')
         expect(config.messagingConfig).not.toHaveProperty('showProductCaptions')
