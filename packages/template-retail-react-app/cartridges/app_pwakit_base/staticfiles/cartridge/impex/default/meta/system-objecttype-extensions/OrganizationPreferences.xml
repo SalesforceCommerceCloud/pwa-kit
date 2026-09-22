@@ -38,8 +38,9 @@
                     Example: my-store.salesforcecommercecloudsites.com,staging.my-store.com
                     The REST API caller (PWA Kit) passes its own hostname with each request; the cartridge
                     validates it against this list before constructing magic-link URLs. If the caller supplies
-                    no host the first entry in this list is used. If the list is empty the cartridge falls back
-                    to the B2C instance hostname, which will not resolve correctly in headless deployments.
+                    no host the first entry in this list is used. If the list is empty, or the caller-supplied
+                    host is not in the list, magic-link CTA buttons are omitted from the email — the email is
+                    still delivered with an inline access code where applicable.
                     Note: when the B2C Script API gains native access to the MRT/eCDN hostname this preference
                     will be deprecated in favour of that API.
                 </description>

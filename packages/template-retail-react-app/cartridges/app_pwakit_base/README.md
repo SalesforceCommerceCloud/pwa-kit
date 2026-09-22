@@ -114,38 +114,50 @@ The plugin can also tail `pwakit-notify` log output in real time while you trigg
 
 ## SLAS Admin configuration
 
-The `pwakit-notify` Custom REST API (passwordless login, OTP, password reset emails) is called by the PWA Kit SSR server using a **private SLAS client** token. The SSR server calls `loginGuestUserPrivate` with a client secret to mint a server-side guest token, then uses that token to call the Custom REST API endpoint. SCAPI enforces the `c_pwakit_notify` scope on that token before invoking the endpoint.
+The `pwakit-notify` Custom REST API (passwordless login, OTP, password reset emails) is called by the PWA Kit SSR server using a SLAS guest token that carries the `c_pwakit_notify` scope. SCAPI enforces this scope before invoking the endpoint.
 
 **This is not the same as `enablePWAKitPrivateClient`.** That flag controls whether shoppers use a private client for their own auth flows. The `pwakit-notify` token is a separate server-side credential and the two are independent.
 
-Both public and private SLAS client setups are supported:
-
-- **Public client** (`PWA_KIT_SLAS_CLIENT_SECRET` not set): the SSR server mints a guest token via the PKCE guest flow (`loginGuestUser`) using the existing public `clientId`. No secret required; the PKCE authorize + code exchange happens entirely server-side.
-- **Private client** (`PWA_KIT_SLAS_CLIENT_SECRET` set): uses `loginGuestUserPrivate` (client_credentials grant) — one fewer round-trip to SLAS on the first call. Prefer this if you already have a private client configured.
-
 > **GLO email is not affected** — the `sendOrderAccessCode` hook is invoked directly by SCAPI and does not use this token at all. If you only need GLO email, you can skip this section entirely.
 
-### 1. Add the scope to your SLAS client
+### Recommended: dedicated private SLAS client (closes open relay risk)
 
-In [Account Manager](https://account.demandware.com) → **API Client**, find the client whose `clientId` matches `config/default.js` → `commerceAPI.parameters.clientId`.
+If you add `c_pwakit_notify` to the default scopes of the **same public storefront client** that browsers use, every guest token issued by that client — including tokens minted by anonymous browser visitors — will carry the scope. An attacker who obtains a guest token could then call the notify endpoint directly and send merchant-branded emails to arbitrary addresses.
 
-Under **Scopes** (the default scopes list, not just the allowed scopes), add: `c_pwakit_notify`
+**To prevent this**, configure a dedicated private SLAS API client exclusively for server-side use:
 
-Adding it to the default scopes list ensures every guest token issued for this client includes it automatically. This applies to both public and private clients. The `commerce-sdk-isomorphic` guest-login helpers do not accept a `scope` parameter, so the scope must be configured as a default on the client — requesting it at call time is not possible through the SDK.
+1. In [Account Manager](https://account.demandware.com) → **API Client**, create a new client (or use an existing private client). Add `c_pwakit_notify` to this client's **default scopes**. Do **not** add it to your main public storefront client.
+2. Set `PWA_KIT_SLAS_CLIENT_SECRET` on the MRT environment to this client's secret:
 
-### 2. (Private client only) Set the client secret on the SSR server
+   ```bash
+   pwa-kit-dev push --set-env PWA_KIT_SLAS_CLIENT_SECRET=<your-client-secret> ...
+   ```
 
-If you are using a private client, set `PWA_KIT_SLAS_CLIENT_SECRET` on the MRT environment:
+   Or via the MRT Admin UI: **Environments → <env> → Environment Variables**.
 
-```bash
-pwa-kit-dev push --set-env PWA_KIT_SLAS_CLIENT_SECRET=<your-client-secret> ...
-```
+3. Set `commerceAPI.notifyClientId` in `config/default.js` to this dedicated client's ID:
 
-Or via the MRT Admin UI: **Environments → <env> → Environment Variables**.
+   ```js
+   module.exports = {
+     app: {
+       commerceAPI: {
+         parameters: { clientId: '<your-public-storefront-client-id>', ... },
+         notifyClientId: '<your-dedicated-notify-client-id>'
+       }
+     }
+   }
+   ```
 
-If this variable is absent, the SSR server automatically falls back to the public PKCE guest flow.
+   When `notifyClientId` is set, the SSR server uses it (with `PWA_KIT_SLAS_CLIENT_SECRET`) to mint the notify token, keeping the scope off all browser guest tokens.
 
-### 3. Verify
+### Alternative: same client, public flow (simpler but has open relay risk)
+
+If you accept the open relay risk described above, you can use the same public storefront client without a secret. No additional config is required — just add `c_pwakit_notify` to that client's default scopes.
+
+- **Public client** (`PWA_KIT_SLAS_CLIENT_SECRET` not set, `notifyClientId` not set): the SSR server mints a guest token via the PKCE guest flow using the existing public `clientId`. No secret required, but every guest token will carry the scope.
+- **Private client, same ID** (`PWA_KIT_SLAS_CLIENT_SECRET` set, `notifyClientId` not set): uses `loginGuestUserPrivate` (client_credentials grant) for the notify token, but the public PKCE flow for the same client still issues tokens with the scope.
+
+### Verify
 
 Trigger a passwordless login or password reset flow and confirm the email is delivered. If you see `401` errors in the `pwakit-notify` log, the most common causes are:
 
@@ -160,7 +172,7 @@ Trigger a passwordless login or password reset flow and confirm the email is del
 | Preference | Type | Description |
 |---|---|---|
 | `pwakitNotifyEnabled` | Boolean | Set to `false` to disable the cartridge's built-in email delivery (e.g. when using a third-party provider). Defaults to `true` when unset. |
-| `pwakitStorefrontHosts` | String | Comma-separated list of allowed public-facing storefront hostnames (no protocol, no trailing slash). Example: `my-store.salesforcecommercecloudsites.com`. The first entry is used for server-side magic-link construction (GLO access code, passwordless magic link). Falls back to the B2C instance hostname if unset — this will be incorrect for headless deployments. |
+| `pwakitStorefrontHosts` | String | Comma-separated list of allowed public-facing storefront hostnames (no protocol, no trailing slash). Example: `my-store.salesforcecommercecloudsites.com`. The first entry is used for server-side magic-link construction (GLO access code, passwordless magic link). If unset (or if the caller-supplied host is not in the list), magic-link CTA buttons are omitted from the email — the email is still delivered with an inline access code where applicable. |
 
 The sender address is read from the **Site Preferences** `customerServiceEmail` custom attribute. If unset, it falls back to `no-reply@<site-https-hostname>`.
 

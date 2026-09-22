@@ -72,7 +72,7 @@ function getAllowedHosts() {
     try {
         var pref = System.getPreferences().getCustom()['pwakitStorefrontHosts'];
         if (!pref || !pref.trim()) return [];
-        return pref.split(',').map(function(h) { return h.trim(); }).filter(Boolean);
+        return pref.split(',').map(function(h) { return h.trim().toLowerCase(); }).filter(Boolean);
     } catch (e) {
         return [];
     }
