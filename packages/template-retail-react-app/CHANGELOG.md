@@ -1,4 +1,4 @@
-## v10.2.1-preview.0
+## v10.2.1 (Sep 22, 2026)
 - [Bugfix] Keep the Page Designer preview URL bar synchronized with client-side navigation. The storefront now parses the exact `mode` query parameter, and the Page Designer initializer emits `notifyClientRouteChanged(url)` after the preview channel is connected whenever the SPA route changes. Bumps `@salesforce/storefront-next-runtime` to `1.3.1`. [#4021](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4021)
 
 ## v10.2.0 (Aug 12, 2026)
