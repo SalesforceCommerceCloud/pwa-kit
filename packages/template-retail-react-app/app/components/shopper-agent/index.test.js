@@ -1940,6 +1940,108 @@ describe('ShopperAgent Component', () => {
             expect(widgetOptions.componentConfig.options).toEqual({dialogPosition: 'bottom-right'})
         })
 
+        test('forwards cc_headerConfig, cc_suggestionButtonConfig and cc_promptsConfig objects to the widget options', () => {
+            const headerConfig = {headerText: 'Ask us', headerTextTextAlign: 'center'}
+            const suggestionButtonConfig = {icon: 'sparkle', iconPosition: 'left'}
+            const promptsConfig = {isOpen: true, isInline: false, elementId: 'prompts-root'}
+            renderCommerceClient({
+                cc_headerConfig: headerConfig,
+                cc_suggestionButtonConfig: suggestionButtonConfig,
+                cc_promptsConfig: promptsConfig
+            })
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({headerConfig, suggestionButtonConfig, promptsConfig})
+            )
+        })
+
+        test('forwards cc_messageAlignment as the messageAlignment widget option', () => {
+            renderCommerceClient({cc_messageAlignment: 'end'})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({messageAlignment: 'end'})
+            )
+        })
+
+        test('converts the string boolean widget flags to real booleans', () => {
+            renderCommerceClient({
+                cc_autoScroll: 'true',
+                cc_openLinksInNewTab: 'true',
+                cc_showProductDescription: 'true',
+                cc_showProductCaptions: 'true'
+            })
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    autoScroll: true,
+                    openLinksInNewTab: true,
+                    showProductDescription: true,
+                    // showProductCaptions rides as a top-level widget option here; the
+                    // (mocked) injection hook is what nests it under messagingConfig.
+                    showProductCaptions: true
+                })
+            )
+        })
+
+        test('trims and lowercases the string boolean widget flags', () => {
+            renderCommerceClient({
+                cc_autoScroll: ' True ',
+                cc_openLinksInNewTab: 'FALSE',
+                cc_showProductDescription: '   ',
+                cc_showProductCaptions: true
+            })
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    autoScroll: true,
+                    openLinksInNewTab: false,
+                    showProductDescription: undefined,
+                    showProductCaptions: true
+                })
+            )
+        })
+
+        test('converts the string boolean widget flags when set to false', () => {
+            renderCommerceClient({
+                cc_autoScroll: 'false',
+                cc_openLinksInNewTab: 'false',
+                cc_showProductDescription: 'false',
+                cc_showProductCaptions: 'false'
+            })
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    autoScroll: false,
+                    openLinksInNewTab: false,
+                    showProductDescription: false,
+                    showProductCaptions: false
+                })
+            )
+        })
+
+        test('leaves the new optional widget fields undefined when not configured so the widget default wins', () => {
+            renderCommerceClient()
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+
+            // The storefront sets no default: each unset value is forwarded as undefined
+            // and the injection hook omits it, leaving the widget's own default in place.
+            expect(widgetOptions.headerConfig).toBeUndefined()
+            expect(widgetOptions.suggestionButtonConfig).toBeUndefined()
+            expect(widgetOptions.messageAlignment).toBeUndefined()
+            expect(widgetOptions.autoScroll).toBeUndefined()
+            expect(widgetOptions.openLinksInNewTab).toBeUndefined()
+            expect(widgetOptions.showProductDescription).toBeUndefined()
+            expect(widgetOptions.showProductCaptions).toBeUndefined()
+            expect(widgetOptions.promptsConfig).toBeUndefined()
+        })
+
         describe('Commerce Client auth-link lifecycle', () => {
             const tokenKey = 'cim_af_ct_test-org-id_My_Embedded_Service'
             const conversationKey = 'cim_af_conv_test-org-id_My_Embedded_Service'

@@ -586,6 +586,27 @@ const COMMERCE_CLIENT_GLOBAL_CLASS = 'commerce-client-shopper-agent'
 const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
 
 /**
+ * Normalizes an optional storefront boolean config into a real boolean for the
+ * widget. Storefront settings arrive as strings ('true'/'false'), but the widget
+ * expects actual booleans. Strings are trimmed and lowercased so values like
+ * 'True' and ' true ' still match. Returns `undefined` when the value is unset
+ * (undefined, null, or blank), so callers can pass it straight through and let the
+ * injection hook omit the option — leaving the widget's own default in place rather
+ * than forcing `false`.
+ *
+ * @param {string|boolean|null|undefined} value - Raw config value ('true'/'false'/boolean)
+ * @returns {boolean|undefined} `true`/`false` when set, otherwise `undefined`
+ */
+const toOptionalWidgetBoolean = (value) => {
+    if (value === undefined || value === null) return undefined
+    if (typeof value === 'boolean') return value
+    if (typeof value !== 'string') return false
+    const normalized = value.trim().toLowerCase()
+    if (normalized === '') return undefined
+    return normalized === 'true'
+}
+
+/**
  * Internal component that renders the Commerce Client messaging widget.
  *
  * Unlike {@link ShopperAgentWindow} (which boots the Salesforce Embedded
@@ -626,6 +647,14 @@ const DEFAULT_COMMERCE_CLIENT_PANEL_WIDTH = '420px'
  * @param {Object} [props.commerceAgentConfiguration.cc_routingAttributes] - Optional Agentforce routing attributes forwarded to the widget as `routingAttributes`. Augmented with `isCartMgmtSupported` (string `'true'`/`'false'`, default `'false'`) and, unless a `commerceClientScriptSourceUrl` override is set, `clientVersion` (from `cc_cdnVersion`) for backend component gating
  * @param {string} [props.commerceAgentConfiguration.cc_overridesUrl] - Optional HTTPS URL of a component override script, forwarded as `overridesUrl`
  * @param {Object} [props.commerceAgentConfiguration.cc_overrides] - Optional inline map of widget override keys (e.g. `ProductTile`) to already-registered custom element tag names, forwarded as `overrides`. Mutually exclusive with `cc_overridesUrl`, which it takes precedence over
+ * @param {Object} [props.commerceAgentConfiguration.cc_headerConfig] - Optional header styling object forwarded as `headerConfig` (e.g. `logoUrl`, `headerText`, `headerBackgroundColor`, `headerTextColor`, `headerTextFontSize`, `headerTextFontWeight`, `headerTextFontFamily`, `headerTextTextAlign`)
+ * @param {Object} [props.commerceAgentConfiguration.cc_suggestionButtonConfig] - Optional suggestion-button config forwarded as `suggestionButtonConfig` (`icon`: 'sparkle' | 'plus' | 'paper-plane', `iconPosition`: 'left' | 'right')
+ * @param {string} [props.commerceAgentConfiguration.cc_messageAlignment] - Optional message-list alignment forwarded as `messageAlignment` ('start' | 'end')
+ * @param {string} [props.commerceAgentConfiguration.cc_autoScroll] - When set ('true'/'false'), forwarded as the boolean `autoScroll`; auto-scrolls to the newest message. Omitted when unset so the widget's own default applies
+ * @param {string} [props.commerceAgentConfiguration.cc_openLinksInNewTab] - When set ('true'/'false'), forwarded as the boolean `openLinksInNewTab`; opens widget links in a new tab. Omitted when unset so the widget's own default applies
+ * @param {string} [props.commerceAgentConfiguration.cc_showProductDescription] - When set ('true'/'false'), forwarded as the boolean `showProductDescription`; shows the product description on tiles. Omitted when unset so the widget's own default applies
+ * @param {string} [props.commerceAgentConfiguration.cc_showProductCaptions] - When set ('true'/'false'), forwarded as the boolean `messagingConfig.showProductCaptions`; shows product captions in the recommendation carousel. Omitted when unset so the widget's own default applies
+ * @param {Object} [props.commerceAgentConfiguration.cc_promptsConfig] - Optional prompts-extension config forwarded as `promptsConfig`. Needs `isOpen`/`isInline`/`elementId` to mount; other fields (e.g. `staticQuestions`, `promptsDisplay`) are optional
  * @returns {JSX.Element} A container element the Commerce Client widget is rendered into
  */
 const CommerceClientAgentWindow = ({
@@ -661,7 +690,15 @@ const CommerceClientAgentWindow = ({
         commerceClientScriptSourceUrl,
         cc_routingAttributes,
         cc_overridesUrl,
-        cc_overrides
+        cc_overrides,
+        cc_headerConfig,
+        cc_suggestionButtonConfig,
+        cc_messageAlignment,
+        cc_autoScroll,
+        cc_openLinksInNewTab,
+        cc_showProductDescription,
+        cc_showProductCaptions,
+        cc_promptsConfig
     } = commerceAgentConfiguration
 
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
@@ -1040,7 +1077,18 @@ const CommerceClientAgentWindow = ({
                 }
             },
             theme: cc_theme,
-            ...resolveCommerceClientOverrideOptions({cc_overrides, cc_overridesUrl})
+            ...resolveCommerceClientOverrideOptions({cc_overrides, cc_overridesUrl}),
+            // Optional widget presentation/behavior configs. Passed through as-is (or
+            // string→boolean converted); the injection hook omits any that are unset so
+            // the widget applies its own defaults — the storefront sets none of its own.
+            headerConfig: cc_headerConfig,
+            suggestionButtonConfig: cc_suggestionButtonConfig,
+            messageAlignment: cc_messageAlignment,
+            autoScroll: toOptionalWidgetBoolean(cc_autoScroll),
+            openLinksInNewTab: toOptionalWidgetBoolean(cc_openLinksInNewTab),
+            showProductDescription: toOptionalWidgetBoolean(cc_showProductDescription),
+            showProductCaptions: toOptionalWidgetBoolean(cc_showProductCaptions),
+            promptsConfig: cc_promptsConfig
         }),
         [
             commerceClientElementId,
@@ -1067,7 +1115,15 @@ const CommerceClientAgentWindow = ({
             cc_dialogWidth,
             cc_theme,
             cc_overridesUrl,
-            cc_overrides
+            cc_overrides,
+            cc_headerConfig,
+            cc_suggestionButtonConfig,
+            cc_messageAlignment,
+            cc_autoScroll,
+            cc_openLinksInNewTab,
+            cc_showProductDescription,
+            cc_showProductCaptions,
+            cc_promptsConfig
         ]
     )
 
