@@ -1,3 +1,6 @@
+## v10.2.1-preview.0
+- [Bugfix] Keep the Page Designer preview URL bar synchronized with client-side navigation. The storefront now parses the exact `mode` query parameter, and the Page Designer initializer emits `notifyClientRouteChanged(url)` after the preview channel is connected whenever the SPA route changes. Bumps `@salesforce/storefront-next-runtime` to `1.3.1`. [#4021](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4021)
+
 ## v10.2.0 (Aug 12, 2026)
 - [Bugfix] Fix the Data Cloud recommender catalog event field name: `personalizationContextId` → `personalizationContentId`. The official `@salesforce/cc-datacloud-typescript` SDK type and Salesforce docs both define `personalizationContentId` (Content); the `Context` spelling did not match, so the recommender UUID (`__recoUUID`) was sent under a key Data Cloud does not recognize and is expected to be dropped on ingest.
 - [Feature] Add `cc_showFab` for the Commerce Client shopper-agent widget: when `'true'`, renders a floating action button at `cc_widgetPosition` that opens the agent panel and hides while it is open. Defaults to `'false'`.
