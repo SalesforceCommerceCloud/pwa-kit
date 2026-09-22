@@ -23,13 +23,15 @@ const messagingFields = {
 }
 
 // The widget always receives capabilitiesVersion (defaults to '65') plus the
-// escalation/transcript toggles (default true) when the caller omits them, so the
-// expected messagingConfig includes them.
+// escalation/transcript toggles (default true) and the image-upload toggle
+// (default false) when the caller omits them, so the expected messagingConfig
+// includes them.
 const expectedMessagingConfig = {
     ...messagingFields,
     capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     enableEscalationToAgent: true,
-    enableDownloadTranscript: true
+    enableDownloadTranscript: true,
+    enableImageUpload: false
 }
 
 describe('injectCommerceClientWidget', () => {
@@ -181,6 +183,29 @@ describe('injectCommerceClientWidget', () => {
         const {messagingConfig} = mockInject.mock.calls[0][0]
         expect(messagingConfig.enableEscalationToAgent).toBe(true)
         expect(messagingConfig.enableDownloadTranscript).toBe(true)
+    })
+
+    test('defaults the image-upload toggle to false in messagingConfig', () => {
+        injectCommerceClientWidget(messagingFields)
+
+        const {messagingConfig} = mockInject.mock.calls[0][0]
+        expect(messagingConfig.enableImageUpload).toBe(false)
+    })
+
+    test('forwards the image-upload toggle when enabled', () => {
+        injectCommerceClientWidget({
+            ...messagingFields,
+            enableImageUpload: true
+        })
+
+        expect(mockInject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                messagingConfig: {
+                    ...expectedMessagingConfig,
+                    enableImageUpload: true
+                }
+            })
+        )
     })
 
     test('forwards escalation and transcript toggles when disabled', () => {
