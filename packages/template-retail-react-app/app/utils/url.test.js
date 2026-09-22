@@ -439,9 +439,11 @@ describe('removeSiteLocaleFromPath', function () {
 
 describe('toStorefrontNavigatePath', function () {
     test('returns pathname, search, and hash from an absolute URL', () => {
-        expect(toStorefrontNavigatePath('https://www.example.com/uk/en-GB/product/sku-1?color=red#reviews')).toBe(
-            '/uk/en-GB/product/sku-1?color=red#reviews'
-        )
+        expect(
+            toStorefrontNavigatePath(
+                'https://www.example.com/uk/en-GB/product/sku-1?color=red#reviews'
+            )
+        ).toBe('/uk/en-GB/product/sku-1?color=red#reviews')
     })
 
     test('returns a relative path unchanged', () => {
