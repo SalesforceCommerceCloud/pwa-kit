@@ -1,7 +1,7 @@
 # Hybrid Cookie Domain Configuration
 
 > **WIP: HttpOnly session cookies are in-progress. Do not enable `enableHttpOnlySessionCookies` in production.**
- 
+
 Maintain shopper sessions across subdomains by configuring a shared parent cookie domain. Without this configuration, browsers isolate cookies to individual hosts, causing shoppers to appear logged out and lose their baskets when crossing subdomain boundaries. The domain-level cookie applies to storefronts that use multiple subdomains, such as `www.` and `shop.` on the `example.com` domain. It also applies to hybrid PWA Kit and SFRA storefronts that serve different paths under one parent domain. This guide shows how to align the cookie domain settings on both PWA Kit and B2C Commerce to enable seamless cross-subdomain navigation.
 
 ## Overview

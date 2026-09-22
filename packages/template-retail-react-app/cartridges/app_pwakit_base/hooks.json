@@ -1,0 +1,8 @@
+{
+    "hooks": [
+        {
+            "name": "sfcc.app.order.sendOrderAccessCode",
+            "script": "./cartridge/scripts/hooks/sendOrderAccessCode"
+        }
+    ]
+}
