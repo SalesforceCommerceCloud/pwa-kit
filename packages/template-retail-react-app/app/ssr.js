@@ -255,11 +255,7 @@ export async function getNotifyToken(apiParams) {
     if (_notifyToken && Date.now() < _notifyTokenExpiry) {
         return _notifyToken
     }
-    const {organizationId, shortCode, siteId} = apiParams
-    // notifyClientId lets merchants use a dedicated private SLAS client for the
-    // notify scope so c_pwakit_notify never appears on browser guest tokens.
-    const clientId =
-        getConfig()?.app?.commerceAPI?.notifyClientId || apiParams.clientId
+    const {clientId, organizationId, shortCode, siteId} = apiParams
     const proxy = `${getAppOrigin()}${
         getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'
     }`
