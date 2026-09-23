@@ -10,6 +10,8 @@ import {getCountryCodeFromLocale} from '@salesforce/retail-react-app/app/compone
 export {getCountryCodeFromLocale}
 
 const getTime = (value) => {
+    if (value == null) return null
+
     const time = new Date(value).getTime()
     return Number.isFinite(time) ? time : null
 }

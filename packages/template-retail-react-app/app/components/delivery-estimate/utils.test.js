@@ -92,6 +92,20 @@ describe('getSlowestDeliveryEstimate', () => {
                             startAt: '2026-09-18T14:00:00Z',
                             endAt: '2026-09-16T14:00:00Z'
                         }
+                    },
+                    {
+                        shippingMethodId: 'missing-start',
+                        deliveryWindow: {
+                            startAt: null,
+                            endAt: '2026-09-16T14:00:00Z'
+                        }
+                    },
+                    {
+                        shippingMethodId: 'missing-end',
+                        deliveryWindow: {
+                            startAt: '2026-09-15T14:00:00Z',
+                            endAt: null
+                        }
                     }
                 ])
             ]
