@@ -1,3 +1,6 @@
+## v5.5.0-nightly-20260923080508 (Sep 23, 2026)
+## v5.5.0-dev (Sep 23, 2026)
+## v3.21.0-nightly-20260923080508 (Sep 23, 2026)
 ## v5.5.0-dev (Aug 12, 2026)
 - [Feature] Re-export `usePreviewContext` from `@salesforce/storefront-next-runtime/design/react/core` via `ShopperExperienceV2` so storefronts can read the Page Designer preview channel `isConnected` state and dispatch `notifyClientRouteChanged` from client code. Bumps `@salesforce/storefront-next-runtime` to `1.3.1`.
 - [Feature] Add Shopper Experience `useComponent` query hook for fetching a single Page Designer component by component ID, with Page Designer edit/preview mode support (raw response preserved when a `mode` or `pdToken` is present). Page Designer mode uses `rawResponse`, which bypasses the SDK's `throwOnBadResponse` check, so `usePage`, `usePages`, and `useComponent` now explicitly throw a `ResponseError` on a non-ok response in that mode instead of parsing the error body as successful data.
