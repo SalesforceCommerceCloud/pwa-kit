@@ -41,6 +41,7 @@ import RecommendedProducts from '@salesforce/retail-react-app/app/components/rec
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
 import Island from '@salesforce/retail-react-app/app/components/island'
+import InlineAgentWidget from '@salesforce/retail-react-app/app/components/inline-agent-widget'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
@@ -76,6 +77,7 @@ const ProductDetail = () => {
     const {onOpen: onOpenStoreLocator} = useStoreLocatorModal()
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const inlineAgentWidgetConfig = getConfig()?.app?.inlineAgentWidget
 
     /****************************** Basket *********************************/
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
@@ -804,6 +806,9 @@ const ProductDetail = () => {
                                 }
                                 onOpenStoreLocator={onOpenStoreLocator}
                                 showDeliveryOptions={storeLocatorEnabled}
+                                actionFooter={
+                                    <InlineAgentWidget config={inlineAgentWidgetConfig} />
+                                }
                             />
                             <InformationAccordion product={product} />
                         </Island>

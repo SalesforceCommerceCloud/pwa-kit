@@ -13,6 +13,7 @@ import {
     openShopperAgentWidget,
     persistCommerceClientOpenState,
     getPersistedCommerceClientOpenState,
+    resolveCommerceClientRoutingAttributes,
     resolveCommerceClientScriptUrl,
     validateCommerceClientDomain,
     validateCommerceClientAgentSettings
@@ -786,6 +787,116 @@ describe('shopper-agent-utils', () => {
         test('returns an empty string for a null/undefined config', () => {
             expect(resolveCommerceClientScriptUrl(null)).toBe('')
             expect(resolveCommerceClientScriptUrl(undefined)).toBe('')
+        })
+    })
+
+    describe('resolveCommerceClientRoutingAttributes', () => {
+        test('stamps clientVersion from cc_cdnVersion and defaults isCartMgmtSupported to false', () => {
+            expect(resolveCommerceClientRoutingAttributes({cc_cdnVersion: '1.24.0'})).toEqual({
+                isCartMgmtSupported: 'false',
+                clientVersion: '1.24.0'
+            })
+        })
+
+        test('trims whitespace around cc_cdnVersion', () => {
+            expect(
+                resolveCommerceClientRoutingAttributes({cc_cdnVersion: '  1.24.0  '}).clientVersion
+            ).toBe('1.24.0')
+        })
+
+        test('omits clientVersion when cc_cdnVersion is unset (backend fails safe to V0)', () => {
+            const attrs = resolveCommerceClientRoutingAttributes({})
+            expect(attrs).not.toHaveProperty('clientVersion')
+            expect(attrs).toEqual({isCartMgmtSupported: 'false'})
+        })
+
+        test('omits clientVersion when cc_cdnVersion is blank', () => {
+            expect(
+                resolveCommerceClientRoutingAttributes({cc_cdnVersion: '   '})
+            ).not.toHaveProperty('clientVersion')
+        })
+
+        test('omits clientVersion when a commerceClientScriptSourceUrl override is set', () => {
+            const attrs = resolveCommerceClientRoutingAttributes({
+                cc_cdnVersion: '1.24.0',
+                commerceClientScriptSourceUrl: 'http://localhost:5050/messaging.umd.js'
+            })
+            expect(attrs).not.toHaveProperty('clientVersion')
+            expect(attrs).toEqual({isCartMgmtSupported: 'false'})
+        })
+
+        test('stamps clientVersion when the override is blank (falls back to cc_cdnVersion)', () => {
+            expect(
+                resolveCommerceClientRoutingAttributes({
+                    cc_cdnVersion: '1.24.0',
+                    commerceClientScriptSourceUrl: '   '
+                }).clientVersion
+            ).toBe('1.24.0')
+        })
+
+        test('preserves merchant-configured routing attributes', () => {
+            expect(
+                resolveCommerceClientRoutingAttributes({
+                    cc_routingAttributes: {Currency: 'EUR', locale: 'de-DE'},
+                    cc_cdnVersion: '2.0.0'
+                })
+            ).toEqual({
+                Currency: 'EUR',
+                locale: 'de-DE',
+                isCartMgmtSupported: 'false',
+                clientVersion: '2.0.0'
+            })
+        })
+
+        test('honors isCartMgmtSupported override from cc_routingAttributes (string "true")', () => {
+            expect(
+                resolveCommerceClientRoutingAttributes({
+                    cc_routingAttributes: {isCartMgmtSupported: 'true'}
+                }).isCartMgmtSupported
+            ).toBe('true')
+        })
+
+        test('treats boolean true as "false" (only the string "true" enables it)', () => {
+            expect(
+                resolveCommerceClientRoutingAttributes({
+                    cc_routingAttributes: {isCartMgmtSupported: true}
+                }).isCartMgmtSupported
+            ).toBe('false')
+        })
+
+        test('only matches the exact lowercase isCartMgmtSupported key', () => {
+            const attrs = resolveCommerceClientRoutingAttributes({
+                cc_routingAttributes: {IsCartMgmtSupported: 'true'}
+            })
+            // PascalCase variant is not recognized; it is preserved as an ordinary key.
+            expect(attrs.isCartMgmtSupported).toBe('false')
+            expect(attrs.IsCartMgmtSupported).toBe('true')
+        })
+
+        test('treats any non-true value as "false"', () => {
+            expect(
+                resolveCommerceClientRoutingAttributes({
+                    cc_routingAttributes: {isCartMgmtSupported: 'yes'}
+                }).isCartMgmtSupported
+            ).toBe('false')
+        })
+
+        test('returns just isCartMgmtSupported for a null/undefined config', () => {
+            expect(resolveCommerceClientRoutingAttributes(null)).toEqual({
+                isCartMgmtSupported: 'false'
+            })
+            expect(resolveCommerceClientRoutingAttributes(undefined)).toEqual({
+                isCartMgmtSupported: 'false'
+            })
+        })
+
+        test('ignores a non-object cc_routingAttributes', () => {
+            expect(
+                resolveCommerceClientRoutingAttributes({
+                    cc_routingAttributes: 'not-an-object',
+                    cc_cdnVersion: '1.24.0'
+                })
+            ).toEqual({isCartMgmtSupported: 'false', clientVersion: '1.24.0'})
         })
     })
 })

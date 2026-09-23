@@ -182,7 +182,7 @@ mockUseCustomer.mockImplementation(() => ({
 }))
 
 // Mock useCurrentCustomer hook (accepts expand and optional queryOptions e.g. refetchOnMount)
-const mockUseCurrentCustomerImpl = jest.fn((expand, _queryOptions) => {
+const mockUseCurrentCustomerImpl = jest.fn(() => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const mockUseCustomer = require('@salesforce/commerce-sdk-react').useCustomer
     const query = mockUseCustomer()

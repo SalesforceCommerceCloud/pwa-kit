@@ -24,7 +24,7 @@
     "nodes": [
       {
         "html": "<a class=\"...\" href=\"/\">Continue Shopping</a>",
-        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #0176d3, background color: #f3f3f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast (font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
         "target": [
           ".css-..."
         ]

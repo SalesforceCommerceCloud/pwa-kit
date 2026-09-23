@@ -23,14 +23,17 @@ jest.mock('../../auth/index.ts', () => {
 type Queries = typeof queries
 const experienceEndpoint = '/experience/shopper-experience/'
 // Not all endpoints use all parameters, but unused parameters are safely discarded
-const OPTIONS = {parameters: {pageId: 'pageId', aspectTypeId: 'aspectTypeId'}}
+const OPTIONS = {
+    parameters: {pageId: 'pageId', aspectTypeId: 'aspectTypeId', componentId: 'componentId'}
+}
 
 /** Map of query name to returned data type */
 type TestMap = {[K in keyof Queries]: NonNullable<ReturnType<Queries[K]>['data']>}
 // This is an object rather than an array to more easily ensure we cover all hooks
 const testMap: TestMap = {
     usePage: {id: 'id', typeId: 'typeId'},
-    usePages: {data: []}
+    usePages: {data: []},
+    useComponent: {id: 'id', typeId: 'typeId'}
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof TestMap]]>
@@ -152,5 +155,65 @@ describe('Shopper Experience query hooks with Page Designer params', () => {
 
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(pageData)
+    })
+
+    test.each(testCases)(
+        '`%s` returns error on error response in Page Designer mode',
+        async (queryName) => {
+            // In Page Designer mode the hooks use rawResponse, which bypasses the SDK's
+            // throwOnBadResponse check. An error status must still surface as a query error
+            // rather than being parsed as successful data.
+            mockQueryEndpoint(experienceEndpoint, {}, 400)
+
+            const pageDesignerParams = {
+                mode: 'edit' as const,
+                pdToken: 'test-pd-token'
+            }
+
+            const {result} = renderHookWithProviders(() => queries[queryName](OPTIONS), {
+                pageDesignerParams
+            })
+
+            await waitAndExpectError(() => result.current)
+        }
+    )
+
+    test.each(testCases)(
+        '`%s` resolves to null on a 304 Not Modified in Page Designer mode',
+        async (queryName) => {
+            // A 304 (conditional request) carries no body. rawResponse mode must return null
+            // instead of calling response.json() on an empty body, which would throw a SyntaxError.
+            mockQueryEndpoint(experienceEndpoint, '', 304)
+
+            const pageDesignerParams = {
+                mode: 'edit' as const,
+                pdToken: 'test-pd-token'
+            }
+
+            const {result} = renderHookWithProviders(() => queries[queryName](OPTIONS), {
+                pageDesignerParams
+            })
+
+            await waitAndExpectSuccess(() => result.current)
+            expect(result.current.data).toBeNull()
+        }
+    )
+
+    test('useComponent merges pageDesignerParams from provider config', async () => {
+        const componentData = {id: 'testComponent', typeId: 'commerce_assets.imageTile'}
+        mockQueryEndpoint(experienceEndpoint, componentData)
+
+        const pageDesignerParams = {
+            mode: 'edit' as const,
+            pdToken: 'test-pd-token'
+        }
+
+        const {result} = renderHookWithProviders(
+            () => queries.useComponent({parameters: {componentId: 'testComponent'}}),
+            {pageDesignerParams}
+        )
+
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toEqual(componentData)
     })
 })

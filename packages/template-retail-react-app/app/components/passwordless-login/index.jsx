@@ -13,14 +13,12 @@ import LoginFields from '@salesforce/retail-react-app/app/components/forms/login
 import StandardLogin from '@salesforce/retail-react-app/app/components/standard-login'
 import SocialLogin from '@salesforce/retail-react-app/app/components/social-login'
 
-const noop = () => {}
 const PasswordlessLogin = ({
     form,
     handleForgotPasswordClick,
     handlePasswordlessLoginClick,
     isSocialEnabled = false,
-    idps = [],
-    setLoginType: _setLoginType = noop
+    idps = []
 }) => {
     const [showPasswordView, setShowPasswordView] = useState(false)
 

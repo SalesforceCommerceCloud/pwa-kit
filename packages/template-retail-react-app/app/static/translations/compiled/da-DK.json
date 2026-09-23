@@ -1463,6 +1463,12 @@
       "value": "Kontakt os"
     }
   ],
+  "footer.link.find_your_order": [
+    {
+      "type": 0,
+      "value": "Find Your Order"
+    }
+  ],
   "footer.link.order_status": [
     {
       "type": 0,
@@ -1649,6 +1655,344 @@
     {
       "type": 0,
       "value": "Vis"
+    }
+  ],
+  "guestOrderLookup.order.button.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel Order"
+    }
+  ],
+  "guestOrderLookup.order.button.refreshStatus": [
+    {
+      "type": 0,
+      "value": "Refresh Status"
+    }
+  ],
+  "guestOrderLookup.order.button.refreshStatus.aria": [
+    {
+      "type": 0,
+      "value": "Refresh order status"
+    }
+  ],
+  "guestOrderLookup.order.button.refreshing": [
+    {
+      "type": 0,
+      "value": "Refreshing…"
+    }
+  ],
+  "guestOrderLookup.order.button.retry": [
+    {
+      "type": 0,
+      "value": "Try Again"
+    }
+  ],
+  "guestOrderLookup.order.button.return": [
+    {
+      "type": 0,
+      "value": "Return Items"
+    }
+  ],
+  "guestOrderLookup.order.cancel.success": [
+    {
+      "type": 0,
+      "value": "Your order has been cancelled."
+    }
+  ],
+  "guestOrderLookup.order.error.generic": [
+    {
+      "type": 0,
+      "value": "Something went wrong loading your order. Please try again."
+    }
+  ],
+  "guestOrderLookup.order.heading": [
+    {
+      "type": 0,
+      "value": "Order Details"
+    }
+  ],
+  "guestOrderLookup.order.item.qty": [
+    {
+      "type": 0,
+      "value": "Qty: "
+    },
+    {
+      "type": 1,
+      "value": "qty"
+    }
+  ],
+  "guestOrderLookup.order.item.unnamed": [
+    {
+      "type": 0,
+      "value": "Product"
+    }
+  ],
+  "guestOrderLookup.order.lastUpdated": [
+    {
+      "type": 0,
+      "value": "Last updated at "
+    },
+    {
+      "type": 1,
+      "value": "time"
+    }
+  ],
+  "guestOrderLookup.order.orderNumber": [
+    {
+      "type": 0,
+      "value": "Order #"
+    },
+    {
+      "type": 1,
+      "value": "orderNo"
+    }
+  ],
+  "guestOrderLookup.order.placedOn": [
+    {
+      "type": 0,
+      "value": "Placed on "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "guestOrderLookup.order.return.success": [
+    {
+      "type": 0,
+      "value": "Your return has been submitted."
+    }
+  ],
+  "guestOrderLookup.order.section.items": [
+    {
+      "type": 0,
+      "value": "Items"
+    }
+  ],
+  "guestOrderLookup.order.section.shipping": [
+    {
+      "type": 0,
+      "value": "Shipping"
+    }
+  ],
+  "guestOrderLookup.order.section.totals": [
+    {
+      "type": 0,
+      "value": "Order Summary"
+    }
+  ],
+  "guestOrderLookup.order.shipping.expectedDelivery": [
+    {
+      "type": 0,
+      "value": "Expected delivery: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "guestOrderLookup.order.shipping.postalCode": [
+    {
+      "type": 0,
+      "value": "Postal code: "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
+  "guestOrderLookup.order.shipping.status": [
+    {
+      "type": 0,
+      "value": "Shipping status: "
+    },
+    {
+      "type": 1,
+      "value": "status"
+    }
+  ],
+  "guestOrderLookup.order.shipping.tracking": [
+    {
+      "type": 0,
+      "value": "Tracking: "
+    },
+    {
+      "type": 1,
+      "value": "trackingNumber"
+    }
+  ],
+  "guestOrderLookup.order.status": [
+    {
+      "type": 0,
+      "value": "Status: "
+    },
+    {
+      "type": 1,
+      "value": "status"
+    }
+  ],
+  "guestOrderLookup.order.totals.shipping": [
+    {
+      "type": 0,
+      "value": "Shipping"
+    }
+  ],
+  "guestOrderLookup.order.totals.subtotal": [
+    {
+      "type": 0,
+      "value": "Subtotal"
+    }
+  ],
+  "guestOrderLookup.order.totals.tax": [
+    {
+      "type": 0,
+      "value": "Tax"
+    }
+  ],
+  "guestOrderLookup.order.totals.total": [
+    {
+      "type": 0,
+      "value": "Total"
+    }
+  ],
+  "guestOrderLookup.request.alert.sessionExpired": [
+    {
+      "type": 0,
+      "value": "Your session has expired. Please request a new access code."
+    }
+  ],
+  "guestOrderLookup.request.button.submit": [
+    {
+      "type": 0,
+      "value": "Send Access Code"
+    }
+  ],
+  "guestOrderLookup.request.error.emailInvalid": [
+    {
+      "type": 0,
+      "value": "Enter a valid email address"
+    }
+  ],
+  "guestOrderLookup.request.error.emailRequired": [
+    {
+      "type": 0,
+      "value": "Email address is required"
+    }
+  ],
+  "guestOrderLookup.request.error.orderNumberInvalid": [
+    {
+      "type": 0,
+      "value": "Enter a valid order number"
+    }
+  ],
+  "guestOrderLookup.request.error.orderNumberRequired": [
+    {
+      "type": 0,
+      "value": "Order number is required"
+    }
+  ],
+  "guestOrderLookup.request.heading": [
+    {
+      "type": 0,
+      "value": "Find Your Order"
+    }
+  ],
+  "guestOrderLookup.request.label.email": [
+    {
+      "type": 0,
+      "value": "Email Address"
+    }
+  ],
+  "guestOrderLookup.request.label.orderNumber": [
+    {
+      "type": 0,
+      "value": "Order Number"
+    }
+  ],
+  "guestOrderLookup.request.subtext": [
+    {
+      "type": 0,
+      "value": "Enter your order number and email address to receive a one-time access code."
+    }
+  ],
+  "guestOrderLookup.verify.button.submit": [
+    {
+      "type": 0,
+      "value": "Verify Code"
+    }
+  ],
+  "guestOrderLookup.verify.error.codeInvalid": [
+    {
+      "type": 0,
+      "value": "Enter the 6-digit code from your email"
+    }
+  ],
+  "guestOrderLookup.verify.error.codeRequired": [
+    {
+      "type": 0,
+      "value": "Access code is required"
+    }
+  ],
+  "guestOrderLookup.verify.error.generic": [
+    {
+      "type": 0,
+      "value": "Something went wrong. Please try again."
+    }
+  ],
+  "guestOrderLookup.verify.error.invalidCode": [
+    {
+      "type": 0,
+      "value": "Code invalid or expired. Please try again or request a new code."
+    }
+  ],
+  "guestOrderLookup.verify.error.tooManyAttempts": [
+    {
+      "type": 0,
+      "value": "Too many attempts. Please wait a moment and try again."
+    }
+  ],
+  "guestOrderLookup.verify.heading": [
+    {
+      "type": 0,
+      "value": "Enter Your Access Code"
+    }
+  ],
+  "guestOrderLookup.verify.label.code": [
+    {
+      "type": 0,
+      "value": "Access Code"
+    }
+  ],
+  "guestOrderLookup.verify.resend.link": [
+    {
+      "type": 0,
+      "value": "Resend code"
+    }
+  ],
+  "guestOrderLookup.verify.resend.prompt": [
+    {
+      "type": 0,
+      "value": "Didn't receive a code?"
+    }
+  ],
+  "guestOrderLookup.verify.subtext": [
+    {
+      "type": 0,
+      "value": "We've sent a 6-digit code to "
+    },
+    {
+      "type": 1,
+      "value": "email"
+    },
+    {
+      "type": 0,
+      "value": ". It may take a moment to arrive."
+    }
+  ],
+  "guestOrderLookup.verify.toast.resent": [
+    {
+      "type": 0,
+      "value": "Check your inbox — it may take a moment."
     }
   ],
   "header.button.assistive_msg.ask_shopping_agent": [

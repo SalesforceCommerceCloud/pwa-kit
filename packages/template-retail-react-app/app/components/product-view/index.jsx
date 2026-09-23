@@ -161,7 +161,8 @@ const ProductView = forwardRef(
             maxOrderQuantity = null,
             imageGalleryFooter = null,
             controlledVariationValues = null,
-            onVariationChange = null
+            onVariationChange = null,
+            actionFooter = null
         },
         ref
     ) => {
@@ -985,6 +986,7 @@ const ProductView = forwardRef(
                                 </Box>
                             </Box>
                         </Box>
+                        {actionFooter}
                     </VStack>
                 </Flex>
 
@@ -1048,7 +1050,8 @@ ProductView.propTypes = {
     imageGalleryFooter: PropTypes.node,
     alignItems: PropTypes.string,
     controlledVariationValues: PropTypes.object,
-    onVariationChange: PropTypes.func
+    onVariationChange: PropTypes.func,
+    actionFooter: PropTypes.node
 }
 
 export default ProductView

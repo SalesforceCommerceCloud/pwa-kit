@@ -34,6 +34,26 @@ const getCreditCardExpiry = (yearsFromNow = 5) => {
         (new Date().getFullYear() % 100) + parseInt(yearsFromNow)
     }`
 }
+
+/**
+ * Removes computed color values that can vary by a single shade between deployed targets while
+ * preserving the accessibility violation and its stable context.
+ *
+ * @param {string} violationId - Axe violation identifier
+ * @param {string} failureSummary - Axe node failure summary
+ * @returns {string} - Stable failure summary for snapshot comparison
+ */
+function sanitizeFailureSummary(violationId, failureSummary) {
+    if (violationId !== 'color-contrast' || !failureSummary) {
+        return failureSummary
+    }
+
+    return failureSummary.replace(
+        /Element has insufficient color contrast of [\d.]+ \(foreground color: #[\da-f]+, background color: #[\da-f]+, /gi,
+        'Element has insufficient color contrast ('
+    )
+}
+
 /**
  * Helper function to create simplified violation objects for snapshots
  *
@@ -52,7 +72,7 @@ function simplifyViolations(violations) {
             // Simplify the HTML to make it more stable for snapshots
             html: sanitizeHtml(node.html),
             // Include the important failure information
-            failureSummary: node.failureSummary,
+            failureSummary: sanitizeFailureSummary(violation.id, node.failureSummary),
             // Simplify target selectors for stability
             // #app-header[data-v-12345] > .navigation[data-testid="main-nav"] => #app-header > .navigation
             // Also handle Chakra UI dynamic selectors like #popover-trigger-:r5l4v:
@@ -203,6 +223,7 @@ module.exports = {
     mkdirIfNotExists,
     diffArrays,
     getCreditCardExpiry,
+    sanitizeFailureSummary,
     generateUserCredentials,
     runAccessibilityTest,
     sleep

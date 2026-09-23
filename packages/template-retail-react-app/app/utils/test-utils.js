@@ -204,6 +204,16 @@ TestProviders.propTypes = {
 export const renderWithProviders = (children, options) => {
     const TestProvidersWithDataAPI = withReactQuery(TestProviders, {
         queryClientConfig: {
+            // Silence react-query's default error logging. Many tests intentionally
+            // leave requests unmocked; those surface as caught query errors that
+            // react-query dumps to console.error (full Response objects), flooding
+            // CI logs with noise that isn't a test failure. See react-query v4 docs
+            // on providing a custom logger for tests.
+            logger: {
+                log: () => {},
+                warn: () => {},
+                error: () => {}
+            },
             defaultOptions: {
                 queries: {
                     retry: false,

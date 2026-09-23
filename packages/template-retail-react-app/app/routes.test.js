@@ -189,6 +189,73 @@ describe('Routes', () => {
             })
         })
 
+        describe('Guest order lookup routes', () => {
+            test('does not add routes when flag is disabled', () => {
+                getConfig.mockReturnValue({
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app,
+                        guestOrderLookup: {
+                            enabled: false
+                        }
+                    }
+                })
+
+                const allRoutes = routes()
+                expect(allRoutes.find((r) => r.path === '/order-lookup')).toBeUndefined()
+                expect(
+                    allRoutes.find((r) => r.path === '/order-lookup/verify/:orderNo')
+                ).toBeUndefined()
+                expect(
+                    allRoutes.find((r) => r.path === '/order-lookup/order/:orderNo')
+                ).toBeUndefined()
+            })
+
+            test('does not add routes when flag is absent', () => {
+                getConfig.mockReturnValue({
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app
+                    }
+                })
+
+                const allRoutes = routes()
+                expect(allRoutes.find((r) => r.path === '/order-lookup')).toBeUndefined()
+                expect(
+                    allRoutes.find((r) => r.path === '/order-lookup/verify/:orderNo')
+                ).toBeUndefined()
+                expect(
+                    allRoutes.find((r) => r.path === '/order-lookup/order/:orderNo')
+                ).toBeUndefined()
+            })
+
+            test('adds all routes when flag is enabled', () => {
+                getConfig.mockReturnValue({
+                    ...mockConfig,
+                    app: {
+                        ...mockConfig.app,
+                        guestOrderLookup: {
+                            enabled: true
+                        }
+                    }
+                })
+
+                const allRoutes = routes()
+                const requestRoute = allRoutes.find((r) => r.path === '/order-lookup')
+                const verifyRoute = allRoutes.find(
+                    (r) => r.path === '/order-lookup/verify/:orderNo'
+                )
+                const orderRoute = allRoutes.find((r) => r.path === '/order-lookup/order/:orderNo')
+
+                expect(requestRoute).toBeDefined()
+                expect(requestRoute.exact).toBe(true)
+                expect(verifyRoute).toBeDefined()
+                expect(verifyRoute.exact).toBe(true)
+                expect(orderRoute).toBeDefined()
+                expect(orderRoute.exact).toBe(true)
+            })
+        })
+
         describe('Social login redirect route', () => {
             test('does not add route when disabled', () => {
                 getConfig.mockReturnValue({

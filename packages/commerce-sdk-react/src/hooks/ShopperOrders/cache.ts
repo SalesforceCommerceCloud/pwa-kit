@@ -86,3 +86,5 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         return {invalidate}
     }
 }
+
+cacheUpdateMatrix['requestOrderAccessCode'] = () => ({})

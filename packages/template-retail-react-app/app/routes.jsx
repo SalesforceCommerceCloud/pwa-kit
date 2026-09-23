@@ -52,6 +52,18 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
 })
 const PaymentProcessing = loadable(() => import('./pages/checkout/payment-processing'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
+const GuestOrderLookupRequest = loadable(() => import('./pages/guest-order-lookup/request'), {
+    fallback
+})
+const GuestOrderLookupVerify = loadable(() => import('./pages/guest-order-lookup/verify'), {
+    fallback
+})
+const GuestOrderLookupOrder = loadable(() => import('./pages/guest-order-lookup/order'), {
+    fallback
+})
+const GuestOrderLookupResults = loadable(() => import('./pages/guest-order-lookup/results'), {
+    fallback
+})
 
 export const routes = [
     {
@@ -136,6 +148,7 @@ export default () => {
     const socialRedirectURI = loginConfig?.social?.redirectURI
     const passwordlessLoginEnabled = loginConfig?.passwordless?.enabled
     const passwordlessLoginLandingPath = loginConfig?.passwordless?.landingPath
+    const guestOrderLookupEnabled = getConfig()?.app?.guestOrderLookup?.enabled
 
     // Add dynamic routes conditionally (only if features are enabled and paths are defined)
     const dynamicRoutes = [
@@ -155,7 +168,27 @@ export default () => {
                 path: socialRedirectURI,
                 component: SocialLoginRedirect,
                 exact: true
-            }
+            },
+        guestOrderLookupEnabled && {
+            path: '/order-lookup',
+            component: GuestOrderLookupRequest,
+            exact: true
+        },
+        guestOrderLookupEnabled && {
+            path: '/order-lookup/verify/:orderNo',
+            component: GuestOrderLookupVerify,
+            exact: true
+        },
+        guestOrderLookupEnabled && {
+            path: '/order-lookup/order/:orderNo',
+            component: GuestOrderLookupOrder,
+            exact: true
+        },
+        guestOrderLookupEnabled && {
+            path: '/order-lookup/results/:orderNo',
+            component: GuestOrderLookupResults,
+            exact: true
+        }
     ].filter(Boolean)
 
     const allRoutes = configureRoutes([...routes, ...dynamicRoutes], config, {

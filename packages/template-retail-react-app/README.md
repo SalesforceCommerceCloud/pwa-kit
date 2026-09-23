@@ -86,16 +86,7 @@ COMMERCE_AGENT_SETTINGS='{
 }'
 ```
 
-Required fields for `provider: "commerce-client"` (validated by `validateCommerceClientAgentSettings` in `app/utils/shopper-agent-utils.js`):
-
-| Field                                                    | Purpose                                                                 |
-| ------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `enabled: "true"`                                       | Master on/off; the widget only mounts when `"true"`.                    |
-| `provider: "commerce-client"`                           | Selects the Commerce Client provider (default is `"miaw"`).            |
-| `scrt2Url`                                               | Your SCRT2 instance URL (`https://….salesforce-scrt.com`).             |
-| `salesforceOrgId`                                        | Salesforce org id, forwarded to the widget as `orgId`.                 |
-| `cc_esDeveloperName`                                     | Embedded Service developer name (falls back to `embeddedServiceName`). |
-| `cc_cdnVersion` **or** `commerceClientScriptSourceUrl`  | Where to load `messaging.umd.js` from (see step 3).                    |
+See [Configuration reference](#configuration-reference) below for the full list of required and optional `COMMERCE_AGENT_SETTINGS` fields.
 
 ### 3. Choose where the bundle loads from
 
@@ -116,15 +107,57 @@ npm start
 
 Open http://localhost:3000/. The widget mounts on the client once the basket finishes loading. With `cc_showFab: "true"` a floating action button appears in the configured corner; you can also open the agent from the header button when `enableAgentFromHeader: "true"`.
 
-### Useful optional settings
+### Configuration reference
 
-Every field is documented inline in the `commerceAgent` block of `config/default.js` (the committed source of truth), with the full default map in `app/utils/config-utils.js` and per-field descriptions in the `CommerceClientAgentWindow` JSDoc in `app/components/shopper-agent/index.jsx`. Handy optional ones for local dev:
+All `COMMERCE_AGENT_SETTINGS` fields for the Commerce Client provider — required and optional — are documented inline in the `commerceAgent` block of `config/default.js` (the committed source of truth), with the full default map in `app/utils/config-utils.js` and per-field descriptions in the `CommerceClientAgentWindow` JSDoc in `app/components/shopper-agent/index.jsx`.
+
+**Required fields** (validated by `validateCommerceClientAgentSettings` in `app/utils/shopper-agent-utils.js`):
+
+| Field                                                   | Purpose                                                                 |
+| -------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `enabled: "true"`                                        | Master on/off; the widget only mounts when `"true"`.                    |
+| `provider: "commerce-client"`                             | Selects the Commerce Client provider (default is `"miaw"`).             |
+| `scrt2Url`                                                | Your SCRT2 instance URL (`https://….salesforce-scrt.com`).              |
+| `salesforceOrgId`                                         | Salesforce org id, forwarded to the widget as `orgId`.                  |
+| `cc_esDeveloperName`                                      | Embedded Service developer name (falls back to `embeddedServiceName`).  |
+| `cc_cdnVersion` **or** `commerceClientScriptSourceUrl`    | Where to load `messaging.umd.js` from (see step 3 above).               |
+
+**General optional settings** — handy ones for local dev:
 
 - `cc_isDevelopment: "true"` — logs widget events to the console.
 - `cc_isOpen: "true"` — opens the panel automatically on load.
 - `cc_widgetPosition: "bottom-left" | "bottom-right"` — corner to dock to.
 - `cc_pagePush: "true"` — shifts page content aside for the panel instead of overlaying it (desktop, full-height dialog only).
 - `cc_headerText`, `cc_logoUrl`, `cc_theme`, `cc_searchConfig` — branding and search-input customization.
+
+**Widget presentation & behavior settings** — these mirror configs the Commerce Client widget already supports. The storefront forwards each one **only when you set it and applies no storefront default** — omit a setting and the widget keeps its own default (shown below). Object-valued settings are passed as JSON objects in `COMMERCE_AGENT_SETTINGS`; boolean-valued ones are passed as the strings `"true"` / `"false"`.
+
+| Setting                     | Type / values                   | Widget default          | Forwarded to the widget as            |
+| --------------------------- | ------------------------------- | ----------------------- | ------------------------------------- |
+| `cc_headerConfig`           | object (see below)              | text `"Commerce Client"`| `headerConfig`                        |
+| `cc_suggestionButtonConfig` | object `{ icon, iconPosition }` | none                    | `suggestionButtonConfig`              |
+| `cc_messageAlignment`       | `"start"` \| `"end"`            | `"start"`               | `messageAlignment`                    |
+| `cc_autoScroll`             | `"true"` \| `"false"`           | `true`                  | `autoScroll`                          |
+| `cc_openLinksInNewTab`      | `"true"` \| `"false"`           | `false`                 | `openLinksInNewTab`                   |
+| `cc_showProductDescription` | `"true"` \| `"false"`           | `false`                 | `showProductDescription`              |
+| `cc_showProductCaptions`    | `"true"` \| `"false"`           | `false`                 | `messagingConfig.showProductCaptions` |
+| `cc_promptsConfig`          | object (see below)              | none                    | `promptsConfig`                       |
+
+- **`cc_headerConfig`** — header styling: `logoUrl`, `headerText`, `headerBackgroundColor`, `headerTextColor`, `headerTextFontSize`, `headerTextFontWeight` (number), `headerTextFontFamily`, `headerTextTextAlign` (`"left"` | `"center"` | `"right"`).
+- **`cc_suggestionButtonConfig`** — `icon` (`"sparkle"` | `"plus"` | `"paper-plane"`) and `iconPosition` (`"left"` | `"right"`).
+- **`cc_promptsConfig`** — configures the prompts extension. To mount it you must supply `isOpen`, `isInline`, and `elementId` (the id of a container element already on the page); other fields such as `staticQuestions` and `promptsDisplay` are optional.
+
+Example `COMMERCE_AGENT_SETTINGS` snippet using several of the fields above:
+
+```json
+{
+  "cc_messageAlignment": "end",
+  "cc_openLinksInNewTab": "true",
+  "cc_showProductCaptions": "true",
+  "cc_headerConfig": {"headerText": "Ask our shopping assistant", "headerTextTextAlign": "center"},
+  "cc_suggestionButtonConfig": {"icon": "sparkle", "iconPosition": "left"}
+}
+```
 
 ### Troubleshooting
 

@@ -42,10 +42,7 @@ const LOGIN_ERROR_MESSAGE = defineMessage({
     id: 'login_page.error.incorrect_username_or_password'
 })
 
-const LOGIN_VIEW = 'login'
-const EMAIL_VIEW = 'email'
-
-const Login = ({initialView = LOGIN_VIEW}) => {
+const Login = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const form = useForm()
@@ -226,7 +223,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 Login.getTemplateName = () => 'login'
 
 Login.propTypes = {
-    initialView: PropTypes.oneOf([LOGIN_VIEW, EMAIL_VIEW]),
     match: PropTypes.object
 }
 

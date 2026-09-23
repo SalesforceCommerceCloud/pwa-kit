@@ -27,6 +27,14 @@ export type QueryKeys = {
         string | undefined,
         Params<'getPage'>
     ]
+    getComponent: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/components/',
+        string | undefined,
+        Params<'getComponent'>
+    ]
 }
 
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
@@ -60,6 +68,22 @@ export const getPage: QueryKeyHelper<'getPage'> = {
         return [
             ...getPage.path(params),
             pickValidParams(params || {}, ShopperExperience.paramKeys.getPage)
+        ]
+    }
+}
+
+export const getComponent: QueryKeyHelper<'getComponent'> = {
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params?.organizationId,
+        '/components/',
+        params?.componentId
+    ],
+    queryKey: (params: Params<'getComponent'>) => {
+        return [
+            ...getComponent.path(params),
+            pickValidParams(params || {}, ShopperExperience.paramKeys.getComponent)
         ]
     }
 }

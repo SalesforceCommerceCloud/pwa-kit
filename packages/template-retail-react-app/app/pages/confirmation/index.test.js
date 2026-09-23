@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {screen, waitFor, within} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import {

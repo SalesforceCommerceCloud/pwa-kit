@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Salesforce, Inc.
+ * Copyright (c) 2026, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +9,9 @@ import {
     getCookieName,
     getSiteId,
     SESSION_COOKIE_CONFIG
-} from '@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config'
+} from '@salesforce/pwa-kit-runtime/ssr/server/httponly-cookie-config.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {isTrustedSalesforceDomain} from './salesforce-domain-allowlist.js'
 
 /* -------------------------------------------------------------------------
  * Token Bridge PoC — calls Core's `/agent/identity/bridge` from PWA Kit.
@@ -26,19 +28,19 @@ import {
  *        sent automatically to same-origin proxy. Client sends auth_link_key
  *        in request body, and siteId as x-site-id header.
  *      - HttpOnly OFF: Access token in localStorage, refresh token in cookie.
- *        Client sends auth_link_key, slas_access_token (from localStorage)
- *        in request body, and siteId as x-site-id header.
+ *        Client sends auth_link_key and the access token (from localStorage)
+ *        in the request body, and siteId as the x-site-id header.
  *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js):
  *      - Reads siteId from x-site-id header (standard PWA Kit pattern)
- *      - Reads tokens from cookies (HttpOnly mode) or request body (non-HttpOnly)
- *      - Reads my_domain directly from ANC_MYDOMAIN environment variable
+ *      - Reads tokens from cookies (HttpOnly mode) or the request body (non-HttpOnly)
+ *      - Reads my_domain directly from AGENT_MYDOMAIN environment variable
  *      - Validates my_domain against Salesforce domain allowlist (SSRF prevention)
  *      - Forwards to Core with `Authorization: SLAS <access_token>` and
  *        `refresh_token` in the body.
  *   3. Core's response (status + body) is forwarded verbatim so the caller
  *      can branch on documented errors (INVALID_SLAS_TOKEN, SLAS_TOKEN_EXPIRED, ...).
  *
- * MyDomain resolution: read directly from ANC_MYDOMAIN environment variable,
+ * My Domain resolution: read directly from AGENT_MYDOMAIN environment variable,
  * then validated against a Salesforce domain allowlist (prevents SSRF).
  * ------------------------------------------------------------------------- */
 
@@ -64,66 +66,34 @@ function parseCookies(cookieHeader) {
 }
 
 /**
- * Resolve the ANC MyDomain origin to call.
- * Accepts values with or without a scheme; always returns an absolute URL
- * origin (or null) so `fetch()` can parse it.
+ * Resolve the Agentforce My Domain origin to call.
  *
- * @param {string} [myDomain] - MyDomain value from the Shopper Configurations API
+ * Accepts the raw value from the AGENT_MYDOMAIN environment variable — which
+ * may be scheme-less (e.g. `orgfarm-1234.my.salesforce.com`) or include a
+ * trailing slash — and always returns an absolute URL origin (or null) so
+ * `new URL()` and `fetch()` can parse it. Trims whitespace, strips trailing
+ * slashes, and prepends `https://` when no scheme is present.
+ *
+ * @param {string} [myDomain] - The My Domain of the customer org (typically
+ *   from the AGENT_MYDOMAIN environment variable)
+ * @returns {string|null} - Absolute origin, or null if the input is empty/invalid
  */
-export function resolveAncMyDomain(myDomain) {
+export function resolveAgentforceMyDomain(myDomain) {
     if (!myDomain || typeof myDomain !== 'string') return null
     const trimmed = myDomain.trim().replace(/\/+$/, '')
     if (!trimmed) return null
     return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
 }
 
-/**
- * Extract myDomain from ANC_MYDOMAIN environment variable.
- * Returns the domain directly from the environment variable.
- * Example: https://orgfarm-8fcc267362.test1.my.pc-rnd.salesforce.com
- *
- * @returns {string|null} - The myDomain or null if not found
- */
-export function extractMyDomainFromEnv() {
-    const myDomain = process.env.ANC_MYDOMAIN
-
-    if (!myDomain) {
-        console.error('[token-bridge] ANC_MYDOMAIN environment variable not set')
-        return null
-    }
-
-    return myDomain.trim()
-}
-
-/**
- * Validate that the myDomain hostname is a trusted Salesforce domain.
- * SSRF prevention: only allow requests to known Salesforce infrastructure.
- *
- * @param {string} myDomain - The full myDomain URL (e.g., https://org.my.salesforce.com)
- * @returns {boolean} - True if the domain is trusted, false otherwise
- */
-export function isTrustedSalesforceDomain(myDomain) {
-    try {
-        const url = new URL(myDomain)
-        const host = url.hostname.toLowerCase()
-
-        // Allowlist: Salesforce production, sandbox, and developer domains
-        return (
-            host.endsWith('.salesforce.com') ||
-            host.endsWith('.my.salesforce.com') ||
-            host.endsWith('.pc-rnd.salesforce.com')
-        )
-    } catch {
-        // Invalid URL
-        return false
-    }
-}
+// isTrustedSalesforceDomain (Core `*.salesforce.com` allowlist) lives in
+// ./salesforce-domain-allowlist.js — the Token Bridge only ever talks to Core's
+// My Domain (AGENT_MYDOMAIN), so it uses the Core list for both its upstream SSRF
+// check and the CSRF Origin check.
 
 /** Express handler for POST /api/agent/identity/bridge. */
 export async function handleTokenBridge(req, res) {
     try {
-        const {auth_link_key: authLinkKey, slas_access_token: slasAccessTokenFromBody} =
-            req.body || {}
+        const {auth_link_key: authLinkKey, slas_access_token: bodySlasAccessToken} = req.body || {}
 
         if (!authLinkKey || typeof authLinkKey !== 'string') {
             return res.status(400).json({error: 'MISSING_AUTH_LINK_KEY'})
@@ -137,7 +107,10 @@ export async function handleTokenBridge(req, res) {
         if (origin) {
             try {
                 const originUrl = new URL(origin)
-                const originHost = originUrl.hostname.toLowerCase()
+                // Use `host` (host:port) rather than `hostname` (no port) so the
+                // comparison matches `req.headers.host`, which includes the port
+                // (e.g. `localhost:3000` in local dev).
+                const originHost = originUrl.host.toLowerCase()
 
                 // Allow same-origin requests (PWA Kit storefront calling its own API)
                 const requestHost = req.headers.host?.toLowerCase()
@@ -192,7 +165,8 @@ export async function handleTokenBridge(req, res) {
                 return res.status(401).json({error: 'INVALID_SLAS_TOKEN'})
             }
         } else {
-            // Non-HttpOnly mode: Access token from body (localStorage), refresh token from cookie
+            // Non-HttpOnly mode: access token arrives in the request body
+            // (browser reads it from localStorage), refresh token from cookie
             const refreshTokenRegisteredCookie = getCookieName(
                 SESSION_COOKIE_CONFIG.refreshTokenRegistered,
                 siteId
@@ -202,7 +176,7 @@ export async function handleTokenBridge(req, res) {
                 siteId
             )
 
-            slasAccessToken = slasAccessTokenFromBody
+            slasAccessToken = bodySlasAccessToken
             refreshToken = cookies[refreshTokenRegisteredCookie] || cookies[refreshTokenGuestCookie]
 
             if (!slasAccessToken || typeof slasAccessToken !== 'string') {
@@ -210,13 +184,17 @@ export async function handleTokenBridge(req, res) {
             }
         }
 
-        // Extract myDomain from ANC_MYDOMAIN environment variable
-        const myDomain = extractMyDomainFromEnv()
+        // Read the Agentforce My Domain from the AGENT_MYDOMAIN environment
+        // variable and normalize it to an absolute origin. AGENT_MYDOMAIN may be
+        // scheme-less (e.g. `orgfarm-...my.salesforce.com`); resolveAgentforceMyDomain
+        // prepends `https://` so `new URL()` in isTrustedSalesforceDomain and the
+        // downstream fetch can parse it.
+        const myDomain = resolveAgentforceMyDomain(process.env.AGENT_MYDOMAIN)
 
         if (!myDomain) {
             console.error(
-                '[token-bridge] ANC MyDomain is not configured. ' +
-                    'Set ANC_MYDOMAIN environment variable.'
+                '[token-bridge] Agentforce My Domain is not configured. ' +
+                    'Set the AGENT_MYDOMAIN environment variable.'
             )
             return res.status(500).json({error: 'MYDOMAIN_NOT_CONFIGURED'})
         }
@@ -231,9 +209,9 @@ export async function handleTokenBridge(req, res) {
         }
 
         if (!refreshToken) {
-            // Core treats refresh_token as optional (guest sessions never have one).
-            // Only log at debug level to avoid noise in production monitoring.
-            console.debug(
+            // We never expect to reach Core without a refresh token in this flow;
+            // log at error level so it surfaces in production monitoring.
+            console.error(
                 '[token-bridge] No SLAS refresh token available; ' +
                     'forwarding to Core without refresh_token.'
             )
@@ -273,10 +251,10 @@ export function registerTokenBridgeRoute(app) {
  * Browser helper: POSTs to the same-origin proxy and returns Core's status + body.
  *
  * In HttpOnly mode, tokens are sent automatically via cookies. In non-HttpOnly mode,
- * the access token is read from localStorage and sent in the body, while the refresh
- * token is read from cookies server-side.
+ * the access token is read from localStorage and sent in the request body,
+ * while the refresh token is read from cookies server-side.
  *
- * myDomain is now derived server-side from ANC_MYDOMAIN environment variable.
+ * myDomain is now derived server-side from AGENT_MYDOMAIN environment variable.
  *
  * @param {string} authLinkKey - Auth link key from the embedded messaging API
  * @param {string} [slasAccessToken] - SLAS access token (non-HttpOnly mode only)

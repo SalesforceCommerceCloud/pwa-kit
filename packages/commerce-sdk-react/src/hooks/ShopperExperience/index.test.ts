@@ -12,13 +12,11 @@ describe('Shopper Experience hooks', () => {
     test('all endpoints have hooks', () => {
         const unimplemtented = getUnimplementedEndpoints(ShopperExperience, queries)
         expect(unimplemtented).toEqual([
-            // TODO: getComponent/resolveQualifiers added with the commerce-sdk-isomorphic 5.4.0 bump; implement later.
-            'getComponent',
             'getContent', //TODO: implement later
             'getContentFolder', //TODO: implement later
             'getContentFolders', //TODO: implement later
             'getMultipleContent', //TODO: implement later
-            'resolveQualifiers',
+            'resolveQualifiers', //TODO: implement later
             'searchContent' //TODO: implement later
         ])
     })

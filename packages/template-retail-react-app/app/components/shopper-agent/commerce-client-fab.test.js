@@ -69,7 +69,7 @@ describe('CommerceClientFab', () => {
         const fab = screen.getByTestId('commerce-client-fab')
 
         // Portaled to the end of <body>, so the FAB follows the skip link in DOM/tab order.
-        // eslint-disable-next-line no-bitwise
+
         expect(
             skipLink.compareDocumentPosition(fab) & Node.DOCUMENT_POSITION_FOLLOWING
         ).toBeTruthy()

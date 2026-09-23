@@ -38,6 +38,7 @@ const Footer = ({...otherProps}) => {
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const guestOrderLookupEnabled = getConfig()?.app?.guestOrderLookup?.enabled
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
@@ -56,6 +57,14 @@ const Footer = ({...otherProps}) => {
                 text: intl.formatMessage({
                     id: 'footer.link.store_locator',
                     defaultMessage: 'Store Locator'
+                })
+            })
+        if (guestOrderLookupEnabled)
+            links.push({
+                href: '/order-lookup',
+                text: intl.formatMessage({
+                    id: 'footer.link.order_lookup',
+                    defaultMessage: 'Order Lookup'
                 })
             })
         links.push({

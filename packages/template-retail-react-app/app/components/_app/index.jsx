@@ -66,6 +66,7 @@ import {
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/use-update-shopper-context'
+import {useAttribution} from '@salesforce/retail-react-app/app/hooks/use-attribution'
 
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
@@ -283,6 +284,10 @@ const App = (props) => {
 
     // Handle updating the shopper context
     useUpdateShopperContext()
+
+    // Write the first-touch `dw_attribution` marketing-attribution cookie (client-side
+    // so it also fires on a CDN cache hit); honors the shopper's tracking-consent state.
+    useAttribution()
 
     useEffect(() => {
         // Lets automatically close the mobile navigation when the

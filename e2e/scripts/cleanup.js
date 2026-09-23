@@ -8,6 +8,7 @@
 const config = require('../config.js')
 
 const SITE_ID = config.RETAIL_APP_HOME_SITE
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // The cleanup helper authenticates SCAPI calls with the active shopper session.
 // Where that session lives depends on whether the target environment has
@@ -64,6 +65,33 @@ const safeRequest = async (label, fn) => {
     }
 }
 
+const ensureOkResponse = async (label, response) => {
+    if (response?.ok()) return response
+
+    const status = response?.status?.() ?? 'unknown'
+    let responseBody = ''
+    try {
+        responseBody = await response?.text()
+    } catch {
+        responseBody = ''
+    }
+
+    throw new Error(
+        `${label} failed with status ${status}${responseBody ? `: ${responseBody}` : ''}`
+    )
+}
+
+const verifyEmpty = async ({label, readIds, attempts = 3, retryDelay = 250, sleepFn = sleep}) => {
+    let remainingIds = []
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+        remainingIds = await readIds()
+        if (remainingIds.length === 0) return
+        if (attempt < attempts) await sleepFn(retryDelay)
+    }
+
+    throw new Error(`${label} still contains: ${remainingIds.join(', ')}`)
+}
+
 /**
  * Empty the active basket and wishlist for the currently logged-in shopper.
  * Reads the session (HttpOnly cookies or localStorage — see readSession) and
@@ -82,54 +110,73 @@ async function clearCartAndWishlist(page) {
     const orgId = config.RETAIL_APP_HOME_ORGANIZATION_ID
     const headers = {Authorization: `Bearer ${session.accessToken}`}
 
+    const readBasketIds = async () => {
+        const basketsRes = await ensureOkResponse(
+            'GET customer baskets',
+            await page.request.get(
+                `${baseUrl}/customer/shopper-customers/v1/organizations/${orgId}/customers/${session.customerId}/baskets?siteId=${siteId}`,
+                {headers}
+            )
+        )
+        const body = await basketsRes.json()
+        return (body?.baskets ?? []).map((basket) => basket?.basketId).filter(Boolean)
+    }
+
+    const readWishlist = async () => {
+        const listsRes = await ensureOkResponse(
+            'GET customer-product-lists',
+            await page.request.get(
+                `${baseUrl}/customer/shopper-customers/v1/organizations/${orgId}/customers/${session.customerId}/customer-product-lists?siteId=${siteId}`,
+                {headers}
+            )
+        )
+        const body = await listsRes.json()
+        const wishlist = body?.data?.find((list) => list.type === 'wish_list')
+        return wishlist
+            ? {id: wishlist.id, items: wishlist.customerProductListItems ?? []}
+            : {id: null, items: []}
+    }
+
     // 1. Active baskets -> delete
     // shopper-baskets has no list endpoint, so list via shopper-customers
     // (works for guest and registered customers since SLAS issues a
     // customer_id for both).
-    const basketsRes = await safeRequest('GET customer baskets', () =>
-        page.request.get(
-            `${baseUrl}/customer/shopper-customers/v1/organizations/${orgId}/customers/${session.customerId}/baskets?siteId=${siteId}`,
-            {headers}
+    const basketIds = (await safeRequest('GET customer baskets', readBasketIds)) ?? []
+    await Promise.all(
+        basketIds.map((basketId) =>
+            safeRequest(`DELETE basket ${basketId}`, async () => {
+                const response = await page.request.delete(
+                    `${baseUrl}/checkout/shopper-baskets/v1/organizations/${orgId}/baskets/${basketId}?siteId=${siteId}`,
+                    {headers}
+                )
+                await ensureOkResponse(`DELETE basket ${basketId}`, response)
+            })
         )
     )
-    if (basketsRes?.ok()) {
-        const body = await safeRequest('parse customer baskets', () => basketsRes.json())
-        const basketIds = (body?.baskets ?? []).map((b) => b?.basketId).filter(Boolean)
-        await Promise.all(
-            basketIds.map((basketId) =>
-                safeRequest(`DELETE basket ${basketId}`, () =>
-                    page.request.delete(
-                        `${baseUrl}/checkout/shopper-baskets/v1/organizations/${orgId}/baskets/${basketId}?siteId=${siteId}`,
-                        {headers}
-                    )
-                )
-            )
-        )
-    }
 
     // 2. Wishlist items -> delete each
-    const listsRes = await safeRequest('GET customer-product-lists', () =>
-        page.request.get(
-            `${baseUrl}/customer/shopper-customers/v1/organizations/${orgId}/customers/${session.customerId}/customer-product-lists?siteId=${siteId}`,
-            {headers}
-        )
-    )
-    if (!listsRes?.ok()) return
-    const body = await safeRequest('parse customer-product-lists', () => listsRes.json())
-    const wishlist = body?.data?.find((l) => l.type === 'wish_list')
-    const items = wishlist?.customerProductListItems
-    if (!items?.length) return
-
+    const wishlist = await safeRequest('GET customer-product-lists', readWishlist)
     await Promise.all(
-        items.map((item) =>
-            safeRequest(`DELETE wishlist item ${item.id}`, () =>
-                page.request.delete(
+        (wishlist?.items ?? []).map((item) =>
+            safeRequest(`DELETE wishlist item ${item.id}`, async () => {
+                const response = await page.request.delete(
                     `${baseUrl}/customer/shopper-customers/v1/organizations/${orgId}/customers/${session.customerId}/customer-product-lists/${wishlist.id}/items/${item.id}?siteId=${siteId}`,
                     {headers}
                 )
-            )
+                await ensureOkResponse(`DELETE wishlist item ${item.id}`, response)
+            })
         )
+    )
+
+    await safeRequest('verify baskets empty', () =>
+        verifyEmpty({label: 'baskets', readIds: readBasketIds})
+    )
+    await safeRequest('verify wishlist empty', () =>
+        verifyEmpty({
+            label: 'wishlist items',
+            readIds: async () => (await readWishlist())?.items.map((item) => item.id) ?? []
+        })
     )
 }
 
-module.exports = {clearCartAndWishlist}
+module.exports = {clearCartAndWishlist, ensureOkResponse, verifyEmpty}
