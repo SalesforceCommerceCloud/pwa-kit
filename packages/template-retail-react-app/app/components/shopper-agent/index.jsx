@@ -771,18 +771,28 @@ const CommerceClientAgentWindow = ({
     }
 
     /**
-     * Read the Commerce Client conversationId from this widget's scoped session
+     * Read the Commerce Client conversationId from this widget's scoped storage
      * key (value shape: {"conversationId":"...","storedAt":...}). Returns null
      * if not present yet (e.g. conversation still being created).
+     *
+     * Checks sessionStorage first for back-compat with older widget builds
+     * (pre-1.34.0) that persisted there, then falls back to localStorage,
+     * which is where the widget stores the conversation id as of 1.34.0.
      */
     const readConversationId = () => {
-        try {
-            const value = window.sessionStorage.getItem(commerceClientConversationKey)
-            return value ? JSON.parse(value)?.conversationId || null : null
-        } catch (err) {
-            console.error('[Commerce Client] Failed to read conversationId', err)
-            return null
+        const stores = [window.sessionStorage, window.localStorage]
+        for (const store of stores) {
+            try {
+                const value = store.getItem(commerceClientConversationKey)
+                const conversationId = value ? JSON.parse(value)?.conversationId : null
+                if (conversationId) {
+                    return conversationId
+                }
+            } catch (err) {
+                console.error('[Commerce Client] Failed to read conversationId', err)
+            }
         }
+        return null
     }
 
     /**

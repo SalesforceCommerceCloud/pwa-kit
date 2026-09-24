@@ -2079,6 +2079,34 @@ describe('ShopperAgent Component', () => {
                 delete window.CimulateMessaging
             })
 
+            test('links a resumed conversation when the widget persisted JWT and conversationId only to localStorage', async () => {
+                // Widget 1.34.0+ writes cim_af_conv_* and cim_af_ct_* only to
+                // localStorage. sessionStorage is intentionally left empty here
+                // to reproduce a full page load of an existing conversation.
+                window.localStorage.setItem(
+                    tokenKey,
+                    JSON.stringify({accessToken: 'local-only.jwt'})
+                )
+                window.localStorage.setItem(
+                    conversationKey,
+                    JSON.stringify({conversationId: 'local-only-conv'})
+                )
+
+                renderCommerceClient()
+
+                await waitFor(() =>
+                    expect(mockCallAuthLink).toHaveBeenCalledWith({
+                        commerceClientJWT: 'local-only.jwt',
+                        scrt2Url: 'https://test.salesforce-scrt.com'
+                    })
+                )
+                expect(mockCallTokenBridge).toHaveBeenCalledWith({
+                    authLinkKey: 'commerce-auth-link-key',
+                    slasAccessToken: 'test-slas-access-token',
+                    siteId: 'RefArchGlobal'
+                })
+            })
+
             test('links a resumed conversation with deployment-scoped storage', async () => {
                 window.sessionStorage.setItem(
                     'cim_af_ct_other-org_Other_Service',
