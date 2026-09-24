@@ -1,3 +1,4 @@
+## v3.21.0-nightly-20260924080512 (Sep 24, 2026)
 ## v3.21.0-dev (Aug 12, 2026)
 - `pwa-kit-dev push` now detects Managed Runtime read-only (maintenance) mode via the `X-MRT-Read-Only` response header and fails with an actionable message pointing to the MRT status page, instead of a generic HTTP error.
 ## v3.20.0 (Aug 12, 2026)
