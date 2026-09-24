@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react'
 import {createPortal} from 'react-dom'
 import PropTypes from 'prop-types'
 import {useDeliveryEstimates, useProduct} from '@salesforce/commerce-sdk-react'
@@ -34,64 +34,34 @@ import {
 import {
     getFallbackDeliveryDescription,
     getPreferredDeliveryDestination,
+    getSavedDeliveryDestination,
     getSlowestDeliveryEstimate,
     getPostalCodeFormat,
     isEligibleShippingOption,
     isValidDestination,
-    normalizeCountryCode,
     normalizeDestination
 } from '@salesforce/retail-react-app/app/components/delivery-estimate/utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
-const getDeliveryZipCodeCookieName = (siteId) => `deliveryZipCode_${siteId}`
 const DELIVERY_DESTINATION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
-const POSTAL_CODE_SANITY_RE = /^[A-Z0-9](?:[A-Z0-9 -]{0,10}[A-Z0-9])?$/i
 const DELIVERY_ESTIMATE_INSTRUCTIONS_ID = 'delivery-estimate-postal-code-instructions'
 const DELIVERY_ESTIMATE_ERROR_ID = 'delivery-estimate-postal-code-error'
+const DELIVERY_ESTIMATE_LOADING_ID = 'delivery-estimate-loading'
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-const normalizePostalCode = (value) => {
-    const postalCode = value?.trim()
-    return postalCode && postalCode.length <= 12 && POSTAL_CODE_SANITY_RE.test(postalCode)
-        ? postalCode
-        : null
-}
-
-const parseDeliveryDestinationCookie = (cookieName) => {
-    const escapedCookieName = cookieName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${escapedCookieName}=([^;]+)`))
-    if (!match) return null
-
-    try {
-        const value = decodeURIComponent(match[1])
-        const legacyPostalCode = normalizePostalCode(value)
-        if (legacyPostalCode) {
-            return {postalCode: legacyPostalCode}
-        }
-
-        const destination = JSON.parse(value)
-        if (typeof destination.postalCode !== 'string') return null
-
-        const postalCode = normalizePostalCode(destination.postalCode)
-        const countryCode = normalizeCountryCode(destination.countryCode)
-        if (!postalCode || (destination.countryCode !== undefined && !countryCode)) return null
-
-        return {postalCode, ...(countryCode ? {countryCode} : {})}
-    } catch {
-        return null
-    }
-}
+// React Query has a render where an enabled query has no result before its loading flags update.
+const isEnabledQueryPending = (enabled, query) =>
+    enabled && ((!query.data && !query.error) || query.isLoading || query.isFetching)
 
 const persistDeliveryDestinationCookie = (siteId, destination) => {
-    const cookieName = getDeliveryZipCodeCookieName(siteId)
-    const postalCode = normalizePostalCode(destination?.postalCode)
-    const countryCode = normalizeCountryCode(destination?.countryCode)
-    if (!postalCode || (destination?.countryCode !== undefined && !countryCode)) return
+    const normalizedDestination = normalizeDestination(destination)
+    if (!isValidDestination(normalizedDestination)) return
 
     const value = encodeURIComponent(
         JSON.stringify({
-            postalCode,
-            ...(countryCode ? {countryCode} : {})
+            postalCode: normalizedDestination.postalCode,
+            countryCode: normalizedDestination.countryCode
         })
     )
     const cookieDomain = getConfig()?.app?.commerceAPI?.cookieDomain
@@ -105,7 +75,7 @@ const persistDeliveryDestinationCookie = (siteId, destination) => {
         ...(sameSite?.toLowerCase() === 'none' ? ['Partitioned'] : [])
     ]
 
-    document.cookie = `${cookieName}=${value}; ${attributes.join('; ')}`
+    document.cookie = `deliveryZipCode_${siteId}=${value}; ${attributes.join('; ')}`
 }
 
 const formatDeliveryWindow = (deliveryWindow, formatDate) => {
@@ -180,6 +150,7 @@ const DeliveryEstimate = ({
     showResultInCard = true,
     showCalculator = true,
     showResult = true,
+    onAutomaticLookupChange,
     onResolvedDestination,
     focusPostalCode = false,
     onPostalCodeFocusHandled
@@ -223,16 +194,12 @@ const DeliveryEstimate = ({
         postalCodeMessageValues
     )
 
-    useEffect(() => {
+    useIsomorphicLayoutEffect(() => {
         hasExplicitDestinationRef.current = false
         hasEditedDestinationRef.current = false
-        const cookieDestination = parseDeliveryDestinationCookie(
-            getDeliveryZipCodeCookieName(siteId)
-        )
-        const restoredDestination = normalizeDestination({
-            countryCode: cookieDestination?.countryCode || defaultCountryCode || '',
-            postalCode: cookieDestination?.postalCode || ''
-        })
+        const restoredDestination =
+            getSavedDeliveryDestination(siteId, defaultCountryCode) ||
+            normalizeDestination({countryCode: defaultCountryCode || '', postalCode: ''})
         const destination = isValidDestination(restoredDestination) ? restoredDestination : null
         setDestination(restoredDestination)
         setSubmittedDestination(destination)
@@ -267,7 +234,7 @@ const DeliveryEstimate = ({
 
     const validDestination = isValidDestination(submittedDestination)
     const canRequest = hydrated && Boolean(productId) && Boolean(siteId) && validDestination
-    const {data, error, isError, isLoading, isFetching} = useDeliveryEstimates(
+    const deliveryEstimateQuery = useDeliveryEstimates(
         {
             parameters: {
                 productIds: canRequest ? [productId] : undefined,
@@ -278,9 +245,11 @@ const DeliveryEstimate = ({
         },
         {enabled: canRequest}
     )
-    const slowestEstimate = canRequest ? getSlowestDeliveryEstimate(productId, data) : null
+    const slowestEstimate = canRequest
+        ? getSlowestDeliveryEstimate(productId, deliveryEstimateQuery.data)
+        : null
     const shippingOptions =
-        (data?.productDeliveryEstimates || [])
+        (deliveryEstimateQuery.data?.productDeliveryEstimates || [])
             .find((estimate) => estimate.productId === productId)
             ?.shippingOptions?.filter(isEligibleShippingOption) || []
     const hasMultipleOptions = shippingOptions.length > 1
@@ -289,9 +258,9 @@ const DeliveryEstimate = ({
         if (
             !slowestEstimate ||
             !submittedDestination ||
-            isError ||
-            isLoading ||
-            isFetching ||
+            deliveryEstimateQuery.isError ||
+            deliveryEstimateQuery.isLoading ||
+            deliveryEstimateQuery.isFetching ||
             !hasExplicitDestinationRef.current ||
             typeof window === 'undefined'
         ) {
@@ -300,7 +269,14 @@ const DeliveryEstimate = ({
 
         persistDeliveryDestinationCookie(siteId, submittedDestination)
         hasExplicitDestinationRef.current = false
-    }, [slowestEstimate, submittedDestination, siteId, isError, isLoading, isFetching])
+    }, [
+        slowestEstimate,
+        submittedDestination,
+        siteId,
+        deliveryEstimateQuery.isError,
+        deliveryEstimateQuery.isLoading,
+        deliveryEstimateQuery.isFetching
+    ])
 
     const handleSubmit = (event) => {
         event.preventDefault()
@@ -322,25 +298,34 @@ const DeliveryEstimate = ({
         setSubmittedDestination(normalizedDestination)
     }
 
-    const isRequesting = canRequest && (isLoading || isFetching)
-    const hasResult = Boolean(slowestEstimate) && !isRequesting && !isError
-    const isUnavailable = canRequest && !isRequesting && (isError || (data && !slowestEstimate))
-    const showPostalCodeInstructions =
-        !isRequesting && !hasResult && !isUnavailable && !validationErrors.postalCode
-    const shouldFetchFallbackDeliveryDescription =
-        isUnavailable &&
-        ([403, 500].includes(error?.response?.status) || Boolean(data && !slowestEstimate))
-    const {data: fallbackProduct} = useProduct(
+    const isDeliveryEstimatePending = isEnabledQueryPending(canRequest, deliveryEstimateQuery)
+    const isEstimateUnavailable =
+        canRequest &&
+        !isDeliveryEstimatePending &&
+        (deliveryEstimateQuery.isError || (deliveryEstimateQuery.data && !slowestEstimate))
+    const shouldFetchFallback =
+        isEstimateUnavailable &&
+        ([403, 500].includes(deliveryEstimateQuery.error?.response?.status) ||
+            Boolean(deliveryEstimateQuery.data && !slowestEstimate))
+    const fallbackProductQuery = useProduct(
         {
             parameters: {
-                id: shouldFetchFallbackDeliveryDescription ? productId : undefined,
-                expand: shouldFetchFallbackDeliveryDescription ? ['shipping_methods'] : undefined
+                id: shouldFetchFallback ? productId : undefined,
+                expand: shouldFetchFallback ? ['shipping_methods'] : undefined
             }
         },
-        {enabled: shouldFetchFallbackDeliveryDescription}
+        {enabled: shouldFetchFallback}
     )
-    const fallbackDeliveryDescription = shouldFetchFallbackDeliveryDescription
-        ? getFallbackDeliveryDescription(fallbackProduct?.shippingMethods)
+    const isFallbackPending = isEnabledQueryPending(shouldFetchFallback, fallbackProductQuery)
+    const isCalculating = isDeliveryEstimatePending || isFallbackPending
+    const isAutomaticLookup = isCalculating && !hasExplicitDestinationRef.current
+    const shouldShowCalculator = hydrated && showCalculator && !isCalculating
+    const hasResult = Boolean(slowestEstimate) && !isCalculating && !deliveryEstimateQuery.isError
+    const shouldShowUnavailable = isEstimateUnavailable && !isFallbackPending
+    const showPostalCodeInstructions =
+        !isCalculating && !hasResult && !shouldShowUnavailable && !validationErrors.postalCode
+    const fallbackDeliveryDescription = shouldFetchFallback
+        ? getFallbackDeliveryDescription(fallbackProductQuery.data?.shippingMethods)
         : null
     const hasDeliveryOptionContent = hasResult || Boolean(fallbackDeliveryDescription)
     const calculatingLabel = formatMessage({
@@ -352,7 +337,13 @@ const DeliveryEstimate = ({
         defaultMessage: 'Free'
     })
 
-    useEffect(() => {
+    useIsomorphicLayoutEffect(() => {
+        if (hydrated) {
+            onAutomaticLookupChange?.(isAutomaticLookup, productId)
+        }
+    }, [hydrated, isAutomaticLookup, onAutomaticLookupChange, productId])
+
+    useIsomorphicLayoutEffect(() => {
         if (!hasDeliveryOptionContent || !submittedDestination || !onResolvedDestination) {
             return
         }
@@ -385,16 +376,28 @@ const DeliveryEstimate = ({
     }, [hasResult])
 
     useEffect(() => {
-        if (!showCalculator || !focusPostalCode) {
+        if (!shouldShowCalculator || !focusPostalCode) {
             return
         }
 
         postalCodeInputRef.current?.focus()
         onPostalCodeFocusHandled?.()
-    }, [focusPostalCode, onPostalCodeFocusHandled, showCalculator])
+    }, [focusPostalCode, onPostalCodeFocusHandled, shouldShowCalculator])
 
     const resultContent = (
         <>
+            {isCalculating && (
+                <Text
+                    id={DELIVERY_ESTIMATE_LOADING_ID}
+                    mt={3}
+                    role="status"
+                    aria-live="polite"
+                    fontSize="xs"
+                    color="gray.600"
+                >
+                    {calculatingLabel}
+                </Text>
+            )}
             {hasResult && (
                 <>
                     <Text
@@ -439,7 +442,7 @@ const DeliveryEstimate = ({
                     )}
                 </>
             )}
-            {isUnavailable && (
+            {shouldShowUnavailable && (
                 <Text mt={3} role="status" fontSize="xs" color="gray.600">
                     {fallbackDeliveryDescription ||
                         formatMessage({
@@ -451,7 +454,8 @@ const DeliveryEstimate = ({
             )}
         </>
     )
-    const renderedResult = !showResult
+    const shouldRenderResult = showResult || isCalculating
+    const renderedResult = !shouldRenderResult
         ? null
         : resultContainer
         ? createPortal(resultContent, resultContainer)
@@ -461,7 +465,7 @@ const DeliveryEstimate = ({
 
     return (
         <>
-            {showCalculator && (
+            {shouldShowCalculator && (
                 <Box
                     as="section"
                     aria-labelledby="delivery-estimate-heading"
@@ -538,23 +542,17 @@ const DeliveryEstimate = ({
                             <Button
                                 type="submit"
                                 variant="outline"
-                                isDisabled={!productId || isRequesting}
+                                isDisabled={!productId}
                                 width={{base: '100%', md: 'auto'}}
-                                aria-label={
-                                    isRequesting
-                                        ? calculatingLabel
-                                        : formatMessage({
-                                              id: 'delivery_estimate.action.calculate_aria_label',
-                                              defaultMessage: 'Calculate delivery estimate'
-                                          })
-                                }
+                                aria-label={formatMessage({
+                                    id: 'delivery_estimate.action.calculate_aria_label',
+                                    defaultMessage: 'Calculate delivery estimate'
+                                })}
                             >
-                                {isRequesting
-                                    ? calculatingLabel
-                                    : formatMessage({
-                                          id: 'delivery_estimate.action.calculate',
-                                          defaultMessage: 'Calculate'
-                                      })}
+                                {formatMessage({
+                                    id: 'delivery_estimate.action.calculate',
+                                    defaultMessage: 'Calculate'
+                                })}
                             </Button>
                         </Stack>
                     </Box>
@@ -571,9 +569,10 @@ const DeliveryEstimate = ({
                     )}
 
                     {(!resultContainer || !showResult) &&
-                        (renderedResult || (isUnavailable && resultContent))}
+                        (renderedResult || (shouldShowUnavailable && resultContent))}
                 </Box>
             )}
+            {!shouldShowCalculator && !resultContainer && isCalculating && renderedResult}
             {resultContainer && renderedResult}
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
@@ -646,6 +645,7 @@ DeliveryEstimate.propTypes = {
     showResultInCard: PropTypes.bool,
     showCalculator: PropTypes.bool,
     showResult: PropTypes.bool,
+    onAutomaticLookupChange: PropTypes.func,
     onResolvedDestination: PropTypes.func,
     focusPostalCode: PropTypes.bool,
     onPostalCodeFocusHandled: PropTypes.func

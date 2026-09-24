@@ -89,6 +89,22 @@ const DeferredVariantHarness = () => {
     )
 }
 
+const ProductChangeHarness = () => {
+    const [product, setProduct] = React.useState(mockStandardProductOrderable)
+
+    return (
+        <>
+            <button
+                type="button"
+                onClick={() => setProduct((currentProduct) => ({...currentProduct, id: 'sku-b'}))}
+            >
+                Select SKU B
+            </button>
+            <MockComponent product={product} showDeliveryEstimate={true} />
+        </>
+    )
+}
+
 MockComponent.propTypes = {
     product: PropTypes.object,
     addToCart: PropTypes.func,
@@ -143,7 +159,7 @@ beforeEach(() => {
         isLoading: false,
         isFetching: false
     })
-    useProduct.mockReturnValue({data: undefined})
+    useProduct.mockReturnValue({data: undefined, error: new Error('Catalog lookup failed')})
     document.cookie = 'deliveryZipCode_site-1=; Max-Age=0; path=/'
     window.localStorage.clear()
 
@@ -305,6 +321,12 @@ test('does not request an estimate for a selected variant while its product data
     await user.click(screen.getByRole('button', {name: 'Select size 39'}))
 
     expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(
+        await within(screen.getByTestId('delivery-fulfillment-option')).findByRole('status')
+    ).toHaveTextContent('Calculating...')
+    expect(
+        screen.queryByText('Enter a postal code to get a delivery estimate')
+    ).not.toBeInTheDocument()
     expect(useDeliveryEstimates).not.toHaveBeenCalledWith(
         expect.objectContaining({
             parameters: expect.objectContaining({productIds: ['750518699585M']})
@@ -323,6 +345,81 @@ test('keeps the delivery estimate calculator separate from the delivery option',
 
     expect(deliveryOption).toHaveAttribute('data-selected', 'true')
     expect(deliveryOption).not.toContainElement(deliveryEstimate)
+})
+
+test('shows saved-destination loading in the delivery option', async () => {
+    document.cookie = `deliveryZipCode_site-1=${encodeURIComponent(
+        JSON.stringify({postalCode: '94105', countryCode: 'US'})
+    )}; Path=/`
+    useDeliveryEstimates.mockReturnValue({
+        data: undefined,
+        isError: false,
+        isLoading: true,
+        isFetching: false
+    })
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
+    )
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+    const loading = await within(deliveryOption).findByRole('status')
+
+    expect(loading).toHaveTextContent('Calculating...')
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', {name: 'Calculating...'})).not.toBeInTheDocument()
+    expect(
+        screen.queryByRole('button', {name: 'Calculate delivery estimate'})
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('radio', {name: 'Delivery'})).toHaveAccessibleDescription(
+        'Calculating...'
+    )
+})
+
+test('keeps saved-destination loading in Delivery when pickup is selected', async () => {
+    document.cookie = `deliveryZipCode_site-1=${encodeURIComponent(
+        JSON.stringify({postalCode: '94105', countryCode: 'US'})
+    )}; Path=/`
+    useDeliveryEstimates.mockReturnValue({
+        data: undefined,
+        isError: false,
+        isLoading: true,
+        isFetching: false
+    })
+    renderWithProviders(
+        <MockComponent
+            product={mockStandardProductOrderable}
+            pickupInStore={true}
+            showDeliveryEstimate={true}
+        />
+    )
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+
+    expect(await within(deliveryOption).findByRole('status')).toHaveTextContent('Calculating...')
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+})
+
+test('keeps saved-destination loading in Delivery when the selected product changes', async () => {
+    document.cookie = `deliveryZipCode_site-1=${encodeURIComponent(
+        JSON.stringify({postalCode: '94105', countryCode: 'US'})
+    )}; Path=/`
+    useDeliveryEstimates.mockReturnValue({
+        data: undefined,
+        isError: false,
+        isLoading: true,
+        isFetching: false
+    })
+    const user = userEvent.setup()
+    renderWithProviders(<ProductChangeHarness />, {wrapperProps: {isGuest: true}})
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+    expect(await within(deliveryOption).findByRole('status')).toHaveTextContent('Calculating...')
+
+    await user.click(screen.getByRole('button', {name: 'Select SKU B'}))
+
+    expect(await within(deliveryOption).findByRole('status')).toHaveTextContent('Calculating...')
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
 })
 
 test('folds catalog delivery guidance into the delivery option when an estimate response is empty', async () => {

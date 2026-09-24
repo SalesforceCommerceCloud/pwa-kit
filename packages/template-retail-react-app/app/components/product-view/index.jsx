@@ -30,6 +30,7 @@ const DELIVERY_OPTIONS = {
     DELIVERY: 'delivery',
     PICKUP: 'pickup'
 }
+const DELIVERY_ESTIMATE_LOADING_ID = 'delivery-estimate-loading'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
@@ -61,6 +62,7 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {useCleanupTemporaryBaskets} from '@salesforce/retail-react-app/app/hooks/use-cleanup-temporary-baskets'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {getCountryCodeFromLocale} from '@salesforce/retail-react-app/app/components/delivery-estimate/locale'
+import {getSavedDeliveryDestination} from '@salesforce/retail-react-app/app/components/delivery-estimate/utils'
 
 // Delivery estimates are opt-in on the PDP, so defer their code until the feature renders.
 const DeliveryEstimate = loadable(() =>
@@ -229,6 +231,10 @@ const ProductView = forwardRef(
         const [deliveryEstimateResultContainer, setDeliveryEstimateResultContainer] = useState(null)
         const [deliveryEstimateDestination, setDeliveryEstimateDestination] = useState(null)
         const [isDeliveryEstimateOpen, setIsDeliveryEstimateOpen] = useState(true)
+        const [automaticDeliveryEstimateLookup, setAutomaticDeliveryEstimateLookup] = useState({
+            productId: null,
+            isLoading: false
+        })
         const [focusDeliveryEstimateInput, setFocusDeliveryEstimateInput] = useState(false)
         const [focusDeliveryEstimateDestination, setFocusDeliveryEstimateDestination] =
             useState(false)
@@ -239,6 +245,8 @@ const ProductView = forwardRef(
         const {pdp: showExpressOnPDP} = useExpressCheckoutEnabled()
         const deliveryEstimateProductId =
             variant?.productId || (product?.type?.item ? product.id : null)
+        const deliveryEstimateProductIdRef = useRef(deliveryEstimateProductId)
+        deliveryEstimateProductIdRef.current = deliveryEstimateProductId
         const hasCurrentDeliveryEstimateProduct = product?.id === deliveryEstimateProductId
         const suppressDeferredDeliveryEstimate =
             hasCurrentDeliveryEstimateProduct &&
@@ -246,9 +254,23 @@ const ProductView = forwardRef(
             product.inventory.ats <= 0 &&
             (product.inventory.preorderable || product.inventory.backorderable)
         const defaultCountryCode = getCountryCodeFromLocale(locale?.id)
+        const hasSavedDeliveryDestination = Boolean(
+            showDeliveryEstimate &&
+                site?.id &&
+                getSavedDeliveryDestination(site.id, defaultCountryCode)
+        )
 
         const hasResolvedDeliveryEstimate =
             deliveryEstimateDestination?.productId === deliveryEstimateProductId
+        const isWaitingForSavedDestinationLookup =
+            hasSavedDeliveryDestination &&
+            automaticDeliveryEstimateLookup.productId !== deliveryEstimateProductId
+        const isAutomaticDeliveryEstimateLoading =
+            (automaticDeliveryEstimateLookup.productId === deliveryEstimateProductId &&
+                automaticDeliveryEstimateLookup.isLoading) ||
+            isWaitingForSavedDestinationLookup
+        const hasDeliveryEstimatePresentation =
+            hasResolvedDeliveryEstimate || isAutomaticDeliveryEstimateLoading
 
         const handleResolvedDeliveryEstimate = useCallback(
             (destination, {focusDeliveryOption = false} = {}) => {
@@ -275,6 +297,14 @@ const ProductView = forwardRef(
             setDeliveryEstimateDestination(null)
             setIsDeliveryEstimateOpen(true)
             setFocusDeliveryEstimateInput(true)
+        }, [])
+
+        const handleAutomaticDeliveryEstimateLookup = useCallback((isLoading, productId) => {
+            if (productId !== deliveryEstimateProductIdRef.current) {
+                return
+            }
+
+            setAutomaticDeliveryEstimateLookup({productId, isLoading})
         }, [])
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
@@ -951,7 +981,10 @@ const ProductView = forwardRef(
                                                                 value={DELIVERY_OPTIONS.DELIVERY}
                                                                 isDisabled={disableButton}
                                                                 aria-describedby={
-                                                                    hasResolvedDeliveryEstimate
+                                                                    isAutomaticDeliveryEstimateLoading &&
+                                                                    isDeliverySelected
+                                                                        ? DELIVERY_ESTIMATE_LOADING_ID
+                                                                        : hasDeliveryEstimatePresentation
                                                                         ? undefined
                                                                         : 'delivery-estimate-description'
                                                                 }
@@ -1006,7 +1039,7 @@ const ProductView = forwardRef(
                                                                 </Text>
                                                             )}
                                                         </Flex>
-                                                        {!hasResolvedDeliveryEstimate && (
+                                                        {!hasDeliveryEstimatePresentation && (
                                                             <Text
                                                                 id="delivery-estimate-description"
                                                                 fontSize="sm"
@@ -1022,7 +1055,25 @@ const ProductView = forwardRef(
                                                         <Box
                                                             ref={setDeliveryEstimateResultContainer}
                                                             data-testid="delivery-estimate-result-container"
-                                                        />
+                                                        >
+                                                            {isWaitingForSavedDestinationLookup && (
+                                                                <Text
+                                                                    id={
+                                                                        DELIVERY_ESTIMATE_LOADING_ID
+                                                                    }
+                                                                    mt={3}
+                                                                    role="status"
+                                                                    aria-live="polite"
+                                                                    fontSize="xs"
+                                                                    color="gray.600"
+                                                                >
+                                                                    <FormattedMessage
+                                                                        defaultMessage="Calculating..."
+                                                                        id="delivery_estimate.status.loading"
+                                                                    />
+                                                                </Text>
+                                                            )}
+                                                        </Box>
                                                     </Box>
                                                     {storeLocatorEnabled && (
                                                         <Box
@@ -1135,16 +1186,25 @@ const ProductView = forwardRef(
                                             siteId={site.id}
                                             defaultCountryCode={defaultCountryCode}
                                             resultContainer={
-                                                showDeliveryOptions && isDeliverySelected
+                                                showDeliveryOptions &&
+                                                (isDeliverySelected ||
+                                                    isAutomaticDeliveryEstimateLoading)
                                                     ? deliveryEstimateResultContainer
                                                     : null
                                             }
                                             showResultInCard={!showDeliveryOptions}
                                             showCalculator={
-                                                !showDeliveryOptions || isDeliveryEstimateOpen
+                                                !showDeliveryOptions ||
+                                                (isDeliveryEstimateOpen &&
+                                                    !isAutomaticDeliveryEstimateLoading)
                                             }
                                             showResult={
                                                 !showDeliveryOptions || !isDeliveryEstimateOpen
+                                            }
+                                            onAutomaticLookupChange={
+                                                showDeliveryOptions
+                                                    ? handleAutomaticDeliveryEstimateLookup
+                                                    : undefined
                                             }
                                             onResolvedDestination={
                                                 showDeliveryOptions

@@ -131,7 +131,7 @@ describe('DeliveryEstimate', () => {
             isFetching: false,
             refetch: jest.fn()
         })
-        useProduct.mockReturnValue({data: undefined})
+        useProduct.mockReturnValue({data: undefined, error: new Error('Catalog lookup failed')})
     })
 
     afterEach(() => jest.clearAllMocks())
@@ -290,9 +290,26 @@ describe('DeliveryEstimate', () => {
         })
         renderDeliveryEstimate()
 
-        const button = await screen.findByRole('button', {name: 'Calculating...'})
-        expect(button).toBeDisabled()
-        expect(screen.queryByRole('status')).not.toBeInTheDocument()
+        expect(await screen.findByRole('status')).toHaveTextContent('Calculating...')
+        expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', {name: 'Calculating...'})).not.toBeInTheDocument()
+    })
+
+    test('shows calculating before a saved-destination query reports loading', async () => {
+        setDeliveryDestinationCookie({postalCode: '94105', countryCode: 'US'})
+        useDeliveryEstimates.mockReturnValue({
+            data: undefined,
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        })
+        renderDeliveryEstimate()
+
+        expect(await screen.findByRole('status')).toHaveTextContent('Calculating...')
+        expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+        expect(
+            screen.queryByRole('button', {name: 'Calculate delivery estimate'})
+        ).not.toBeInTheDocument()
     })
 
     test('retains the structured delivery destination cookie country when the locale changes', async () => {
@@ -646,6 +663,78 @@ describe('DeliveryEstimate', () => {
                 }
             },
             {enabled: true}
+        )
+    })
+
+    test('keeps calculating visible while catalog delivery guidance is loading', async () => {
+        const user = userEvent.setup()
+        let deliveryEstimateQuery = {
+            data: undefined,
+            error: undefined,
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        }
+        let fallbackProductQuery = {
+            data: undefined,
+            error: undefined,
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        }
+        useDeliveryEstimates.mockImplementation(() => deliveryEstimateQuery)
+        useProduct.mockImplementation(() => fallbackProductQuery)
+        const {rerender} = renderDeliveryEstimate({showResult: false})
+
+        await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
+        expect(await screen.findByRole('status')).toHaveTextContent('Calculating...')
+
+        deliveryEstimateQuery = {
+            data: {productDeliveryEstimates: []},
+            error: undefined,
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        }
+        rerender(
+            <DeliveryEstimate
+                productId="sku-a"
+                siteId="site-1"
+                defaultCountryCode="US"
+                showResult={false}
+            />
+        )
+
+        expect(screen.getByRole('status')).toHaveTextContent('Calculating...')
+        expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+        expect(
+            screen.queryByRole('button', {name: 'Calculate delivery estimate'})
+        ).not.toBeInTheDocument()
+        expect(screen.queryByText(/delivery dates unavailable/i)).not.toBeInTheDocument()
+
+        fallbackProductQuery = {
+            data: {
+                shippingMethods: [
+                    {id: '001', description: 'Order received within 7-10 business days'}
+                ]
+            },
+            error: undefined,
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        }
+        rerender(
+            <DeliveryEstimate
+                productId="sku-a"
+                siteId="site-1"
+                defaultCountryCode="US"
+                showResult={false}
+            />
+        )
+
+        expect(screen.getByRole('status')).toHaveTextContent(
+            'Order received within 7-10 business days'
         )
     })
 
