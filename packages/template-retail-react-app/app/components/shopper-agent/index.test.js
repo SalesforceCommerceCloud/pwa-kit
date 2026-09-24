@@ -2269,33 +2269,35 @@ describe('ShopperAgent Component', () => {
                 ).toHaveLength(1)
             })
 
-            test('does not fall through to a stale local JWT while the excluded session JWT rotates', async () => {
+            test('falls through to a localStorage JWT when the excluded token is stuck in sessionStorage (tab open since before 1.34.0)', async () => {
+                // Reproduces a tab that was already open on a pre-1.34.0 widget:
+                // sessionStorage still holds the old JWT and the widget never
+                // writes there again, so waiting for it to "rotate" would hang
+                // forever. A new conversation's JWT lands only in localStorage.
                 seedAuthLinkStorage({jwt: 'current-session.jwt'})
                 window.localStorage.setItem(
                     tokenKey,
-                    JSON.stringify({accessToken: 'stale-local.jwt'})
+                    JSON.stringify({accessToken: 'new-conversation.jwt'})
                 )
                 renderCommerceClient()
 
                 await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(1))
+                expect(mockCallAuthLink).toHaveBeenNthCalledWith(1, {
+                    commerceClientJWT: 'current-session.jwt',
+                    scrt2Url: 'https://test.salesforce-scrt.com'
+                })
 
                 await act(async () => {
                     window.dispatchEvent(new Event('onCimulateWidgetReady'))
                 })
-                expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
 
-                window.sessionStorage.setItem(
-                    tokenKey,
-                    JSON.stringify({accessToken: 'rotated-session.jwt'})
-                )
-
+                // sessionStorage still returns the excluded 'current-session.jwt'
+                // (the widget no longer writes there), so the poll falls through
+                // to localStorage's differing, genuinely new token instead of
+                // giving up.
                 await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(2))
                 expect(mockCallAuthLink).toHaveBeenLastCalledWith({
-                    commerceClientJWT: 'rotated-session.jwt',
-                    scrt2Url: 'https://test.salesforce-scrt.com'
-                })
-                expect(mockCallAuthLink).not.toHaveBeenCalledWith({
-                    commerceClientJWT: 'stale-local.jwt',
+                    commerceClientJWT: 'new-conversation.jwt',
                     scrt2Url: 'https://test.salesforce-scrt.com'
                 })
             })
