@@ -19,12 +19,14 @@ import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
     DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
     COMMERCE_CLIENT_UI_STATE_EVENT
 } from '@salesforce/retail-react-app/app/constants'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {toStorefrontNavigatePath} from '@salesforce/retail-react-app/app/utils/url'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
@@ -651,7 +653,7 @@ const toOptionalWidgetBoolean = (value) => {
  * @param {Object} [props.commerceAgentConfiguration.cc_suggestionButtonConfig] - Optional suggestion-button config forwarded as `suggestionButtonConfig` (`icon`: 'sparkle' | 'plus' | 'paper-plane', `iconPosition`: 'left' | 'right')
  * @param {string} [props.commerceAgentConfiguration.cc_messageAlignment] - Optional message-list alignment forwarded as `messageAlignment` ('start' | 'end')
  * @param {string} [props.commerceAgentConfiguration.cc_autoScroll] - When set ('true'/'false'), forwarded as the boolean `autoScroll`; auto-scrolls to the newest message. Omitted when unset so the widget's own default applies
- * @param {string} [props.commerceAgentConfiguration.cc_openLinksInNewTab] - When set ('true'/'false'), forwarded as the boolean `openLinksInNewTab`; opens widget links in a new tab. Omitted when unset so the widget's own default applies
+ * @param {string} [props.commerceAgentConfiguration.cc_openLinksInNewTab] - When set ('true'/'false'), forwarded as the boolean `openLinksInNewTab`; opens widget links in a new tab. Omitted when unset so the widget's own default applies. When omitted (same-tab), product/checkout/markdown clicks are routed through `onNavigate` so the storefront stays an SPA
  * @param {string} [props.commerceAgentConfiguration.cc_showProductDescription] - When set ('true'/'false'), forwarded as the boolean `showProductDescription`; shows the product description on tiles. Omitted when unset so the widget's own default applies
  * @param {string} [props.commerceAgentConfiguration.cc_showProductCaptions] - When set ('true'/'false'), forwarded as the boolean `messagingConfig.showProductCaptions`; shows product captions in the recommendation carousel. Omitted when unset so the widget's own default applies
  * @param {Object} [props.commerceAgentConfiguration.cc_promptsConfig] - Optional prompts-extension config forwarded as `promptsConfig`. Needs `isOpen`/`isInline`/`elementId` to mount; other fields (e.g. `staticQuestions`, `promptsDisplay`) are optional
@@ -700,6 +702,17 @@ const CommerceClientAgentWindow = ({
         cc_showProductCaptions,
         cc_promptsConfig
     } = commerceAgentConfiguration
+
+    const navigate = useNavigation()
+    const onNavigate = useMemo(
+        () => (url, event) => {
+            const path = toStorefrontNavigatePath(url)
+            if (!path) return
+            event.preventDefault()
+            navigate(path)
+        },
+        [navigate]
+    )
 
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
     const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
@@ -1086,6 +1099,7 @@ const CommerceClientAgentWindow = ({
             messageAlignment: cc_messageAlignment,
             autoScroll: toOptionalWidgetBoolean(cc_autoScroll),
             openLinksInNewTab: toOptionalWidgetBoolean(cc_openLinksInNewTab),
+            onNavigate,
             showProductDescription: toOptionalWidgetBoolean(cc_showProductDescription),
             showProductCaptions: toOptionalWidgetBoolean(cc_showProductCaptions),
             promptsConfig: cc_promptsConfig
@@ -1121,6 +1135,7 @@ const CommerceClientAgentWindow = ({
             cc_messageAlignment,
             cc_autoScroll,
             cc_openLinksInNewTab,
+            onNavigate,
             cc_showProductDescription,
             cc_showProductCaptions,
             cc_promptsConfig

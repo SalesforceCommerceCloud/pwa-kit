@@ -2024,6 +2024,14 @@ describe('ShopperAgent Component', () => {
             )
         })
 
+        test('always forwards onNavigate so same-tab widget links stay in the SPA', () => {
+            renderCommerceClient()
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+            expect(typeof widgetOptions.onNavigate).toBe('function')
+        })
+
         test('leaves the new optional widget fields undefined when not configured so the widget default wins', () => {
             renderCommerceClient()
 
@@ -2037,6 +2045,7 @@ describe('ShopperAgent Component', () => {
             expect(widgetOptions.messageAlignment).toBeUndefined()
             expect(widgetOptions.autoScroll).toBeUndefined()
             expect(widgetOptions.openLinksInNewTab).toBeUndefined()
+            expect(typeof widgetOptions.onNavigate).toBe('function')
             expect(widgetOptions.showProductDescription).toBeUndefined()
             expect(widgetOptions.showProductCaptions).toBeUndefined()
             expect(widgetOptions.promptsConfig).toBeUndefined()
