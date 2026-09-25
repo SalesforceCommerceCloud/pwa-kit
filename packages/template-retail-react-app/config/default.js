@@ -83,6 +83,11 @@ module.exports = {
             // When 'true' (default), shoppers can download the chat transcript.
             // Forwarded as `messagingConfig.enableDownloadTranscript`.
             cc_enableDownloadTranscript: 'true',
+            // When 'true', shoppers can upload images in the chat. Requires a
+            // Commerce Client bundle that supports image upload (set via
+            // cc_cdnVersion) plus the backend file-upload prerequisites.
+            // Forwarded as `messagingConfig.enableImageUpload`. Defaults to 'false'.
+            cc_enableImageUpload: 'false',
             // Optional URL to customer's component override script. Must use HTTPS;
             // a non-HTTPS or malformed URL is dropped and the widget keeps its defaults.
             // The script defines Web Components that replace default product cards, carousels,
