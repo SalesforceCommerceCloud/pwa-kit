@@ -98,7 +98,7 @@ jobs:
           node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
-        timeout-minutes: 7
+        timeout-minutes: 8
 
       - name: Lint the generated project
         uses: "./.github/actions/linting"
