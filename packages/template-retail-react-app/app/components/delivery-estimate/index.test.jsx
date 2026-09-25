@@ -647,7 +647,7 @@ describe('DeliveryEstimate', () => {
                 ]
             }
         })
-        renderDeliveryEstimate({showResult: false})
+        renderDeliveryEstimate()
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
@@ -684,7 +684,7 @@ describe('DeliveryEstimate', () => {
         }
         useDeliveryEstimates.mockImplementation(() => deliveryEstimateQuery)
         useProduct.mockImplementation(() => fallbackProductQuery)
-        const {rerender} = renderDeliveryEstimate({showResult: false})
+        const {rerender} = renderDeliveryEstimate()
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
@@ -697,14 +697,7 @@ describe('DeliveryEstimate', () => {
             isLoading: false,
             isFetching: false
         }
-        rerender(
-            <DeliveryEstimate
-                productId="sku-a"
-                siteId="site-1"
-                defaultCountryCode="US"
-                showResult={false}
-            />
-        )
+        rerender(<DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="US" />)
 
         expect(screen.getByRole('status')).toHaveTextContent('Calculating...')
         expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
@@ -724,14 +717,7 @@ describe('DeliveryEstimate', () => {
             isLoading: false,
             isFetching: false
         }
-        rerender(
-            <DeliveryEstimate
-                productId="sku-a"
-                siteId="site-1"
-                defaultCountryCode="US"
-                showResult={false}
-            />
-        )
+        rerender(<DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="US" />)
 
         expect(screen.getByRole('status')).toHaveTextContent(
             'Order received within 7-10 business days'
@@ -747,7 +733,7 @@ describe('DeliveryEstimate', () => {
             isLoading: false,
             isFetching: false
         })
-        renderDeliveryEstimate({showResult: false})
+        renderDeliveryEstimate()
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
@@ -774,7 +760,7 @@ describe('DeliveryEstimate', () => {
                 ]
             }
         })
-        renderDeliveryEstimate({showResult: false})
+        renderDeliveryEstimate()
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
@@ -809,7 +795,7 @@ describe('DeliveryEstimate', () => {
                 ]
             }
         })
-        renderDeliveryEstimate({showResult: false})
+        renderDeliveryEstimate()
 
         expect(useProduct).toHaveBeenLastCalledWith(
             {

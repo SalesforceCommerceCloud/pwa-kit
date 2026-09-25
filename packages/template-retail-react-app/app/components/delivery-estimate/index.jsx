@@ -569,7 +569,10 @@ const DeliveryEstimate = ({
                     )}
 
                     {(!resultContainer || !showResult) &&
-                        (renderedResult || (shouldShowUnavailable && resultContent))}
+                        (renderedResult ||
+                            (shouldShowUnavailable &&
+                                !fallbackDeliveryDescription &&
+                                resultContent))}
                 </Box>
             )}
             {!shouldShowCalculator && !resultContainer && isCalculating && renderedResult}

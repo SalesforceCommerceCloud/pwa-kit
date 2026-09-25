@@ -536,6 +536,53 @@ test('settles delivery to the postal-code control and reopens the calculator on 
     )
 })
 
+test('keeps fallback guidance in Delivery after changing the postal code', async () => {
+    const user = userEvent.setup()
+    let deliveryEstimateQuery = {
+        data: deliveryEstimateResult,
+        isError: false,
+        isLoading: false,
+        isFetching: false
+    }
+    useDeliveryEstimates.mockImplementation(() => deliveryEstimateQuery)
+    useProduct.mockReturnValue({
+        data: {
+            shippingMethods: [{id: '001', description: 'Order received within 7-10 business days'}]
+        },
+        isError: false,
+        isLoading: false,
+        isFetching: false
+    })
+    renderWithProviders(
+        <MockComponent product={mockStandardProductOrderable} showDeliveryEstimate={true} />
+    )
+
+    await user.click(
+        await screen.findByRole('button', {name: 'Change delivery destination from 33712'})
+    )
+    const postalCodeInput = await screen.findByRole('textbox', {name: /zip code/i})
+    await user.clear(postalCodeInput)
+    await user.type(postalCodeInput, '94105')
+
+    deliveryEstimateQuery = {
+        data: {productDeliveryEstimates: []},
+        isError: false,
+        isLoading: false,
+        isFetching: false
+    }
+    await user.click(screen.getByRole('button', {name: 'Calculate delivery estimate'}))
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+    expect(
+        await within(deliveryOption).findByText('Order received within 7-10 business days')
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('textbox', {name: /zip code/i})).not.toBeInTheDocument()
+    expect(
+        screen.queryByText('Delivery dates unavailable. See checkout for options and costs.')
+    ).not.toBeInTheDocument()
+})
+
 describe('Event Handlers', () => {
     test('calls addToCart when add to cart button is clicked', async () => {
         const addToCart = jest.fn()
