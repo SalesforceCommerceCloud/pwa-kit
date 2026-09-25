@@ -45,7 +45,7 @@ packages/test-commerce-sdk-react/                          @SalesforceCommerceCl
 packages/template-retail-react-app/app/components/store-display/ @SalesforceCommerceCloud/cc-spark
 packages/template-retail-react-app/app/hooks/use-selected-store.js @SalesforceCommerceCloud/cc-spark
 packages/template-retail-react-app/app/hooks/use-pickup-shipment.js @SalesforceCommerceCloud/cc-spark
-packages/template-retail-react-app/app/hooks/use-pickup-shipment.test.js @SalesforceCommerceCloud/cc-spark
+packages/template-retail-react-app/app/hooks/use-pickup-shipment-temp.test.js @SalesforceCommerceCloud/cc-spark
 e2e/tests/desktop/bopis.spec.js @SalesforceCommerceCloud/cc-spark
 
 # Bonus Products feature files - PR #2704
