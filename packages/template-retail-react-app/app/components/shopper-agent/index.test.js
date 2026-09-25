@@ -2079,6 +2079,34 @@ describe('ShopperAgent Component', () => {
                 delete window.CimulateMessaging
             })
 
+            test('links a resumed conversation when the widget persisted JWT and conversationId only to localStorage', async () => {
+                // Widget 1.34.0+ writes cim_af_conv_* and cim_af_ct_* only to
+                // localStorage. sessionStorage is intentionally left empty here
+                // to reproduce a full page load of an existing conversation.
+                window.localStorage.setItem(
+                    tokenKey,
+                    JSON.stringify({accessToken: 'local-only.jwt'})
+                )
+                window.localStorage.setItem(
+                    conversationKey,
+                    JSON.stringify({conversationId: 'local-only-conv'})
+                )
+
+                renderCommerceClient()
+
+                await waitFor(() =>
+                    expect(mockCallAuthLink).toHaveBeenCalledWith({
+                        commerceClientJWT: 'local-only.jwt',
+                        scrt2Url: 'https://test.salesforce-scrt.com'
+                    })
+                )
+                expect(mockCallTokenBridge).toHaveBeenCalledWith({
+                    authLinkKey: 'commerce-auth-link-key',
+                    slasAccessToken: 'test-slas-access-token',
+                    siteId: 'RefArchGlobal'
+                })
+            })
+
             test('links a resumed conversation with deployment-scoped storage', async () => {
                 window.sessionStorage.setItem(
                     'cim_af_ct_other-org_Other_Service',
@@ -2241,33 +2269,35 @@ describe('ShopperAgent Component', () => {
                 ).toHaveLength(1)
             })
 
-            test('does not fall through to a stale local JWT while the excluded session JWT rotates', async () => {
+            test('falls through to a localStorage JWT when the excluded token is stuck in sessionStorage (tab open since before 1.34.0)', async () => {
+                // Reproduces a tab that was already open on a pre-1.34.0 widget:
+                // sessionStorage still holds the old JWT and the widget never
+                // writes there again, so waiting for it to "rotate" would hang
+                // forever. A new conversation's JWT lands only in localStorage.
                 seedAuthLinkStorage({jwt: 'current-session.jwt'})
                 window.localStorage.setItem(
                     tokenKey,
-                    JSON.stringify({accessToken: 'stale-local.jwt'})
+                    JSON.stringify({accessToken: 'new-conversation.jwt'})
                 )
                 renderCommerceClient()
 
                 await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(1))
+                expect(mockCallAuthLink).toHaveBeenNthCalledWith(1, {
+                    commerceClientJWT: 'current-session.jwt',
+                    scrt2Url: 'https://test.salesforce-scrt.com'
+                })
 
                 await act(async () => {
                     window.dispatchEvent(new Event('onCimulateWidgetReady'))
                 })
-                expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
 
-                window.sessionStorage.setItem(
-                    tokenKey,
-                    JSON.stringify({accessToken: 'rotated-session.jwt'})
-                )
-
+                // sessionStorage still returns the excluded 'current-session.jwt'
+                // (the widget no longer writes there), so the poll falls through
+                // to localStorage's differing, genuinely new token instead of
+                // giving up.
                 await waitFor(() => expect(mockCallAuthLink).toHaveBeenCalledTimes(2))
                 expect(mockCallAuthLink).toHaveBeenLastCalledWith({
-                    commerceClientJWT: 'rotated-session.jwt',
-                    scrt2Url: 'https://test.salesforce-scrt.com'
-                })
-                expect(mockCallAuthLink).not.toHaveBeenCalledWith({
-                    commerceClientJWT: 'stale-local.jwt',
+                    commerceClientJWT: 'new-conversation.jwt',
                     scrt2Url: 'https://test.salesforce-scrt.com'
                 })
             })

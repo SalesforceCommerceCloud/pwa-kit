@@ -771,13 +771,19 @@ const CommerceClientAgentWindow = ({
     }
 
     /**
-     * Read the Commerce Client conversationId from this widget's scoped session
+     * Read the Commerce Client conversationId from this widget's scoped storage
      * key (value shape: {"conversationId":"...","storedAt":...}). Returns null
      * if not present yet (e.g. conversation still being created).
+     *
+     * Checks localStorage first, which is where the widget stores the
+     * conversation id as of 1.34.0, then falls back to sessionStorage for
+     * back-compat with older widget builds (pre-1.34.0) that persisted there.
      */
     const readConversationId = () => {
         try {
-            const value = window.sessionStorage.getItem(commerceClientConversationKey)
+            const value =
+                window.localStorage.getItem(commerceClientConversationKey) ||
+                window.sessionStorage.getItem(commerceClientConversationKey)
             return value ? JSON.parse(value)?.conversationId || null : null
         } catch (err) {
             console.error('[Commerce Client] Failed to read conversationId', err)
@@ -787,8 +793,12 @@ const CommerceClientAgentWindow = ({
 
     /**
      * Extract this widget's Commerce Client JWT from its scoped cim_af_ct_* key.
-     * The session-scoped value is authoritative; localStorage is a compatibility
-     * fallback for SDK versions that persist the same scoped key there.
+     * Checks sessionStorage first, then localStorage, which is where the widget
+     * stores the JWT as of 1.34.0. A store's value is skipped (not just treated
+     * as "no token yet") when it equals excludedJWT, so a stale value left behind
+     * in one store (e.g. a tab open since before 1.34.0, whose sessionStorage
+     * entry no longer gets updated) does not block picking up a genuinely newer
+     * token from the other store.
      */
     const extractCommerceClientJWT = (excludedJWT = null) => {
         const stores = [window.sessionStorage, window.localStorage]
@@ -796,8 +806,12 @@ const CommerceClientAgentWindow = ({
             try {
                 const data = JSON.parse(store.getItem(commerceClientTokenKey) || 'null')
                 const accessToken = data?.accessToken
-                if (typeof accessToken === 'string' && accessToken.trim().length > 0) {
-                    return accessToken !== excludedJWT ? accessToken : null
+                if (
+                    typeof accessToken === 'string' &&
+                    accessToken.trim().length > 0 &&
+                    accessToken !== excludedJWT
+                ) {
+                    return accessToken
                 }
             } catch (err) {
                 console.error('[Commerce Client] Failed to parse storage for JWT', err)
