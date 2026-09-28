@@ -208,16 +208,14 @@ describe('DeliveryEstimate', () => {
         expect(await screen.findByText('Arrives Wed, Dec 30 \u2013 Sun, Jan 3')).toBeInTheDocument()
     })
 
-    test('uses the localized postcode label, example, and instructions for GB', () => {
+    test('uses the localized postcode label without displaying additional instructions', () => {
         renderWithProviders(
             <DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="GB" />
         )
 
         const input = screen.getByRole('textbox', {name: /postcode/i})
-        expect(input).toHaveAttribute('placeholder', 'Enter postcode (e.g. SW1A 1AA)')
-        expect(input).toHaveAccessibleDescription(
-            'Enter your postcode (e.g. SW1A 1AA) to see delivery estimates.'
-        )
+        expect(input).toHaveAttribute('placeholder', 'Enter a postal code...')
+        expect(input).not.toHaveAccessibleDescription()
     })
 
     test('falls back to default delivery-estimate messages for untranslated locales', () => {
@@ -234,7 +232,7 @@ describe('DeliveryEstimate', () => {
             ).toBeInTheDocument()
             expect(screen.getByRole('textbox', {name: 'postal code'})).toHaveAttribute(
                 'placeholder',
-                'Enter postal code (e.g. 10115)'
+                'Enter a postal code...'
             )
             expect(
                 screen.getByRole('button', {name: 'Calculate delivery estimate'})
@@ -293,6 +291,30 @@ describe('DeliveryEstimate', () => {
         expect(await screen.findByRole('status')).toHaveTextContent('Calculating...')
         expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
         expect(screen.queryByRole('button', {name: 'Calculating...'})).not.toBeInTheDocument()
+    })
+
+    test('keeps the calculator available with a disabled button during a shopper-initiated lookup', async () => {
+        const user = userEvent.setup()
+        useDeliveryEstimates.mockReturnValue({
+            data: undefined,
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        })
+        renderDeliveryEstimate()
+
+        const calculator = screen.getByRole('region', {name: 'Estimated Delivery Date'})
+        await user.type(within(calculator).getByRole('textbox', {name: /zip code/i}), '94105')
+        await user.click(
+            within(calculator).getByRole('button', {name: 'Calculate delivery estimate'})
+        )
+
+        const calculatingButton = await within(calculator).findByRole('button', {
+            name: 'Calculating...'
+        })
+        expect(within(calculator).getByRole('textbox', {name: /zip code/i})).toHaveValue('94105')
+        expect(calculatingButton).toBeDisabled()
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
     })
 
     test('shows calculating before a saved-destination query reports loading', async () => {
@@ -688,7 +710,9 @@ describe('DeliveryEstimate', () => {
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
-        expect(await screen.findByRole('status')).toHaveTextContent('Calculating...')
+        expect(await screen.findByRole('button', {name: 'Calculating...'})).toBeDisabled()
+        expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveValue('94105')
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
 
         deliveryEstimateQuery = {
             data: {productDeliveryEstimates: []},
@@ -699,11 +723,9 @@ describe('DeliveryEstimate', () => {
         }
         rerender(<DeliveryEstimate productId="sku-a" siteId="site-1" defaultCountryCode="US" />)
 
-        expect(screen.getByRole('status')).toHaveTextContent('Calculating...')
-        expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
-        expect(
-            screen.queryByRole('button', {name: 'Calculate delivery estimate'})
-        ).not.toBeInTheDocument()
+        expect(screen.getByRole('button', {name: 'Calculating...'})).toBeDisabled()
+        expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveValue('94105')
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
         expect(screen.queryByText(/delivery dates unavailable/i)).not.toBeInTheDocument()
 
         fallbackProductQuery = {

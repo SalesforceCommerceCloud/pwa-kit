@@ -45,7 +45,6 @@ import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const DELIVERY_DESTINATION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
-const DELIVERY_ESTIMATE_INSTRUCTIONS_ID = 'delivery-estimate-postal-code-instructions'
 const DELIVERY_ESTIMATE_ERROR_ID = 'delivery-estimate-postal-code-error'
 const DELIVERY_ESTIMATE_LOADING_ID = 'delivery-estimate-loading'
 const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
@@ -118,19 +117,7 @@ const postalCodeTermMessages = defineMessages({
 const postalCodeMessages = defineMessages({
     placeholder: {
         id: 'delivery_estimate.placeholder.postal_code',
-        defaultMessage: 'Enter {term}'
-    },
-    placeholderExample: {
-        id: 'delivery_estimate.placeholder.postal_code_example',
-        defaultMessage: 'Enter {term} (e.g. {example})'
-    },
-    instructions: {
-        id: 'delivery_estimate.instructions.postal_code',
-        defaultMessage: 'Enter your {term} (e.g. {example}) to see delivery estimates.'
-    },
-    instructionsNoExample: {
-        id: 'delivery_estimate.instructions.postal_code_no_example',
-        defaultMessage: 'Enter your {term} to see delivery estimates.'
+        defaultMessage: 'Enter a postal code...'
     },
     invalid: {
         id: 'delivery_estimate.error.invalid_postal_code',
@@ -139,6 +126,17 @@ const postalCodeMessages = defineMessages({
     invalidNoExample: {
         id: 'delivery_estimate.error.invalid_postal_code_no_example',
         defaultMessage: 'Enter a valid {term}.'
+    }
+})
+
+const deliveryEstimateMessages = defineMessages({
+    calculateAriaLabel: {
+        id: 'delivery_estimate.action.calculate_aria_label',
+        defaultMessage: 'Calculate delivery estimate'
+    },
+    calculating: {
+        id: 'delivery_estimate.status.loading',
+        defaultMessage: 'Calculating...'
     }
 })
 
@@ -177,18 +175,7 @@ const DeliveryEstimate = ({
         postalCodeTermMessages[postalCodeFormat.termKey] || postalCodeTermMessages.postalCode
     )
     const postalCodeMessageValues = {term: postalCodeTerm, example: postalCodeFormat.example}
-    const postalCodePlaceholder = formatMessage(
-        postalCodeFormat.example
-            ? postalCodeMessages.placeholderExample
-            : postalCodeMessages.placeholder,
-        postalCodeMessageValues
-    )
-    const postalCodeInstructions = formatMessage(
-        postalCodeFormat.example
-            ? postalCodeMessages.instructions
-            : postalCodeMessages.instructionsNoExample,
-        postalCodeMessageValues
-    )
+    const postalCodePlaceholder = formatMessage(postalCodeMessages.placeholder)
     const postalCodeInvalid = formatMessage(
         postalCodeFormat.example ? postalCodeMessages.invalid : postalCodeMessages.invalidNoExample,
         postalCodeMessageValues
@@ -318,20 +305,18 @@ const DeliveryEstimate = ({
     )
     const isFallbackPending = isEnabledQueryPending(shouldFetchFallback, fallbackProductQuery)
     const isCalculating = isDeliveryEstimatePending || isFallbackPending
-    const isAutomaticLookup = isCalculating && !hasExplicitDestinationRef.current
-    const shouldShowCalculator = hydrated && showCalculator && !isCalculating
+    const isExplicitDestination = hasExplicitDestinationRef.current
+    const isExplicitCalculation = isCalculating && isExplicitDestination
+    const isAutomaticLookup = isCalculating && !isExplicitDestination
+    const shouldShowCalculator =
+        hydrated && showCalculator && (!isCalculating || isExplicitDestination)
     const hasResult = Boolean(slowestEstimate) && !isCalculating && !deliveryEstimateQuery.isError
     const shouldShowUnavailable = isEstimateUnavailable && !isFallbackPending
-    const showPostalCodeInstructions =
-        !isCalculating && !hasResult && !shouldShowUnavailable && !validationErrors.postalCode
     const fallbackDeliveryDescription = shouldFetchFallback
         ? getFallbackDeliveryDescription(fallbackProductQuery.data?.shippingMethods)
         : null
     const hasDeliveryOptionContent = hasResult || Boolean(fallbackDeliveryDescription)
-    const calculatingLabel = formatMessage({
-        id: 'delivery_estimate.status.loading',
-        defaultMessage: 'Calculating...'
-    })
+    const calculatingLabel = formatMessage(deliveryEstimateMessages.calculating)
     const freeLabel = formatMessage({
         id: 'checkout_confirmation.label.free',
         defaultMessage: 'Free'
@@ -386,7 +371,7 @@ const DeliveryEstimate = ({
 
     const resultContent = (
         <>
-            {isCalculating && (
+            {isCalculating && !isExplicitDestination && (
                 <Text
                     id={DELIVERY_ESTIMATE_LOADING_ID}
                     mt={3}
@@ -454,7 +439,7 @@ const DeliveryEstimate = ({
             )}
         </>
     )
-    const shouldRenderResult = showResult || isCalculating
+    const shouldRenderResult = showResult || (isCalculating && !isExplicitDestination)
     const renderedResult = !shouldRenderResult
         ? null
         : resultContainer
@@ -515,8 +500,6 @@ const DeliveryEstimate = ({
                                     aria-describedby={
                                         validationErrors.postalCode
                                             ? DELIVERY_ESTIMATE_ERROR_ID
-                                            : showPostalCodeInstructions
-                                            ? DELIVERY_ESTIMATE_INSTRUCTIONS_ID
                                             : undefined
                                     }
                                     value={destination.postalCode}
@@ -542,12 +525,15 @@ const DeliveryEstimate = ({
                             <Button
                                 type="submit"
                                 variant="outline"
-                                isDisabled={!productId}
+                                isLoading={isExplicitCalculation}
+                                loadingText={calculatingLabel}
+                                isDisabled={!productId || isExplicitCalculation}
                                 width={{base: '100%', md: 'auto'}}
-                                aria-label={formatMessage({
-                                    id: 'delivery_estimate.action.calculate_aria_label',
-                                    defaultMessage: 'Calculate delivery estimate'
-                                })}
+                                aria-label={formatMessage(
+                                    isExplicitCalculation
+                                        ? deliveryEstimateMessages.calculating
+                                        : deliveryEstimateMessages.calculateAriaLabel
+                                )}
                             >
                                 {formatMessage({
                                     id: 'delivery_estimate.action.calculate',
@@ -556,17 +542,6 @@ const DeliveryEstimate = ({
                             </Button>
                         </Stack>
                     </Box>
-
-                    {showPostalCodeInstructions && (
-                        <Text
-                            id={DELIVERY_ESTIMATE_INSTRUCTIONS_ID}
-                            mt={3}
-                            fontSize="xs"
-                            color="gray.600"
-                        >
-                            {postalCodeInstructions}
-                        </Text>
-                    )}
 
                     {(!resultContainer || !showResult) &&
                         (renderedResult ||

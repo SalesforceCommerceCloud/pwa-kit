@@ -4117,58 +4117,6 @@
       "value": "]"
     }
   ],
-  "delivery_estimate.instructions.postal_code": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḗƞŧḗḗř ẏǿǿŭŭř "
-    },
-    {
-      "type": 1,
-      "value": "term"
-    },
-    {
-      "type": 0,
-      "value": " (ḗḗ.ɠ. "
-    },
-    {
-      "type": 1,
-      "value": "example"
-    },
-    {
-      "type": 0,
-      "value": ") ŧǿǿ şḗḗḗḗ ḓḗḗŀīṽḗḗřẏ ḗḗşŧīḿȧȧŧḗḗş."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "delivery_estimate.instructions.postal_code_no_example": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḗƞŧḗḗř ẏǿǿŭŭř "
-    },
-    {
-      "type": 1,
-      "value": "term"
-    },
-    {
-      "type": 0,
-      "value": " ŧǿǿ şḗḗḗḗ ḓḗḗŀīṽḗḗřẏ ḗḗşŧīḿȧȧŧḗḗş."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "delivery_estimate.link.view_all_shipping_options": [
     {
       "type": 0,
@@ -4204,41 +4152,7 @@
     },
     {
       "type": 0,
-      "value": "Ḗƞŧḗḗř "
-    },
-    {
-      "type": 1,
-      "value": "term"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "delivery_estimate.placeholder.postal_code_example": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḗƞŧḗḗř "
-    },
-    {
-      "type": 1,
-      "value": "term"
-    },
-    {
-      "type": 0,
-      "value": " (ḗḗ.ɠ. "
-    },
-    {
-      "type": 1,
-      "value": "example"
-    },
-    {
-      "type": 0,
-      "value": ")"
+      "value": "Ḗƞŧḗḗř ȧȧ ƥǿǿşŧȧȧŀ ƈǿǿḓḗḗ..."
     },
     {
       "type": 0,
@@ -9672,7 +9586,7 @@
     },
     {
       "type": 0,
-      "value": "Ḗƞŧḗḗř ȧȧ ƥǿǿşŧȧȧŀ ƈǿǿḓḗḗ ŧǿǿ ɠḗḗŧ ȧȧ ḓḗḗŀīṽḗḗřẏ ḗḗşŧīḿȧȧŧḗḗ"
+      "value": "Ḗƞŧḗḗř ƥǿǿşŧȧȧŀ ƈǿǿḓḗḗ ŧǿǿ şḗḗḗḗ ḓḗḗŀīṽḗḗřẏ ḗḗşŧīḿȧȧŧḗḗ"
     },
     {
       "type": 0,

@@ -324,9 +324,7 @@ test('does not request an estimate for a selected variant while its product data
     expect(
         await within(screen.getByTestId('delivery-fulfillment-option')).findByRole('status')
     ).toHaveTextContent('Calculating...')
-    expect(
-        screen.queryByText('Enter a postal code to get a delivery estimate')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Enter postal code to see delivery estimate')).not.toBeInTheDocument()
     expect(useDeliveryEstimates).not.toHaveBeenCalledWith(
         expect.objectContaining({
             parameters: expect.objectContaining({productIds: ['750518699585M']})
@@ -497,7 +495,7 @@ test('matches the Storefront Next fulfillment option labels', () => {
     )
 
     expect(screen.getByRole('radio', {name: 'Delivery'})).toHaveAccessibleDescription(
-        'Enter a postal code to get a delivery estimate'
+        'Enter postal code to see delivery estimate'
     )
     expect(screen.getByRole('radio', {name: 'Free pickup in'})).toHaveAccessibleDescription(
         'Select Store'
@@ -532,7 +530,7 @@ test('settles delivery to the postal-code control and reopens the calculator on 
         expect(screen.getByRole('textbox', {name: /zip code/i})).toHaveFocus()
     })
     expect(screen.getByRole('radio', {name: 'Delivery'})).toHaveAccessibleDescription(
-        'Enter a postal code to get a delivery estimate'
+        'Enter postal code to see delivery estimate'
     )
 })
 

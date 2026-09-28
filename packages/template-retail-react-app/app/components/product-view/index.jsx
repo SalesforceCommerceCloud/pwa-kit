@@ -1047,7 +1047,7 @@ const ProductView = forwardRef(
                                                                 mt={2}
                                                             >
                                                                 <FormattedMessage
-                                                                    defaultMessage="Enter a postal code to get a delivery estimate"
+                                                                    defaultMessage="Enter postal code to see delivery estimate"
                                                                     id="product_view.description.delivery_estimate"
                                                                 />
                                                             </Text>

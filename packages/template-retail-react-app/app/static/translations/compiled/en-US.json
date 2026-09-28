@@ -2013,42 +2013,6 @@
       "value": "Estimated Delivery Date"
     }
   ],
-  "delivery_estimate.instructions.postal_code": [
-    {
-      "type": 0,
-      "value": "Enter your "
-    },
-    {
-      "type": 1,
-      "value": "term"
-    },
-    {
-      "type": 0,
-      "value": " (e.g. "
-    },
-    {
-      "type": 1,
-      "value": "example"
-    },
-    {
-      "type": 0,
-      "value": ") to see delivery estimates."
-    }
-  ],
-  "delivery_estimate.instructions.postal_code_no_example": [
-    {
-      "type": 0,
-      "value": "Enter your "
-    },
-    {
-      "type": 1,
-      "value": "term"
-    },
-    {
-      "type": 0,
-      "value": " to see delivery estimates."
-    }
-  ],
   "delivery_estimate.link.view_all_shipping_options": [
     {
       "type": 0,
@@ -2064,33 +2028,7 @@
   "delivery_estimate.placeholder.postal_code": [
     {
       "type": 0,
-      "value": "Enter "
-    },
-    {
-      "type": 1,
-      "value": "term"
-    }
-  ],
-  "delivery_estimate.placeholder.postal_code_example": [
-    {
-      "type": 0,
-      "value": "Enter "
-    },
-    {
-      "type": 1,
-      "value": "term"
-    },
-    {
-      "type": 0,
-      "value": " (e.g. "
-    },
-    {
-      "type": 1,
-      "value": "example"
-    },
-    {
-      "type": 0,
-      "value": ")"
+      "value": "Enter a postal code..."
     }
   ],
   "delivery_estimate.postal_term.cap": [
@@ -4636,7 +4574,7 @@
   "product_view.description.delivery_estimate": [
     {
       "type": 0,
-      "value": "Enter a postal code to get a delivery estimate"
+      "value": "Enter postal code to see delivery estimate"
     }
   ],
   "product_view.error.no_store_selected_for_pickup": [
