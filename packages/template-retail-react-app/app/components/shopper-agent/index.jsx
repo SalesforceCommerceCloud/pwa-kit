@@ -411,10 +411,10 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, domainUrl}) => {
         // starts from a clean state.
         const failSessionInit = () => {
             resetEmbeddedMessagingForCommerceSessionChange()
-            toastRef.current({
-                title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
-                status: 'error'
-            })
+            // toastRef.current({
+            //     title: formatMessageRef.current(SESSION_INIT_ERROR_MESSAGE),
+            //     status: 'error'
+            // })
         }
 
         const handleEmbeddedMessagingConversationStarted = (event) => {
