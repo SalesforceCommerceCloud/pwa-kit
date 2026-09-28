@@ -52,6 +52,7 @@ const onClient = typeof window !== 'undefined'
  * @param {string} [options.messageAlignment] - Message-list alignment forwarded as `messageAlignment` ('start' | 'end')
  * @param {boolean} [options.autoScroll] - Forwarded as `autoScroll` when set; auto-scrolls to the newest message. Omitted when undefined so the widget's own default applies
  * @param {boolean} [options.openLinksInNewTab] - Forwarded as `openLinksInNewTab` when set; opens links rendered by the widget in a new tab. Omitted when undefined so the widget's own default applies
+ * @param {function} [options.onNavigate] - Storefront router callback forwarded as `onNavigate`. The widget calls this on an unmodified same-origin product/checkout/markdown click so the host can `history.push` instead of a full page load. Omitted when not a function
  * @param {boolean} [options.showProductDescription] - Forwarded as `showProductDescription` when set; shows the product description on product tiles. Omitted when undefined so the widget's own default applies
  * @param {boolean} [options.showProductCaptions] - Forwarded as `messagingConfig.showProductCaptions` when set; shows product captions in the recommendation carousel. Omitted when undefined so the widget's own default applies
  * @param {Object} [options.promptsConfig] - Prompts-extension config forwarded as `promptsConfig`. The extension mounts into a merchant-supplied `elementId` and needs `isOpen`/`isInline`/`elementId`; other fields (e.g. `staticQuestions`, `promptsDisplay`) are optional
@@ -81,6 +82,7 @@ const injectCommerceClientWidget = ({
     messageAlignment,
     autoScroll,
     openLinksInNewTab,
+    onNavigate,
     showProductDescription,
     showProductCaptions,
     promptsConfig
@@ -139,6 +141,7 @@ const injectCommerceClientWidget = ({
             ...(messageAlignment ? {messageAlignment} : {}),
             ...(typeof autoScroll === 'boolean' ? {autoScroll} : {}),
             ...(typeof openLinksInNewTab === 'boolean' ? {openLinksInNewTab} : {}),
+            ...(typeof onNavigate === 'function' ? {onNavigate} : {}),
             ...(typeof showProductDescription === 'boolean' ? {showProductDescription} : {}),
             ...(promptsConfig && typeof promptsConfig === 'object' ? {promptsConfig} : {})
         })
