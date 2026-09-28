@@ -1056,7 +1056,7 @@ const CommerceClientAgentWindow = ({
             capabilitiesVersion: cc_capabilitiesVersion,
             enableEscalationToAgent: cc_enableEscalationToAgent !== 'false',
             enableDownloadTranscript: cc_enableDownloadTranscript !== 'false',
-            enableImageUpload: cc_enableImageUpload !== 'false',
+            enableImageUpload: cc_enableImageUpload === 'true',
             routingAttributes: resolveCommerceClientRoutingAttributes({
                 cc_routingAttributes,
                 cc_cdnVersion,
