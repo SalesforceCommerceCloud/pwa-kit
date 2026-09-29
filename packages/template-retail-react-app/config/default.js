@@ -83,6 +83,11 @@ module.exports = {
             // When 'true' (default), shoppers can download the chat transcript.
             // Forwarded as `messagingConfig.enableDownloadTranscript`.
             cc_enableDownloadTranscript: 'true',
+            // When 'true', shoppers can upload images in the chat. Requires a
+            // Commerce Client bundle that supports image upload (set via
+            // cc_cdnVersion) plus the backend file-upload prerequisites.
+            // Forwarded as `messagingConfig.enableImageUpload`. Defaults to 'false'.
+            cc_enableImageUpload: 'false',
             // Optional URL to customer's component override script. Must use HTTPS;
             // a non-HTTPS or malformed URL is dropped and the widget keeps its defaults.
             // The script defines Web Components that replace default product cards, carousels,
@@ -109,6 +114,28 @@ module.exports = {
             // elements must already be registered with customElements.define() before the widget
             // injects. Mutually exclusive with `cc_overridesUrl` — set one or the other, not
             // both; when both are set `cc_overrides` wins and the URL is ignored.
+            // Optional: pass `cc_headerConfig` (object) via COMMERCE_AGENT_SETTINGS to style the
+            // widget header. Forwarded to the widget as `headerConfig` (e.g. `logoUrl`,
+            // `headerText`, `headerBackgroundColor`, `headerTextColor`, `headerTextFontSize`,
+            // `headerTextFontWeight`, `headerTextFontFamily`, `headerTextTextAlign`).
+            // Optional: pass `cc_suggestionButtonConfig` (object) via COMMERCE_AGENT_SETTINGS to
+            // configure suggestion buttons. Forwarded as `suggestionButtonConfig`
+            // ({ icon: 'sparkle' | 'plus' | 'paper-plane', iconPosition: 'left' | 'right' }).
+            // Optional: pass `cc_messageAlignment` ('start' | 'end') via COMMERCE_AGENT_SETTINGS,
+            // forwarded to the widget as `messageAlignment`.
+            // Optional: pass `cc_autoScroll` ('true' | 'false') via COMMERCE_AGENT_SETTINGS,
+            // forwarded to the widget as the boolean `autoScroll`.
+            // Optional: pass `cc_openLinksInNewTab` ('true' | 'false') via COMMERCE_AGENT_SETTINGS,
+            // forwarded to the widget as the boolean `openLinksInNewTab`.
+            // Optional: pass `cc_showProductDescription` ('true' | 'false') via
+            // COMMERCE_AGENT_SETTINGS, forwarded as the boolean `showProductDescription`.
+            // Optional: pass `cc_showProductCaptions` ('true' | 'false') via COMMERCE_AGENT_SETTINGS,
+            // forwarded as the boolean `messagingConfig.showProductCaptions`.
+            // Optional: pass `cc_promptsConfig` (object) via COMMERCE_AGENT_SETTINGS to configure the
+            // prompts extension. Forwarded as `promptsConfig`; requires `isOpen`, `isInline`, and
+            // `elementId` to mount, plus optional fields like `staticQuestions` and `promptsDisplay`.
+            // None of the above set a storefront default — the widget applies its own defaults when
+            // a value is omitted.
         },
         url: {
             site: 'path',

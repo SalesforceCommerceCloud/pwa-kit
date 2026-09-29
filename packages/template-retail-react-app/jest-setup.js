@@ -108,10 +108,22 @@ export const setupMockServer = () => {
     )
 }
 
+// Track unhandled requests we've already reported so a single unmocked endpoint
+// hit hundreds of times in one test file logs once, not once per request. This
+// preserves the diagnostic signal (which endpoints are unmocked) without flooding
+// CI logs. Keyed on method + origin + pathname (query string stripped so param
+// variations collapse to one entry).
+const reportedUnhandledRequests = new Set()
+
 beforeAll(() => {
     global.server = setupMockServer()
     global.server.listen({
         onUnhandledRequest(req) {
+            const key = `${req.method} ${req.url.origin}${req.url.pathname}`
+            if (reportedUnhandledRequests.has(key)) {
+                return
+            }
+            reportedUnhandledRequests.add(key)
             console.error('Found an unhandled %s request to %s', req.method, req.url.href)
         }
     })

@@ -23,13 +23,15 @@ const messagingFields = {
 }
 
 // The widget always receives capabilitiesVersion (defaults to '65') plus the
-// escalation/transcript toggles (default true) when the caller omits them, so the
-// expected messagingConfig includes them.
+// escalation/transcript toggles (default true) and the image-upload toggle
+// (default false) when the caller omits them, so the expected messagingConfig
+// includes them.
 const expectedMessagingConfig = {
     ...messagingFields,
     capabilitiesVersion: DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     enableEscalationToAgent: true,
-    enableDownloadTranscript: true
+    enableDownloadTranscript: true,
+    enableImageUpload: false
 }
 
 describe('injectCommerceClientWidget', () => {
@@ -183,6 +185,29 @@ describe('injectCommerceClientWidget', () => {
         expect(messagingConfig.enableDownloadTranscript).toBe(true)
     })
 
+    test('defaults the image-upload toggle to false in messagingConfig', () => {
+        injectCommerceClientWidget(messagingFields)
+
+        const {messagingConfig} = mockInject.mock.calls[0][0]
+        expect(messagingConfig.enableImageUpload).toBe(false)
+    })
+
+    test('forwards the image-upload toggle when enabled', () => {
+        injectCommerceClientWidget({
+            ...messagingFields,
+            enableImageUpload: true
+        })
+
+        expect(mockInject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                messagingConfig: {
+                    ...expectedMessagingConfig,
+                    enableImageUpload: true
+                }
+            })
+        )
+    })
+
     test('forwards escalation and transcript toggles when disabled', () => {
         injectCommerceClientWidget({
             ...messagingFields,
@@ -267,6 +292,107 @@ describe('injectCommerceClientWidget', () => {
         expect(config).not.toHaveProperty('globalClassName')
         expect(config).not.toHaveProperty('overridesUrl')
         expect(config).not.toHaveProperty('overrides')
+    })
+
+    test('forwards the optional widget presentation and behavior fields when provided', () => {
+        injectCommerceClientWidget({
+            ...messagingFields,
+            headerConfig: {headerText: 'Ask us', headerTextTextAlign: 'center'},
+            suggestionButtonConfig: {icon: 'sparkle', iconPosition: 'left'},
+            messageAlignment: 'end',
+            autoScroll: true,
+            openLinksInNewTab: true,
+            showProductDescription: true,
+            promptsConfig: {isOpen: true, isInline: false, elementId: 'prompts-root'}
+        })
+
+        expect(mockInject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                headerConfig: {headerText: 'Ask us', headerTextTextAlign: 'center'},
+                suggestionButtonConfig: {icon: 'sparkle', iconPosition: 'left'},
+                messageAlignment: 'end',
+                autoScroll: true,
+                openLinksInNewTab: true,
+                showProductDescription: true,
+                promptsConfig: {isOpen: true, isInline: false, elementId: 'prompts-root'}
+            })
+        )
+    })
+
+    test('nests showProductCaptions inside messagingConfig when provided', () => {
+        injectCommerceClientWidget({...messagingFields, showProductCaptions: true})
+
+        expect(mockInject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                messagingConfig: {...expectedMessagingConfig, showProductCaptions: true}
+            })
+        )
+        // showProductCaptions is a messagingConfig field, never a top-level widget option.
+        expect(mockInject.mock.calls[0][0]).not.toHaveProperty('showProductCaptions')
+    })
+
+    test('forwards boolean widget flags even when set to false', () => {
+        injectCommerceClientWidget({
+            ...messagingFields,
+            autoScroll: false,
+            openLinksInNewTab: false,
+            showProductDescription: false,
+            showProductCaptions: false
+        })
+
+        const config = mockInject.mock.calls[0][0]
+        expect(config.autoScroll).toBe(false)
+        expect(config.openLinksInNewTab).toBe(false)
+        expect(config.showProductDescription).toBe(false)
+        expect(config.messagingConfig.showProductCaptions).toBe(false)
+    })
+
+    test('omits object/enum widget fields when not the expected type', () => {
+        injectCommerceClientWidget({
+            ...messagingFields,
+            headerConfig: 'not-an-object',
+            suggestionButtonConfig: 'not-an-object',
+            messageAlignment: '',
+            promptsConfig: 'not-an-object'
+        })
+
+        const config = mockInject.mock.calls[0][0]
+        expect(config).not.toHaveProperty('headerConfig')
+        expect(config).not.toHaveProperty('suggestionButtonConfig')
+        expect(config).not.toHaveProperty('messageAlignment')
+        expect(config).not.toHaveProperty('promptsConfig')
+    })
+
+    test('omits boolean widget flags when not real booleans', () => {
+        // The hook forwards only actual booleans; string values are dropped so the
+        // widget default wins (the component converts strings to booleans upstream).
+        injectCommerceClientWidget({
+            ...messagingFields,
+            autoScroll: 'true',
+            openLinksInNewTab: 'false',
+            showProductDescription: undefined,
+            showProductCaptions: 'true'
+        })
+
+        const config = mockInject.mock.calls[0][0]
+        expect(config).not.toHaveProperty('autoScroll')
+        expect(config).not.toHaveProperty('openLinksInNewTab')
+        expect(config).not.toHaveProperty('showProductDescription')
+        expect(config.messagingConfig).not.toHaveProperty('showProductCaptions')
+    })
+
+    test('omits the new optional widget fields when not provided', () => {
+        injectCommerceClientWidget(messagingFields)
+
+        const config = mockInject.mock.calls[0][0]
+        expect(config).not.toHaveProperty('headerConfig')
+        expect(config).not.toHaveProperty('suggestionButtonConfig')
+        expect(config).not.toHaveProperty('messageAlignment')
+        expect(config).not.toHaveProperty('autoScroll')
+        expect(config).not.toHaveProperty('openLinksInNewTab')
+        expect(config).not.toHaveProperty('showProductDescription')
+        expect(config).not.toHaveProperty('promptsConfig')
+        expect(config.messagingConfig).not.toHaveProperty('showProductCaptions')
     })
 
     test('always forwards mode as "messaging"', () => {

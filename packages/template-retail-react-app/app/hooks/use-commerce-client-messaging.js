@@ -32,6 +32,7 @@ const onClient = typeof window !== 'undefined'
  * @param {string} [options.capabilitiesVersion] - Embedded Messaging capabilities version (defaults to '65')
  * @param {boolean} [options.enableEscalationToAgent=true] - Whether shoppers can escalate to a human agent
  * @param {boolean} [options.enableDownloadTranscript=true] - Whether shoppers can download the chat transcript
+ * @param {boolean} [options.enableImageUpload=false] - Whether shoppers can upload images in the chat
  * @param {Object} [options.routingAttributes] - Optional Agentforce routing attributes
  * @param {string} [options.logoUrl] - URL of the logo shown in the widget
  * @param {string} [options.headerText] - Header text shown at the top of the widget
@@ -47,6 +48,14 @@ const onClient = typeof window !== 'undefined'
  * @param {Object} [options.theme] - Partial theme merged over the defaults
  * @param {string} [options.overridesUrl] - URL to customer's component override script (sets window.CimulateOverrides)
  * @param {Object} [options.overrides] - Inline map of override keys (e.g. `ProductTile`) to registered custom element tag names. The widget takes a single override source, so callers should pass this or `overridesUrl`, not both
+ * @param {Object} [options.headerConfig] - Header styling config forwarded as `headerConfig` (e.g. `logoUrl`, `headerText`, `headerBackgroundColor`, `headerTextColor`, `headerTextFontSize`, `headerTextFontWeight`, `headerTextFontFamily`, `headerTextTextAlign`)
+ * @param {Object} [options.suggestionButtonConfig] - Suggestion-button config forwarded as `suggestionButtonConfig` (`icon`: 'sparkle' | 'plus' | 'paper-plane', `iconPosition`: 'left' | 'right')
+ * @param {string} [options.messageAlignment] - Message-list alignment forwarded as `messageAlignment` ('start' | 'end')
+ * @param {boolean} [options.autoScroll] - Forwarded as `autoScroll` when set; auto-scrolls to the newest message. Omitted when undefined so the widget's own default applies
+ * @param {boolean} [options.openLinksInNewTab] - Forwarded as `openLinksInNewTab` when set; opens links rendered by the widget in a new tab. Omitted when undefined so the widget's own default applies
+ * @param {boolean} [options.showProductDescription] - Forwarded as `showProductDescription` when set; shows the product description on product tiles. Omitted when undefined so the widget's own default applies
+ * @param {boolean} [options.showProductCaptions] - Forwarded as `messagingConfig.showProductCaptions` when set; shows product captions in the recommendation carousel. Omitted when undefined so the widget's own default applies
+ * @param {Object} [options.promptsConfig] - Prompts-extension config forwarded as `promptsConfig`. The extension mounts into a merchant-supplied `elementId` and needs `isOpen`/`isInline`/`elementId`; other fields (e.g. `staticQuestions`, `promptsDisplay`) are optional
  * @returns {boolean} True when the widget injection was invoked, false otherwise
  */
 const injectCommerceClientWidget = ({
@@ -57,6 +66,7 @@ const injectCommerceClientWidget = ({
     capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     enableEscalationToAgent = true,
     enableDownloadTranscript = true,
+    enableImageUpload = false,
     routingAttributes,
     logoUrl,
     headerText,
@@ -67,7 +77,15 @@ const injectCommerceClientWidget = ({
     componentConfig,
     theme,
     overridesUrl,
-    overrides
+    overrides,
+    headerConfig,
+    suggestionButtonConfig,
+    messageAlignment,
+    autoScroll,
+    openLinksInNewTab,
+    showProductDescription,
+    showProductCaptions,
+    promptsConfig
 } = {}) => {
     if (!onClient) return false
 
@@ -86,10 +104,14 @@ const injectCommerceClientWidget = ({
             esDeveloperName,
             capabilitiesVersion,
             enableEscalationToAgent,
-            enableDownloadTranscript
+            enableDownloadTranscript,
+            enableImageUpload
         }
         if (routingAttributes && typeof routingAttributes === 'object') {
             messagingConfig.routingAttributes = routingAttributes
+        }
+        if (typeof showProductCaptions === 'boolean') {
+            messagingConfig.showProductCaptions = showProductCaptions
         }
 
         commerceClient.injectMessagingWidget({
@@ -112,7 +134,16 @@ const injectCommerceClientWidget = ({
             },
             theme: {...DEFAULT_COMMERCE_CLIENT_THEME, ...theme},
             ...(overridesUrl ? {overridesUrl} : {}),
-            ...(overrides && typeof overrides === 'object' ? {overrides} : {})
+            ...(overrides && typeof overrides === 'object' ? {overrides} : {}),
+            ...(headerConfig && typeof headerConfig === 'object' ? {headerConfig} : {}),
+            ...(suggestionButtonConfig && typeof suggestionButtonConfig === 'object'
+                ? {suggestionButtonConfig}
+                : {}),
+            ...(messageAlignment ? {messageAlignment} : {}),
+            ...(typeof autoScroll === 'boolean' ? {autoScroll} : {}),
+            ...(typeof openLinksInNewTab === 'boolean' ? {openLinksInNewTab} : {}),
+            ...(typeof showProductDescription === 'boolean' ? {showProductDescription} : {}),
+            ...(promptsConfig && typeof promptsConfig === 'object' ? {promptsConfig} : {})
         })
         return true
     } catch (err) {
