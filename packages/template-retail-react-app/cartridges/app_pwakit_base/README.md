@@ -164,6 +164,19 @@ Trigger a passwordless login or password reset flow and confirm the email is del
 
 The sender address is read from the **Site Preferences** `customerServiceEmail` custom attribute. If unset, it falls back to `no-reply@<site-https-hostname>`.
 
+### Customer existence validation
+
+The `pwakit-notify` endpoint validates the recipient against B2C's customer directory differently depending on the notification type:
+
+| Type | Customer check | Reason |
+|---|---|---|
+| `passwordless-magic-link` | Yes — silently succeeds if not found | Passwordless login requires a pre-existing account. Silently succeeding (no email sent, 200 returned) prevents email enumeration. |
+| `password-reset` | Yes — silently succeeds if not found | Same as above. |
+| `otp` | Yes — silently succeeds if not found | SLAS creates the B2C customer profile at authorize time, before the callback fires. Requiring the profile to exist prevents a crafted payload from sending verification emails to arbitrary addresses. Verified/unverified state is not checked — that is managed by SLAS and is not reliably exposed through the B2C scripting API. |
+| `glo-access-code` | **No** | GLO is for shoppers who placed an order as a guest. By definition there is no registered customer profile. |
+
+The silent-success behaviour for `passwordless-magic-link` and `password-reset` is intentional — the storefront flow completes normally and the shopper receives no indication of whether their email is registered. If you need to audit skipped sends, filter the `pwakit-notify` log for `skipping send`.
+
 ### Known limitation — site URL aliases
 
 The magic link path uses `siteId.toLowerCase()` as the URL path segment (e.g. `refarchglobal`). If your PWA Kit storefront defines a `siteAlias` in `config/default.js` (e.g. `RefArchGlobal → global`), the generated link will not match the registered route. Add a CDN-level redirect from `/<siteId-lowercase>/...` to `/<alias>/...` to resolve this, or override the `sendOrderAccessCode` hook with an alias-aware implementation.

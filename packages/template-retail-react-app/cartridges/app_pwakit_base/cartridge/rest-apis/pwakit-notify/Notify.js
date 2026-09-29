@@ -21,6 +21,7 @@ var Resource = require('dw/web/Resource');
 var System = require('dw/system/System');
 var Site = require('dw/system/Site');
 var Logger = require('dw/system/Logger');
+var CustomerMgr = require('dw/customer/CustomerMgr');
 var resolveStorefrontHost = require('*/cartridge/scripts/helpers/storefrontHostProvider');
 var buildOrderLookupUrl = require('*/cartridge/scripts/helpers/buildOrderLookupUrl');
 
@@ -115,6 +116,15 @@ exports.notify = function () {
     var magicLink; // set for magic-link types; returned in the success response
 
     if (type === 'passwordless-magic-link') {
+        // Passwordless login requires a pre-existing registered account. Succeed
+        // silently for unrecognised addresses — this prevents email enumeration
+        // while avoiding delivery to non-existent accounts.
+        var plCustomer = CustomerMgr.getCustomerByLogin(recipient);
+        if (!plCustomer || !plCustomer.registered) {
+            log.debug('passwordless-magic-link: no registered customer found for recipient — skipping send');
+            RESTResponseMgr.createSuccess({success: true}).render();
+            return;
+        }
         if (!body.data.magicLinkPath) {
             RESTResponseMgr.createError(
                 400,
@@ -149,6 +159,15 @@ exports.notify = function () {
         templateName = 'email/passwordlessLogin';
         context = { magicLink: magicLink, accessCode: inlineAccessCode };
     } else if (type === 'password-reset') {
+        // Password reset requires a pre-existing registered account. Succeed
+        // silently for unrecognised addresses — this prevents email enumeration
+        // while avoiding delivery to non-existent accounts.
+        var prCustomer = CustomerMgr.getCustomerByLogin(recipient);
+        if (!prCustomer || !prCustomer.registered) {
+            log.debug('password-reset: no registered customer found for recipient — skipping send');
+            RESTResponseMgr.createSuccess({success: true}).render();
+            return;
+        }
         if (!body.data.magicLinkPath) {
             RESTResponseMgr.createError(
                 400,
@@ -174,9 +193,19 @@ exports.notify = function () {
         context = { magicLink: magicLink };
     } else if (type === 'otp') {
         // Used by the account registration / email verification flow. The `token`
-        // field is a short 6-8 digit SLAS TOTP (not a JWT). The ssr.js caller for
-        // this type has not yet been implemented in pwa-kit — see sf-next's
-        // otp-callback.server.ts for the reference implementation.
+        // field is a short 6-8 digit SLAS TOTP (not a JWT).
+        //
+        // SLAS creates the B2C customer profile at authorize time, before this
+        // callback fires. Requiring the profile to exist in CustomerMgr prevents
+        // a crafted payload from sending verification emails to arbitrary addresses.
+        // We do not check verified/unverified state — that is managed by SLAS and
+        // is not reliably exposed through the B2C scripting API.
+        var otpCustomer = CustomerMgr.getCustomerByLogin(recipient);
+        if (!otpCustomer || !otpCustomer.registered) {
+            log.debug('otp: no registered customer found for recipient — skipping send');
+            RESTResponseMgr.createSuccess({success: true}).render();
+            return;
+        }
         if (!body.data.token) {
             RESTResponseMgr.createError(
                 400,
@@ -190,6 +219,9 @@ exports.notify = function () {
         templateName = 'email/registrationVerification';
         context = { token: body.data.token };
     } else if (type === 'glo-access-code') {
+        // No customer existence check here: GLO is specifically for shoppers who
+        // placed an order as a guest without creating an account. By definition
+        // there is no registered customer profile to look up.
         if (!body.data.orderNo || !body.data.accessCode) {
             RESTResponseMgr.createError(
                 400,
