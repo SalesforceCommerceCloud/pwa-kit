@@ -42,6 +42,7 @@ import ProductView from '@salesforce/retail-react-app/app/components/product-vie
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
 import Island from '@salesforce/retail-react-app/app/components/island'
 import InlineAgentWidget from '@salesforce/retail-react-app/app/components/inline-agent-widget'
+import {parsePdpQuestions} from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
@@ -807,7 +808,12 @@ const ProductDetail = () => {
                                 onOpenStoreLocator={onOpenStoreLocator}
                                 showDeliveryOptions={storeLocatorEnabled}
                                 actionFooter={
-                                    <InlineAgentWidget config={inlineAgentWidgetConfig} />
+                                    <InlineAgentWidget
+                                        config={inlineAgentWidgetConfig}
+                                        pdpQuestions={parsePdpQuestions(
+                                            productResponse?.c_pdpQuestions
+                                        )}
+                                    />
                                 }
                             />
                             <InformationAccordion product={product} />

@@ -42,10 +42,17 @@ const ensureWidget = () => {
 const isConfigured = (config) =>
     Boolean(config?.enabled && config?.scrt2Url && config?.orgId && config?.esDeveloperName)
 
-const useInlineAgentWidget = (config) => {
+// Stable string key for the pdpQuestions array so the sync effect's dependency
+// is by value, not identity. An empty/undefined list serializes to "" so it
+// compares equal across renders and doesn't churn.
+const pdpQuestionsKey = (pdpQuestions) =>
+    Array.isArray(pdpQuestions) && pdpQuestions.length > 0 ? JSON.stringify(pdpQuestions) : ''
+
+const useInlineAgentWidget = (config, {pdpQuestions} = {}) => {
     const [ready, setReady] = useState(false)
     const containerRef = useRef(null)
     const configured = isConfigured(config)
+    const questionsKey = pdpQuestionsKey(pdpQuestions)
 
     useEffect(() => {
         if (typeof window === 'undefined') return
@@ -72,6 +79,10 @@ const useInlineAgentWidget = (config) => {
         if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
         if (config.persistSession !== false) el.setAttribute('persist-session', '')
         if (config.enableLogging) el.setAttribute('enable-logging', '')
+        // Seed pdp-questions at create time when we already have them, so the
+        // pills paint in the same frame the widget mounts (no visible pop-in
+        // from the attribute-sync effect below).
+        if (questionsKey) el.setAttribute('pdp-questions', questionsKey)
 
         containerRef.current.appendChild(el)
 
@@ -79,6 +90,22 @@ const useInlineAgentWidget = (config) => {
             el.remove()
         }
     }, [configured, ready, config])
+
+    // Keep the pdp-questions attribute in sync with the current product. Runs
+    // separately from element creation so a variant switch / SPA nav to a new
+    // PDP updates the pills without tearing down the widget (which would drop
+    // the SCRT2 session).
+    useEffect(() => {
+        if (!configured || !ready) return
+        if (!containerRef.current) return
+        const el = containerRef.current.querySelector('inline-agent-widget')
+        if (!el) return
+        if (questionsKey) {
+            el.setAttribute('pdp-questions', questionsKey)
+        } else {
+            el.removeAttribute('pdp-questions')
+        }
+    }, [configured, ready, questionsKey])
 
     return containerRef
 }
