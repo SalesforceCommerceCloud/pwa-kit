@@ -4124,7 +4124,7 @@
     },
     {
       "type": 0,
-      "value": "Ḿǿǿřḗḗ Ḓḗḗŀīṽḗḗřẏ Ǿƥŧīǿǿƞş"
+      "value": "Ṽīḗḗẇ Ȧŀŀ Şħīƥƥīƞɠ Ǿƥŧīǿǿƞş"
     },
     {
       "type": 0,
@@ -9665,6 +9665,20 @@
     {
       "type": 1,
       "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.label.deliver": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀīṽḗḗř"
     },
     {
       "type": 0,

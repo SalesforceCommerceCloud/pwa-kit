@@ -2016,7 +2016,7 @@
   "delivery_estimate.link.view_all_shipping_options": [
     {
       "type": 0,
-      "value": "More Delivery Options"
+      "value": "View All Shipping Options"
     }
   ],
   "delivery_estimate.modal.heading": [
@@ -4613,6 +4613,12 @@
     {
       "type": 1,
       "value": "productName"
+    }
+  ],
+  "product_view.label.deliver": [
+    {
+      "type": 0,
+      "value": "Deliver"
     }
   ],
   "product_view.label.delivery": [

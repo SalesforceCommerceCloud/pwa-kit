@@ -162,10 +162,10 @@ describe('DeliveryEstimate', () => {
         ).toBeInTheDocument()
         expect(screen.queryByText(/ground/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/express/i)).not.toBeInTheDocument()
-        expect(screen.getByRole('button', {name: 'More Delivery Options'})).toHaveStyle(
+        expect(screen.getByRole('button', {name: 'View All Shipping Options'})).toHaveStyle(
             'text-decoration: underline'
         )
-        await user.click(screen.getByRole('button', {name: 'More Delivery Options'}))
+        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
         const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
         expect(within(shippingOptions).getByText('Ground')).toBeInTheDocument()
         expect(within(shippingOptions).getByText('Express')).toBeInTheDocument()
@@ -901,7 +901,7 @@ describe('DeliveryEstimate', () => {
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
-        await user.click(screen.getByRole('button', {name: 'More Delivery Options'}))
+        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
 
         const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
         expect(within(shippingOptions).queryByText('Unavailable')).not.toBeInTheDocument()
@@ -935,7 +935,7 @@ describe('DeliveryEstimate', () => {
 
         await user.type(screen.getByRole('textbox', {name: /zip code/i}), '94105')
         await user.click(screen.getByRole('button', {name: /calculate delivery estimate/i}))
-        await user.click(screen.getByRole('button', {name: 'More Delivery Options'}))
+        await user.click(screen.getByRole('button', {name: 'View All Shipping Options'}))
 
         const shippingOptions = await screen.findByRole('dialog', {name: 'Shipping Options'})
         expect(within(shippingOptions).getByText('£5.00')).toBeInTheDocument()

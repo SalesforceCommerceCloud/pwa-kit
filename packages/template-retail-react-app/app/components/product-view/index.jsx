@@ -984,15 +984,22 @@ const ProductView = forwardRef(
                                                                     isAutomaticDeliveryEstimateLoading &&
                                                                     isDeliverySelected
                                                                         ? DELIVERY_ESTIMATE_LOADING_ID
-                                                                        : hasDeliveryEstimatePresentation
-                                                                        ? undefined
+                                                                        : hasResolvedDeliveryEstimate
+                                                                        ? 'delivery-estimate-destination'
                                                                         : 'delivery-estimate-description'
                                                                 }
                                                             >
-                                                                <FormattedMessage
-                                                                    defaultMessage="Delivery"
-                                                                    id="product_view.label.delivery"
-                                                                />
+                                                                {hasResolvedDeliveryEstimate ? (
+                                                                    <FormattedMessage
+                                                                        defaultMessage="Deliver"
+                                                                        id="product_view.label.deliver"
+                                                                    />
+                                                                ) : (
+                                                                    <FormattedMessage
+                                                                        defaultMessage="Delivery"
+                                                                        id="product_view.label.delivery"
+                                                                    />
+                                                                )}
                                                             </Radio>
                                                             {hasResolvedDeliveryEstimate && (
                                                                 <Text
@@ -1005,6 +1012,7 @@ const ProductView = forwardRef(
                                                                         values={{
                                                                             postalCode: (
                                                                                 <Button
+                                                                                    id="delivery-estimate-destination"
                                                                                     ref={
                                                                                         deliveryEstimateDestinationButtonRef
                                                                                     }

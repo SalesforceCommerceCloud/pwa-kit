@@ -518,8 +518,9 @@ test('settles delivery to the postal-code control and reopens the calculator on 
     await user.click(screen.getByRole('button', {name: 'Calculate delivery estimate'}))
 
     await waitFor(() => {
-        expect(deliveryOption).toHaveTextContent(/Delivery\s*to 94105/)
+        expect(deliveryOption).toHaveTextContent(/Deliver\s*to 94105/)
     })
+    expect(screen.getByRole('radio', {name: 'Deliver'})).toHaveAccessibleDescription('94105')
     expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
     expect(within(deliveryOption).getByTestId('delivery-estimate-result')).toBeInTheDocument()
 

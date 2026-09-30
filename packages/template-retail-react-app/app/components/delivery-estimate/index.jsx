@@ -421,7 +421,7 @@ const DeliveryEstimate = ({
                         >
                             {formatMessage({
                                 id: 'delivery_estimate.link.view_all_shipping_options',
-                                defaultMessage: 'More Delivery Options'
+                                defaultMessage: 'View All Shipping Options'
                             })}
                         </Button>
                     )}
