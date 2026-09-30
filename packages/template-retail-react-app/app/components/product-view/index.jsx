@@ -976,7 +976,12 @@ const ProductView = forwardRef(
                                                         data-testid="delivery-fulfillment-option"
                                                         data-selected={isDeliverySelected}
                                                     >
-                                                        <Flex align="center" gap={2}>
+                                                        <Flex
+                                                            align="center"
+                                                            gap={
+                                                                hasResolvedDeliveryEstimate ? 1 : 2
+                                                            }
+                                                        >
                                                             <Radio
                                                                 value={DELIVERY_OPTIONS.DELIVERY}
                                                                 isDisabled={disableButton}
