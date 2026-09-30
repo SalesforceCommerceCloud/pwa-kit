@@ -1862,6 +1862,24 @@ describe('ShopperAgent Component', () => {
             )
         })
 
+        test('defaults image upload to false in the widget options', () => {
+            renderCommerceClient()
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({enableImageUpload: false})
+            )
+        })
+
+        test('forwards cc_enableImageUpload as true when explicitly set', () => {
+            renderCommerceClient({cc_enableImageUpload: 'true'})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({enableImageUpload: true})
+            )
+        })
+
         test('loads the Commerce Client bundle via useScript, resolving cc_cdnVersion to a CDN URL', () => {
             renderCommerceClient()
 

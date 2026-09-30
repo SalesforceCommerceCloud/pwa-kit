@@ -32,6 +32,7 @@ const onClient = typeof window !== 'undefined'
  * @param {string} [options.capabilitiesVersion] - Embedded Messaging capabilities version (defaults to '65')
  * @param {boolean} [options.enableEscalationToAgent=true] - Whether shoppers can escalate to a human agent
  * @param {boolean} [options.enableDownloadTranscript=true] - Whether shoppers can download the chat transcript
+ * @param {boolean} [options.enableImageUpload=false] - Whether shoppers can upload images in the chat
  * @param {Object} [options.routingAttributes] - Optional Agentforce routing attributes
  * @param {string} [options.logoUrl] - URL of the logo shown in the widget
  * @param {string} [options.headerText] - Header text shown at the top of the widget
@@ -65,6 +66,7 @@ const injectCommerceClientWidget = ({
     capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     enableEscalationToAgent = true,
     enableDownloadTranscript = true,
+    enableImageUpload = false,
     routingAttributes,
     logoUrl,
     headerText,
@@ -102,7 +104,8 @@ const injectCommerceClientWidget = ({
             esDeveloperName,
             capabilitiesVersion,
             enableEscalationToAgent,
-            enableDownloadTranscript
+            enableDownloadTranscript,
+            enableImageUpload
         }
         if (routingAttributes && typeof routingAttributes === 'object') {
             messagingConfig.routingAttributes = routingAttributes
