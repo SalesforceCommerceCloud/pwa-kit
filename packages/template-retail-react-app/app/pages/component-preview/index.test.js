@@ -19,6 +19,7 @@ jest.mock('@salesforce/commerce-sdk-react/page-designer', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react/page-designer'),
     // Render a marker so we can assert the pipeline was reached without pulling in
     // the full runtime design machinery.
+    // eslint-disable-next-line react/prop-types
     Page: ({page}) => <div data-testid="pd-page">{page?.regions?.[0]?.components?.[0]?.id}</div>
 }))
 
