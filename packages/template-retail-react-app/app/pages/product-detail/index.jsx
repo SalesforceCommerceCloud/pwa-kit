@@ -806,9 +806,7 @@ const ProductDetail = () => {
                                 }
                                 onOpenStoreLocator={onOpenStoreLocator}
                                 showDeliveryOptions={storeLocatorEnabled}
-                                actionFooter={
-                                    <InlineAgentWidget config={embeddedAgentConfig} />
-                                }
+                                actionFooter={<InlineAgentWidget config={embeddedAgentConfig} />}
                             />
                             <InformationAccordion product={product} />
                         </Island>
