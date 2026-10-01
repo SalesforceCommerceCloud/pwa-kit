@@ -1880,6 +1880,15 @@ describe('ShopperAgent Component', () => {
             )
         })
 
+        test('accepts a boolean cc_enableImageUpload from JSON settings', () => {
+            renderCommerceClient({cc_enableImageUpload: true})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({enableImageUpload: true})
+            )
+        })
+
         test('loads the Commerce Client bundle via useScript, resolving cc_cdnVersion to a CDN URL', () => {
             renderCommerceClient()
 
