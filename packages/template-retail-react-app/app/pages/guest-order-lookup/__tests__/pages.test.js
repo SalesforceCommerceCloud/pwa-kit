@@ -450,6 +450,18 @@ describe('GuestOrderLookupVerify', () => {
         })
     })
 
+    test('shows generic error and does not call fetch when getTokenWhenReady resolves null', async () => {
+        mockGetTokenWhenReady.mockResolvedValueOnce(null)
+        const user = userEvent.setup()
+        renderVerifyWithState()
+        await typeOtpCode(user, '123456')
+        await user.click(screen.getByRole('button', {name: /verify code/i}))
+        await waitFor(() => {
+            expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument()
+        })
+        expect(global.fetch).not.toHaveBeenCalledWith('/api/order-lookup/verify', expect.anything())
+    })
+
     // ── S13: error behavior ────────────────────────────────────────────────────
     test('S13: submit button re-enables after a server error', async () => {
         global.fetch.mockResolvedValue({ok: false, status: 500})
