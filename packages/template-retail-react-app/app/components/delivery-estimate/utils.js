@@ -73,7 +73,7 @@ const postalCodeFormats = {
         maxLength: 8
     },
     IE: {
-        regex: /^[A-Z]\d{2} [A-Z\d]{4}$/,
+        regex: /^(?:[A-Z]\d{2}|D6W) [A-Z\d]{4}$/,
         example: 'D02 X285',
         termKey: 'eircode',
         normalize: (value) => {

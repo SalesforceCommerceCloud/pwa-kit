@@ -165,6 +165,7 @@ describe('delivery destination validation', () => {
         expect(isValidDestination({countryCode: 'US', postalCode: '9410'})).toBe(false)
         expect(isValidDestination({countryCode: 'GB', postalCode: 'SW1A 1AA'})).toBe(true)
         expect(isValidDestination({countryCode: 'GB', postalCode: '12345'})).toBe(false)
+        expect(isValidDestination({countryCode: 'IE', postalCode: 'D6W QW58'})).toBe(true)
         expect(getPostalCodeFormat('JP')).toMatchObject({inputMode: 'numeric', maxLength: 8})
         expect(getPostalCodeFormat('fr-CA')).toMatchObject({
             example: 'M5V 3A8',

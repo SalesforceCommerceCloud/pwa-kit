@@ -165,7 +165,7 @@ const DeliveryEstimate = ({
     const [submittedDestination, setSubmittedDestination] = useState(null)
     const [validationErrors, setValidationErrors] = useState({})
     const resolvedDestinationRef = useRef(null)
-    const hasExplicitDestinationRef = useRef(false)
+    const [isExplicitDestination, setIsExplicitDestination] = useState(false)
     const hasEditedDestinationRef = useRef(false)
     const shouldFocusResultRef = useRef(false)
     const postalCodeInputRef = useRef(null)
@@ -182,7 +182,7 @@ const DeliveryEstimate = ({
     )
 
     useIsomorphicLayoutEffect(() => {
-        hasExplicitDestinationRef.current = false
+        setIsExplicitDestination(false)
         hasEditedDestinationRef.current = false
         const restoredDestination =
             getSavedDeliveryDestination(siteId, defaultCountryCode) ||
@@ -193,6 +193,10 @@ const DeliveryEstimate = ({
         shouldFocusResultRef.current = false
         setHydrated(true)
     }, [siteId, defaultCountryCode])
+
+    useIsomorphicLayoutEffect(() => {
+        setIsExplicitDestination(false)
+    }, [productId])
 
     useEffect(() => {
         if (!hydrated || submittedDestination || hasEditedDestinationRef.current) {
@@ -248,21 +252,22 @@ const DeliveryEstimate = ({
             deliveryEstimateQuery.isError ||
             deliveryEstimateQuery.isLoading ||
             deliveryEstimateQuery.isFetching ||
-            !hasExplicitDestinationRef.current ||
+            !isExplicitDestination ||
             typeof window === 'undefined'
         ) {
             return
         }
 
         persistDeliveryDestinationCookie(siteId, submittedDestination)
-        hasExplicitDestinationRef.current = false
+        setIsExplicitDestination(false)
     }, [
         slowestEstimate,
         submittedDestination,
         siteId,
         deliveryEstimateQuery.isError,
         deliveryEstimateQuery.isLoading,
-        deliveryEstimateQuery.isFetching
+        deliveryEstimateQuery.isFetching,
+        isExplicitDestination
     ])
 
     const handleSubmit = (event) => {
@@ -280,7 +285,7 @@ const DeliveryEstimate = ({
         }
 
         resolvedDestinationRef.current = null
-        hasExplicitDestinationRef.current = true
+        setIsExplicitDestination(true)
         shouldFocusResultRef.current = true
         setSubmittedDestination(normalizedDestination)
     }
@@ -305,7 +310,6 @@ const DeliveryEstimate = ({
     )
     const isFallbackPending = isEnabledQueryPending(shouldFetchFallback, fallbackProductQuery)
     const isCalculating = isDeliveryEstimatePending || isFallbackPending
-    const isExplicitDestination = hasExplicitDestinationRef.current
     const isExplicitCalculation = isCalculating && isExplicitDestination
     const isAutomaticLookup = isCalculating && !isExplicitDestination
     const shouldShowCalculator =
@@ -341,14 +345,15 @@ const DeliveryEstimate = ({
 
         resolvedDestinationRef.current = destinationKey
         onResolvedDestination(normalizedDestination, {
-            focusDeliveryOption: !hasResult && hasExplicitDestinationRef.current
+            focusDeliveryOption: !hasResult && isExplicitDestination
         })
     }, [
         hasDeliveryOptionContent,
         hasResult,
         onResolvedDestination,
         productId,
-        submittedDestination
+        submittedDestination,
+        isExplicitDestination
     ])
 
     useEffect(() => {

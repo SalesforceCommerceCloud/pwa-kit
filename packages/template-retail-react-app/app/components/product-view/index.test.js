@@ -309,6 +309,60 @@ test('suppresses delivery estimates for deferred-availability products', () => {
     expect(useDeliveryEstimates).not.toHaveBeenCalled()
 })
 
+test('keeps the normal delivery guidance for a saved destination on a deferred-availability product', () => {
+    document.cookie = `deliveryZipCode_site-1=${encodeURIComponent(
+        JSON.stringify({postalCode: '94105', countryCode: 'US'})
+    )}; Path=/`
+    const deferredProduct = {
+        ...mockStandardProductOrderable,
+        inventory: {
+            ...mockStandardProductOrderable.inventory,
+            ats: 0,
+            backorderable: true,
+            stockLevel: 0
+        }
+    }
+
+    renderWithProviders(
+        <MockComponent
+            product={deferredProduct}
+            showDeliveryEstimate={true}
+            showDeliveryOptions={true}
+        />,
+        {wrapperProps: {isGuest: true}}
+    )
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+    expect(deliveryOption).toHaveTextContent('Enter postal code to see delivery estimate')
+    expect(within(deliveryOption).queryByRole('status')).not.toBeInTheDocument()
+    expect(useDeliveryEstimates).not.toHaveBeenCalled()
+})
+
+test('keeps the normal delivery guidance for a saved destination without a locale country', () => {
+    document.cookie = `deliveryZipCode_site-1=${encodeURIComponent(
+        JSON.stringify({postalCode: '94105', countryCode: 'US'})
+    )}; Path=/`
+    useMultiSite.mockReturnValue({
+        site: {id: 'site-1'},
+        locale: {id: 'en'},
+        buildUrl: (url) => url
+    })
+
+    renderWithProviders(
+        <MockComponent
+            product={mockStandardProductOrderable}
+            showDeliveryEstimate={true}
+            showDeliveryOptions={true}
+        />,
+        {wrapperProps: {isGuest: true}}
+    )
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+    expect(deliveryOption).toHaveTextContent('Enter postal code to see delivery estimate')
+    expect(within(deliveryOption).queryByRole('status')).not.toBeInTheDocument()
+    expect(useDeliveryEstimates).not.toHaveBeenCalled()
+})
+
 test('does not request an estimate for a selected variant while its product data is stale', async () => {
     document.cookie = `deliveryZipCode_site-1=${encodeURIComponent(
         JSON.stringify({postalCode: '94105', countryCode: 'US'})
@@ -580,6 +634,44 @@ test('keeps fallback guidance in Delivery after changing the postal code', async
     expect(
         screen.queryByText('Delivery dates unavailable. See checkout for options and costs.')
     ).not.toBeInTheDocument()
+})
+
+test('treats a product lookup as automatic after catalog fallback', async () => {
+    document.cookie = `deliveryZipCode_site-1=${encodeURIComponent(
+        JSON.stringify({postalCode: '94105', countryCode: 'US'})
+    )}; Path=/`
+    useDeliveryEstimates.mockImplementation(({parameters}) => {
+        if (parameters.productIds?.[0] === 'sku-b') {
+            return {data: undefined, isError: false, isLoading: true, isFetching: false}
+        }
+
+        return {
+            data: {productDeliveryEstimates: []},
+            isError: false,
+            isLoading: false,
+            isFetching: false
+        }
+    })
+    useProduct.mockReturnValue({
+        data: {
+            shippingMethods: [{id: '001', description: 'Order received within 7-10 business days'}]
+        },
+        isError: false,
+        isLoading: false,
+        isFetching: false
+    })
+    const user = userEvent.setup()
+    renderWithProviders(<ProductChangeHarness />, {wrapperProps: {isGuest: true}})
+
+    const deliveryOption = screen.getByTestId('delivery-fulfillment-option')
+    expect(
+        await within(deliveryOption).findByText('Order received within 7-10 business days')
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', {name: 'Select SKU B'}))
+
+    expect(await within(deliveryOption).findByRole('status')).toHaveTextContent('Calculating...')
+    expect(screen.queryByRole('region', {name: 'Estimated Delivery Date'})).not.toBeInTheDocument()
 })
 
 describe('Event Handlers', () => {

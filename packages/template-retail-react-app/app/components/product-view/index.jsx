@@ -254,9 +254,23 @@ const ProductView = forwardRef(
             product.inventory.ats <= 0 &&
             (product.inventory.preorderable || product.inventory.backorderable)
         const defaultCountryCode = getCountryCodeFromLocale(locale?.id)
-        const hasSavedDeliveryDestination = Boolean(
+        const canRenderDeliveryEstimate = Boolean(
             showDeliveryEstimate &&
+                defaultCountryCode &&
+                hasCurrentDeliveryEstimateProduct &&
+                !suppressDeferredDeliveryEstimate &&
                 site?.id &&
+                deliveryEstimateProductId
+        )
+        const canShowDeliveryEstimateLoading = Boolean(
+            showDeliveryEstimate &&
+                defaultCountryCode &&
+                !suppressDeferredDeliveryEstimate &&
+                site?.id &&
+                deliveryEstimateProductId
+        )
+        const hasSavedDeliveryDestination = Boolean(
+            canShowDeliveryEstimateLoading &&
                 getSavedDeliveryDestination(site.id, defaultCountryCode)
         )
 
@@ -1188,48 +1202,41 @@ const ProductView = forwardRef(
                                         </Box>
                                     </>
                                 )}
-                                {showDeliveryEstimate &&
-                                    defaultCountryCode &&
-                                    hasCurrentDeliveryEstimateProduct &&
-                                    !suppressDeferredDeliveryEstimate &&
-                                    site?.id &&
-                                    deliveryEstimateProductId && (
-                                        <DeliveryEstimate
-                                            productId={deliveryEstimateProductId}
-                                            siteId={site.id}
-                                            defaultCountryCode={defaultCountryCode}
-                                            resultContainer={
-                                                showDeliveryOptions &&
-                                                (isDeliverySelected ||
-                                                    isAutomaticDeliveryEstimateLoading)
-                                                    ? deliveryEstimateResultContainer
-                                                    : null
-                                            }
-                                            showResultInCard={!showDeliveryOptions}
-                                            showCalculator={
-                                                !showDeliveryOptions ||
-                                                (isDeliveryEstimateOpen &&
-                                                    !isAutomaticDeliveryEstimateLoading)
-                                            }
-                                            showResult={
-                                                !showDeliveryOptions || !isDeliveryEstimateOpen
-                                            }
-                                            onAutomaticLookupChange={
-                                                showDeliveryOptions
-                                                    ? handleAutomaticDeliveryEstimateLookup
-                                                    : undefined
-                                            }
-                                            onResolvedDestination={
-                                                showDeliveryOptions
-                                                    ? handleResolvedDeliveryEstimate
-                                                    : undefined
-                                            }
-                                            focusPostalCode={focusDeliveryEstimateInput}
-                                            onPostalCodeFocusHandled={() =>
-                                                setFocusDeliveryEstimateInput(false)
-                                            }
-                                        />
-                                    )}
+                                {canRenderDeliveryEstimate && (
+                                    <DeliveryEstimate
+                                        productId={deliveryEstimateProductId}
+                                        siteId={site.id}
+                                        defaultCountryCode={defaultCountryCode}
+                                        resultContainer={
+                                            showDeliveryOptions &&
+                                            (isDeliverySelected ||
+                                                isAutomaticDeliveryEstimateLoading)
+                                                ? deliveryEstimateResultContainer
+                                                : null
+                                        }
+                                        showResultInCard={!showDeliveryOptions}
+                                        showCalculator={
+                                            !showDeliveryOptions ||
+                                            (isDeliveryEstimateOpen &&
+                                                !isAutomaticDeliveryEstimateLoading)
+                                        }
+                                        showResult={!showDeliveryOptions || !isDeliveryEstimateOpen}
+                                        onAutomaticLookupChange={
+                                            showDeliveryOptions
+                                                ? handleAutomaticDeliveryEstimateLookup
+                                                : undefined
+                                        }
+                                        onResolvedDestination={
+                                            showDeliveryOptions
+                                                ? handleResolvedDeliveryEstimate
+                                                : undefined
+                                        }
+                                        focusPostalCode={focusDeliveryEstimateInput}
+                                        onPostalCodeFocusHandled={() =>
+                                            setFocusDeliveryEstimateInput(false)
+                                        }
+                                    />
+                                )}
                                 <Box
                                     display={
                                         isProductPartOfSet
