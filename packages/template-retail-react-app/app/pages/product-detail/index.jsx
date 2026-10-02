@@ -78,7 +78,7 @@ const ProductDetail = () => {
     const {onOpen: onOpenStoreLocator} = useStoreLocatorModal()
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
-    const inlineAgentWidgetConfig = getConfig()?.app?.inlineAgentWidget
+    const embeddedAgentConfig = getConfig()?.app?.embeddedAgent
 
     /****************************** Basket *********************************/
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
@@ -809,7 +809,7 @@ const ProductDetail = () => {
                                 showDeliveryOptions={storeLocatorEnabled}
                                 actionFooter={
                                     <InlineAgentWidget
-                                        config={inlineAgentWidgetConfig}
+                                        config={embeddedAgentConfig}
                                         pdpQuestions={parsePdpQuestions(
                                             productResponse?.c_pdpQuestions
                                         )}
