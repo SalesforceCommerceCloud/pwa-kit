@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {jwtDecode} from 'jwt-decode'
 import {
     COMMERCE_CLIENT_CDN_BASE_URL,
     COMMERCE_CLIENT_OPEN_STATE_KEY
@@ -344,4 +345,51 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
     }
 
     return true
+}
+
+/**
+ * Resolve the current SLAS access token's expiry as an epoch-seconds number,
+ * so callers can schedule a proactive refresh before the agent identity
+ * bridge rejects a stale
+ * token. Mirrors how commerce-sdk-react's own `Auth.isAccessTokenExpired()`
+ * reads expiry internally, but is exposed here so the Commerce Client
+ * auth-link flow can compute a refresh delay without reaching into SDK
+ * internals for the comparison itself.
+ *
+ * - HttpOnly mode: the access token JWT is not readable by JS, so the SSR
+ *   server also writes a sibling, non-HttpOnly cookie (`cc-at-expires`)
+ *   carrying the same JWT's `exp` claim (see
+ *   `pwa-kit-runtime/ssr/server/process-token-response.js`). Pass that
+ *   cookie's raw string value as `accessTokenExpiresCookie`.
+ * - Non-HttpOnly mode: the access token itself is a readable JWT. Pass it as
+ *   `token` and this decodes the `exp` claim directly.
+ *
+ * @param {Object} options
+ * @param {boolean} options.isHttpOnly - Whether HttpOnly session cookies are enabled
+ * @param {string} [options.accessTokenExpiresCookie] - Raw `cc-at-expires` cookie value (HttpOnly mode)
+ * @param {string} [options.token] - The SLAS access token JWT (non-HttpOnly mode)
+ * @returns {number} Epoch seconds the access token expires at, or `NaN` if unreadable/undecodable
+ */
+export const getSlasExpiryEpochSeconds = ({isHttpOnly, accessTokenExpiresCookie, token}) => {
+    if (isHttpOnly) {
+        // CookieStorage.get() returns '' for a missing/evicted cookie, and
+        // Number('') === 0 — a *finite* number — so an empty value would otherwise
+        // decode to the epoch-0 timestamp instead of "unreadable". Guard it first,
+        // mirroring the SDK's own Auth.getExpiresIn() (`if (!expiresAt) return NaN`).
+        // A non-positive value is treated as unreadable for the same reason.
+        if (!accessTokenExpiresCookie) return NaN
+        const parsed = Number(accessTokenExpiresCookie)
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : NaN
+    }
+
+    if (typeof token !== 'string' || !token.trim()) {
+        return NaN
+    }
+
+    try {
+        const {exp} = jwtDecode(token)
+        return typeof exp === 'number' ? exp : NaN
+    } catch {
+        return NaN
+    }
 }

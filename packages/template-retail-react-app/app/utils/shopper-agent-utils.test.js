@@ -16,7 +16,8 @@ import {
     resolveCommerceClientRoutingAttributes,
     resolveCommerceClientScriptUrl,
     validateCommerceClientDomain,
-    validateCommerceClientAgentSettings
+    validateCommerceClientAgentSettings,
+    getSlasExpiryEpochSeconds
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {
     COMMERCE_CLIENT_CDN_BASE_URL,
@@ -897,6 +898,99 @@ describe('shopper-agent-utils', () => {
                     cc_cdnVersion: '1.24.0'
                 })
             ).toEqual({isCartMgmtSupported: 'false', clientVersion: '1.24.0'})
+        })
+    })
+
+    describe('getSlasExpiryEpochSeconds', () => {
+        // jwt-decode only reads the middle (payload) segment; header/signature
+        // content is irrelevant, so placeholder values are fine.
+        const makeJwt = (payload) => {
+            const base64url = (obj) =>
+                btoa(JSON.stringify(obj)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+            return `${base64url({alg: 'none'})}.${base64url(payload)}.sig`
+        }
+
+        describe('HttpOnly mode (cc-at-expires cookie)', () => {
+            test('parses a numeric epoch-seconds cookie value', () => {
+                expect(
+                    getSlasExpiryEpochSeconds({
+                        isHttpOnly: true,
+                        accessTokenExpiresCookie: '1699999999'
+                    })
+                ).toBe(1699999999)
+            })
+
+            // Regression: CookieStorage.get() returns '' for a missing/evicted cookie
+            // and Number('') === 0 (a *finite* number), which would otherwise decode to
+            // the epoch-0 timestamp and defeat the caller's fallback + backoff clamp.
+            test('returns NaN for an empty cookie value ("")', () => {
+                expect(
+                    getSlasExpiryEpochSeconds({isHttpOnly: true, accessTokenExpiresCookie: ''})
+                ).toBeNaN()
+            })
+
+            test('returns NaN when the cookie is undefined', () => {
+                expect(
+                    getSlasExpiryEpochSeconds({
+                        isHttpOnly: true,
+                        accessTokenExpiresCookie: undefined
+                    })
+                ).toBeNaN()
+            })
+
+            test('returns NaN for a non-numeric cookie value', () => {
+                expect(
+                    getSlasExpiryEpochSeconds({
+                        isHttpOnly: true,
+                        accessTokenExpiresCookie: 'not-a-number'
+                    })
+                ).toBeNaN()
+            })
+
+            test('returns NaN for a non-positive ("0") cookie value', () => {
+                expect(
+                    getSlasExpiryEpochSeconds({isHttpOnly: true, accessTokenExpiresCookie: '0'})
+                ).toBeNaN()
+            })
+
+            test('ignores the token JWT in HttpOnly mode (reads only the cookie)', () => {
+                expect(
+                    getSlasExpiryEpochSeconds({
+                        isHttpOnly: true,
+                        accessTokenExpiresCookie: '1699999999',
+                        token: makeJwt({exp: 1234567890})
+                    })
+                ).toBe(1699999999)
+            })
+        })
+
+        describe('non-HttpOnly mode (readable JWT)', () => {
+            test('decodes the exp claim from the access-token JWT', () => {
+                expect(
+                    getSlasExpiryEpochSeconds({
+                        isHttpOnly: false,
+                        token: makeJwt({exp: 1699999999})
+                    })
+                ).toBe(1699999999)
+            })
+
+            test('returns NaN for a missing/blank token', () => {
+                expect(getSlasExpiryEpochSeconds({isHttpOnly: false})).toBeNaN()
+                expect(getSlasExpiryEpochSeconds({isHttpOnly: false, token: '   '})).toBeNaN()
+            })
+
+            test('returns NaN for an undecodable token', () => {
+                expect(getSlasExpiryEpochSeconds({isHttpOnly: false, token: 'not.a.jwt'})).toBeNaN()
+            })
+
+            test('returns NaN when the JWT has no numeric exp claim', () => {
+                expect(
+                    getSlasExpiryEpochSeconds({
+                        isHttpOnly: false,
+                        token: makeJwt({sub: 'shopper'})
+                    })
+                ).toBeNaN()
+            })
         })
     })
 })
