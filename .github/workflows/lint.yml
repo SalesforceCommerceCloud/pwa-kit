@@ -98,7 +98,7 @@ jobs:
           node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
-        timeout-minutes: 8
+        timeout-minutes: 7
 
       - name: Lint the generated project
         uses: "./.github/actions/linting"
@@ -110,4 +110,3 @@ jobs:
         with:
           name: verdaccio-log-lint-windows-${{ matrix.template }}
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio-windows-${{ matrix.template }}.log
-
