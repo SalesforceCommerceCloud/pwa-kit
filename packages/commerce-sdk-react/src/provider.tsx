@@ -16,6 +16,7 @@ import {
     ShopperContexts,
     ShopperConfigurations,
     ShopperCustomers,
+    ShopperDeliveryEstimates,
     ShopperExperience,
     ShopperGiftCertificates,
     ShopperLogin,
@@ -320,6 +321,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperContexts: new ShopperContexts(config),
             shopperConfigurations: new ShopperConfigurations(config),
             shopperCustomers: new ShopperCustomers(config),
+            shopperDeliveryEstimates: new ShopperDeliveryEstimates(config),
             shopperExperience: new ShopperExperience(config),
             shopperGiftCertificates: new ShopperGiftCertificates(config),
             shopperLogin: new ShopperLogin({

@@ -72,8 +72,8 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
         page.locator(`meta[name="og:url"][content*="/products/${selectedPid}?"]`)
     ).toHaveCount(1)
 
-    const pickupRadio = page.getByRole('radio', {name: /Pick Up in Store/i})
-    await page.locator('label').filter({has: pickupRadio}).click()
+    const pickupRadio = page.locator('input[type="radio"][value="pickup"]')
+    await page.locator('label.chakra-radio:has(input[type="radio"][value="pickup"])').click()
 
     // Verify the pickup radio is selected
     await expect(pickupRadio).toBeChecked()

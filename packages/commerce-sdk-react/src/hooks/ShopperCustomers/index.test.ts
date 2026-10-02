@@ -17,6 +17,7 @@ describe('Shopper Customers hooks', () => {
         // If this test fails: create a new query hook, add the endpoint to the mutations enum,
         // or add it to the `expected` array with a comment explaining "TODO" or "never" (and why).
         expect(unimplemented).toEqual([
+            'completeCustomerPaymentMethodReferenceSetup', // TODO: Implement with the payment method reference setup flow.
             'deleteCustomerPaymentMethodReference', // TODO: Implement when the endpoint exits closed beta
             'getExternalProfile', // TODO: Implement when the endpoint exits closed beta
             'getPublicProductListItems', // TODO: Implement when the endpoint exits closed beta
