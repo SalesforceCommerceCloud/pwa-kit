@@ -16,7 +16,7 @@ describe('Shopper Payments hooks', () => {
         // If this test fails: create a new query hook, add the endpoint to the mutations enum,
         // or add it to the `expected` array with a comment explaining "TODO" or "never" (and why).
         expect(unimplemented).toEqual([
-            // Added by commerce-sdk-isomorphic@5.6.0-unstable-20260909155346; no hook yet.
+            // Added by commerce-sdk-isomorphic@5.7.0; no hook yet.
             'getPaymentInstrumentBalance'
         ])
     })
