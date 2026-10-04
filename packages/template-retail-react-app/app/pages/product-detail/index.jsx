@@ -377,7 +377,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_ship_to_address',
                             defaultMessage:
-                                "Select 'Ship to Address' to match the delivery method for the items in your cart."
+                                "Select 'Delivery' to match the fulfillment method for the items in your cart."
                         })
                     )
                 }
@@ -386,7 +386,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_pickup_in_store',
                             defaultMessage:
-                                "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
+                                "Select 'Free pickup in' to match the fulfillment method for the items in your cart."
                         })
                     )
                 }
@@ -508,7 +508,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_ship_to_address',
                             defaultMessage:
-                                "Select 'Ship to Address' to match the delivery method for the items in your cart."
+                                "Select 'Delivery' to match the fulfillment method for the items in your cart."
                         })
                     )
                 } else if (
@@ -520,7 +520,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_pickup_in_store',
                             defaultMessage:
-                                "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
+                                "Select 'Free pickup in' to match the fulfillment method for the items in your cart."
                         })
                     )
                 }
@@ -807,6 +807,7 @@ const ProductDetail = () => {
                                 }
                                 onOpenStoreLocator={onOpenStoreLocator}
                                 showDeliveryOptions={storeLocatorEnabled}
+                                showDeliveryEstimate={true}
                                 actionFooter={
                                     <InlineAgentWidget
                                         config={embeddedAgentConfig}

@@ -67,6 +67,7 @@ export const CLIENT_KEYS = {
     SHOPPER_CONSENTS: 'shopperConsents',
     SHOPPER_CONTEXTS: 'shopperContexts',
     SHOPPER_CUSTOMERS: 'shopperCustomers',
+    SHOPPER_DELIVERY_ESTIMATES: 'shopperDeliveryEstimates',
     SHOPPER_EXPERIENCE: 'shopperExperience',
     SHOPPER_GIFT_CERTIFICATES: 'shopperGiftCertificates',
     SHOPPER_LOGIN: 'shopperLogin',

@@ -12,6 +12,7 @@ import {
     ShopperConsents,
     ShopperContexts,
     ShopperCustomers,
+    ShopperDeliveryEstimates,
     ShopperExperience,
     ShopperGiftCertificates,
     ShopperLogin,
@@ -93,6 +94,7 @@ export interface ApiClients {
     shopperConsents?: ShopperConsents<ApiClientConfigParams>
     shopperContexts?: ShopperContexts<ApiClientConfigParams>
     shopperCustomers?: ShopperCustomers<ApiClientConfigParams>
+    shopperDeliveryEstimates?: ShopperDeliveryEstimates<ApiClientConfigParams>
     shopperExperience?: ShopperExperience<ApiClientConfigParams>
     shopperGiftCertificates?: ShopperGiftCertificates<ApiClientConfigParams>
     shopperLogin?: ShopperLogin<ApiClientConfigParams>
