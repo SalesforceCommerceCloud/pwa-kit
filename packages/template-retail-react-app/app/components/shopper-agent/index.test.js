@@ -2460,6 +2460,65 @@ describe('ShopperAgent Component', () => {
                 })
             })
 
+            test('uses the widget getAuthLinkKey when the bundle exposes it', async () => {
+                seedAuthLinkStorage()
+                const getAuthLinkKey = jest.fn().mockResolvedValue('widget-auth-link-key')
+                window.CimulateMessaging = {injectMessagingWidget: jest.fn(), getAuthLinkKey}
+
+                renderCommerceClient()
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                expect(getAuthLinkKey).toHaveBeenCalledTimes(1)
+                expect(mockCallAuthLink).not.toHaveBeenCalled()
+                expect(mockCallTokenBridge).toHaveBeenCalledWith({
+                    authLinkKey: 'widget-auth-link-key',
+                    slasAccessToken: 'test-slas-access-token',
+                    siteId: 'RefArchGlobal'
+                })
+            })
+
+            test('falls back to the direct SCRT2 call when getAuthLinkKey is not a function', async () => {
+                seedAuthLinkStorage()
+                window.CimulateMessaging = {
+                    injectMessagingWidget: jest.fn(),
+                    getAuthLinkKey: 'not-a-function'
+                }
+
+                renderCommerceClient()
+
+                await waitFor(() =>
+                    expect(mockCallAuthLink).toHaveBeenCalledWith({
+                        commerceClientJWT: 'commerce.jwt',
+                        scrt2Url: 'https://test.salesforce-scrt.com'
+                    })
+                )
+                await waitFor(() =>
+                    expect(mockCallTokenBridge).toHaveBeenCalledWith(
+                        expect.objectContaining({authLinkKey: 'commerce-auth-link-key'})
+                    )
+                )
+            })
+
+            test('does not fall back or bridge when the widget getAuthLinkKey rejects', async () => {
+                const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+                seedAuthLinkStorage()
+                const rejection = new Error('not ready')
+                const getAuthLinkKey = jest.fn().mockRejectedValue(rejection)
+                window.CimulateMessaging = {injectMessagingWidget: jest.fn(), getAuthLinkKey}
+
+                renderCommerceClient()
+
+                await waitFor(() =>
+                    expect(errorSpy).toHaveBeenCalledWith(
+                        '[Commerce Client] performAuthLink(resumed-conversation) threw',
+                        rejection
+                    )
+                )
+                expect(mockCallAuthLink).not.toHaveBeenCalled()
+                expect(mockCallTokenBridge).not.toHaveBeenCalled()
+                errorSpy.mockRestore()
+            })
+
             test('does not auth-link without my_domain', async () => {
                 const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
                 mockedUseConfigurations.mockReturnValue({data: {configurations: []}})
