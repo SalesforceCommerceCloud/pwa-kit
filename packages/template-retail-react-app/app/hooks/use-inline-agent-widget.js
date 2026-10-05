@@ -48,7 +48,7 @@ const isConfigured = (config) =>
 const pdpQuestionsKey = (pdpQuestions) =>
     Array.isArray(pdpQuestions) && pdpQuestions.length > 0 ? JSON.stringify(pdpQuestions) : ''
 
-const useInlineAgentWidget = (config, {pdpQuestions} = {}) => {
+const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
     const [ready, setReady] = useState(false)
     const containerRef = useRef(null)
     const configured = isConfigured(config)
@@ -83,6 +83,11 @@ const useInlineAgentWidget = (config, {pdpQuestions} = {}) => {
         // pills paint in the same frame the widget mounts (no visible pop-in
         // from the attribute-sync effect below).
         if (questionsKey) el.setAttribute('pdp-questions', questionsKey)
+        // Seed product-name at create time so the InputBar placeholder reads
+        // "Ask me anything about <productName>" from first paint. The sync
+        // effect below handles variant switches / SPA PDP navigation without
+        // tearing down the widget.
+        if (productName) el.setAttribute('product-name', productName)
 
         containerRef.current.appendChild(el)
 
@@ -106,6 +111,22 @@ const useInlineAgentWidget = (config, {pdpQuestions} = {}) => {
             el.removeAttribute('pdp-questions')
         }
     }, [configured, ready, questionsKey])
+
+    // Keep the product-name attribute in sync. Same rationale as pdp-questions
+    // above: variant switch / SPA PDP nav re-templates the InputBar
+    // placeholder without a widget teardown. Removing the attribute when the
+    // name is absent lets the widget fall back to the generic placeholder.
+    useEffect(() => {
+        if (!configured || !ready) return
+        if (!containerRef.current) return
+        const el = containerRef.current.querySelector('inline-agent-widget')
+        if (!el) return
+        if (productName) {
+            el.setAttribute('product-name', productName)
+        } else {
+            el.removeAttribute('product-name')
+        }
+    }, [configured, ready, productName])
 
     return containerRef
 }

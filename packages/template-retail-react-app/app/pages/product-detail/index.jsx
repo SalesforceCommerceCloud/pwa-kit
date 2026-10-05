@@ -814,6 +814,7 @@ const ProductDetail = () => {
                                         pdpQuestions={parsePdpQuestions(
                                             productResponse?.c_pdpQuestions
                                         )}
+                                        productName={productResponse?.name}
                                     />
                                 }
                             />

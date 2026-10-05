@@ -12,8 +12,8 @@ import useInlineAgentWidget, {
     isConfigured
 } from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 
-const InlineAgentWidget = ({config, pdpQuestions}) => {
-    const containerRef = useInlineAgentWidget(config, {pdpQuestions})
+const InlineAgentWidget = ({config, pdpQuestions, productName}) => {
+    const containerRef = useInlineAgentWidget(config, {pdpQuestions, productName})
 
     if (!isConfigured(config)) return null
 
@@ -40,7 +40,15 @@ InlineAgentWidget.propTypes = {
      * above the widget input. Typically sourced from the SCAPI
      * `c_pdpQuestions` custom attribute (parsed via `parsePdpQuestions`).
      */
-    pdpQuestions: PropTypes.arrayOf(PropTypes.string)
+    pdpQuestions: PropTypes.arrayOf(PropTypes.string),
+    /**
+     * Current product's display name. Templated into the InputBar
+     * placeholder — "Ask me anything about <productName>" — so the shopper
+     * sees product-grounded prompting on PDP load. Sourced from the SCAPI
+     * `name` standard field. When absent, the widget falls back to the
+     * generic "Ask me anything" string.
+     */
+    productName: PropTypes.string
 }
 
 export default InlineAgentWidget
