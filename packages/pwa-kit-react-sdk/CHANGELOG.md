@@ -1,4 +1,4 @@
-## v3.21.0-dev (Aug 12, 2026)
+## v3.21.0-preview.0 (Oct 05, 2026)
 ## v3.20.0 (Aug 12, 2026)
 - Version alignment release; no functional changes to `pwa-kit-react-sdk` since v3.19.0.
 
