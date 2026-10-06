@@ -124,6 +124,37 @@ export function openCommerceClientWidget(show = true) {
 }
 
 /**
+ * End the current Commerce Client conversation.
+ *
+ * Calls `window.CimulateMessaging.eventHandlers.session.endConversation()`
+ * (widget 1.39.0+), which ends the SCRT2 conversation and clears the in-widget
+ * transcript WITHOUT starting a replacement; the widget starts a fresh
+ * conversation the next time it is opened. Fire-and-forget: the SDK dispatches
+ * the request internally and returns nothing to await.
+ *
+ * @function endCommerceClientConversation
+ * @returns {boolean} `true` when the call was dispatched, `false` when the
+ *   loaded widget bundle does not support it (or it threw)
+ */
+export function endCommerceClientConversation() {
+    if (!onClient) return false
+
+    try {
+        const session = window.CimulateMessaging?.eventHandlers?.session
+        if (session && typeof session.endConversation === 'function') {
+            session.endConversation()
+            return true
+        }
+        console.warn(
+            'Shopper Agent: Commerce Client endConversation is unavailable; requires widget 1.39.0 or later'
+        )
+    } catch (error) {
+        console.error('Shopper Agent: Error ending Commerce Client conversation', error)
+    }
+    return false
+}
+
+/**
  * Persist whether the Commerce Client panel is open to `sessionStorage`, so it
  * survives page navigation and resets to the configured default in a fresh tab.
  *

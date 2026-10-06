@@ -9,6 +9,7 @@ import {
     launchChat,
     openShopperAgent,
     resetEmbeddedMessagingForCommerceSessionChange,
+    endCommerceClientConversation,
     openCommerceClientWidget,
     openShopperAgentWidget,
     persistCommerceClientOpenState,
@@ -299,6 +300,55 @@ describe('shopper-agent-utils', () => {
             delete global.window
 
             expect(() => resetEmbeddedMessagingForCommerceSessionChange()).not.toThrow()
+        })
+    })
+
+    describe('endCommerceClientConversation', () => {
+        test('should return false if not on client side', () => {
+            delete global.window
+
+            expect(endCommerceClientConversation()).toBe(false)
+        })
+
+        test('should call endConversation and return true when supported', () => {
+            const mockEnd = jest.fn()
+            global.window = {
+                CimulateMessaging: {eventHandlers: {session: {endConversation: mockEnd}}}
+            }
+
+            expect(endCommerceClientConversation()).toBe(true)
+            expect(mockEnd).toHaveBeenCalledTimes(1)
+        })
+
+        test('should warn and return false when the widget lacks endConversation', () => {
+            const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+            global.window = {CimulateMessaging: {eventHandlers: {session: {}}}}
+
+            expect(endCommerceClientConversation()).toBe(false)
+            expect(warnSpy).toHaveBeenCalledWith(
+                expect.stringContaining('endConversation is unavailable')
+            )
+            warnSpy.mockRestore()
+        })
+
+        test('should log and return false when endConversation throws', () => {
+            global.window = {
+                CimulateMessaging: {
+                    eventHandlers: {
+                        session: {
+                            endConversation: () => {
+                                throw new Error('boom')
+                            }
+                        }
+                    }
+                }
+            }
+
+            expect(endCommerceClientConversation()).toBe(false)
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Shopper Agent: Error ending Commerce Client conversation',
+                expect.any(Error)
+            )
         })
     })
 

@@ -28,6 +28,7 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
+    endCommerceClientConversation,
     getPersistedCommerceClientOpenState,
     persistCommerceClientOpenState,
     resetEmbeddedMessagingForCommerceSessionChange,
@@ -622,6 +623,7 @@ const toOptionalWidgetBoolean = (value) => {
  * @param {Object} props.authLinkGenerationRef - Monotonic auth-link attempt generation
  * @param {Object} props.authLinkQueueRef - Serialized auth-link operation queue
  * @param {Object} props.lastAttemptedCommerceClientJWTRef - JWT used by the latest auth-link attempt
+ * @param {Object} props.prevSlasIdentityRef - Last observed SLAS identity, kept across remounts
  * @param {string} props.commerceAgentConfiguration.scrt2Url - SCRT2 URL (passed to `messagingConfig.scrt2Url`)
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID (passed to `messagingConfig.orgId`)
  * @param {string} [props.commerceAgentConfiguration.cc_esDeveloperName] - Embedded Service developer name
@@ -664,7 +666,8 @@ const CommerceClientAgentWindow = ({
     lastCommerceClientJWTRef,
     authLinkGenerationRef,
     authLinkQueueRef,
-    lastAttemptedCommerceClientJWTRef
+    lastAttemptedCommerceClientJWTRef,
+    prevSlasIdentityRef
 }) => {
     const {
         scrt2Url,
@@ -1011,8 +1014,12 @@ const CommerceClientAgentWindow = ({
      * unchanged but is now linked to the wrong (or anonymous) shopper, so we
      * re-link. Skips the initial mount; the composite dedup key in
      * performAuthLink prevents a redundant link if nothing effectively changed.
+     *
+     * Logout (registered -> guest) is the exception: the conversation belongs
+     * to the shopper who just signed out, so it is ended (clearing its visible
+     * history) rather than re-linked to the guest. The widget starts a fresh
+     * conversation on next open, which the widget-ready trigger links.
      */
-    const prevSlasIdentityRef = useRef(undefined)
     useEffect(() => {
         if (!isCommerceClientReady) {
             return
@@ -1029,9 +1036,18 @@ const CommerceClientAgentWindow = ({
             }
             return
         }
-        if (prev !== identity) {
-            performAuthLinkRef.current({reason: 'slas-identity-change'})
+        if (prev === identity) {
+            return
         }
+        const isLogout = prev.startsWith('registered:') && identity === 'guest'
+        if (isLogout && endCommerceClientConversation()) {
+            // Invalidate any in-flight link for the ended conversation.
+            authLinkGenerationRef.current++
+            lastAuthLinkKeyRef.current = null
+            return
+        }
+        // Older widget bundles lack endConversation; fall back to re-linking.
+        performAuthLinkRef.current({reason: 'slas-identity-change'})
     }, [customerType, usid, isCommerceClientReady])
 
     const isDialog = cc_displayType === 'dialog'
@@ -1174,7 +1190,8 @@ CommerceClientAgentWindow.propTypes = {
     lastCommerceClientJWTRef: PropTypes.shape({current: PropTypes.string}).isRequired,
     authLinkGenerationRef: PropTypes.shape({current: PropTypes.number}).isRequired,
     authLinkQueueRef: PropTypes.shape({current: PropTypes.object}).isRequired,
-    lastAttemptedCommerceClientJWTRef: PropTypes.shape({current: PropTypes.string}).isRequired
+    lastAttemptedCommerceClientJWTRef: PropTypes.shape({current: PropTypes.string}).isRequired,
+    prevSlasIdentityRef: PropTypes.shape({current: PropTypes.string}).isRequired
 }
 
 /**
@@ -1217,6 +1234,10 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     const authLinkGenerationRef = useRef(0)
     const authLinkQueueRef = useRef(Promise.resolve())
     const lastAttemptedCommerceClientJWTRef = useRef(null)
+    // Kept here, not in the inner widget, so the identity transition survives
+    // any remount (e.g. the agent being disabled and re-enabled).
+    const prevSlasIdentityRef = useRef(undefined)
+    const hasMountedCommerceClientRef = useRef(false)
 
     // Extract enabled state and provider from configuration.
     // `provider` defaults to 'miaw' to preserve backwards compatibility with the
@@ -1237,7 +1258,15 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     const {isLoading: isConfigurationsLoading} = useConfigurations({})
 
     // Only render when the agent is enabled (client-side), the basket has loaded, and configurations API has completed.
-    if (!isShopperAgentEnabled || !basketDoneLoading || isConfigurationsLoading) {
+    // Once the Commerce Client widget has mounted, keep it mounted through later
+    // basket reloads (login/logout swap the basket query): remounting re-injects
+    // the bundle, leaving a second widget instance whose stale client keeps its
+    // SSE stream open and double-handles conversation lifecycle calls.
+    const isReady = basketDoneLoading && !isConfigurationsLoading
+    if (isReady && provider === 'commerce-client') {
+        hasMountedCommerceClientRef.current = true
+    }
+    if (!isShopperAgentEnabled || (!isReady && !hasMountedCommerceClientRef.current)) {
         return null
     }
 
@@ -1252,6 +1281,7 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
                     authLinkGenerationRef={authLinkGenerationRef}
                     authLinkQueueRef={authLinkQueueRef}
                     lastAttemptedCommerceClientJWTRef={lastAttemptedCommerceClientJWTRef}
+                    prevSlasIdentityRef={prevSlasIdentityRef}
                 />
             </div>
         ) : null
