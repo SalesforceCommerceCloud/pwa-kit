@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect, useMemo} from 'react'
+import React, {useState, useEffect, useMemo, Suspense} from 'react'
 import PropTypes from 'prop-types'
 import loadable from '@loadable/component'
 import {useHistory, useLocation} from 'react-router-dom'
@@ -435,12 +435,24 @@ const StorefrontApp = (props) => {
                                     {!isCheckout ? (
                                         <>
                                             {embeddedHeader && (
-                                                <EmbeddedSubtreeProvider embedded>
-                                                    <Region
-                                                        component={embeddedHeader}
-                                                        regionId="announcement"
-                                                    />
-                                                </EmbeddedSubtreeProvider>
+                                                // The announcement `<Region>` renders in
+                                                // *component mode*, which has no Suspense
+                                                // boundary of its own. In production the
+                                                // registry discovers components via lazy
+                                                // importers, so `<Component>` throws
+                                                // `registry.preload()`'s promise to suspend on
+                                                // first render. `renderToString` (SSR) rethrows
+                                                // an uncaught suspend, blanking the tree (a 500).
+                                                // Provide the boundary here so SSR streams the
+                                                // fallback instead of crashing.
+                                                <Suspense fallback={null}>
+                                                    <EmbeddedSubtreeProvider embedded>
+                                                        <Region
+                                                            component={embeddedHeader}
+                                                            regionId="announcement"
+                                                        />
+                                                    </EmbeddedSubtreeProvider>
+                                                </Suspense>
                                             )}
                                             <AboveHeader />
                                             <Header
