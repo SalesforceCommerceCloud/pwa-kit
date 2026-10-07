@@ -1018,7 +1018,9 @@ const CommerceClientAgentWindow = ({
      * Logout (registered -> guest) is the exception: the conversation belongs
      * to the shopper who just signed out, so it is ended (clearing its visible
      * history) rather than re-linked to the guest. The widget starts a fresh
-     * conversation on next open, which the widget-ready trigger links.
+     * conversation on next open, which the widget-ready trigger links. Widgets
+     * without endConversation (1.36.0–1.38.x) reset the conversation instead,
+     * which starts the replacement immediately; it is linked the same way.
      */
     useEffect(() => {
         if (!isCommerceClientReady) {
@@ -1046,7 +1048,7 @@ const CommerceClientAgentWindow = ({
             lastAuthLinkKeyRef.current = null
             return
         }
-        // Older widget bundles lack endConversation; fall back to re-linking.
+        // Widgets before 1.36.0 can neither end nor reset; fall back to re-linking.
         performAuthLinkRef.current({reason: 'slas-identity-change'})
     }, [customerType, usid, isCommerceClientReady])
 

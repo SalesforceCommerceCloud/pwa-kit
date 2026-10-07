@@ -126,27 +126,33 @@ export function openCommerceClientWidget(show = true) {
 /**
  * End the current Commerce Client conversation.
  *
- * Calls `window.CimulateMessaging.eventHandlers.session.endConversation()`
+ * Prefers `window.CimulateMessaging.eventHandlers.session.endConversation()`
  * (widget 1.39.0+), which ends the SCRT2 conversation and clears the in-widget
  * transcript WITHOUT starting a replacement; the widget starts a fresh
- * conversation the next time it is opened. Fire-and-forget: the SDK dispatches
- * the request internally and returns nothing to await.
+ * conversation the next time it is opened. Widgets 1.36.0–1.38.x only expose
+ * `resetConversation()` (the widget's reset chat button), which clears the
+ * transcript and immediately starts a new conversation instead. Fire-and-forget:
+ * the SDK dispatches the request internally and returns nothing to await.
  *
  * @function endCommerceClientConversation
- * @returns {boolean} `true` when the call was dispatched, `false` when the
- *   loaded widget bundle does not support it (or it threw)
+ * @returns {boolean} `true` when an end or reset was dispatched, `false` when
+ *   the loaded widget bundle supports neither (or the call threw)
  */
 export function endCommerceClientConversation() {
     if (!onClient) return false
 
     try {
         const session = window.CimulateMessaging?.eventHandlers?.session
-        if (session && typeof session.endConversation === 'function') {
+        if (typeof session?.endConversation === 'function') {
             session.endConversation()
             return true
         }
+        if (typeof session?.resetConversation === 'function') {
+            session.resetConversation()
+            return true
+        }
         console.warn(
-            'Shopper Agent: Commerce Client endConversation is unavailable; requires widget 1.39.0 or later'
+            'Shopper Agent: Commerce Client endConversation and resetConversation are unavailable; requires widget 1.36.0 or later'
         )
     } catch (error) {
         console.error('Shopper Agent: Error ending Commerce Client conversation', error)

@@ -310,23 +310,39 @@ describe('shopper-agent-utils', () => {
             expect(endCommerceClientConversation()).toBe(false)
         })
 
-        test('should call endConversation and return true when supported', () => {
+        test('should prefer endConversation over resetConversation when both exist', () => {
             const mockEnd = jest.fn()
+            const mockReset = jest.fn()
             global.window = {
-                CimulateMessaging: {eventHandlers: {session: {endConversation: mockEnd}}}
+                CimulateMessaging: {
+                    eventHandlers: {
+                        session: {endConversation: mockEnd, resetConversation: mockReset}
+                    }
+                }
             }
 
             expect(endCommerceClientConversation()).toBe(true)
             expect(mockEnd).toHaveBeenCalledTimes(1)
+            expect(mockReset).not.toHaveBeenCalled()
         })
 
-        test('should warn and return false when the widget lacks endConversation', () => {
+        test('should fall back to resetConversation when endConversation is missing', () => {
+            const mockReset = jest.fn()
+            global.window = {
+                CimulateMessaging: {eventHandlers: {session: {resetConversation: mockReset}}}
+            }
+
+            expect(endCommerceClientConversation()).toBe(true)
+            expect(mockReset).toHaveBeenCalledTimes(1)
+        })
+
+        test('should warn and return false when the widget supports neither', () => {
             const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
             global.window = {CimulateMessaging: {eventHandlers: {session: {}}}}
 
             expect(endCommerceClientConversation()).toBe(false)
             expect(warnSpy).toHaveBeenCalledWith(
-                expect.stringContaining('endConversation is unavailable')
+                expect.stringContaining('endConversation and resetConversation are unavailable')
             )
             warnSpy.mockRestore()
         })

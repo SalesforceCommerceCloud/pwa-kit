@@ -2286,7 +2286,26 @@ describe('ShopperAgent Component', () => {
                     })
                 })
 
-                test('falls back to re-linking on logout when the widget lacks endConversation', async () => {
+                test('resets the conversation on logout when the widget lacks endConversation', async () => {
+                    const mockResetConversation = jest.fn()
+                    window.CimulateMessaging.eventHandlers = {
+                        session: {resetConversation: mockResetConversation}
+                    }
+                    setRegistered()
+                    seedAuthLinkStorage({jwt: 'registered.jwt'})
+                    const {rerender} = renderCommerceClientWithBasket()
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    setGuest()
+                    rerenderShopperAgent(rerender)
+
+                    await waitFor(() => expect(mockResetConversation).toHaveBeenCalledTimes(1))
+                    // The registered shopper's conversation must not be linked to the guest.
+                    expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                })
+
+                test('falls back to re-linking on logout when the widget can neither end nor reset', async () => {
                     delete window.CimulateMessaging.eventHandlers
                     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
                     setRegistered()
@@ -2299,7 +2318,9 @@ describe('ShopperAgent Component', () => {
 
                     await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
                     expect(warnSpy).toHaveBeenCalledWith(
-                        expect.stringContaining('endConversation is unavailable')
+                        expect.stringContaining(
+                            'endConversation and resetConversation are unavailable'
+                        )
                     )
                     warnSpy.mockRestore()
                 })
