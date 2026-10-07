@@ -20,7 +20,8 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 // Constants
 import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
-import {SHARE_PREVIEW_COOKIE} from '@salesforce/retail-react-app/app/middlewares/share-preview'
+
+const SHARE_PREVIEW_COOKIE = 'share_preview_ctx'
 
 /*
  * This hook will set the shopper context when search params pertinant
@@ -56,7 +57,9 @@ export const useUpdateShopperContext = () => {
     }
 
     useEffect(() => {
-        if (document.cookie.split(';').some((c) => c.trim().startsWith(SHARE_PREVIEW_COOKIE + '='))) {
+        if (
+            document.cookie.split(';').some((c) => c.trim().startsWith(SHARE_PREVIEW_COOKIE + '='))
+        ) {
             return
         }
 

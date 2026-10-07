@@ -55,7 +55,9 @@ export async function sharePreviewMiddleware(req, res, next) {
         let response
         try {
             response = await fetch(
-                `${proxy}/shopper/shopper-experience/v1/organizations/${encodeURIComponent(organizationId)}/preview-context/apply?siteId=${encodeURIComponent(siteId)}`,
+                `${proxy}/shopper/shopper-experience/v1/organizations/${encodeURIComponent(
+                    organizationId
+                )}/preview-context/apply?siteId=${encodeURIComponent(siteId)}`,
                 {
                     method: 'POST',
                     headers: {

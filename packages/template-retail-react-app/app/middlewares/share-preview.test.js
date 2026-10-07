@@ -131,7 +131,9 @@ describe('sharePreviewMiddleware', () => {
             await sharePreviewMiddleware(createReq(), res, next)
 
             expect(global.fetch).toHaveBeenCalledWith(
-                `https://test-app.com/mobify/proxy/api/shopper/shopper-experience/v1/organizations/${encodeURIComponent('f_ecom_test_001')}/preview-context/apply?siteId=${encodeURIComponent('RefArch')}`,
+                `https://test-app.com/mobify/proxy/api/shopper/shopper-experience/v1/organizations/${encodeURIComponent(
+                    'f_ecom_test_001'
+                )}/preview-context/apply?siteId=${encodeURIComponent('RefArch')}`,
                 {
                     method: 'POST',
                     headers: {
