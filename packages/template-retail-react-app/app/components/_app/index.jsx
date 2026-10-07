@@ -562,15 +562,15 @@ const COMPONENT_PREVIEW_PATH_RE = /\/preview\/component$/
  * Minimal app surface for the Page Designer component-preview iframe.
  *
  * It renders only the providers a single Page Designer component needs — i18n, currency,
- * the Storefront Preview postMessage bridge, and the Page Designer context/init — and none
- * of the storefront chrome (header, footer, menus) or shopper-state hooks (basket, customer,
- * category, analytics, shopper agent). Those hooks mutate session state and fire analytics,
- * which must not happen inside an authoring iframe; skipping them is the point of this split,
- * not merely hiding the chrome.
+ * and the Page Designer context/init — and none of the storefront chrome (header, footer,
+ * menus) or shopper-state hooks (basket, customer, category, analytics, shopper agent).
+ * Those hooks mutate session state and fire analytics, which must not happen inside an
+ * authoring iframe; skipping them is the point of this split, not merely hiding the chrome.
+ * MRT StorefrontPreview is omitted here: the Content Block Editor iframe already owns the
+ * authoring postMessage bridge via PageDesignerProvider.
  */
 const ComponentPreviewApp = (props) => {
     const {children} = props
-    const {getTokenWhenReady} = useAccessToken()
     const {usid} = useUsid()
     const appOrigin = useAppOrigin()
     const location = useLocation()
@@ -600,49 +600,47 @@ const ComponentPreviewApp = (props) => {
 
     return (
         <Box className="sf-app">
-            <StorefrontPreview getToken={getTokenWhenReady} getBasePath={getRouterBasePath}>
-                <IntlProvider
-                    onError={(err) => {
-                        if (!messages) {
-                            // During the ssr prepass phase the messages object has not loaded,
-                            // so we can suppress errors during this time.
-                            return
-                        }
-                        if (err.code === 'MISSING_TRANSLATION') {
-                            logger.warn('Missing translation', {
-                                namespace: 'ComponentPreviewApp.IntlProvider',
-                                additionalProperties: {errorMessage: err.message}
-                            })
-                            return
-                        }
-                        throw err
-                    }}
-                    locale={targetLocale}
-                    messages={messages}
-                    defaultLocale={DEFAULT_LOCALE}
-                >
-                    <CurrencyProvider currency={currency}>
-                        <Box
-                            as="main"
-                            id="app-main"
-                            role="main"
-                            display="flex"
-                            flexDirection="column"
-                            flex="1"
+            <IntlProvider
+                onError={(err) => {
+                    if (!messages) {
+                        // During the ssr prepass phase the messages object has not loaded,
+                        // so we can suppress errors during this time.
+                        return
+                    }
+                    if (err.code === 'MISSING_TRANSLATION') {
+                        logger.warn('Missing translation', {
+                            namespace: 'ComponentPreviewApp.IntlProvider',
+                            additionalProperties: {errorMessage: err.message}
+                        })
+                        return
+                    }
+                    throw err
+                }}
+                locale={targetLocale}
+                messages={messages}
+                defaultLocale={DEFAULT_LOCALE}
+            >
+                <CurrencyProvider currency={currency}>
+                    <Box
+                        as="main"
+                        id="app-main"
+                        role="main"
+                        display="flex"
+                        flexDirection="column"
+                        flex="1"
+                    >
+                        <PageDesignerProvider
+                            clientId="pwa-kit-client"
+                            targetOrigin="*"
+                            usid={usid}
+                            mode={pageDesignerMode}
                         >
-                            <PageDesignerProvider
-                                clientId="pwa-kit-client"
-                                targetOrigin="*"
-                                usid={usid}
-                                mode={pageDesignerMode}
-                            >
-                                <PageDesignerInit />
-                                {children}
-                            </PageDesignerProvider>
-                        </Box>
-                    </CurrencyProvider>
-                </IntlProvider>
-            </StorefrontPreview>
+                            <PageDesignerInit />
+                            {children}
+                        </PageDesignerProvider>
+                    </Box>
+                </CurrencyProvider>
+            </IntlProvider>
         </Box>
     )
 }

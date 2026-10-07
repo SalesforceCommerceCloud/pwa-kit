@@ -24,6 +24,16 @@ import {mockEmbeddedHeader} from '@salesforce/retail-react-app/app/mocks/page-de
 // `@salesforce/commerce-sdk-react/page-designer` is only stubbed for `PageDesignerProvider`
 // below — the `registry` export it re-exports is the real V2 singleton.
 import {registry} from '@salesforce/commerce-sdk-react/page-designer'
+import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
+
+jest.mock('@salesforce/commerce-sdk-react/components', () => {
+    const actual = jest.requireActual('@salesforce/commerce-sdk-react/components')
+    return {
+        ...actual,
+        // eslint-disable-next-line react/prop-types
+        StorefrontPreview: jest.fn(({children}) => children)
+    }
+})
 
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 jest.mock('../../hooks/use-update-shopper-context', () => ({
@@ -86,8 +96,11 @@ beforeEach(() => {
 
 afterEach(() => {
     windowSpy.mockRestore()
+    StorefrontPreview.mockClear()
     jest.restoreAllMocks()
     jest.resetModules()
+    // Reset the jsdom URL so a route-dependent test can't leak its location into the next.
+    window.history.pushState({}, '', '/')
 })
 describe('App', () => {
     const site = {
@@ -166,6 +179,29 @@ describe('App', () => {
 
         expect(hreflangLinks.some((link) => hasGeneralLocale(link))).toBe(true)
         expect(hreflangLinks.some((link) => link.hrefLang === 'x-default')).toBe(true)
+    })
+
+    test('renders the component-preview surface without StorefrontPreview or storefront chrome', async () => {
+        useMultiSite.mockImplementation(() => resultUseMultiSite)
+        // BrowserRouter reads window.location, so put the app on the preview route.
+        window.history.pushState({}, '', '/uk/en-GB/preview/component?mode=EDIT')
+        StorefrontPreview.mockClear()
+
+        renderWithProviders(
+            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+                <p>Preview child</p>
+            </App>
+        )
+
+        await waitFor(() => {
+            expect(screen.getByText('Preview child')).toBeInTheDocument()
+        })
+        // The chrome-free preview surface renders the main region but no storefront
+        // header navigation or footer, and does not mount MRT StorefrontPreview.
+        expect(screen.getByRole('main')).toBeInTheDocument()
+        expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+        expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument()
+        expect(StorefrontPreview).not.toHaveBeenCalled()
     })
 
     test('SSR-renders the embedded header when its component is only lazily registered', () => {
