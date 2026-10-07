@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {decodeJwt} from 'jose'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {cookieAsString} from '@salesforce/pwa-kit-runtime/utils/ssr-proxying'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
@@ -41,8 +40,10 @@ export async function sharePreviewMiddleware(req, res, next) {
     try {
         let exp
         try {
-            const decoded = decodeJwt(previewToken)
-            exp = decoded.exp
+            const payload = JSON.parse(
+                Buffer.from(previewToken.split('.')[1], 'base64url').toString('utf8')
+            )
+            exp = typeof payload.exp === 'number' ? payload.exp : undefined
         } catch {
             logger.warn('share-preview: malformed token, skipping')
             return next()
