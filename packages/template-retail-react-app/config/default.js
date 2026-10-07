@@ -151,7 +151,7 @@ module.exports = {
             // If the env var `OTP_TOKEN_LENGTH` is set, it will override the config value. Valid values are 6 or 8. Defaults to: 8
             tokenLength: validateOtpTokenLength(process.env.OTP_TOKEN_LENGTH),
             passwordless: {
-                enabled: true,
+                enabled: false,
                 mode: 'callback',
                 landingPath: '/passwordless-login-landing',
                 callbackURI: '/passwordless-login-callback'
@@ -170,7 +170,7 @@ module.exports = {
                 callbackURI: '/registration-verification-callback'
             }
         },
-        defaultSite: 'RefArch',
+        defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -179,11 +179,10 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '11deeece-0b48-4b60-bf1b-d96649faec43',
-                notifyClientId: 'cac0e789-e1db-4c39-805c-924574c78b79',
-                organizationId: 'f_ecom_zysg_001',
-                shortCode: 'sandbox-001',
-                siteId: 'RefArch'
+                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                organizationId: 'f_ecom_zzrf_001',
+                shortCode: 'kv7kzm78',
+                siteId: 'RefArchGlobal'
             }
             // Optional: Set the domain for auth cookies to share them across subdomains.
             // If not set, cookies default to the current host.
@@ -224,7 +223,7 @@ module.exports = {
         },
         storeLocatorEnabled: true,
         guestOrderLookup: {
-            enabled: true,
+            enabled: false,
             orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$',
             requestCodeThrottle: {
                 windowMs: 60000,
@@ -274,7 +273,7 @@ module.exports = {
         enableHttpOnlySessionCookies: false,
         proxyConfigs: [
             {
-                host: 'sandbox-001.api.commercecloud.salesforce.com',
+                host: 'kv7kzm78.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {

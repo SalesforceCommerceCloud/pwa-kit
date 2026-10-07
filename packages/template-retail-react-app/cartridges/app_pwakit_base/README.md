@@ -118,52 +118,39 @@ The `pwakit-notify` Custom REST API (passwordless login, OTP, password reset ema
 
 **This is not the same as `enablePWAKitPrivateClient`.** That flag controls whether shoppers use a private client for their own auth flows. The `pwakit-notify` token is a separate server-side credential and the two are independent.
 
-A dedicated SLAS private client scoped only to `c_pwakit_notify` is required. Using the shopper client would expose that scope to browser tokens, which this setup is specifically designed to prevent.
+Both public and private SLAS client setups are supported:
+
+- **Public client** (`PWA_KIT_SLAS_CLIENT_SECRET` not set): the SSR server mints a guest token via the PKCE guest flow (`loginGuestUser`) using the existing public `clientId`. No secret required; the PKCE authorize + code exchange happens entirely server-side.
+- **Private client** (`PWA_KIT_SLAS_CLIENT_SECRET` set): uses `loginGuestUserPrivate` (client_credentials grant) — one fewer round-trip to SLAS on the first call. Prefer this if you already have a private client configured.
 
 > **GLO email is not affected** — the `sendOrderAccessCode` hook is invoked directly by SCAPI and does not use this token at all. If you only need GLO email, you can skip this section entirely.
 
-### 1. Register a dedicated notify SLAS client
+### 1. Add the scope to your SLAS client
 
-In [SLAS Admin](https://account.demandware.com/dwsso/oauth2/authorize) (separate from Account Manager), create a new private client with:
+In [Account Manager](https://account.demandware.com) → **API Client**, find the client whose `clientId` matches `config/default.js` → `commerceAPI.parameters.clientId`.
 
-- **Private client**: yes (`isPrivateClient: true`)
-- **Default Scopes**: `c_pwakit_notify` only — do not include shopper scopes
-- **Channels**: add every site ID this storefront serves, or the guest token request will fail
-- **Client Secret**: generate and save a secret; you will need it in step 2
+Under **Scopes** (the default scopes list, not just the allowed scopes), add: `c_pwakit_notify`
 
-Note the new client's ID. Do **not** add `c_pwakit_notify` to your existing shopper client — if that scope is present on the shopper client, browser tokens could carry it.
+Adding it to the default scopes list ensures every guest token issued for this client includes it automatically. This applies to both public and private clients. The `commerce-sdk-isomorphic` guest-login helpers do not accept a `scope` parameter, so the scope must be configured as a default on the client — requesting it at call time is not possible through the SDK.
 
-### 2. Configure the client ID and secret
+### 2. (Private client only) Set the client secret on the SSR server
 
-Set the client ID in `config/default.js` → `commerceAPI.parameters.notifyClientId`:
-
-```js
-commerceAPI: {
-    parameters: {
-        clientId: '<your-shopper-client-id>',
-        notifyClientId: '<your-notify-client-id>',
-        // ...
-    }
-}
-```
-
-Set the client secret as an environment variable on the MRT environment:
+If you are using a private client, set `PWA_KIT_SLAS_CLIENT_SECRET` on the MRT environment:
 
 ```bash
-pwa-kit-dev push --set-env PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET=<your-notify-client-secret> ...
+pwa-kit-dev push --set-env PWA_KIT_SLAS_CLIENT_SECRET=<your-client-secret> ...
 ```
 
 Or via the MRT Admin UI: **Environments → <env> → Environment Variables**.
 
-If either value is missing, the callback routes will return 500 and log the missing-config error on first use — there is no fallback to the shopper client.
+If this variable is absent, the SSR server automatically falls back to the public PKCE guest flow.
 
 ### 3. Verify
 
 Trigger a passwordless login or password reset flow and confirm the email is delivered. If you see `401` errors in the `pwakit-notify` log, the most common causes are:
 
-- `c_pwakit_notify` not added to the notify client's Default Scopes in Account Manager
-- `commerceAPI.parameters.notifyClientId` in config does not match the registered client
-- `PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET` incorrect or not yet deployed
+- `c_pwakit_notify` not added to the API client's Allowed Scopes in Account Manager
+- `PWA_KIT_SLAS_CLIENT_SECRET` set but incorrect (private client path fails, public fallback not used because the variable is present)
 - Code version not yet activated after deploying the cartridge
 
 ---

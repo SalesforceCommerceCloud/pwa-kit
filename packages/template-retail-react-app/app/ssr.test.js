@@ -121,7 +121,7 @@ import {
     _resetNotifyTokenCacheForTest,
     extractLocaleFromUrl
 } from '@salesforce/retail-react-app/app/ssr.js'
-import {ShopperLogin, helpers} from 'commerce-sdk-isomorphic'
+import {helpers} from 'commerce-sdk-isomorphic'
 
 // Mock environment variables
 const originalEnv = process.env
@@ -276,7 +276,6 @@ describe('handleCallback', () => {
 
 const TEST_API_PARAMS = {
     clientId: 'test-client-id',
-    notifyClientId: 'test-notify-client-id',
     organizationId: 'f_ecom_test_001',
     shortCode: 'test-shortcode',
     siteId: 'RefArch'
@@ -285,58 +284,39 @@ const TEST_API_PARAMS = {
 describe('getNotifyToken', () => {
     beforeEach(() => {
         _resetNotifyTokenCacheForTest()
-        process.env.PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET = 'notify-secret'
+        delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
     })
 
-    afterEach(() => {
-        delete process.env.PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET
-    })
-
-    test('fetches a token via private client using the notify client credentials', async () => {
-        helpers.loginGuestUserPrivate.mockResolvedValueOnce({access_token: 'notify-token-abc'})
+    test('fetches a new token via public client (no secret)', async () => {
+        helpers.loginGuestUser.mockResolvedValueOnce({access_token: 'guest-token-abc'})
 
         const token = await getNotifyToken(TEST_API_PARAMS)
 
-        expect(token).toBe('notify-token-abc')
+        expect(token).toBe('guest-token-abc')
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
+        expect(helpers.loginGuestUserPrivate).not.toHaveBeenCalled()
+    })
+
+    test('fetches a new token via private client when secret is set', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'super-secret'
+        helpers.loginGuestUserPrivate.mockResolvedValueOnce({access_token: 'private-token-xyz'})
+
+        const token = await getNotifyToken(TEST_API_PARAMS)
+
+        expect(token).toBe('private-token-xyz')
         expect(helpers.loginGuestUserPrivate).toHaveBeenCalledTimes(1)
         expect(helpers.loginGuestUser).not.toHaveBeenCalled()
-        // Guard against regression: must use the dedicated notify client, not the shopper client
-        expect(ShopperLogin).toHaveBeenCalledWith(
-            expect.objectContaining({
-                parameters: expect.objectContaining({clientId: 'test-notify-client-id'})
-            })
-        )
-        expect(helpers.loginGuestUserPrivate).toHaveBeenCalledWith(
-            expect.objectContaining({
-                credentials: {clientSecret: 'notify-secret'}
-            })
-        )
-    })
-
-    test('throws when notifyClientId is missing from apiParams', async () => {
-        const paramsWithoutNotifyClient = {...TEST_API_PARAMS}
-        delete paramsWithoutNotifyClient.notifyClientId
-        await expect(getNotifyToken(paramsWithoutNotifyClient)).rejects.toThrow(
-            'commerceAPI.parameters.notifyClientId (config) and PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET (env) are required'
-        )
-    })
-
-    test('throws when PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET is not set', async () => {
-        delete process.env.PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET
-        await expect(getNotifyToken(TEST_API_PARAMS)).rejects.toThrow(
-            'commerceAPI.parameters.notifyClientId (config) and PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET (env) are required'
-        )
     })
 
     test('returns cached token without making a new SLAS call', async () => {
-        helpers.loginGuestUserPrivate.mockResolvedValue({access_token: 'cached-token'})
+        helpers.loginGuestUser.mockResolvedValue({access_token: 'cached-token'})
 
         const first = await getNotifyToken(TEST_API_PARAMS)
         const second = await getNotifyToken(TEST_API_PARAMS)
 
         expect(first).toBe('cached-token')
         expect(second).toBe('cached-token')
-        expect(helpers.loginGuestUserPrivate).toHaveBeenCalledTimes(1)
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
     })
 })
 
@@ -345,8 +325,8 @@ describe('sendViaB2cCartridge', () => {
 
     beforeEach(() => {
         _resetNotifyTokenCacheForTest()
-        process.env.PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET = 'notify-secret'
-        helpers.loginGuestUserPrivate.mockResolvedValue({access_token: 'notify-token'})
+        delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
+        helpers.loginGuestUser.mockResolvedValue({access_token: 'notify-token'})
         fetchSpy = jest.spyOn(global, 'fetch').mockImplementation(() =>
             Promise.resolve({
                 ok: true,
@@ -357,7 +337,6 @@ describe('sendViaB2cCartridge', () => {
     })
 
     afterEach(() => {
-        delete process.env.PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET
         fetchSpy.mockRestore()
     })
 
@@ -438,7 +417,7 @@ describe('sendViaB2cCartridge', () => {
     })
 
     test('retries with a fresh token on 401 and succeeds', async () => {
-        helpers.loginGuestUserPrivate
+        helpers.loginGuestUser
             .mockResolvedValueOnce({access_token: 'stale-token'})
             .mockResolvedValueOnce({access_token: 'fresh-token'})
         // First fetch: 401 with stale token; second fetch: 200 with fresh token
@@ -471,10 +450,10 @@ describe('sendViaB2cCartridge', () => {
         ).rejects.toThrow('pwakit-notify returned 503')
 
         // Token should still be cached (503 is not 401)
-        helpers.loginGuestUserPrivate.mockClear()
+        helpers.loginGuestUser.mockClear()
         mockFetchOk()
         await sendViaB2cCartridge('otp', 'user@example.com', {token: '111'}, TEST_API_PARAMS)
-        expect(helpers.loginGuestUserPrivate).not.toHaveBeenCalled()
+        expect(helpers.loginGuestUser).not.toHaveBeenCalled()
     })
 
     test('appends locale to URL when provided in apiParams', async () => {
