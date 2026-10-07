@@ -62,6 +62,20 @@ describe('useScript hook', () => {
         expect(finalScriptCount).toBe(initialScriptCount)
     })
 
+    test('should report loaded when a script element already exists on remount', () => {
+        const src = 'https://test-script.js'
+
+        const existingScript = document.createElement('script')
+        existingScript.src = src
+        document.body.appendChild(existingScript)
+
+        const {getByTestId} = render(<TestComponent src={src} />)
+
+        expect(getByTestId('script-status').textContent).toBe(
+            JSON.stringify({loaded: true, error: false})
+        )
+    })
+
     test('should update state to loaded when script loads successfully', () => {
         const src = 'https://test-script.js'
         const {getByTestId} = render(<TestComponent src={src} />)

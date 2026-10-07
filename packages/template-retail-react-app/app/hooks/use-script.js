@@ -24,23 +24,28 @@ const useScript = (src) => {
         // Check if script already exists
         const scriptAlreadyOnPage = document.querySelector(`script[src="${src}"]`)
 
-        if (!scriptAlreadyOnPage) {
-            const script = document.createElement('script')
-            script.src = src
-            script.defer = true
-            document.body.appendChild(script)
-
-            const onScriptLoad = (event) => {
-                const loadStatus = event.type === 'load' ? 'ready' : 'error'
-                setScriptLoadStatus({
-                    loaded: loadStatus === 'ready',
-                    error: loadStatus === 'error'
-                })
-            }
-
-            script.addEventListener('load', onScriptLoad)
-            script.addEventListener('error', onScriptLoad)
+        if (scriptAlreadyOnPage) {
+            // Script tag survived a previous mount (e.g. shopper navigated to a PDP
+            // and back). Treat it as already loaded so consumers remount correctly.
+            setScriptLoadStatus({loaded: true, error: false})
+            return
         }
+
+        const script = document.createElement('script')
+        script.src = src
+        script.defer = true
+        document.body.appendChild(script)
+
+        const onScriptLoad = (event) => {
+            const loadStatus = event.type === 'load' ? 'ready' : 'error'
+            setScriptLoadStatus({
+                loaded: loadStatus === 'ready',
+                error: loadStatus === 'error'
+            })
+        }
+
+        script.addEventListener('load', onScriptLoad)
+        script.addEventListener('error', onScriptLoad)
     }, [src])
 
     return scriptLoadStatus
