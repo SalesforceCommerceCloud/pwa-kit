@@ -11,7 +11,6 @@ import {useComponent} from '@salesforce/commerce-sdk-react'
 import {Page} from '@salesforce/commerce-sdk-react/page-designer'
 import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
-import {PAGEDESIGNER_TO_COMPONENT} from '@salesforce/retail-react-app/app/page-designer/component-map'
 import {injectIntoPreviewRegion} from '@salesforce/retail-react-app/app/page-designer/preview-page'
 
 /**
@@ -64,12 +63,7 @@ const ComponentPreview = () => {
                     Error loading component.
                 </Box>
             )}
-            {component && !error && (
-                <Page
-                    page={injectIntoPreviewRegion(component)}
-                    components={PAGEDESIGNER_TO_COMPONENT}
-                />
-            )}
+            {component && !error && <Page page={injectIntoPreviewRegion(component)} />}
         </Box>
     )
 }
