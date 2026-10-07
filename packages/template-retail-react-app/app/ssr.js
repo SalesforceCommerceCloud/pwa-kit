@@ -30,6 +30,8 @@ import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {sharePreviewMiddleware} from './middlewares/share-preview.js'
 import {ShopperOrders} from 'commerce-sdk-isomorphic'
 
 const config = getConfig()
@@ -1122,6 +1124,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
     })
 
+    app.get('*', sharePreviewMiddleware)
     app.get('*', runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that

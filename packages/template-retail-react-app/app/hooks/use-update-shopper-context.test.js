@@ -133,4 +133,24 @@ describe('useShopperContextSearchParams', () => {
             body: {sourceCode: 'instagram'}
         })
     })
+
+    describe('share_preview_ctx cookie', () => {
+        afterEach(() => {
+            document.cookie = 'share_preview_ctx=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
+        })
+
+        test('skips create/update of the shopper context when share_preview_ctx cookie is present', () => {
+            document.cookie = 'share_preview_ctx=1; path=/'
+            const history = createMemoryHistory()
+            history.push('/test/path/?sourceCode=instagram')
+            useShopperContext.mockReturnValue({data: undefined, isLoading: false})
+            renderWithProviders(
+                <Router history={history}>
+                    <MockComponent />
+                </Router>
+            )
+            expect(createShopperContext.mutateAsync).not.toHaveBeenCalled()
+            expect(updateShopperContext.mutateAsync).not.toHaveBeenCalled()
+        })
+    })
 })
