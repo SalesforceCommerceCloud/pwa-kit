@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://www.demandware.com/xml/impex/metadata/2006-10-31">
+
+    <!--
+        PWA Kit site-level preferences.
+        Import via Business Manager: Administration > Site Development > Import & Export.
+    -->
+    <type-extension type-id="SitePreferences">
+        <custom-attribute-definitions>
+
+            <!--
+                The public-facing hostname of this storefront site, without protocol or
+                trailing slash. Used to construct magic-link and order-lookup URLs in
+                transactional emails.
+
+                Example: my-store.salesforcecommercecloudsites.com
+
+                When the B2C Script API provides native access to the MRT/eCDN hostname
+                (e.g. Site.getCurrent().mrtExternalHostname), this preference will be used
+                as a fallback only.
+            -->
+            <attribute-definition attribute-id="pwakitStorefrontHost">
+                <display-name xml:lang="x-default">Storefront Host</display-name>
+                <description xml:lang="x-default">
+                    Public-facing hostname of this storefront site (no protocol, no trailing slash).
+                    Example: my-store.salesforcecommercecloudsites.com
+                    Used to construct magic-link and order-lookup URLs in transactional emails.
+                    Configure once per site. Will be superseded by a platform API in a future release.
+                </description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+
+        </custom-attribute-definitions>
+
+        <group-definitions>
+            <attribute-group group-id="pwakit">
+                <display-name xml:lang="x-default">PWA Kit</display-name>
+                <attribute attribute-id="pwakitStorefrontHost"/>
+            </attribute-group>
+        </group-definitions>
+    </type-extension>
+
+</metadata>

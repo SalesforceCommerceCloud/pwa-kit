@@ -80,9 +80,15 @@ sfcc-ci meta:import \
   --directory meta
 ```
 
-This registers `pwakitNotifyEnabled` and `pwakitStorefrontHosts` under **Administration → Global Preferences → Custom Preferences → PWA Kit**.
+This registers `pwakitNotifyEnabled` under **Administration → Global Preferences → Custom Preferences → PWA Kit**, and `pwakitStorefrontHost` under **Merchant Tools → Custom Preferences → pwakit** (site-level).
 
-**4. Activate the code version**
+**4. Configure `pwakitStorefrontHost` per site** (one-time, via Business Manager)
+
+In Business Manager → **Merchant Tools → Custom Preferences → pwakit**, set `Storefront Host` to the public-facing hostname of your storefront (no protocol, no trailing slash). Example: `my-store.salesforcecommercecloudsites.com`. This is used to construct magic-link and order-lookup URLs in transactional emails.
+
+If left unset, magic-link CTA buttons are omitted from emails — the email is still delivered with an inline access code where applicable.
+
+**5. Activate the code version**
 
 The `deploy:cartridge` script uses `--reload`, which handles activation automatically. No separate activation step is needed after the first deploy.
 
@@ -172,8 +178,8 @@ Trigger a passwordless login or password reset flow and confirm the email is del
 
 | Preference | Type | Description |
 |---|---|---|
-| `pwakitNotifyEnabled` | Boolean | Set to `false` to disable the cartridge's built-in email delivery (e.g. when using a third-party provider). Defaults to `true` when unset. |
-| `pwakitStorefrontHosts` | String | Comma-separated list of allowed public-facing storefront hostnames (no protocol, no trailing slash). Example: `my-store.salesforcecommercecloudsites.com`. The first entry is used for server-side magic-link construction (GLO access code, passwordless magic link). If unset (or if the caller-supplied host is not in the list), magic-link CTA buttons are omitted from the email — the email is still delivered with an inline access code where applicable. |
+| `pwakitNotifyEnabled` | Boolean (org) | Set to `false` to disable the cartridge's built-in email delivery (e.g. when using a third-party provider). Defaults to `true` when unset. |
+| `pwakitStorefrontHost` | String (site) | Public-facing hostname of this storefront site (no protocol, no trailing slash). Example: `my-store.salesforcecommercecloudsites.com`. Used to construct magic-link and order-lookup URLs in transactional emails. Configure once per site in **Merchant Tools → Custom Preferences → pwakit**. If unset, magic-link CTA buttons are omitted — the email is still delivered with an inline access code where applicable. |
 
 The sender address is read from the **Site Preferences** `customerServiceEmail` custom attribute. If unset, it falls back to `no-reply@<site-https-hostname>`.
 
@@ -186,7 +192,6 @@ The `pwakit-notify` endpoint validates the recipient against B2C's customer dire
 | `passwordless-magic-link` | Yes — silently succeeds if not found | Passwordless login requires a pre-existing account. Silently succeeding (no email sent, 200 returned) prevents email enumeration. |
 | `password-reset` | Yes — silently succeeds if not found | Same as above. |
 | `otp` | Yes — silently succeeds if not found | SLAS creates the B2C customer profile at authorize time, before the callback fires. Requiring the profile to exist prevents a crafted payload from sending verification emails to arbitrary addresses. Verified/unverified state is not checked — that is managed by SLAS and is not reliably exposed through the B2C scripting API. |
-| `glo-access-code` | **No** | GLO is for shoppers who placed an order as a guest. By definition there is no registered customer profile. |
 
 The silent-success behaviour for `passwordless-magic-link` and `password-reset` is intentional — the storefront flow completes normally and the shopper receives no indication of whether their email is registered. If you need to audit skipped sends, filter the `pwakit-notify` log for `skipping send`.
 

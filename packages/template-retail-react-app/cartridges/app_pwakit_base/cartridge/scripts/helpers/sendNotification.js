@@ -21,6 +21,7 @@ var Template = require('dw/util/Template');
 var HashMap = require('dw/util/HashMap');
 var Site = require('dw/system/Site');
 var Logger = require('dw/system/Logger');
+var Resource = require('dw/web/Resource');
 
 var log = Logger.getLogger('pwakit-notify', 'pwakit-notify');
 
@@ -42,6 +43,24 @@ function renderTemplate(templateName, templateContext) {
 }
 
 /**
+ * Returns a minimal plain-text fallback for the given notification type and context.
+ * Screen readers and plain-mail clients need this; spam filters score multipart higher.
+ */
+function buildPlainText(templateName, context) {
+    if (context.magicLink) {
+        return Resource.msg('email.plaintext.useThisLink', 'email', 'Use this link to continue:') + '\n' + context.magicLink;
+    }
+    if (context.token) {
+        return Resource.msg('email.plaintext.verificationCode', 'email', 'Your verification code:') + ' ' + context.token;
+    }
+    if (context.accessCode) {
+        return Resource.msg('email.plaintext.orderAccessCode', 'email', 'Your order access code:') + ' ' + context.accessCode
+            + '\n' + Resource.msg('email.plaintext.orderNumber', 'email', 'Order:') + ' ' + (context.orderNo || '');
+    }
+    return '';
+}
+
+/**
  * Sends a transactional notification.
  *
  * // Customize this function to integrate your preferred delivery service.
@@ -59,21 +78,15 @@ function renderTemplate(templateName, templateContext) {
  */
 function send(recipient, subject, templateName, context) {
     try {
-        var site = Site.getCurrent();
-        var senderEmail = site.getCustomPreferenceValue('customerServiceEmail')
-            || 'no-reply@' + site.httpsHostName;
+        var senderEmail = Site.current.getCustomPreferenceValue('customerServiceEmail')
+            || 'no-reply@' + Site.current.httpsHostName;
 
         log.info('Sending notification: template={0}, subject={1}, from={2}', templateName, subject, senderEmail);
 
-        var localeRaw = request.locale || site.defaultLocale || 'en';
-        var localeId = String(localeRaw).replace(/_/g, '-');
-        var ctx = context || {};
-        var templateContext = { localeId: localeId, emailTitle: subject };
-        var ctxKeys = Object.keys(ctx);
-        for (var k = 0; k < ctxKeys.length; k++) {
-            templateContext[ctxKeys[k]] = ctx[ctxKeys[k]];
-        }
+        var localeId = (request.locale || Site.current.defaultLocale || 'en').replace(/_/g, '-');
+        var templateContext = Object.assign({ localeId: localeId, emailTitle: subject }, context || {});
         var htmlBody = renderTemplate(templateName, templateContext);
+        var plainBody = buildPlainText(templateName, context || {});
 
         var mail = new Mail();
         mail.addTo(recipient);

@@ -297,8 +297,7 @@ export async function sendViaB2cCartridge(type, recipient, data, apiParams) {
     const requestBody = JSON.stringify({
         type,
         recipient,
-        data,
-        callerHost: new URL(getAppOrigin()).hostname
+        data
     })
     let res = await fetch(url, {
         method: 'POST',

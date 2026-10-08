@@ -22,7 +22,7 @@ var Resource = require('dw/web/Resource');
 var System = require('dw/system/System');
 var Site = require('dw/system/Site');
 var sendNotification = require('*/cartridge/scripts/helpers/sendNotification');
-var resolveStorefrontHost = require('*/cartridge/scripts/helpers/storefrontHostProvider');
+var getStorefrontHost = require('*/cartridge/scripts/helpers/getStorefrontHost');
 var buildOrderLookupUrl = require('*/cartridge/scripts/helpers/buildOrderLookupUrl');
 
 var log = Logger.getLogger('pwakit-notify', 'pwakit-notify');
@@ -78,9 +78,9 @@ function sendOrderAccessCode(order, accessCode) {
         return new Status(Status.ERROR, 'NULL_ORDER', 'Order or customer info is null');
     }
 
-    var storefrontHost = resolveStorefrontHost(null);
+    var storefrontHost = getStorefrontHost();
     if (!storefrontHost) {
-        log.warn('sendOrderAccessCode: pwakitStorefrontHosts is not configured — sending email without lookup link');
+        log.warn('sendOrderAccessCode: pwakitStorefrontHost is not configured — sending email without lookup link');
     }
 
     // Note: uses siteId.toLowerCase() as the URL path segment. If your storefront
