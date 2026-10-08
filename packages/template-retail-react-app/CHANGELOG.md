@@ -1,3 +1,6 @@
+## v10.3.0-preview.1 (Oct 08, 2026)
+- Version alignment release; no functional changes to `retail-react-app` since v10.3.0-preview.0.
+
 ## v10.3.0-preview.0 (Oct 05, 2026)
 - [Enhancement] Rename `INLINE_AGENT_WIDGET_COMMERCE_SETTINGS` environment variable to `EMBEDDED_AGENT_COMMERCE_SETTINGS` and config key `inlineAgentWidget` to `embeddedAgent` to align with updated product terminology. [#4041](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4041)
 - [Feature] Add a configurable `cc_enableImageUpload` toggle for the Commerce Client (Embedded Messaging) shopper-agent widget, defaulting to `'false'` and forwarded to the bundle as `messagingConfig.enableImageUpload`. Set it to `'true'` via `COMMERCE_AGENT_SETTINGS` to let shoppers upload images in the chat; requires a Commerce Client bundle that supports image upload (`cc_cdnVersion` >= `1.44.0`) plus the backend file-upload prerequisites. Also adds `blob:` and `data:` to the `img-src` CSP directive in `app/ssr.js` so the widget can render the pre-send preview (a `blob:` URL) and the sent-image thumbnail (a `data:` URL); the widget renders images locally only, so no image host is added. [#4030](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4030)
