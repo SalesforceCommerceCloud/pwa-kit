@@ -85,7 +85,7 @@ module.exports = {
                 enabled: false,
                 {{/if}}
                 // The mode for passwordless login. Valid values include 'email|callback'. Defaults to: 'email'
-                mode: 'email',
+                mode: 'callback',
                 // The callback URI, which can be an absolute URL (including third-party URIs) or a relative path set up by the developer.
                 // Required when mode is set to 'callback'. If the env var `PASSWORDLESS_LOGIN_CALLBACK_URI` is set, it will override the config value.
                 callbackURI:
@@ -110,7 +110,7 @@ module.exports = {
             },
             resetPassword: {
                 // The mode for reset password. Valid values include 'email|callback'. Defaults to: 'email'
-                mode: 'email',
+                mode: 'callback',
                 // The callback URI, which can be an absolute URL (including third-party URIs) or a relative path set up by the developer.
                 // Required when mode is set to 'callback'. If the env var `RESET_PASSWORD_CALLBACK_URI` is set, it will override the config value.
                 callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
