@@ -10,8 +10,9 @@ import {cookieAsString} from '@salesforce/pwa-kit-runtime/utils/ssr-proxying'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 
-export const PREVIEW_CONTEXT_PARAM = '__previewContext'
-export const SHARE_PREVIEW_COOKIE = 'share_preview_ctx'
+export const PREVIEW_CONTEXT_PARAM = 'previewContext'
+// Share-preview marker cookie; site-scoped as cc-sp_<siteId> at set time.
+export const SHARE_PREVIEW_COOKIE = 'cc-sp'
 
 function parseCookieValue(req, cookieName) {
     const raw = req.headers?.cookie
@@ -27,10 +28,12 @@ export async function sharePreviewMiddleware(req, res, next) {
     const previewToken = req.query?.[PREVIEW_CONTEXT_PARAM]
     if (!previewToken || typeof previewToken !== 'string') return next()
 
-    if (parseCookieValue(req, SHARE_PREVIEW_COOKIE)) return next()
-
     const appConfig = getConfig()?.app
     const {organizationId, siteId} = appConfig?.commerceAPI?.parameters || {}
+    const cookieName = `${SHARE_PREVIEW_COOKIE}_${siteId}`
+
+    if (parseCookieValue(req, cookieName)) return next()
+
     const shopperToken = parseCookieValue(req, `cc-at_${siteId}`)
     if (!shopperToken) {
         logger.warn('share-preview: no shopper token found, skipping preview context apply')
@@ -84,7 +87,7 @@ export async function sharePreviewMiddleware(req, res, next) {
         res.append(
             'set-cookie',
             cookieAsString({
-                name: SHARE_PREVIEW_COOKIE,
+                name: cookieName,
                 value: '1',
                 path: '/',
                 secure: true,

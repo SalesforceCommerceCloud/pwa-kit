@@ -37,9 +37,9 @@ const JWT_EXP = 1761942400
 const SHOPPER_TOKEN = 'shopper-access-token'
 
 const createReq = ({query, cookie, originalUrl} = {}) => ({
-    query: query === undefined ? {__previewContext: MOCK_JWT} : query,
+    query: query === undefined ? {previewContext: MOCK_JWT} : query,
     headers: cookie === undefined ? {cookie: `cc-at_RefArch=${SHOPPER_TOKEN}`} : {cookie},
-    originalUrl: originalUrl || `/some/path?__previewContext=${MOCK_JWT}`
+    originalUrl: originalUrl || `/some/path?previewContext=${MOCK_JWT}`
 })
 
 const createRes = () => ({
@@ -77,15 +77,15 @@ describe('sharePreviewMiddleware', () => {
             expect(res.redirect).not.toHaveBeenCalled()
         })
 
-        test('calls next() without fetching when __previewContext is absent', async () => {
+        test('calls next() without fetching when previewContext is absent', async () => {
             await sharePreviewMiddleware(createReq({query: {}}), res, next)
             expect(next).toHaveBeenCalledTimes(1)
             expect(global.fetch).not.toHaveBeenCalled()
         })
 
-        test('calls next() without fetching when share_preview_ctx cookie exists', async () => {
+        test('calls next() without fetching when cc-sp_RefArch cookie exists', async () => {
             const req = createReq({
-                cookie: `cc-at_RefArch=${SHOPPER_TOKEN}; share_preview_ctx=1`
+                cookie: `cc-at_RefArch=${SHOPPER_TOKEN}; cc-sp_RefArch=1`
             })
             await sharePreviewMiddleware(req, res, next)
             expect(next).toHaveBeenCalledTimes(1)
@@ -146,7 +146,7 @@ describe('sharePreviewMiddleware', () => {
             )
             expect(res.append).toHaveBeenCalledWith('set-cookie', expect.any(String))
             const cookie = res.append.mock.calls[0][1]
-            expect(cookie).toContain('share_preview_ctx=1')
+            expect(cookie).toContain('cc-sp_RefArch=1')
             expect(cookie).toContain('Path=/')
             expect(cookie).toContain('Secure')
             expect(res.redirect).toHaveBeenCalledWith(302, '/some/path')
@@ -161,7 +161,7 @@ describe('sharePreviewMiddleware', () => {
 
         test('preserves other query params in the redirect', async () => {
             const req = createReq({
-                originalUrl: `/search?q=shirt&__previewContext=${MOCK_JWT}&page=2`
+                originalUrl: `/search?q=shirt&previewContext=${MOCK_JWT}&page=2`
             })
             await sharePreviewMiddleware(req, res, next)
             expect(res.redirect).toHaveBeenCalledWith(302, '/search?q=shirt&page=2')

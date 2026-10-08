@@ -134,13 +134,13 @@ describe('useShopperContextSearchParams', () => {
         })
     })
 
-    describe('share_preview_ctx cookie', () => {
+    describe('cc-sp share preview cookie', () => {
         afterEach(() => {
-            document.cookie = 'share_preview_ctx=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
+            document.cookie = 'cc-sp_site-1=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
         })
 
-        test('skips create/update of the shopper context when share_preview_ctx cookie is present', () => {
-            document.cookie = 'share_preview_ctx=1; path=/'
+        test('skips create/update of the shopper context when cc-sp cookie is present', () => {
+            document.cookie = 'cc-sp_site-1=1; path=/'
             const history = createMemoryHistory()
             history.push('/test/path/?sourceCode=instagram')
             useShopperContext.mockReturnValue({data: undefined, isLoading: false})
