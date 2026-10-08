@@ -35,7 +35,7 @@
 
         <group-definitions>
             <attribute-group group-id="pwakit">
-                <display-name xml:lang="x-default">PWA Kit</display-name>
+                <display-name xml:lang="x-default">PWA-Kit Configs</display-name>
                 <attribute attribute-id="pwakitNotifyEnabled"/>
             </attribute-group>
         </group-definitions>
