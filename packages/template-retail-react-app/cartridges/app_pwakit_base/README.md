@@ -168,28 +168,6 @@ Trigger a passwordless login or password reset flow and confirm the email is del
 
 ---
 
-## Security: restricting direct browser access to pwakit-notify
-
-The `pwakit-notify` Custom REST API accepts any valid SLAS token that carries the `c_pwakit_notify` scope. Because this scope is configured on the same client used by the browser for shopper flows, a browser or bot can mint a guest token and call `pwakit-notify` directly, bypassing the SSR — an open email relay risk.
-
-**Starting with B2C Commerce 26.10**, close this vector using **SCAPI Request Identification (SCAPI Identity Header / SIH)**: Salesforce MRT attaches a shared-secret header to every request it forwards to SCAPI, and an eCDN firewall rule on the SCAPI zone blocks requests that arrive without it.
-
-### Setup
-
-1. In Business Manager, enable the **Managed Runtime SCAPI Request Identification** feature switch on each instance (Development, Staging, Production separately). Wait for the setup job to finish before adding a block rule for that instance.
-2. In Business Manager on your **Production** instance, go to **Administration → Sites → Embedded CDN Settings → SCAPI zone → Security Rules**. A Salesforce-managed allow rule will appear for each instance where you enabled the switch.
-3. On the same **Security Rules** tab, create a custom firewall rule for each instance with:
-   - **URI Path contains `<org-specific segment>`** (e.g. `f_ecom_blnd_prd` for Production — same segment shown in the Salesforce-managed allow rule for that instance)
-   - **URI Path contains `/custom/pwakit-notify`**
-4. Start with the `log` action. Monitor matches in Security Analytics for at least one full business cycle before switching to `block`.
-5. Drag the rule into place directly after the Salesforce-managed allow rule for that instance. Rule order matters — the allow rule must evaluate first so legitimate MRT traffic is passed before the block rule runs.
-
-> **Important:** Use `/custom/pwakit-notify` as the path matcher, **not `/shopper`**. The `pwakit-notify` endpoint is a Custom REST API (`/custom/...`) and won't be matched by a `/shopper`-scoped rule.
-
-For full setup steps and rollback instructions, see [Restrict SCAPI Access to Managed Runtime Traffic](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/scapi-request-identification.html).
-
----
-
 ## Configuration
 
 | Preference | Type | Description |
