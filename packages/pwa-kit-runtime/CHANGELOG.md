@@ -1,5 +1,5 @@
 ## v3.21.0 (Oct 08, 2026)
-- Version alignment release; no functional changes to `pwa-kit-runtime` since v3.21.0-preview.0.
+- Version alignment release; no functional changes to `pwa-kit-runtime` since v3.20.0.
 
 ## v3.20.0 (Aug 12, 2026)
 - Remove the custom per-request CloudWatch metrics emitted by the SSR remote server (`GCTime`, `RequestTime`, `RequestSuccess`, `RequestFailed404`/`RequestFailed400`/`RequestFailed500`, `LambdaCreated`, `LambdaReused`, `RenderTime`, `RenderErrors`) to eliminate the `PutMetricData` cost incurred on every request. This is not a breaking change: `app.sendMetric()` and the `MetricsSender` (`send()`/`flush()`) are retained with their original signatures as no-ops for backwards compatibility.
