@@ -264,29 +264,28 @@ export async function getNotifyToken(apiParams) {
     if (_notifyToken && Date.now() < _notifyTokenExpiry) {
         return _notifyToken
     }
-    const {clientId, organizationId, shortCode, siteId} = apiParams
+    const {notifyClientId, organizationId, shortCode, siteId} = apiParams
     const proxy = `${getAppOrigin()}${
         getConfig()?.app?.commerceAPI?.proxyPath || '/mobify/proxy/api'
     }`
+    // notifyClientId comes from config (commerceAPI.parameters.notifyClientId); the secret
+    // is env-only because it's a credential. Both are required — they're a matched SLAS pair.
+    const clientSecret = process.env.PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET
+    if (!notifyClientId || !clientSecret) {
+        throw new Error(
+            'commerceAPI.parameters.notifyClientId (config) and PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET (env) are required. Configure a dedicated SLAS private client scoped only to c_pwakit_notify.'
+        )
+    }
     const slasClient = new ShopperLogin({
-        parameters: {clientId, organizationId, shortCode, siteId},
+        parameters: {clientId: notifyClientId, organizationId, shortCode, siteId},
         proxy,
         throwOnBadResponse: true
     })
-    // Private client: single round-trip via client_credentials grant.
-    // Public client: PKCE guest flow — loginGuestUser handles authorize + code exchange
-    // server-side; no browser needed, redirectURI just needs to be a registered value.
-    const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
-    const tokenResponse = clientSecret
-        ? await helpers.loginGuestUserPrivate({
-              slasClient,
-              parameters: {},
-              credentials: {clientSecret}
-          })
-        : await helpers.loginGuestUser({
-              slasClient,
-              parameters: {redirectURI: `${getAppOrigin()}/callback`}
-          })
+    const tokenResponse = await helpers.loginGuestUserPrivate({
+        slasClient,
+        parameters: {},
+        credentials: {clientSecret}
+    })
     _notifyToken = tokenResponse.access_token
     // Cache for 25 min — SLAS guest tokens last 30 min, 5 min buffer
     _notifyTokenExpiry = Date.now() + 25 * 60 * 1000
