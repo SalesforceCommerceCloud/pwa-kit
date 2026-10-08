@@ -21,7 +21,6 @@ var Template = require('dw/util/Template');
 var HashMap = require('dw/util/HashMap');
 var Site = require('dw/system/Site');
 var Logger = require('dw/system/Logger');
-var Resource = require('dw/web/Resource');
 
 var log = Logger.getLogger('pwakit-notify', 'pwakit-notify');
 
@@ -42,23 +41,6 @@ function renderTemplate(templateName, templateContext) {
     return template.render(map).text;
 }
 
-/**
- * Returns a minimal plain-text fallback for the given notification type and context.
- * Screen readers and plain-mail clients need this; spam filters score multipart higher.
- */
-function buildPlainText(templateName, context) {
-    if (context.magicLink) {
-        return Resource.msg('email.plaintext.useThisLink', 'email', 'Use this link to continue:') + '\n' + context.magicLink;
-    }
-    if (context.token) {
-        return Resource.msg('email.plaintext.verificationCode', 'email', 'Your verification code:') + ' ' + context.token;
-    }
-    if (context.accessCode) {
-        return Resource.msg('email.plaintext.orderAccessCode', 'email', 'Your order access code:') + ' ' + context.accessCode
-            + '\n' + Resource.msg('email.plaintext.orderNumber', 'email', 'Order:') + ' ' + (context.orderNo || '');
-    }
-    return '';
-}
 
 /**
  * Sends a transactional notification.
@@ -86,7 +68,6 @@ function send(recipient, subject, templateName, context) {
         var localeId = (request.locale || Site.current.defaultLocale || 'en').replace(/_/g, '-');
         var templateContext = Object.assign({ localeId: localeId, emailTitle: subject }, context || {});
         var htmlBody = renderTemplate(templateName, templateContext);
-        var plainBody = buildPlainText(templateName, context || {});
 
         var mail = new Mail();
         mail.addTo(recipient);
