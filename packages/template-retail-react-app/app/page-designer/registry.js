@@ -32,6 +32,7 @@ export function initializeRegistry() {
     registry.registerImporter('commerce_assets.productTile', () =>
         import('./assets/image-with-text')
     )
+    registry.registerImporter('commerce_assets.imageTile', () => import('./assets/image-tile'))
 
     // Commerce Layouts - Layout components
     registry.registerImporter('commerce_layouts.mobileGrid1r1c', () =>
@@ -51,5 +52,12 @@ export function initializeRegistry() {
     )
     registry.registerImporter('commerce_layouts.mobileGrid3r2c', () =>
         import('./layouts/mobileGrid3r2c')
+    )
+    registry.registerImporter('commerce_layouts.carousel', () => import('./layouts/carousel'))
+    registry.registerImporter('commerce_layouts.header', () => import('./layouts/header'))
+
+    // Content - Embedded content blocks
+    registry.registerImporter('commerce_assets.announcementBanner', () =>
+        import('./content/announcement-banner')
     )
 }
