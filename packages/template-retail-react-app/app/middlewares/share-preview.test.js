@@ -6,6 +6,7 @@
  */
 
 import {sharePreviewMiddleware} from '@salesforce/retail-react-app/app/middlewares/share-preview'
+import {ShopperExperience} from 'commerce-sdk-isomorphic'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
@@ -29,6 +30,13 @@ jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => ({
 jest.mock('@salesforce/pwa-kit-runtime/utils/logger-instance', () => ({
     __esModule: true,
     default: {warn: jest.fn(), error: jest.fn(), info: jest.fn(), log: jest.fn()}
+}))
+
+const mockApplyPreviewContext = jest.fn()
+jest.mock('commerce-sdk-isomorphic', () => ({
+    ShopperExperience: jest.fn().mockImplementation(() => ({
+        applyPreviewContext: mockApplyPreviewContext
+    }))
 }))
 
 // Payload: {"exp":1761942400}
@@ -56,7 +64,7 @@ describe('sharePreviewMiddleware', () => {
         delete process.env.DEPLOY_TARGET
         next = jest.fn()
         res = createRes()
-        global.fetch = jest.fn().mockResolvedValue({ok: true, status: 204})
+        mockApplyPreviewContext.mockResolvedValue({status: 204})
     })
 
     afterEach(() => {
@@ -73,14 +81,14 @@ describe('sharePreviewMiddleware', () => {
             process.env.DEPLOY_TARGET = 'production'
             await sharePreviewMiddleware(createReq(), res, next)
             expect(next).toHaveBeenCalledTimes(1)
-            expect(global.fetch).not.toHaveBeenCalled()
+            expect(mockApplyPreviewContext).not.toHaveBeenCalled()
             expect(res.redirect).not.toHaveBeenCalled()
         })
 
         test('calls next() without fetching when previewContext is absent', async () => {
             await sharePreviewMiddleware(createReq({query: {}}), res, next)
             expect(next).toHaveBeenCalledTimes(1)
-            expect(global.fetch).not.toHaveBeenCalled()
+            expect(mockApplyPreviewContext).not.toHaveBeenCalled()
         })
 
         test('calls next() without fetching when cc-sp_RefArch cookie exists', async () => {
@@ -89,7 +97,7 @@ describe('sharePreviewMiddleware', () => {
             })
             await sharePreviewMiddleware(req, res, next)
             expect(next).toHaveBeenCalledTimes(1)
-            expect(global.fetch).not.toHaveBeenCalled()
+            expect(mockApplyPreviewContext).not.toHaveBeenCalled()
             expect(res.redirect).not.toHaveBeenCalled()
         })
 
@@ -97,28 +105,28 @@ describe('sharePreviewMiddleware', () => {
             await sharePreviewMiddleware(createReq({cookie: 'other=1'}), res, next)
             expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('no shopper token'))
             expect(next).toHaveBeenCalledTimes(1)
-            expect(global.fetch).not.toHaveBeenCalled()
+            expect(mockApplyPreviewContext).not.toHaveBeenCalled()
         })
     })
 
     describe('SCAPI call failures', () => {
         test.each([400, 500])('warns and calls next() when SCAPI returns %i', async (status) => {
-            global.fetch.mockResolvedValue({ok: false, status})
+            mockApplyPreviewContext.mockRejectedValue(new Error(`${status} Bad Response`))
             await sharePreviewMiddleware(createReq(), res, next)
             expect(logger.warn).toHaveBeenCalledWith(
                 expect.stringContaining('apply preview context failed'),
-                {status}
+                {message: `${status} Bad Response`}
             )
             expect(next).toHaveBeenCalledTimes(1)
             expect(res.append).not.toHaveBeenCalled()
             expect(res.redirect).not.toHaveBeenCalled()
         })
 
-        test('warns and calls next() when fetch throws', async () => {
-            global.fetch.mockRejectedValue(new Error('network down'))
+        test('warns and calls next() when the client throws', async () => {
+            mockApplyPreviewContext.mockRejectedValue(new Error('network down'))
             await sharePreviewMiddleware(createReq(), res, next)
             expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining('apply preview context error'),
+                expect.stringContaining('apply preview context failed'),
                 {message: 'network down'}
             )
             expect(next).toHaveBeenCalledTimes(1)
@@ -130,20 +138,19 @@ describe('sharePreviewMiddleware', () => {
         test('calls SCAPI, sets cookie and redirects to the clean URL', async () => {
             await sharePreviewMiddleware(createReq(), res, next)
 
-            expect(global.fetch).toHaveBeenCalledWith(
-                `https://test-app.com/mobify/proxy/api/shopper/shopper-experience/v1/organizations/${encodeURIComponent(
-                    'f_ecom_test_001'
-                )}/preview-context/apply?siteId=${encodeURIComponent('RefArch')}`,
-                {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${SHOPPER_TOKEN}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({token: MOCK_JWT}),
-                    signal: expect.anything()
-                }
+            expect(ShopperExperience).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    parameters: expect.objectContaining({
+                        organizationId: 'f_ecom_test_001',
+                        siteId: 'RefArch'
+                    }),
+                    headers: {authorization: `Bearer ${SHOPPER_TOKEN}`},
+                    throwOnBadResponse: true
+                })
             )
+            expect(mockApplyPreviewContext).toHaveBeenCalledWith({
+                body: {token: MOCK_JWT}
+            })
             expect(res.append).toHaveBeenCalledWith('set-cookie', expect.any(String))
             const cookie = res.append.mock.calls[0][1]
             expect(cookie).toContain('cc-sp_RefArch=1')

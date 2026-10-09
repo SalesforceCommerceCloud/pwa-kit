@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {ShopperExperience} from 'commerce-sdk-isomorphic'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {cookieAsString} from '@salesforce/pwa-kit-runtime/utils/ssr-proxying'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
@@ -53,34 +54,17 @@ export async function sharePreviewMiddleware(req, res, next) {
         }
 
         const proxy = `${getAppOrigin()}${appConfig?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
-        const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), 5000)
-        let response
-        try {
-            response = await fetch(
-                `${proxy}/shopper/shopper-experience/v1/organizations/${encodeURIComponent(
-                    organizationId
-                )}/preview-context/apply?siteId=${encodeURIComponent(siteId)}`,
-                {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${shopperToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({token: previewToken}),
-                    signal: controller.signal
-                }
-            )
-        } finally {
-            clearTimeout(timeout)
-        }
+        const {clientId, shortCode} = appConfig?.commerceAPI?.parameters || {}
+        const client = new ShopperExperience({
+            parameters: {clientId, organizationId, shortCode, siteId},
+            headers: {authorization: `Bearer ${shopperToken}`},
+            proxy,
+            throwOnBadResponse: true
+        })
 
-        if (!response.ok) {
-            logger.warn('share-preview: apply preview context failed', {
-                status: response.status
-            })
-            return next()
-        }
+        await client.applyPreviewContext({
+            body: {token: previewToken}
+        })
 
         // Not HttpOnly — the client-side useUpdateShopperContext hook reads this cookie
         // via document.cookie to skip its own shopper context update.
@@ -101,7 +85,7 @@ export async function sharePreviewMiddleware(req, res, next) {
         const pathname = url.pathname.replace(/^\/\/+/, '/')
         return res.redirect(302, `${pathname}${url.search}`)
     } catch (error) {
-        logger.warn('share-preview: apply preview context error', {message: error.message})
+        logger.warn('share-preview: apply preview context failed', {message: error.message})
         return next()
     }
 }
