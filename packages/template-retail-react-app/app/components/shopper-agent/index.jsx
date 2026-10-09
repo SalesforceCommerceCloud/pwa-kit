@@ -1028,6 +1028,8 @@ const CommerceClientAgentWindow = ({
      * conversation on next open, which the widget-ready trigger links. Widgets
      * without endConversation (1.36.0–1.38.x) reset the conversation instead,
      * which starts the replacement immediately; it is linked the same way.
+     * An expired registered session (SLAS falls back to a guest login) takes
+     * the same path, which is intended.
      */
     useEffect(() => {
         if (!isCommerceClientReady) {
@@ -1048,14 +1050,18 @@ const CommerceClientAgentWindow = ({
         if (prev === identity) {
             return
         }
-        const isLogout = prev.startsWith('registered:') && identity === 'guest'
+        // Fail closed: logout clears customerType to null before the guest login,
+        // and that login can fail, so anything other than registered ends the
+        // conversation rather than leaving the shopper's history visible.
+        const isLogout = prev.startsWith('registered:') && customerType !== 'registered'
         if (isLogout && endCommerceClientConversation()) {
             // Invalidate any in-flight link for the ended conversation.
             authLinkGenerationRef.current++
             lastAuthLinkKeyRef.current = null
             return
         }
-        // Widgets before 1.36.0 can neither end nor reset; fall back to re-linking.
+        // If the widget can't end or reset (before 1.36.0, or the call failed),
+        // re-link so the conversation at least stops acting as the signed-out shopper.
         performAuthLinkRef.current({reason: 'slas-identity-change'})
     }, [customerType, usid, isCommerceClientReady])
 
@@ -1244,7 +1250,7 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     const authLinkQueueRef = useRef(Promise.resolve())
     const lastAttemptedCommerceClientJWTRef = useRef(null)
     // Kept here, not in the inner widget, so the identity transition survives
-    // any remount (e.g. the agent being disabled and re-enabled).
+    // a remount of the inner widget (e.g. invalid settings becoming valid).
     const prevSlasIdentityRef = useRef(undefined)
     const hasMountedCommerceClientRef = useRef(false)
 

@@ -2207,6 +2207,17 @@ describe('ShopperAgent Component', () => {
                     mockedUseUsid.mockReturnValue({usid: 'guest-usid'})
                 }
 
+                // Logout clears auth storage before the guest login completes.
+                const setUnresolved = () => {
+                    mockedUseCustomerType.mockReturnValue({
+                        customerType: null,
+                        isGuest: false,
+                        isRegistered: false,
+                        isExternal: false
+                    })
+                    mockedUseUsid.mockReturnValue({usid: null})
+                }
+
                 const rerenderShopperAgent = (rerender) =>
                     rerender(
                         <ShopperAgent
@@ -2259,6 +2270,40 @@ describe('ShopperAgent Component', () => {
 
                     await waitFor(() => expect(mockEndConversation).toHaveBeenCalledTimes(1))
                     expect(screen.getByTestId('shopper-agent')).toBe(widget)
+                    expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                })
+
+                test('ends the conversation once when logout passes through an unresolved customer type', async () => {
+                    setRegistered()
+                    seedAuthLinkStorage({jwt: 'registered.jwt'})
+                    const {rerender} = renderCommerceClientWithBasket()
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    setUnresolved()
+                    rerenderShopperAgent(rerender)
+                    await waitFor(() => expect(mockEndConversation).toHaveBeenCalledTimes(1))
+
+                    setGuest()
+                    rerenderShopperAgent(rerender)
+
+                    // Guest login settling afterwards must not end or re-link again.
+                    await act(async () => {})
+                    expect(mockEndConversation).toHaveBeenCalledTimes(1)
+                    expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                })
+
+                test('ends the conversation on logout even if the guest login never completes', async () => {
+                    setRegistered()
+                    seedAuthLinkStorage({jwt: 'registered.jwt'})
+                    const {rerender} = renderCommerceClientWithBasket()
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    setUnresolved()
+                    rerenderShopperAgent(rerender)
+
+                    await waitFor(() => expect(mockEndConversation).toHaveBeenCalledTimes(1))
                     expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
                     expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
                 })
