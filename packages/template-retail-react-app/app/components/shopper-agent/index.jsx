@@ -917,13 +917,20 @@ const CommerceClientAgentWindow = ({
                     : await getTokenWhenReadyRef.current()
                 if (generation !== authLinkGenerationRef.current) return
 
-                // Step 1: auth link key from SCRT. Called directly from the
-                // browser against the configured SCRT2 origin — the authlink
-                // endpoint authenticates with the Commerce Client JWT (Bearer)
-                // alone, needing neither the siteId nor the conversationId.
-                const authLinkResponse = await callAuthLink({commerceClientJWT, scrt2Url})
+                // Step 1: auth link key from SCRT. Use the widget's getAuthLinkKey()
+                // when present; older bundles lack it, so fall back to calling SCRT2
+                // directly. No fallback on rejection: both hit the same endpoint.
+                let authLinkResponse
+                if (typeof window.CimulateMessaging?.getAuthLinkKey === 'function') {
+                    authLinkResponse = await window.CimulateMessaging.getAuthLinkKey()
+                } else {
+                    authLinkResponse = await callAuthLink({commerceClientJWT, scrt2Url})
+                }
                 if (generation !== authLinkGenerationRef.current) return
-                const authLinkKey = authLinkResponse?.auth_link_key || authLinkResponse?.authLinkKey
+                const authLinkKey =
+                    typeof authLinkResponse === 'string'
+                        ? authLinkResponse
+                        : authLinkResponse?.auth_link_key || authLinkResponse?.authLinkKey
                 if (!authLinkKey || typeof authLinkKey !== 'string') {
                     console.error(
                         `[Commerce Client] performAuthLink(${reason}): no auth link key`,
