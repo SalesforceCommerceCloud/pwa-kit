@@ -1,3 +1,5 @@
+## v5.5.0 (Oct 09, 2026)
+## v3.22.0-dev (Oct 09, 2026)
 ## v5.5.0 (Oct 08, 2026)
 - [Feature] Add a `useDeliveryEstimates` query hook and `ShopperDeliveryEstimates` client registration for the Shopper Delivery Estimates API. This requires `commerce-sdk-isomorphic` `5.7.0`, which includes the generated client. The TypeDoc entry is grouped with the Shopper Delivery Estimates API and links to the endpoint, SDK, and TanStack Query references. [#4013](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4013)
 - [Feature] Add Shopper Experience `useComponent` query hook for fetching a single Page Designer component by component ID, with Page Designer edit/preview mode support (raw response preserved when a `mode` or `pdToken` is present). Page Designer mode uses `rawResponse`, which bypasses the SDK's `throwOnBadResponse` check, so `usePage`, `usePages`, and `useComponent` now explicitly throw a `ResponseError` on a non-ok response in that mode instead of parsing the error body as successful data.

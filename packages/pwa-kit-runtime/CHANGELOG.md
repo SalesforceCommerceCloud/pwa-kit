@@ -1,3 +1,4 @@
+## v3.22.0-dev (Oct 09, 2026)
 ## v3.21.0 (Oct 08, 2026)
 - Version alignment release; no functional changes to `pwa-kit-runtime` since v3.20.0.
 
