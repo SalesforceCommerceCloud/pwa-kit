@@ -62,6 +62,54 @@ describe('useScript hook', () => {
         expect(finalScriptCount).toBe(initialScriptCount)
     })
 
+    test('should not report loaded when an existing script has not finished loading', () => {
+        const src = 'https://test-script.js'
+
+        const existingScript = document.createElement('script')
+        existingScript.src = src
+        document.body.appendChild(existingScript)
+
+        const {getByTestId} = render(<TestComponent src={src} />)
+
+        expect(getByTestId('script-status').textContent).toBe(
+            JSON.stringify({loaded: false, error: false})
+        )
+    })
+
+    test('should report loaded when an existing script already finished loading', () => {
+        const src = 'https://test-script.js'
+
+        const existingScript = document.createElement('script')
+        existingScript.src = src
+        existingScript.setAttribute('data-script-status', 'ready')
+        document.body.appendChild(existingScript)
+
+        const {getByTestId} = render(<TestComponent src={src} />)
+
+        expect(getByTestId('script-status').textContent).toBe(
+            JSON.stringify({loaded: true, error: false})
+        )
+    })
+
+    test('should update state when an in-flight existing script finishes loading', () => {
+        const src = 'https://test-script.js'
+
+        const existingScript = document.createElement('script')
+        existingScript.src = src
+        document.body.appendChild(existingScript)
+
+        const {getByTestId} = render(<TestComponent src={src} />)
+
+        act(() => {
+            existingScript.dispatchEvent(new Event('load'))
+        })
+
+        expect(getByTestId('script-status').textContent).toBe(
+            JSON.stringify({loaded: true, error: false})
+        )
+        expect(existingScript.getAttribute('data-script-status')).toBe('ready')
+    })
+
     test('should update state to loaded when script loads successfully', () => {
         const src = 'https://test-script.js'
         const {getByTestId} = render(<TestComponent src={src} />)
