@@ -166,5 +166,14 @@ describe('sharePreviewMiddleware', () => {
             await sharePreviewMiddleware(req, res, next)
             expect(res.redirect).toHaveBeenCalledWith(302, '/search?q=shirt&page=2')
         })
+
+        test('does not produce a protocol-relative redirect for double-slash paths', async () => {
+            const req = createReq({
+                originalUrl: `//attacker.example/?previewContext=${MOCK_JWT}`
+            })
+            await sharePreviewMiddleware(req, res, next)
+            const [, location] = res.redirect.mock.calls[0]
+            expect(location).not.toMatch(/^\/\//)
+        })
     })
 })

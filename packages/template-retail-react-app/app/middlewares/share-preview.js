@@ -98,7 +98,8 @@ export async function sharePreviewMiddleware(req, res, next) {
 
         const url = new URL(req.originalUrl, 'http://localhost')
         url.searchParams.delete(PREVIEW_CONTEXT_PARAM)
-        return res.redirect(302, `${url.pathname}${url.search}`)
+        const pathname = url.pathname.replace(/^\/\/+/, '/')
+        return res.redirect(302, `${pathname}${url.search}`)
     } catch (error) {
         logger.warn('share-preview: apply preview context error', {message: error.message})
         return next()
