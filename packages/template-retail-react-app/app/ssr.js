@@ -733,7 +733,9 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.post(registrationVerificationCallback, async (req, res) => {
         const appConfig = getConfig()?.app
         if (appConfig?.login?.passwordless?.mode !== 'callback') {
-            return res.status(400).json({error: 'Registration verification callback mode not enabled'})
+            return res
+                .status(400)
+                .json({error: 'Registration verification callback mode not enabled'})
         }
         const slasCallbackToken = req.headers['x-slas-callback-token']
         if (!slasCallbackToken) {
