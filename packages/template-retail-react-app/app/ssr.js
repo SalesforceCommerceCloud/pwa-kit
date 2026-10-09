@@ -33,6 +33,8 @@ import {getCommerceClientOverridesCspSources} from './utils/commerce-client-over
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {sharePreviewMiddleware} from './middlewares/share-preview.js'
 import {ShopperOrders} from 'commerce-sdk-isomorphic'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {getSiteByReference} from './utils/site-utils.js'
 
 const config = getConfig()
 
@@ -1125,6 +1127,27 @@ const {handler} = runtime.createHandler(options, (app) => {
     })
 
     app.get('*', sharePreviewMiddleware)
+    // The Content Block Editor (Page Designer) builds the component-preview iframe URL
+    // with SFCC's `default` pseudo-locale token (the platform's convention for "the site's
+    // default locale"). PWA Kit's route matcher only accepts real locale ids/aliases from
+    // the site config, so `/:site/default/preview/component` misses every route and falls
+    // through to PageNotFound. Translate `default` to the resolved site's actual default
+    // locale and redirect once so the request matches /:site/:locale/preview/component.
+    // Scoped to the preview route to leave the public storefront URL model untouched.
+    app.get('/:site/default/preview/component', (req, res, next) => {
+        const site = getSiteByReference(req.params.site)
+        const defaultLocale = site?.l10n?.defaultLocale
+        if (!defaultLocale) {
+            // Can't resolve a locale — let the normal renderer handle it (PageNotFound)
+            // rather than emitting a broken redirect.
+            return next()
+        }
+        // Preserve the exact encoded query string (mode, componentId, pdToken, stamp, …).
+        const queryIndex = req.originalUrl.indexOf('?')
+        const search = queryIndex >= 0 ? req.originalUrl.slice(queryIndex) : ''
+        res.redirect(302, `/${req.params.site}/${defaultLocale}/preview/component${search}`)
+    })
+
     app.get('*', runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that
