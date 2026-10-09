@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://www.demandware.com/xml/impex/metadata/2006-10-31">
+
+    <!--
+        PWA Kit global (organization-level) preferences.
+        Import via Business Manager: Administration > Site Development > Import & Export.
+    -->
+    <type-extension type-id="OrganizationPreferences">
+        <custom-attribute-definitions>
+
+            <!--
+                Set to false to disable the cartridge's built-in notification feature.
+                Use this if you have customized email delivery (e.g. Marketing Cloud, a
+                third-party provider, or your own hook) and do not want the cartridge's
+                default ISML-based emails to fire.
+
+                When unset or set to true, all notification types are active (the default
+                for new installs). Setting this to false causes the REST API to return 503
+                and the sendOrderAccessCode hook to no-op — no emails are sent by the cartridge.
+            -->
+            <attribute-definition attribute-id="pwakitNotifyEnabled">
+                <display-name xml:lang="x-default">Notifications Enabled</display-name>
+                <description xml:lang="x-default">
+                    Enable the built-in notification feature (email sending via ISML templates and dw/net/Mail).
+                    Set to false if you have a custom email provider.
+                    When unset, notifications are enabled by default.
+                </description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>true</default-value>
+            </attribute-definition>
+
+        </custom-attribute-definitions>
+
+        <group-definitions>
+            <attribute-group group-id="pwakit">
+                <display-name xml:lang="x-default">PWA-Kit Configs</display-name>
+                <attribute attribute-id="pwakitNotifyEnabled"/>
+            </attribute-group>
+        </group-definitions>
+    </type-extension>
+
+</metadata>

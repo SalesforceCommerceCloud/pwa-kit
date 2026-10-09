@@ -25,10 +25,16 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useCustomerType, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {nanoid} from 'nanoid'
+
+const registrationCallbackURL = getPasswordlessCallbackUrl(
+    getConfig()?.app?.login?.registrationVerification?.callbackURI
+)
 
 export default function UserRegistration({
     enableUserRegistration,
@@ -86,7 +92,8 @@ export default function UserRegistration({
             try {
                 await authorizePasswordlessLogin.mutateAsync({
                     userid: basket.customerInfo.email,
-                    mode: 'email',
+                    mode: 'callback',
+                    ...(registrationCallbackURL && {callbackURI: registrationCallbackURL}),
                     locale: locale?.id,
                     register_customer: true,
                     last_name: basket.customerInfo.email,
@@ -318,7 +325,8 @@ export default function UserRegistration({
                 handleSendEmailOtp={async (email) => {
                     return authorizePasswordlessLogin.mutateAsync({
                         userid: email,
-                        mode: 'email',
+                        mode: 'callback',
+                        ...(registrationCallbackURL && {callbackURI: registrationCallbackURL}),
                         locale: locale?.id,
                         register_customer: true,
                         last_name: email,

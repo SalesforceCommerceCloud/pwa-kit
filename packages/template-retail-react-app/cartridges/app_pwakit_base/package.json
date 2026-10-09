@@ -1,0 +1,6 @@
+{
+  "name": "app_pwakit_base",
+  "version": "1.0.0",
+  "description": "PWA Kit base cartridge — email delivery via ISML templates and dw/net/Mail",
+  "hooks": "./hooks.json"
+}
