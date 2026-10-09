@@ -65,7 +65,7 @@ function send(recipient, subject, templateName, context) {
 
         log.info('Sending notification: template={0}, subject={1}, from={2}', templateName, subject, senderEmail);
 
-        var localeId = (request.locale || Site.current.defaultLocale || 'en').replace(/_/g, '-');
+        var localeId = ((request.locale !== 'default' && request.locale) || Site.current.defaultLocale || 'en').replace(/_/g, '-');
         var templateContext = Object.assign({ localeId: localeId, emailTitle: subject }, context || {});
         var htmlBody = renderTemplate(templateName, templateContext);
 

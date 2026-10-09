@@ -88,7 +88,7 @@ function sendOrderAccessCode(order, accessCode) {
     // will 404 unless you add a redirect at the CDN/router level or override this
     // hook with an alias-aware implementation.
     var siteId = Site.getCurrent().ID.toLowerCase();
-    var locale = (request.locale || Site.getCurrent().defaultLocale || 'en_US').replace(/_/g, '-');
+    var locale = ((request.locale !== 'default' && request.locale) || Site.getCurrent().defaultLocale || 'en_US').replace(/_/g, '-');
     var lookupLink = storefrontHost
         ? buildOrderLookupUrl(storefrontHost, siteId, locale, order.orderNo, accessCode)
         : null;

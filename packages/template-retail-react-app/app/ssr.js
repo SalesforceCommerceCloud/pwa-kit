@@ -337,7 +337,7 @@ export function extractLocaleFromUrl(urlString) {
     if (!urlString) return null
     try {
         const path = new URL(urlString, 'https://placeholder').pathname
-        const match = path.match(/^\/([a-z]{2}-[A-Z]{2})(\/|$)/)
+        const match = path.match(/^(?:\/[^/]*)?\/([a-z]{2}-[A-Z]{2})(\/|$)/)
         return match ? match[1] : null
     } catch (_) {
         return null
@@ -426,6 +426,9 @@ export const validateSlasCallbackToken = async (token) => {
         } else {
             jwks = createRemoteJWKSet(tenantId)
         }
+        // TODO: add `audience` validation once SLAS documents the expected aud claim value.
+        // The SLAS callback token's aud claim is not yet publicly documented, so we can only
+        // verify signature and issuer for now. Track in: W-XXXXXXX
         const {payload: validatedPayload} = await jwtVerify(token, jwks, {
             algorithms: ['RS256', 'ES256']
         })
@@ -728,6 +731,10 @@ const {handler} = runtime.createHandler(options, (app) => {
         getConfig()?.app?.login?.registrationVerification?.callbackURI ??
         '/registration-verification-callback'
     app.post(registrationVerificationCallback, async (req, res) => {
+        const appConfig = getConfig()?.app
+        if (appConfig?.login?.passwordless?.mode !== 'callback') {
+            return res.status(400).json({error: 'Registration verification callback mode not enabled'})
+        }
         const slasCallbackToken = req.headers['x-slas-callback-token']
         if (!slasCallbackToken) {
             return res.status(400).json({error: 'Missing x-slas-callback-token header'})
@@ -915,7 +922,12 @@ const {handler} = runtime.createHandler(options, (app) => {
             res.json(filtered)
         } catch (err) {
             const scapiStatus = err?.response?.status || 500
-            const errorKind = scapiStatus === 404 ? 'invalid_code' : 'scapi_error'
+            const errorKind =
+                scapiStatus === 404
+                    ? 'invalid_code'
+                    : scapiStatus === 401 || scapiStatus === 403
+                    ? 'auth_error'
+                    : 'scapi_error'
             logger.warn('guest-order-lookup verify error', {
                 namespace: 'guest-order-lookup',
                 additionalProperties: {
@@ -928,6 +940,8 @@ const {handler} = runtime.createHandler(options, (app) => {
             })
             if (scapiStatus === 404)
                 return res.status(404).json({error: 'Invalid or expired access code'})
+            if (scapiStatus === 401 || scapiStatus === 403)
+                return res.status(401).json({error: 'Unauthorized'})
             res.status(502).json({error: 'Service error'})
         }
     })
