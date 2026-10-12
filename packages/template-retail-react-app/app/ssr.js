@@ -30,6 +30,8 @@ import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {sharePreviewMiddleware} from './middlewares/share-preview.js'
 import {ShopperOrders} from 'commerce-sdk-isomorphic'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {getSiteByReference} from './utils/site-utils.js'
@@ -1124,6 +1126,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
     })
 
+    app.get('*', sharePreviewMiddleware)
     // The Content Block Editor (Page Designer) builds the component-preview iframe URL
     // with SFCC's `default` pseudo-locale token (the platform's convention for "the site's
     // default locale"). PWA Kit's route matcher only accepts real locale ids/aliases from
