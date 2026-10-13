@@ -1,4 +1,5 @@
 ## v3.22.0-dev (Oct 09, 2026)
+- Fix Storefront Preview occasionally showing data from the previous shopper context (e.g. a missing promotion) after a context change. The `/__pwa-kit/refresh` route now cancels in-flight queries before invalidating them, so the remounted page refetches instead of reusing a response requested under the old context.
 ## v3.21.0 (Oct 08, 2026)
 - Version alignment release; no functional changes to `pwa-kit-react-sdk` since v3.20.0.
 

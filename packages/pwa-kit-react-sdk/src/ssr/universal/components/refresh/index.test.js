@@ -28,8 +28,10 @@ jest.mock('react-router-dom', () => {
 
 jest.mock('@tanstack/react-query', () => {
     const invalidateQueries = jest.fn()
+    const cancelQueries = jest.fn(() => Promise.resolve())
     return {
         useQueryClient: jest.fn(() => ({
+            cancelQueries,
             invalidateQueries
         }))
     }
@@ -48,6 +50,7 @@ test('wait for react-query cache to be invalidated', async () => {
     render(<Refresh />)
 
     await waitFor(() => {
+        expect(useQueryClient().cancelQueries).toHaveBeenCalled()
         expect(useQueryClient().invalidateQueries).toHaveBeenCalled()
     })
 })

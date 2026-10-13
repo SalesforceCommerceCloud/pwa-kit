@@ -42,7 +42,13 @@ const Refresh = () => {
             const showLoadingSpinner = new Promise((resolve) =>
                 setTimeout(resolve, LOADING_SPINNER_MIN_DURATION)
             )
-            const invalidateQueries = queryClient?.invalidateQueries()
+            // Cancel in-flight fetches first: they may have been sent before the data changed
+            // (e.g. shopper context updated in Storefront Preview). Since the page is unmounted
+            // here, invalidateQueries won't refetch them, and the remounted page would otherwise
+            // reuse their stale responses.
+            const invalidateQueries = queryClient
+                ?.cancelQueries()
+                .then(() => queryClient.invalidateQueries())
 
             await Promise.all([showLoadingSpinner, invalidateQueries])
 
