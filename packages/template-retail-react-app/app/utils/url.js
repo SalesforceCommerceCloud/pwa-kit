@@ -283,6 +283,24 @@ export const removeSiteLocaleFromPath = (pathName = '') => {
 }
 
 /**
+ * Widget `onNavigate` may pass an absolute same-origin URL; `useNavigation`
+ * expects a path and will re-apply site/locale itself.
+ *
+ * @param {string} url
+ * @returns {string|null}
+ */
+export const toStorefrontNavigatePath = (url) => {
+    if (!url) return null
+
+    try {
+        const parsed = new URL(url, 'http://storefront.local')
+        return `${parsed.pathname}${parsed.search}${parsed.hash}` || '/'
+    } catch {
+        return null
+    }
+}
+
+/**
  * Encodes a string to work around server-side double-decoding issues.
  *
  * This function applies a second level of URL encoding to handle cases where the server
