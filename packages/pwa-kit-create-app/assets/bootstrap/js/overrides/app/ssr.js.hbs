@@ -344,7 +344,7 @@ export function extractLocaleFromUrl(urlString) {
     if (!urlString) return null
     try {
         const path = new URL(urlString, 'https://placeholder').pathname
-        const match = path.match(/^\/([a-z]{2}-[A-Z]{2})(\/|$)/)
+        const match = path.match(/^(?:\/[^/]*)?\/([a-z]{2}-[A-Z]{2})(\/|$)/)
         return match ? match[1] : null
     } catch (_) {
         return null
@@ -665,6 +665,12 @@ const {handler} = runtime.createHandler(options, (app) => {
         getConfig()?.app?.login?.registrationVerification?.callbackURI ??
         '/registration-verification-callback'
     app.post(registrationVerificationCallback, async (req, res) => {
+        const appConfig = getConfig()?.app
+        if (appConfig?.login?.passwordless?.mode !== 'callback') {
+            return res
+                .status(400)
+                .json({error: 'Registration verification callback mode not enabled'})
+        }
         const slasCallbackToken = req.headers['x-slas-callback-token']
         if (!slasCallbackToken) {
             return res.status(400).json({error: 'Missing x-slas-callback-token header'})
@@ -788,6 +794,8 @@ const {handler} = runtime.createHandler(options, (app) => {
             const scapiStatus = err?.response?.status || 500
             if (scapiStatus === 404)
                 return res.status(404).json({error: 'Invalid or expired access code'})
+            if (scapiStatus === 401 || scapiStatus === 403)
+                return res.status(401).json({error: 'Unauthorized'})
             res.status(502).json({error: 'Service error'})
         }
     })
