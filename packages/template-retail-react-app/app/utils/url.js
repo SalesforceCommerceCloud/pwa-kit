@@ -210,15 +210,39 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
             pathLocale && locale && !isHomeWithDefaultSiteAndLocale ? `/${locale}` : ''
 
         const hasQuery = isQuery && (site || locale) && !isHomeWithDefaultSiteAndLocale
-        let queryString = ''
-        if (hasQuery) {
-            const searchParams = new URLSearchParams()
-            querySite && site && searchParams.append('site', site)
-            queryLocale && locale && searchParams.append('locale', locale)
-            queryString = `?${searchParams.toString()}`
+        if (!hasQuery) {
+            return `${sitePath}${localePath}${path}`
         }
 
-        return `${sitePath}${localePath}${path}${queryString}`
+        // `path` may already carry a query and/or hash (e.g. `/search?q=boots#top`).
+        // Merge site/locale into that query instead of appending a second `?`, and
+        // keep the hash last. Existing pairs are kept verbatim (not re-encoded);
+        // stale site/locale pairs are dropped so the current ones win.
+        const hashIndex = path.indexOf('#')
+        const hash = hashIndex === -1 ? '' : path.slice(hashIndex)
+        const pathWithoutHash = hashIndex === -1 ? path : path.slice(0, hashIndex)
+        const queryIndex = pathWithoutHash.indexOf('?')
+        const pathname = queryIndex === -1 ? pathWithoutHash : pathWithoutHash.slice(0, queryIndex)
+        const existingPairs =
+            queryIndex === -1
+                ? []
+                : pathWithoutHash
+                      .slice(queryIndex + 1)
+                      .split('&')
+                      .filter((pair) => {
+                          if (!pair) return false
+                          const key = pair.split('=')[0]
+                          if (querySite && site && key === 'site') return false
+                          if (queryLocale && locale && key === 'locale') return false
+                          return true
+                      })
+
+        const searchParams = new URLSearchParams()
+        querySite && site && searchParams.append('site', site)
+        queryLocale && locale && searchParams.append('locale', locale)
+        const queryString = [...existingPairs, searchParams.toString()].join('&')
+
+        return `${sitePath}${localePath}${pathname}?${queryString}${hash}`
     }
 }
 
@@ -280,6 +304,24 @@ export const removeSiteLocaleFromPath = (pathName = '') => {
     }
 
     return pathName
+}
+
+/**
+ * Widget `onNavigate` may pass an absolute same-origin URL; `useNavigation`
+ * expects a path and will re-apply site/locale itself.
+ *
+ * @param {string} url
+ * @returns {string|null}
+ */
+export const toStorefrontNavigatePath = (url) => {
+    if (!url) return null
+
+    try {
+        const parsed = new URL(url, 'http://storefront.local')
+        return `${parsed.pathname}${parsed.search}${parsed.hash}` || '/'
+    } catch {
+        return null
+    }
 }
 
 /**
