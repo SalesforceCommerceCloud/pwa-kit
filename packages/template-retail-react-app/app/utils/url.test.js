@@ -397,6 +397,60 @@ describe('createUrlTemplate tests', () => {
             })
         })
     })
+
+    describe('paths that already carry a query and/or hash', () => {
+        const queryParamConfig = {
+            url: {site: 'query_param', locale: 'query_param', showDefaults: true}
+        }
+
+        test('merges site/locale into the existing query instead of appending a second `?`', () => {
+            const buildUrl = createUrlTemplate(queryParamConfig, 'uk', 'en-GB')
+            const result = buildUrl('/search?q=boots', 'uk', 'en-GB')
+
+            expect(result).toBe('/search?q=boots&site=uk&locale=en-GB')
+            const parsed = new URL(result, 'http://storefront.local')
+            expect(parsed.searchParams.get('q')).toBe('boots')
+        })
+
+        test('replaces stale site/locale params rather than duplicating them', () => {
+            const buildUrl = createUrlTemplate(queryParamConfig, 'uk', 'en-GB')
+
+            expect(buildUrl('/search?site=us&locale=fr&q=boots', 'uk', 'en-GB')).toBe(
+                '/search?q=boots&site=uk&locale=en-GB'
+            )
+        })
+
+        test('keeps the hash at the end of the URL', () => {
+            const buildUrl = createUrlTemplate(queryParamConfig, 'uk', 'en-GB')
+
+            expect(buildUrl('/product/123?pid=456#reviews', 'uk', 'en-GB')).toBe(
+                '/product/123?pid=456&site=uk&locale=en-GB#reviews'
+            )
+            expect(buildUrl('/product/123#reviews', 'uk', 'en-GB')).toBe(
+                '/product/123?site=uk&locale=en-GB#reviews'
+            )
+        })
+
+        test('does not re-encode existing query values', () => {
+            const buildUrl = createUrlTemplate(queryParamConfig, 'uk', 'en-GB')
+
+            expect(buildUrl('/search?q=red%20boots', 'uk', 'en-GB')).toBe(
+                '/search?q=red%20boots&site=uk&locale=en-GB'
+            )
+        })
+
+        test('leaves the query and hash untouched when site/locale are in the path', () => {
+            const buildUrl = createUrlTemplate(
+                {url: {site: 'path', locale: 'path', showDefaults: true}},
+                'uk',
+                'en-GB'
+            )
+
+            expect(buildUrl('/search?q=boots#top', 'uk', 'en-GB')).toBe(
+                '/uk/en-GB/search?q=boots#top'
+            )
+        })
+    })
 })
 
 describe('rebuildPathWithParams test', () => {
