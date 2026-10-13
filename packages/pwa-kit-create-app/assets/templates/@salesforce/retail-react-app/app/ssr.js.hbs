@@ -517,7 +517,15 @@ const {handler} = runtime.createHandler(options, (app) => {
                 'www.gstatic.com', // optional, if icon is on gstatic
                 // Commerce Client messaging widget images
                 'cimulate.ai',
-                '*.cimulate.ai'
+                '*.cimulate.ai',
+                // Commerce Client image upload (cc_enableImageUpload): the widget
+                // renders images locally only — never from an external host. The
+                // pre-send preview uses a blob: URL (URL.createObjectURL) and the
+                // sent-image thumbnail (live and after a refresh) is a data: URL.
+                // The upload itself is a sendFile POST covered by connect-src
+                // (*.salesforce-scrt.com), so no image host is needed here.
+                'blob:',
+                'data:'
             ],
             'script-src': [
                 // Commerce Client messaging widget bundle (messaging.umd.js)

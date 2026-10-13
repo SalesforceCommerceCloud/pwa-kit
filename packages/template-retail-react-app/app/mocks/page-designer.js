@@ -23,3 +23,29 @@ export const mockImageWithText = {
         '<p><em>Text</em> <strong>Overlay</strong> <s>test</s> <u>Image</u> With Text <a href="https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArchGlobal/mens/?lang=en_US" target="_self" data-link-type="category" data-link-label="Mens" data-category-id="mens" data-category-catalog-id="storefront-catalog-m-en">Component Link</a><img src="https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Library-Sites-RefArchSharedLibrary/default/dw2d9142bf/images/myaccount_registry.png" alt="alt text myaccount_registry image"></p>',
     alt: 'Alt Text test Image With Text Component'
 }
+
+export const mockAnnouncementBanner = {
+    message: 'Free standard shipping on orders over $50',
+    linkUrl: '/sale',
+    linkText: 'Shop the sale',
+    colorScheme: 'primary',
+    height: 'md',
+    alignment: 'center'
+}
+
+export const mockEmbeddedHeader = {
+    id: 'header',
+    typeId: 'commerce_layouts.header',
+    regions: [
+        {
+            id: 'announcement',
+            components: [
+                {
+                    id: 'announcement-banner-1',
+                    typeId: 'commerce_assets.announcementBanner',
+                    data: mockAnnouncementBanner
+                }
+            ]
+        }
+    ]
+}
