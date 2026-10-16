@@ -615,6 +615,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'places.googleapis.com',
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
+                        // Commerce Client widget telemetry (Salesforce o11y / Falcon)
+                        'o11y.sfproxy-core1.sfdc-y37hzm.svc.sfdcfc.net',
                         // Payment gateways
                         // Note: Google Pay requires different CSP entries depending on the integration and environment.
                         // - 'pay.google.com' and 'payments.google.com' are generally needed for the SDK to load and create payment tokens.

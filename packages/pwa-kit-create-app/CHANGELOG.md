@@ -1,3 +1,6 @@
+## v3.22.0-dev
+- Keep the generated `ssr.js.hbs` templates in sync with `template-retail-react-app` for Commerce Client widget telemetry: add the Salesforce o11y (Falcon) host `o11y.sfproxy-core1.sfdc-y37hzm.svc.sfdcfc.net` to `connect-src` in both SSR template variants so generated projects don't block the widget's telemetry uploads.
+
 ## v3.21.0 (Oct 08, 2026)
 - [Bugfix] Keep the generated `ssr.js.hbs` templates in sync with `template-retail-react-app` for Commerce Client image upload (`cc_enableImageUpload`): add `blob:` and `data:` to `img-src` in both SSR template variants so the widget's image preview and sent-image thumbnail are not blocked by CSP in generated projects. [#4053](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4053)
 - Keep the generated `ssr.js.hbs` templates in sync with `template-retail-react-app` for the `dw_attribution` first-touch marketing-attribution cookie (W-23493129): both SSR template variants now import `createAttributionCookieMiddleware`, construct it with the configured `cookieDomain`, and mount it on the catch-all render route, so generated projects write the attribution cookie instead of shipping the utility as dead code.
