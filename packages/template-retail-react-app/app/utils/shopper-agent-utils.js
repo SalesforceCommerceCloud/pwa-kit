@@ -9,6 +9,10 @@ import {
     COMMERCE_CLIENT_OPEN_STATE_KEY
 } from '@salesforce/retail-react-app/app/constants'
 import {validateOverridesUrl} from '@salesforce/retail-react-app/app/utils/commerce-client-overrides'
+import {
+    getLocalCommerceClientAssetOrigin,
+    isLoopbackHostname
+} from '@salesforce/retail-react-app/app/utils/commerce-client-security'
 
 const onClient = typeof window !== 'undefined'
 
@@ -293,17 +297,29 @@ export const resolveCommerceClientRoutingAttributes = (commerceAgent) => {
 
 /**
  * Validates that a URL is served from a trusted Commerce Client domain.
+ * The loopback exception is temporary starter-branch scaffolding for locally
+ * developing Commerce Client; it is not required by the express-payment iframe.
  *
  * @param {string} url - The URL to validate (e.g., 'https://cdn.search.cimulate.ai/.../messaging.umd.js')
+ * @param {string} [nodeEnv=process.env.NODE_ENV] - Runtime environment
  * @returns {boolean} True if the URL is from a trusted Commerce Client domain, false otherwise
  */
-export const validateCommerceClientDomain = (url) => {
+export const validateCommerceClientDomain = (url, nodeEnv = process.env.NODE_ENV) => {
     try {
-        const {hostname} = new URL(url)
+        const {hostname, protocol} = new URL(url)
+
+        // TODO (before merging to develop): Remove this temporary exception and
+        // the nodeEnv parameter. Productized Commerce Client bundles must use a
+        // trusted hosted domain; loopback is only for this branch's local testing.
+        if (isLoopbackHostname(hostname)) {
+            return Boolean(getLocalCommerceClientAssetOrigin(url, nodeEnv))
+        }
+
         return (
-            hostname === 'cimulate.ai' ||
-            hostname.endsWith('.cimulate.ai') ||
-            hostname.endsWith('.sfcc-store-internal.net')
+            protocol === 'https:' &&
+            (hostname === 'cimulate.ai' ||
+                hostname.endsWith('.cimulate.ai') ||
+                hostname.endsWith('.sfcc-store-internal.net'))
         )
     } catch {
         return false
@@ -325,9 +341,13 @@ export const validateCommerceClientDomain = (url) => {
  * @param {string} [commerceAgent.commerceClientScriptSourceUrl] - Explicit bundle URL override (local dev / self-hosting)
  * @param {string} [commerceAgent.cc_overridesUrl] - Optional URL to customer's component override script
  * @param {Object} [commerceAgent.cc_overrides] - Optional inline override map, mutually exclusive with `cc_overridesUrl`
+ * @param {string} [nodeEnv=process.env.NODE_ENV] - Runtime environment
  * @returns {boolean} True if configuration is valid, false otherwise
  */
-export const validateCommerceClientAgentSettings = (commerceAgent) => {
+export const validateCommerceClientAgentSettings = (
+    commerceAgent,
+    nodeEnv = process.env.NODE_ENV
+) => {
     if (!commerceAgent || typeof commerceAgent !== 'object') {
         console.error('Commerce agent configuration must be an object.')
         return false
@@ -352,9 +372,9 @@ export const validateCommerceClientAgentSettings = (commerceAgent) => {
         return false
     }
 
-    if (!validateCommerceClientDomain(scriptSourceUrl)) {
+    if (!validateCommerceClientDomain(scriptSourceUrl, nodeEnv)) {
         console.error(
-            'Commerce Client script URL must be served from a trusted cimulate.ai or sfcc-store-internal.net domain.'
+            'Commerce Client script URL must use HTTPS and be served from a trusted cimulate.ai or sfcc-store-internal.net domain. Localhost script URLs are allowed only when NODE_ENV=development.'
         )
         return false
     }

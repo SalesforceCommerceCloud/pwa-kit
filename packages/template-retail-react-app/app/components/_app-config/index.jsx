@@ -43,6 +43,7 @@ import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/compon
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 import {generateSfdcUserAgent} from '@salesforce/retail-react-app/app/utils/sfdc-user-agent-utils'
+import {isShopperAgentExpressPaymentPath} from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/routes'
 import {
     DEFAULT_DNT_STATE,
     STORE_LOCATOR_RADIUS,
@@ -102,6 +103,9 @@ const AppConfig = ({children, locals = {}}) => {
     const slasPublicClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPublicProxyPath}`
 
     const pageDesignerParams = locals.pageDesignerParams || {}
+    const requestPath =
+        typeof window === 'undefined' ? locals.originalUrl : window.location.pathname
+    const isShopperAgentExpressPaymentRoute = isShopperAgentExpressPaymentPath(requestPath)
 
     return (
         <CommerceApiProvider
@@ -116,9 +120,12 @@ const AppConfig = ({children, locals = {}}) => {
             proxy={proxy}
             headers={headers}
             defaultDnt={DEFAULT_DNT_STATE}
+            // TODO (before merging to develop): Enabled for the starter branch's
+            // local private SLAS client. Restore the template default or make this
+            // derive from generated-app configuration during productization.
             // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
-            enablePWAKitPrivateClient={false}
+            enablePWAKitPrivateClient={true}
             privateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
             publicClientProxyEndpoint={slasPublicClientProxyEndpoint}
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
@@ -137,7 +144,7 @@ const AppConfig = ({children, locals = {}}) => {
                     <ChakraProvider theme={theme}>{children}</ChakraProvider>
                 </StoreLocatorProvider>
             </MultiSiteProvider>
-            <ReactQueryDevtools />
+            {!isShopperAgentExpressPaymentRoute && <ReactQueryDevtools />}
         </CommerceApiProvider>
     )
 }

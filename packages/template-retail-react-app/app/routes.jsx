@@ -51,6 +51,7 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
 const PaymentProcessing = loadable(() => import('./pages/checkout/payment-processing'), {fallback})
+const ShopperAgentExpressPaymentPage = loadable(() => import('./pages/express'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 const GuestOrderLookupRequest = loadable(() => import('./pages/guest-order-lookup/request'), {
     fallback
@@ -143,6 +144,16 @@ export const routes = [
     {
         path: '/preview/component',
         component: ComponentPreview
+    },
+    {
+        path: '/Payments-Express',
+        component: ShopperAgentExpressPaymentPage,
+        exact: true
+    },
+    {
+        path: '/Payments-ExpressProduct',
+        component: ShopperAgentExpressPaymentPage,
+        exact: true
     }
 ]
 
