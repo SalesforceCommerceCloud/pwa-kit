@@ -93,6 +93,7 @@
     "cross-env": "^5.2.1"
   },
   "overrides": {
+    "vitest": "4.1.11",
     "react-router": {
       "path-to-regexp": "^1.9.0"
     },
