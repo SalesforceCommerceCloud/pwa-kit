@@ -101,6 +101,7 @@ import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/con
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import {useShopperAgent} from '@salesforce/retail-react-app/app/hooks/use-shopper-agent'
 import {useCommerceClientPagePush} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-push'
+import {isShopperAgentExpressPaymentPath} from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/routes'
 
 // Code-split the optional, client-only Shopper Agent so the component and its messaging
 // integrations (MIAW / Commerce Client) ship in a separate async chunk instead of the
@@ -232,7 +233,6 @@ const StorefrontApp = (props) => {
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
-
     const {l10n} = site
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency
@@ -650,10 +650,69 @@ ComponentPreviewApp.propTypes = {
 }
 
 /**
- * Selects the app shell by route: the Page Designer component-preview iframe gets a
- * chrome-free surface, every other route gets the full storefront app. Uses `req.url`
- * on the server and `location.pathname` on the client, matching the SSR-safe pattern
- * already used for Page Designer mode detection.
+ * Minimal app surface for express payment content embedded in the Shopper Agent.
+ *
+ * AppConfig still supplies the Commerce API, multisite, and Chakra providers. Keeping
+ * this surface separate prevents the storefront shell and its shopper-state side
+ * effects from running recursively inside the Commerce Client iframe.
+ */
+const ShopperAgentExpressPaymentApp = ({children}) => {
+    const appOrigin = useAppOrigin()
+    const {site, locale} = useMultiSite()
+
+    const targetLocale = getTargetLocale({
+        getUserPreferredLocales: () => [locale?.id || DEFAULT_LOCALE],
+        l10nConfig: site.l10n
+    })
+
+    const {data: messages} = useQuery({
+        queryKey: ['app', 'translations', 'messages', targetLocale],
+        queryFn: () => fetchTranslations(targetLocale, appOrigin),
+        enabled: isServer
+    })
+
+    const currency = locale.preferredCurrency || site.l10n.defaultCurrency
+
+    return (
+        <Box
+            className="sf-app sf-app-shopper-agent-express-payment"
+            data-testid="shopper-agent-express-payment-app"
+            bg="transparent"
+        >
+            <IntlProvider
+                onError={(err) => {
+                    if (!messages) return
+                    if (err.code === 'MISSING_TRANSLATION') {
+                        logger.warn('Missing translation', {
+                            namespace: 'ShopperAgentExpressPaymentApp.IntlProvider',
+                            additionalProperties: {errorMessage: err.message}
+                        })
+                        return
+                    }
+                    throw err
+                }}
+                locale={targetLocale}
+                messages={messages}
+                defaultLocale={DEFAULT_LOCALE}
+            >
+                <CurrencyProvider currency={currency}>
+                    <Box as="main" id="app-main" role="main" width="100%">
+                        {children}
+                    </Box>
+                </CurrencyProvider>
+            </IntlProvider>
+        </Box>
+    )
+}
+
+ShopperAgentExpressPaymentApp.propTypes = {
+    children: PropTypes.node
+}
+
+/**
+ * Selects the app shell by route. Embedded iframe routes get their own chrome-free
+ * surface; every other route gets the full storefront app. Uses `req.url` on the
+ * server and `location.pathname` on the client.
  */
 const App = (props) => {
     const location = useLocation()
@@ -661,7 +720,15 @@ const App = (props) => {
     const pathname = req?.url ? req.url.split('?')[0] : location?.pathname || ''
     const isComponentPreview = COMPONENT_PREVIEW_PATH_RE.test(pathname)
 
-    return isComponentPreview ? <ComponentPreviewApp {...props} /> : <StorefrontApp {...props} />
+    if (isComponentPreview) {
+        return <ComponentPreviewApp {...props} />
+    }
+
+    if (isShopperAgentExpressPaymentPath(pathname)) {
+        return <ShopperAgentExpressPaymentApp {...props} />
+    }
+
+    return <StorefrontApp {...props} />
 }
 
 App.propTypes = {

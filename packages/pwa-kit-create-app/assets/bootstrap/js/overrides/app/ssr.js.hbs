@@ -574,6 +574,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                 'www.google.com/pay/'
             ],
             'frame-src': [
+                // The Shopper Agent embeds storefront-owned express-payment routes.
+                "'self'",
                 // Allow frames from Salesforce site.com (Needed for MIAW)
                 '*.site.com',
                 // Payment gateways
