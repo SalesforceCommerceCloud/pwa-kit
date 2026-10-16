@@ -1,3 +1,6 @@
+## v3.22.0-dev
+- [Bugfix] Temporarily pin transitive Vitest to 4.1.11 in the create-app package and generated extensible apps to avoid an npm 10 dependency resolver crash while the Vitest browser packages require 4.1.11.
+
 ## v3.21.0 (Oct 08, 2026)
 - [Bugfix] Keep the generated `ssr.js.hbs` templates in sync with `template-retail-react-app` for Commerce Client image upload (`cc_enableImageUpload`): add `blob:` and `data:` to `img-src` in both SSR template variants so the widget's image preview and sent-image thumbnail are not blocked by CSP in generated projects. [#4053](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4053)
 - Keep the generated `ssr.js.hbs` templates in sync with `template-retail-react-app` for the `dw_attribution` first-touch marketing-attribution cookie (W-23493129): both SSR template variants now import `createAttributionCookieMiddleware`, construct it with the configured `cookieDomain`, and mount it on the catch-all render route, so generated projects write the attribution cookie instead of shipping the utility as dead code.
