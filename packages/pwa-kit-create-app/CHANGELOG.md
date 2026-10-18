@@ -1,4 +1,5 @@
 ## v3.22.0-dev
+- [Bugfix] Temporarily pin transitive Vitest to 4.1.11 in the create-app package and generated extensible apps to avoid an npm 10 dependency resolver crash while the Vitest browser packages require 4.1.11.
 - Keep the generated `ssr.js.hbs` templates in sync with `template-retail-react-app` for Commerce Client widget telemetry: add the Salesforce o11y (Falcon) host `o11y.sfproxy-core1.sfdc-y37hzm.svc.sfdcfc.net` to `connect-src` in both SSR template variants so generated projects don't block the widget's telemetry uploads.
 
 ## v3.21.0 (Oct 08, 2026)
