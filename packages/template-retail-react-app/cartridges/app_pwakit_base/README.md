@@ -153,13 +153,7 @@ commerceAPI: {
 }
 ```
 
-Set the client secret as an environment variable on the MRT environment:
-
-```bash
-pwa-kit-dev push --set-env PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET=<your-notify-client-secret> ...
-```
-
-Or via the MRT Admin UI: **Environments → <env> → Environment Variables**.
+Set the client secret as an environment variable on the MRT environment via the MRT Admin UI: **Environments → <env> → Environment Variables**.
 
 If either value is missing, the callback routes will return 500 and log the missing-config error on first use — there is no fallback to the shopper client.
 
@@ -191,7 +185,7 @@ The `pwakit-notify` endpoint validates the recipient against B2C's customer dire
 |---|---|---|
 | `passwordless-magic-link` | Yes — silently succeeds if not found | Passwordless login requires a pre-existing account. Silently succeeding (no email sent, 200 returned) prevents email enumeration. |
 | `password-reset` | Yes — silently succeeds if not found | Same as above. |
-| `otp` | Yes — silently succeeds if not found | SLAS creates the B2C customer profile at authorize time, before the callback fires. Requiring the profile to exist prevents a crafted payload from sending verification emails to arbitrary addresses. Verified/unverified state is not checked — that is managed by SLAS and is not reliably exposed through the B2C scripting API. |
+| `otp` | No | SLAS creates the B2C customer profile after the shopper exchanges the TOTP, so no B2C profile exists yet when this callback fires. Anti-abuse rate limiting is enforced by SLAS upstream. |
 
 The silent-success behaviour for `passwordless-magic-link` and `password-reset` is intentional — the storefront flow completes normally and the shopper receives no indication of whether their email is registered. If you need to audit skipped sends, filter the `pwakit-notify` log for `skipping send`.
 

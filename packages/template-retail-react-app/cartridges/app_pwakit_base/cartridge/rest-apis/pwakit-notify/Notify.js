@@ -190,17 +190,9 @@ exports.notify = function () {
         // Used by the account registration / email verification flow. The `token`
         // field is a short 6-8 digit SLAS TOTP (not a JWT).
         //
-        // SLAS creates the B2C customer profile at authorize time, before this
-        // callback fires. Requiring the profile to exist in CustomerMgr prevents
-        // a crafted payload from sending verification emails to arbitrary addresses.
-        // We do not check verified/unverified state — that is managed by SLAS and
-        // is not reliably exposed through the B2C scripting API.
-        var otpCustomer = CustomerMgr.getCustomerByLogin(recipient);
-        if (!otpCustomer || !otpCustomer.registered) {
-            log.debug('otp: no registered customer found for recipient — skipping send');
-            RESTResponseMgr.createSuccess({success: true}).render();
-            return;
-        }
+        // SLAS creates the B2C customer profile after the shopper exchanges this TOTP,
+        // so the profile does not exist yet when this callback fires. Rate-limiting is
+        // enforced by SLAS upstream on /authorizePasswordlessCustomer.
         if (!body.data.token) {
             RESTResponseMgr.createError(
                 400,
