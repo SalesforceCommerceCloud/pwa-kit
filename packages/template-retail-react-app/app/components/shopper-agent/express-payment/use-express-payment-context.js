@@ -11,8 +11,13 @@ import {useLocation} from 'react-router-dom'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useExpressPaymentBasket from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/use-express-payment-basket'
+import {
+    EXPRESS_PAYMENT_BASKET_STATUSES,
+    EXPRESS_PAYMENT_PROVIDER_API_VERSION,
+    EXPRESS_PAYMENT_SURFACES
+} from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/contract'
 
-export const EXPRESS_PAYMENT_CONTEXT_VERSION = 1
+export {EXPRESS_PAYMENT_PROVIDER_API_VERSION}
 
 const PRODUCT_ROUTE_RE = /\/Payments-ExpressProduct\/?$/
 
@@ -34,7 +39,7 @@ export const buildExpressPaymentContext = ({
     locale,
     currency,
     basketId,
-    basketStatus = 'loading'
+    basketStatus = EXPRESS_PAYMENT_BASKET_STATUSES.LOADING
 }) => {
     const query = new URLSearchParams(search)
     const isProductSurface = PRODUCT_ROUTE_RE.test(pathname)
@@ -42,8 +47,8 @@ export const buildExpressPaymentContext = ({
     if (!isProductSurface) {
         return {
             context: {
-                contractVersion: EXPRESS_PAYMENT_CONTEXT_VERSION,
-                surface: 'cart',
+                providerApiVersion: EXPRESS_PAYMENT_PROVIDER_API_VERSION,
+                surface: EXPRESS_PAYMENT_SURFACES.CART,
                 siteId,
                 locale,
                 currency,
@@ -61,8 +66,8 @@ export const buildExpressPaymentContext = ({
 
     return {
         context: {
-            contractVersion: EXPRESS_PAYMENT_CONTEXT_VERSION,
-            surface: 'product',
+            providerApiVersion: EXPRESS_PAYMENT_PROVIDER_API_VERSION,
+            surface: EXPRESS_PAYMENT_SURFACES.PRODUCT,
             siteId,
             locale,
             currency,

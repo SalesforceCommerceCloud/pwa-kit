@@ -27,17 +27,32 @@ describe('createExpressPaymentLifecycle', () => {
         })
     })
 
-    test('keeps arbitrary string payment method names when reporting availability', () => {
-        lifecycle.available({paymentMethods: ['wallet-a', 'merchant.custom', 42]})
+    test('normalizes and de-duplicates payment methods when reporting availability', () => {
+        lifecycle.available({
+            paymentMethods: ['wallet-a', 'merchant.custom', 'wallet-a', '  wallet-b  ', 42]
+        })
 
         expect(availableDetailsRef.current).toEqual({
-            paymentMethods: ['wallet-a', 'merchant.custom']
+            paymentMethods: ['wallet-a', 'merchant.custom', 'wallet-b']
         })
         expect(notifyParentOfAvailability).toHaveBeenCalledTimes(1)
     })
 
-    test('translates neutral success fields to the Shopper Agent payload', () => {
-        lifecycle.success({orderId: ' ORDER-1 ', paymentMethod: 'merchant.custom'})
+    test('limits availability to twenty payment methods', () => {
+        const paymentMethods = Array.from({length: 25}, (_, index) => `method-${index}`)
+
+        lifecycle.available({paymentMethods})
+
+        expect(availableDetailsRef.current.paymentMethods).toEqual(paymentMethods.slice(0, 20))
+    })
+
+    test('translates neutral fields and ignores provider-specific success data', () => {
+        lifecycle.success({
+            orderId: ' ORDER-1 ',
+            paymentMethod: 'merchant.custom',
+            providerOrderId: 'PROVIDER-1',
+            approvalData: {token: 'must-not-cross-frame-boundary'}
+        })
 
         expect(notifyParent).toHaveBeenCalledWith('express.payment.success', {
             orderId: 'ORDER-1',
@@ -59,6 +74,35 @@ describe('createExpressPaymentLifecycle', () => {
             PAYMENT_METHOD: 'wallet-b'
         })
         expect(successSentRef.current).toBe(false)
+    })
+
+    test('bounds provider-controlled strings before creating parent payloads', () => {
+        lifecycle.failure({
+            shopperMessage: `  ${'x'.repeat(250)}  `,
+            paymentMethod: 'y'.repeat(101)
+        })
+
+        expect(notifyParent).toHaveBeenCalledWith('express.payment.failure', {
+            error: 'x'.repeat(200)
+        })
+    })
+
+    test('rejects missing or oversized order identifiers', () => {
+        lifecycle.success()
+        lifecycle.success({orderId: 'x'.repeat(129)})
+
+        expect(notifyParent).not.toHaveBeenCalled()
+        expect(successSentRef.current).toBe(false)
+    })
+
+    test('becomes terminal only after the success message is delivered', () => {
+        notifyParent.mockReturnValue(false)
+        lifecycle.success({orderId: 'ORDER-1'})
+        expect(successSentRef.current).toBe(false)
+
+        notifyParent.mockReturnValue(true)
+        lifecycle.success({orderId: 'ORDER-1'})
+        expect(successSentRef.current).toBe(true)
     })
 
     test('suppresses provider lifecycle events after a successful payment', () => {

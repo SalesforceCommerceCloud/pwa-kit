@@ -7,7 +7,7 @@
 
 import {
     buildExpressPaymentContext,
-    EXPRESS_PAYMENT_CONTEXT_VERSION
+    EXPRESS_PAYMENT_PROVIDER_API_VERSION
 } from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/use-express-payment-context'
 
 const baseContext = {
@@ -28,7 +28,7 @@ describe('buildExpressPaymentContext', () => {
             })
         ).toEqual({
             context: {
-                contractVersion: EXPRESS_PAYMENT_CONTEXT_VERSION,
+                providerApiVersion: EXPRESS_PAYMENT_PROVIDER_API_VERSION,
                 surface: 'cart',
                 ...baseContext,
                 basket: {id: 'basket-1', status: 'ready'}
@@ -46,7 +46,7 @@ describe('buildExpressPaymentContext', () => {
             })
         ).toEqual({
             context: {
-                contractVersion: EXPRESS_PAYMENT_CONTEXT_VERSION,
+                providerApiVersion: EXPRESS_PAYMENT_PROVIDER_API_VERSION,
                 surface: 'product',
                 ...baseContext,
                 productId: 'sku-1',

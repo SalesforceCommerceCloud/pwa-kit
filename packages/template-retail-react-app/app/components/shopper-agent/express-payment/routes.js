@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export const SHOPPER_AGENT_EXPRESS_PAYMENT_PATH_RE =
-    /\/Payments-Express(?:Product)?\/?(?:\?|$)/
+export const SHOPPER_AGENT_EXPRESS_PAYMENT_PATH_RE = /\/Payments-Express(?:Product)?\/?(?:\?|$)/
 
 export const isShopperAgentExpressPaymentPath = (path = '') =>
     SHOPPER_AGENT_EXPRESS_PAYMENT_PATH_RE.test(path)
