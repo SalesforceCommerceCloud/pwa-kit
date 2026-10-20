@@ -678,8 +678,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         const {email_id, token} = req.body
         try {
             const validatedPayload = await validateSlasCallbackToken(slasCallbackToken)
-            if (!validatedPayload?.email_id || validatedPayload.email_id !== email_id) {
-                return res.status(401).json({error: 'email_id claim does not match request'})
+            if (validatedPayload.email_id !== email_id || validatedPayload.token !== token) {
+                return res.status(401).json({error: 'callback body fields do not match SLAS callback token claims'})
             }
             await sendViaB2cCartridge(
                 'otp',
