@@ -7,8 +7,8 @@
 
 import React from 'react'
 
-import PaymentExpressIframeShell from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/payment-express-iframe-shell'
+import ExpressPaymentIframeShell from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/express-payment-iframe-shell'
 
-const ShopperAgentExpressPaymentPage = () => <PaymentExpressIframeShell />
+const ShopperAgentExpressPaymentPage = () => <ExpressPaymentIframeShell />
 
 export default ShopperAgentExpressPaymentPage

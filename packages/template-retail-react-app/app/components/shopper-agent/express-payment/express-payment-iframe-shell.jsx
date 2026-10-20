@@ -6,9 +6,9 @@
  */
 
 import React, {useCallback, useEffect, useMemo, useRef} from 'react'
+import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 
-import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ExpressPaymentProvider from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/provider'
 import {
     EXPRESS_PAYMENT_EVENTS,
@@ -19,10 +19,11 @@ import {createExpressPaymentLifecycle} from '@salesforce/retail-react-app/app/co
 import useExpressPaymentContext from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/use-express-payment-context'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 
+// Keep these frame bounds aligned with the Commerce Client express-payment host.
 const MIN_IFRAME_HEIGHT = 44
 const MAX_IFRAME_HEIGHT = 400
 
-const PaymentExpressIframeShell = () => {
+const ExpressPaymentIframeShell = ({Provider = ExpressPaymentProvider}) => {
     const location = useLocation()
     const appOrigin = useAppOrigin()
     const containerRef = useRef(null)
@@ -63,6 +64,7 @@ const PaymentExpressIframeShell = () => {
     )
 
     useEffect(() => {
+        // The framed document must remain visually transparent inside the host surface.
         const previousHtmlBackground = document.documentElement.style.backgroundColor
         const previousBodyBackground = document.body.style.backgroundColor
         document.documentElement.style.backgroundColor = 'transparent'
@@ -86,32 +88,23 @@ const PaymentExpressIframeShell = () => {
         return () => observer.disconnect()
     }, [notifyParentOfAvailability])
 
-    if (!parentOrigin) {
-        return (
-            <Text data-testid="express-payment-invalid-origin" role="alert">
-                Express payment cannot verify its parent origin.
-            </Text>
-        )
-    }
-
-    if (!contextIsValid) {
-        return (
-            <Text data-testid="express-payment-invalid-context" role="alert">
-                Express payment requires a valid product and quantity.
-            </Text>
-        )
-    }
+    if (!parentOrigin || !contextIsValid) return null
 
     return (
-        <Box
+        <div
             ref={containerRef}
-            data-testid="payment-express-iframe-shell"
+            data-testid="express-payment-iframe-shell"
             data-payment-surface={context.surface}
-            width="100%"
         >
-            <ExpressPaymentProvider context={context} lifecycle={lifecycle} />
-        </Box>
+            <Provider context={context} lifecycle={lifecycle} />
+        </div>
     )
 }
 
-export default PaymentExpressIframeShell
+ExpressPaymentIframeShell.propTypes = {
+    // Test seam for proving that contrasting providers use the same shell. The
+    // production route relies on provider.jsx rather than passing this prop.
+    Provider: PropTypes.elementType
+}
+
+export default ExpressPaymentIframeShell

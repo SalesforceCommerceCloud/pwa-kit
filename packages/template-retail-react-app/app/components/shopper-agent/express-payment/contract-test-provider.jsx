@@ -5,19 +5,60 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
-import PropTypes from 'prop-types'
+import React, {useEffect, useState} from 'react'
 
-import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Button, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {expressPaymentProviderPropTypes} from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/contract'
+
+export const CONTRACT_TEST_PAYMENT_METHOD = 'CONTRACT_TEST'
+export const CONTRACT_TEST_ORDER_ID = 'CONTRACT-TEST-ORDER'
 
 /**
  * Temporary provider used to validate the iframe shell before a real payment
  * provider is connected. Replace the export in provider.jsx to change providers.
  */
 const ContractTestProvider = ({context, lifecycle}) => {
+    const [status, setStatus] = useState('Available')
+    const [successSubmitted, setSuccessSubmitted] = useState(false)
+
     useEffect(() => {
-        lifecycle.available({paymentMethods: ['CONTRACT_TEST']})
+        lifecycle.available({paymentMethods: [CONTRACT_TEST_PAYMENT_METHOD]})
     }, [lifecycle])
+
+    const reportAvailable = () => {
+        lifecycle.available({paymentMethods: [CONTRACT_TEST_PAYMENT_METHOD]})
+        setStatus('Available')
+    }
+
+    const reportUnavailable = () => {
+        lifecycle.unavailable()
+        setStatus('Unavailable')
+    }
+
+    const reportFailure = () => {
+        lifecycle.failure({
+            shopperMessage: 'Contract-test failure',
+            paymentMethod: CONTRACT_TEST_PAYMENT_METHOD
+        })
+        setStatus('Failure reported; retry remains available')
+    }
+
+    const reportCancellation = () => {
+        lifecycle.cancel({
+            shopperMessage: 'Contract-test cancellation',
+            paymentMethod: CONTRACT_TEST_PAYMENT_METHOD
+        })
+        setStatus('Cancellation reported; retry remains available')
+    }
+
+    const reportSuccess = () => {
+        lifecycle.success({
+            orderId: CONTRACT_TEST_ORDER_ID,
+            paymentMethod: CONTRACT_TEST_PAYMENT_METHOD
+        })
+        setSuccessSubmitted(true)
+        setStatus('Simulated success submitted; fixture controls are now disabled')
+    }
 
     return (
         <Box
@@ -36,40 +77,30 @@ const ContractTestProvider = ({context, lifecycle}) => {
             <Text fontSize="xs">
                 Site: {context.siteId}, locale: {context.locale}, currency: {context.currency}
             </Text>
+            <Text role="status" aria-live="polite" fontSize="sm" mt={2}>
+                {status}
+            </Text>
+            <Stack direction="row" flexWrap="wrap" spacing={2} mt={3}>
+                <Button size="sm" onClick={reportAvailable} isDisabled={successSubmitted}>
+                    Report available
+                </Button>
+                <Button size="sm" onClick={reportUnavailable} isDisabled={successSubmitted}>
+                    Report unavailable
+                </Button>
+                <Button size="sm" onClick={reportFailure} isDisabled={successSubmitted}>
+                    Report failure
+                </Button>
+                <Button size="sm" onClick={reportCancellation} isDisabled={successSubmitted}>
+                    Report cancellation
+                </Button>
+                <Button size="sm" onClick={reportSuccess} isDisabled={successSubmitted}>
+                    Report simulated success
+                </Button>
+            </Stack>
         </Box>
     )
 }
 
-ContractTestProvider.propTypes = {
-    context: PropTypes.oneOfType([
-        PropTypes.shape({
-            contractVersion: PropTypes.number.isRequired,
-            surface: PropTypes.oneOf(['cart']).isRequired,
-            siteId: PropTypes.string.isRequired,
-            locale: PropTypes.string.isRequired,
-            currency: PropTypes.string.isRequired,
-            basket: PropTypes.shape({
-                id: PropTypes.string,
-                status: PropTypes.oneOf(['loading', 'ready', 'empty', 'error']).isRequired
-            }).isRequired
-        }),
-        PropTypes.shape({
-            contractVersion: PropTypes.number.isRequired,
-            surface: PropTypes.oneOf(['product']).isRequired,
-            siteId: PropTypes.string.isRequired,
-            locale: PropTypes.string.isRequired,
-            currency: PropTypes.string.isRequired,
-            productId: PropTypes.string.isRequired,
-            quantity: PropTypes.number.isRequired
-        })
-    ]).isRequired,
-    lifecycle: PropTypes.shape({
-        available: PropTypes.func.isRequired,
-        unavailable: PropTypes.func.isRequired,
-        success: PropTypes.func.isRequired,
-        failure: PropTypes.func.isRequired,
-        cancel: PropTypes.func.isRequired
-    }).isRequired
-}
+ContractTestProvider.propTypes = expressPaymentProviderPropTypes
 
 export default ContractTestProvider
