@@ -204,6 +204,21 @@ describe('App', () => {
         expect(StorefrontPreview).not.toHaveBeenCalled()
     })
 
+    test('stretches the Shopper Agent express payment surface to the iframe width', () => {
+        useMultiSite.mockImplementation(() => resultUseMultiSite)
+        window.history.pushState({}, '', '/Payments-ExpressProduct?pid=product-1&quantity=1')
+
+        renderWithProviders(
+            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+                <p>Express payment child</p>
+            </App>
+        )
+
+        expect(screen.getByTestId('shopper-agent-express-payment-app')).toHaveStyle({
+            width: '100%'
+        })
+    })
+
     test('SSR-renders the embedded header when its component is only lazily registered', () => {
         // The production regression: `initializeRegistry()` registers *lazy importers*, not
         // eager components, so during SSR `registry.getComponent()` returns null on first

@@ -12,6 +12,7 @@ import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-pa
 import basketWithSuit from '@salesforce/retail-react-app/app/mocks/basket-with-suit'
 import emptyBasket from '@salesforce/retail-react-app/app/mocks/empty-basket'
 import {EXPRESS_PAY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
+import {EXPRESS_PAYMENT_MODES} from '@salesforce/retail-react-app/app/constants/express-payment'
 
 // Mock getConfig to provide necessary configuration
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
@@ -38,6 +39,8 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
 
 // Captured prepareBasket from SFPaymentsExpressButtons for tests
 let capturedPrepareBasket = null
+let capturedPaymentMethodSet = null
+let capturedMode
 
 // Mock the SFPaymentsExpressButtons child component
 jest.mock('@salesforce/retail-react-app/app/components/sf-payments-express-buttons', () => {
@@ -52,9 +55,13 @@ jest.mock('@salesforce/retail-react-app/app/components/sf-payments-express-butto
         initialAmount,
         prepareBasket,
         expressButtonLayout,
-        maximumButtonCount
+        maximumButtonCount,
+        paymentMethodSet,
+        mode
     }) => {
         capturedPrepareBasket = prepareBasket
+        capturedPaymentMethodSet = paymentMethodSet
+        capturedMode = mode
         return (
             <div data-testid="sf-payments-express-buttons">
                 <div data-testid="usage">{usage}</div>
@@ -74,7 +81,9 @@ jest.mock('@salesforce/retail-react-app/app/components/sf-payments-express-butto
         initialAmount: PropTypes.number,
         prepareBasket: PropTypes.func,
         expressButtonLayout: PropTypes.string,
-        maximumButtonCount: PropTypes.number
+        maximumButtonCount: PropTypes.number,
+        paymentMethodSet: PropTypes.object,
+        mode: PropTypes.string
     }
 
     return MockSFPaymentsExpressButtons
@@ -135,6 +144,8 @@ beforeEach(() => {
 afterEach(() => {
     jest.clearAllMocks()
     capturedPrepareBasket = null
+    capturedPaymentMethodSet = null
+    capturedMode = undefined
 })
 
 describe('SFPaymentsExpress', () => {
@@ -185,6 +196,26 @@ describe('SFPaymentsExpress', () => {
         renderWithProviders(<SFPaymentsExpress maximumButtonCount={3} />)
 
         expect(screen.getByTestId('maximum-button-count')).toHaveTextContent('3')
+    })
+
+    test('passes a caller-supplied payment method set to the buttons', () => {
+        useCurrentBasket.mockReturnValue(createMockBasket(basketWithSuit))
+        const paymentMethodSet = {
+            paymentMethods: [{paymentMethodType: 'applepay'}],
+            paymentMethodSetAccounts: []
+        }
+
+        renderWithProviders(<SFPaymentsExpress paymentMethodSet={paymentMethodSet} />)
+
+        expect(capturedPaymentMethodSet).toBe(paymentMethodSet)
+    })
+
+    test('passes Shopper Agent mode to the buttons', () => {
+        useCurrentBasket.mockReturnValue(createMockBasket(basketWithSuit))
+
+        renderWithProviders(<SFPaymentsExpress mode={EXPRESS_PAYMENT_MODES.SHOPPER_AGENT} />)
+
+        expect(capturedMode).toBe(EXPRESS_PAYMENT_MODES.SHOPPER_AGENT)
     })
 
     test('passes onPaymentMethodsRendered callback when provided', () => {

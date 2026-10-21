@@ -13,6 +13,7 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useExpressPaymentBasket from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/use-express-payment-basket'
 import {
     EXPRESS_PAYMENT_BASKET_STATUSES,
+    EXPRESS_PAYMENT_MODES,
     EXPRESS_PAYMENT_PROVIDER_API_VERSION,
     EXPRESS_PAYMENT_SURFACES
 } from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/contract'
@@ -48,6 +49,7 @@ export const buildExpressPaymentContext = ({
         return {
             context: {
                 providerApiVersion: EXPRESS_PAYMENT_PROVIDER_API_VERSION,
+                mode: EXPRESS_PAYMENT_MODES.SHOPPER_AGENT,
                 surface: EXPRESS_PAYMENT_SURFACES.CART,
                 siteId,
                 locale,
@@ -67,6 +69,7 @@ export const buildExpressPaymentContext = ({
     return {
         context: {
             providerApiVersion: EXPRESS_PAYMENT_PROVIDER_API_VERSION,
+            mode: EXPRESS_PAYMENT_MODES.SHOPPER_AGENT,
             surface: EXPRESS_PAYMENT_SURFACES.PRODUCT,
             siteId,
             locale,

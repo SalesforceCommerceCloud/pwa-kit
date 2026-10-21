@@ -38,6 +38,7 @@ jest.mock(
 )
 
 import ExpressPaymentIframeShell from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/express-payment-iframe-shell'
+import ContractTestProvider from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/contract-test-provider'
 import MinimalProviderFixture from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/test-fixtures/minimal-provider-fixture'
 
 describe('ExpressPaymentIframeShell', () => {
@@ -63,7 +64,7 @@ describe('ExpressPaymentIframeShell', () => {
             '/Payments-ExpressProduct?pid=sku-1&quantity=2&parentOrigin=https%3A%2F%2Fstore.example.com'
         )
 
-        renderWithProviders(<ExpressPaymentIframeShell />)
+        renderWithProviders(<ExpressPaymentIframeShell Provider={ContractTestProvider} />)
 
         expect(screen.getByTestId('express-payment-iframe-shell')).toHaveAttribute(
             'data-payment-surface',
@@ -86,7 +87,7 @@ describe('ExpressPaymentIframeShell', () => {
             '/Payments-Express?parentOrigin=https%3A%2F%2Fstore.example.com'
         )
 
-        renderWithProviders(<ExpressPaymentIframeShell />)
+        renderWithProviders(<ExpressPaymentIframeShell Provider={ContractTestProvider} />)
 
         const shell = screen.getByTestId('express-payment-iframe-shell')
         expect(shell).toHaveAttribute('data-payment-surface', 'cart')
@@ -126,6 +127,28 @@ describe('ExpressPaymentIframeShell', () => {
         renderWithProviders(<ExpressPaymentIframeShell />)
 
         expect(screen.queryByTestId('express-payment-iframe-shell')).not.toBeInTheDocument()
+        await waitFor(() =>
+            expect(mockPostExpressPaymentEvent).toHaveBeenCalledWith({
+                parentOrigin: 'https://store.example.com',
+                type: 'express.payment.unavailable',
+                payload: {}
+            })
+        )
+    })
+
+    test('renders no payment UI and reports unavailable when no provider is selected', async () => {
+        window.history.pushState(
+            {},
+            '',
+            '/Payments-ExpressProduct?pid=sku-1&quantity=1&parentOrigin=https%3A%2F%2Fstore.example.com'
+        )
+
+        renderWithProviders(<ExpressPaymentIframeShell />)
+
+        expect(screen.getByTestId('express-payment-iframe-shell')).toBeEmptyDOMElement()
+        expect(
+            screen.queryByTestId('express-payment-contract-test-provider')
+        ).not.toBeInTheDocument()
         await waitFor(() =>
             expect(mockPostExpressPaymentEvent).toHaveBeenCalledWith({
                 parentOrigin: 'https://store.example.com',

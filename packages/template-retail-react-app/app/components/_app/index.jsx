@@ -678,6 +678,7 @@ const ShopperAgentExpressPaymentApp = ({children}) => {
             className="sf-app sf-app-shopper-agent-express-payment"
             data-testid="shopper-agent-express-payment-app"
             bg="transparent"
+            width="100%"
         >
             <IntlProvider
                 onError={(err) => {

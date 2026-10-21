@@ -17,6 +17,7 @@ import ContractTestProvider, {
 
 const context = {
     providerApiVersion: 1,
+    mode: 'shopper-agent',
     surface: 'product',
     siteId: 'RefArchGlobal',
     locale: 'en-GB',
