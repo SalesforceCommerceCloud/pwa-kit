@@ -734,10 +734,10 @@ const {handler} = runtime.createHandler(options, (app) => {
         '/registration-verification-callback'
     app.post(registrationVerificationCallback, async (req, res) => {
         const appConfig = getConfig()?.app
-        if (appConfig?.login?.passwordless?.mode !== 'callback') {
+        if (!appConfig?.login?.registrationVerification?.callbackURI) {
             return res
                 .status(400)
-                .json({error: 'Registration verification callback mode not enabled'})
+                .json({error: 'Registration verification callback not configured'})
         }
         const slasCallbackToken = req.headers['x-slas-callback-token']
         if (!slasCallbackToken) {
@@ -745,7 +745,12 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
         const {email_id, token} = req.body
         try {
-            await validateSlasCallbackToken(slasCallbackToken)
+            const validatedPayload = await validateSlasCallbackToken(slasCallbackToken)
+            if (validatedPayload.email_id !== email_id || validatedPayload.token !== token) {
+                return res
+                    .status(401)
+                    .json({error: 'callback body fields do not match SLAS callback token claims'})
+            }
             await sendViaB2cCartridge(
                 'otp',
                 email_id,

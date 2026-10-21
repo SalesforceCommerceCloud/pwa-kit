@@ -68,14 +68,14 @@ const GuestOrderLookupVerify = () => {
 
     useEffect(() => {
         if (!autoCode) return
-        if (!email) return // wait for the user to enter their email before auto-submitting
+        if (!emailFromContext) return // only auto-submit when email came from router state
         const cleaned = autoCode.replace(/\D/g, '').slice(0, ACCESS_CODE_LENGTH)
         if (cleaned.length !== ACCESS_CODE_LENGTH) return
         const timer = setTimeout(() => {
             formRef.current?.requestSubmit()
         }, 100)
         return () => clearTimeout(timer)
-    }, [autoCode, email])
+    }, [autoCode, emailFromContext])
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [serverError, setServerError] = useState(null)
     const inputRefs = useRef([])
