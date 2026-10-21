@@ -6,6 +6,6 @@
  */
 
 // Application-owned replacement point. The shell imports only this entry file.
-// This contract fixture is temporary; Salesforce Payments becomes the default
-// after the provider-neutral contract candidate is verified.
-export {default} from './contract-test-provider'
+// The neutral default renders nothing and reports unavailable until the application
+// explicitly selects a supported payment provider.
+export {default} from './providers/unavailable-express-payment-provider'

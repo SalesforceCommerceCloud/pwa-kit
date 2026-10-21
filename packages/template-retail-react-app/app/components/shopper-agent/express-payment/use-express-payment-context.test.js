@@ -9,6 +9,7 @@ import {
     buildExpressPaymentContext,
     EXPRESS_PAYMENT_PROVIDER_API_VERSION
 } from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/use-express-payment-context'
+import {EXPRESS_PAYMENT_MODES} from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/contract'
 
 const baseContext = {
     siteId: 'RefArchGlobal',
@@ -29,6 +30,7 @@ describe('buildExpressPaymentContext', () => {
         ).toEqual({
             context: {
                 providerApiVersion: EXPRESS_PAYMENT_PROVIDER_API_VERSION,
+                mode: EXPRESS_PAYMENT_MODES.SHOPPER_AGENT,
                 surface: 'cart',
                 ...baseContext,
                 basket: {id: 'basket-1', status: 'ready'}
@@ -47,6 +49,7 @@ describe('buildExpressPaymentContext', () => {
         ).toEqual({
             context: {
                 providerApiVersion: EXPRESS_PAYMENT_PROVIDER_API_VERSION,
+                mode: EXPRESS_PAYMENT_MODES.SHOPPER_AGENT,
                 surface: 'product',
                 ...baseContext,
                 productId: 'sku-1',

@@ -6,6 +6,9 @@
  */
 
 import PropTypes from 'prop-types'
+import {EXPRESS_PAYMENT_MODES} from '@salesforce/retail-react-app/app/constants/express-payment'
+
+export {EXPRESS_PAYMENT_MODES}
 
 // Versions the in-frame shell-to-provider API, not the Commerce Client message protocol.
 export const EXPRESS_PAYMENT_PROVIDER_API_VERSION = 1
@@ -25,6 +28,7 @@ export const EXPRESS_PAYMENT_BASKET_STATUSES = Object.freeze({
 export const expressPaymentContextPropType = PropTypes.oneOfType([
     PropTypes.shape({
         providerApiVersion: PropTypes.oneOf([EXPRESS_PAYMENT_PROVIDER_API_VERSION]).isRequired,
+        mode: PropTypes.oneOf(Object.values(EXPRESS_PAYMENT_MODES)).isRequired,
         surface: PropTypes.oneOf([EXPRESS_PAYMENT_SURFACES.CART]).isRequired,
         siteId: PropTypes.string.isRequired,
         locale: PropTypes.string.isRequired,
@@ -36,6 +40,7 @@ export const expressPaymentContextPropType = PropTypes.oneOfType([
     }),
     PropTypes.shape({
         providerApiVersion: PropTypes.oneOf([EXPRESS_PAYMENT_PROVIDER_API_VERSION]).isRequired,
+        mode: PropTypes.oneOf(Object.values(EXPRESS_PAYMENT_MODES)).isRequired,
         surface: PropTypes.oneOf([EXPRESS_PAYMENT_SURFACES.PRODUCT]).isRequired,
         siteId: PropTypes.string.isRequired,
         locale: PropTypes.string.isRequired,
