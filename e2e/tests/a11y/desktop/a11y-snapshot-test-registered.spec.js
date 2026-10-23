@@ -9,11 +9,21 @@ const {test} = require('@playwright/test')
 const {
     answerConsentTrackingForm,
     registeredUserHappyPath,
+    validateOrderHistory,
     wishlistFlow,
     loginShopper,
     registerShopper
 } = require('../../../scripts/pageHelpers')
 const {generateUserCredentials, runAccessibilityTest} = require('../../../scripts/utils')
+
+const runTimedPhase = async (name, action) => {
+    const startedAt = Date.now()
+    try {
+        await action()
+    } finally {
+        console.log(`[a11y] ${name}: ${Date.now() - startedAt}ms`)
+    }
+}
 
 test.describe('Accessibility Tests with Snapshots for a registered user', async () => {
     let registeredUserCredentials = {}
@@ -23,14 +33,36 @@ test.describe('Accessibility Tests with Snapshots for a registered user', async 
         registeredUserCredentials = generateUserCredentials()
     })
 
-    test('Registered shopper happy path flow should not have new accessibility issues', async ({
+    test('Registered shopper checkout should not have new accessibility issues', async ({page}) => {
+        await runTimedPhase('registered checkout', () =>
+            registeredUserHappyPath({
+                page,
+                registeredUserCredentials,
+                a11y: {checkA11y: true, snapShotName: 'registered'},
+                includeOrderHistory: false
+            })
+        )
+    })
+
+    test('Registered shopper order history should not have new accessibility issues', async ({
         page
     }) => {
-        await registeredUserHappyPath({
-            page,
-            registeredUserCredentials,
-            a11y: {checkA11y: true, snapShotName: 'registered'}
-        })
+        const orderHistoryCredentials = generateUserCredentials()
+
+        await runTimedPhase('registered checkout setup for order history', () =>
+            registeredUserHappyPath({
+                page,
+                registeredUserCredentials: orderHistoryCredentials,
+                includeOrderHistory: false
+            })
+        )
+
+        await runTimedPhase('registered order history', () =>
+            validateOrderHistory({
+                page,
+                a11y: {checkA11y: true, snapShotName: 'registered'}
+            })
+        )
     })
 
     test('Wishlist page should not have any new a11y issues', async ({page}) => {
