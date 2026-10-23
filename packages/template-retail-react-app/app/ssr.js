@@ -350,7 +350,7 @@ async function sendMagicLinkEmail(req, res, landingPath, notifyType, redirectUrl
     const {email_id, token} = req.body
 
     let magicLinkPath = `${landingPath}?token=${encodeURIComponent(token)}`
-    if (notifyType === 'passwordless-magic-link' && redirectUrl) {
+    if (notifyType === 'passwordless-login' && redirectUrl) {
         magicLinkPath += `&redirect_url=${encodeURIComponent(redirectUrl)}`
     }
 
@@ -678,11 +678,12 @@ const {handler} = runtime.createHandler(options, (app) => {
         const redirectUrl = req.query.redirectUrl
         try {
             await validateSlasCallbackToken(slasCallbackToken)
+            const isRegistration = req.query.register === 'true'
             await sendMagicLinkEmail(
                 req,
                 res,
                 config.app.login?.passwordless?.landingPath,
-                'passwordless-magic-link',
+                isRegistration ? 'passwordless-registration' : 'passwordless-login',
                 redirectUrl
             )
         } catch (err) {
@@ -752,7 +753,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     .json({error: 'callback body fields do not match SLAS callback token claims'})
             }
             await sendViaB2cCartridge(
-                'otp',
+                'password-registration',
                 email_id,
                 {token},
                 getConfig().app.commerceAPI.parameters
