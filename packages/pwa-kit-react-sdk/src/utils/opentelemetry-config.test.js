@@ -17,6 +17,8 @@ describe('OpenTelemetry Config', () => {
     beforeEach(() => {
         // Reset environment variables
         process.env = {...originalEnv}
+        delete process.env.OTEL_TRACING_ENABLED
+        delete process.env.MRT_DISTRIBUTED_TRACING_ENABLED
 
         // Clear module cache to reset _cachedConfig
         jest.resetModules()
@@ -67,6 +69,15 @@ describe('OpenTelemetry Config', () => {
                 expect(config.enabled).toBe(true)
             })
 
+            test('should return enabled as true when MRT_DISTRIBUTED_TRACING_ENABLED is "true"', () => {
+                process.env.MRT_DISTRIBUTED_TRACING_ENABLED = 'true'
+
+                const {getOTELConfig} = mockModule()
+                const config = getOTELConfig()
+
+                expect(config.enabled).toBe(true)
+            })
+
             test('should return enabled as false when OTEL_TRACING_ENABLED is not set', () => {
                 delete process.env.OTEL_TRACING_ENABLED
 
@@ -96,6 +107,16 @@ describe('OpenTelemetry Config', () => {
 
                     expect(config.enabled).toBe(false)
                 })
+            })
+
+            test('should return enabled as false when neither tracing flag is "true"', () => {
+                process.env.OTEL_TRACING_ENABLED = 'false'
+                process.env.MRT_DISTRIBUTED_TRACING_ENABLED = '1'
+
+                const {getOTELConfig} = mockModule()
+                const config = getOTELConfig()
+
+                expect(config.enabled).toBe(false)
             })
         })
     })
