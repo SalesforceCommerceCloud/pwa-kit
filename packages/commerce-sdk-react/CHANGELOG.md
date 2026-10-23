@@ -1,3 +1,6 @@
+## v5.6.0-nightly-20261023080440 (Oct 23, 2026)
+## v5.6.0-dev (Oct 23, 2026)
+## v3.22.0-nightly-20261023080440 (Oct 23, 2026)
 ## v5.6.0-dev (Oct 09, 2026)
 ## v5.5.0 (Oct 08, 2026)
 - [Feature] Add a `useDeliveryEstimates` query hook and `ShopperDeliveryEstimates` client registration for the Shopper Delivery Estimates API. This requires `commerce-sdk-isomorphic` `5.7.0`, which includes the generated client. The TypeDoc entry is grouped with the Shopper Delivery Estimates API and links to the endpoint, SDK, and TanStack Query references. [#4013](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4013)
