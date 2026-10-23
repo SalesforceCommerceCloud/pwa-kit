@@ -1282,6 +1282,47 @@ describe('SLAS private client proxy', () => {
             })
     }, 15000)
 
+    test('adds x-slas-client-auth header if request is for /oauth2/login', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const encodedCredentials = Buffer.from('clientId:a secret').toString('base64')
+
+        const app = RemoteServerFactory._createApp(opts(appConfig))
+
+        // Raw base64 with no `Basic ` prefix; `Authorization` carries the
+        // shopper's credentials on this endpoint and must be left untouched.
+        // A client-supplied x-slas-client-auth value must be overwritten.
+        return await request(app)
+            .post('/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/login')
+            .set('Authorization', 'Basic shopper-creds')
+            .set('x-slas-client-auth', 'spoofed')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body['x-slas-client-auth']).toBe(encodedCredentials)
+                expect(response.body.authorization).toBe('Basic shopper-creds')
+                expect(response.body._sfdc_client_auth).toBeUndefined()
+            })
+    }, 15000)
+
+    test('adds x-slas-client-auth header if request is for /oauth2/authorize', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const encodedCredentials = Buffer.from('clientId:a secret').toString('base64')
+
+        const app = RemoteServerFactory._createApp(opts(appConfig))
+
+        return await request(app)
+            .get(
+                '/mobify/slas/private/shopper/auth/v1/organizations/f_ecom_test/oauth2/authorize?client_id=clientId&hint=google'
+            )
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body['x-slas-client-auth']).toBe(encodedCredentials)
+                expect(response.body.authorization).toBeUndefined()
+                expect(response.body._sfdc_client_auth).toBeUndefined()
+            })
+    }, 15000)
+
     test('adds _sfdc_client_auth header if request is for /oauth2/trusted-agent/token', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
