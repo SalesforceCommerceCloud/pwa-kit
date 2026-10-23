@@ -129,6 +129,17 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     default: jest.fn()
 }))
 
+const mockNavigate = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
+    __esModule: true,
+    default: () => mockNavigate
+}))
+
+const mockStopProductLinkRouting = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/utils/shopper-agent-product-links', () => ({
+    attachAgentProductLinkRouting: jest.fn(() => mockStopProductLinkRouting)
+}))
+
 // Mock the useTheme hook
 jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => ({
     useTheme: jest.fn()
@@ -147,6 +158,7 @@ import {
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import {attachAgentProductLinkRouting} from '@salesforce/retail-react-app/app/utils/shopper-agent-product-links'
 
 // Get mocked functions
 const mockedUseScript = useScript
@@ -2057,6 +2069,25 @@ describe('ShopperAgent Component', () => {
             const calls = mockedUseCommerceClientMessaging.mock.calls
             const widgetOptions = calls[calls.length - 1][1]
             expect(typeof widgetOptions.onNavigate).toBe('function')
+        })
+
+        test('points agent product links at the storefront product page and stops on unmount', () => {
+            const buildUrl = jest.fn((path) => `/us/en-US${path}`)
+            mockedUseMultiSite.mockReturnValue({
+                locale: {id: 'en-US', preferredCurrency: 'USD'},
+                buildUrl
+            })
+
+            const {unmount} = renderCommerceClient()
+
+            const calls = attachAgentProductLinkRouting.mock.calls
+            const {navigateToProduct, getProductHref} = calls[calls.length - 1][0]
+            expect(getProductHref('DH-387')).toBe('/us/en-US/product/DH-387')
+            navigateToProduct('2040793A5H')
+            expect(mockNavigate).toHaveBeenCalledWith('/product/2040793A5H')
+
+            unmount()
+            expect(mockStopProductLinkRouting).toHaveBeenCalled()
         })
 
         test('leaves the new optional widget fields undefined when not configured so the widget default wins', () => {

@@ -26,7 +26,11 @@ import {
     COMMERCE_CLIENT_UI_STATE_EVENT
 } from '@salesforce/retail-react-app/app/constants'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {toStorefrontNavigatePath} from '@salesforce/retail-react-app/app/utils/url'
+import {
+    productUrlBuilder,
+    toStorefrontNavigatePath
+} from '@salesforce/retail-react-app/app/utils/url'
+import {attachAgentProductLinkRouting} from '@salesforce/retail-react-app/app/utils/shopper-agent-product-links'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
@@ -717,6 +721,18 @@ const CommerceClientAgentWindow = ({
             navigate(path)
         },
         [navigate]
+    )
+
+    // The backend sends product links as SFRA `.html` URLs on the backend origin, which `onNavigate`
+    // never sees. Point the widget's product links at the PWA product page instead.
+    const {buildUrl} = useMultiSite()
+    useEffect(
+        () =>
+            attachAgentProductLinkRouting({
+                navigateToProduct: (productId) => navigate(productUrlBuilder({id: productId})),
+                getProductHref: (productId) => buildUrl(productUrlBuilder({id: productId}))
+            }),
+        [navigate, buildUrl]
     )
 
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
