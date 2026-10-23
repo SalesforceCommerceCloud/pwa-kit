@@ -23,11 +23,7 @@ import PasswordRequirements from '@salesforce/retail-react-app/app/components/fo
 import useUpdatePasswordFields from '@salesforce/retail-react-app/app/components/forms/useUpdatePasswordFields'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {
-    API_ERROR_MESSAGE,
-    INVALID_TOKEN_ERROR,
-    INVALID_TOKEN_ERROR_MESSAGE
-} from '@salesforce/retail-react-app/app/constants'
+import {getResetPasswordActionErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const ResetPasswordLanding = () => {
     const form = useForm()
@@ -48,9 +44,7 @@ const ResetPasswordLanding = () => {
             navigate('/login')
         } catch (error) {
             const errorData = await error.response?.json()
-            const message = INVALID_TOKEN_ERROR.test(errorData.message)
-                ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
+            const message = formatMessage(getResetPasswordActionErrorMessage(errorData?.message))
             form.setError('global', {type: 'manual', message})
         }
     }

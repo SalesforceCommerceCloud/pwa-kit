@@ -350,6 +350,9 @@ async function sendMagicLinkEmail(req, res, landingPath, notifyType, redirectUrl
     const {email_id, token} = req.body
 
     let magicLinkPath = `${landingPath}?token=${encodeURIComponent(token)}`
+    if (notifyType === 'passwordless-magic-link' && email_id) {
+        magicLinkPath += `&login_id=${encodeURIComponent(email_id)}`
+    }
     if (notifyType === 'passwordless-magic-link' && redirectUrl) {
         magicLinkPath += `&redirect_url=${encodeURIComponent(redirectUrl)}`
     }

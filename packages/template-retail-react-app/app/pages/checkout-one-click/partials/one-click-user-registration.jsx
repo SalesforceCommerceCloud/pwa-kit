@@ -51,7 +51,7 @@ export default function UserRegistration({
     const {isGuest} = useCustomerType()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
-    const {locale} = useMultiSite()
+    const {site, locale} = useMultiSite()
     const {formatMessage} = useIntl()
     const showToast = useToast()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
@@ -182,7 +182,9 @@ export default function UserRegistration({
         try {
             const token = await loginPasswordless.mutateAsync({
                 pwdlessLoginToken: otpCode,
-                register_customer: true
+                register_customer: true,
+                login_id: basket?.customerInfo?.email,
+                channel_id: site.id
             })
 
             const customerId = token?.customer_id || token?.customerId
