@@ -76,7 +76,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const updateBillingAddressForBasket = useShopperBasketsMutation('updateBillingAddressForBasket')
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
-    const {locale} = useMultiSite()
+    const {site, locale} = useMultiSite()
     const passwordlessConfig = getConfig().app.login?.passwordless
     const callbackURL = getPasswordlessCallbackUrl(passwordlessConfig?.callbackURI)
     const redirectPath = location.pathname + location.search
@@ -304,7 +304,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         try {
             // Prevent post-auth recovery effect from also attempting merge in this flow
             hasAttemptedRecoveryRef.current = true
-            await loginPasswordless.mutateAsync({pwdlessLoginToken: otpCode})
+            const loginId =
+                form.getValues('email') || (emailRef.current && emailRef.current.value) || ''
+            await loginPasswordless.mutateAsync({
+                pwdlessLoginToken: otpCode,
+                login_id: loginId,
+                channel_id: site.id
+            })
 
             // Successful OTP verification - user is now logged in
             const hasBasketItem = basket.productItems?.length > 0

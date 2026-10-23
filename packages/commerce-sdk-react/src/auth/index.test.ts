@@ -1055,11 +1055,37 @@ describe('Auth', () => {
 
     test('getPasswordLessAccessToken calls isomorphic getPasswordLessAccessToken', async () => {
         const auth = new Auth(config)
-        await auth.getPasswordLessAccessToken({pwdlessLoginToken: '12345678'})
+        await auth.getPasswordLessAccessToken({
+            pwdlessLoginToken: '12345678',
+            login_id: 'shopper@example.com',
+            channel_id: config.siteId
+        })
         expect(helpers.getPasswordLessAccessToken).toHaveBeenCalled()
         const functionArg = (helpers.getPasswordLessAccessToken as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
-            parameters: {pwdlessLoginToken: '12345678'}
+            parameters: {
+                pwdlessLoginToken: '12345678',
+                login_id: 'shopper@example.com',
+                channel_id: config.siteId
+            }
+        })
+    })
+
+    test('getPasswordLessAccessToken forwards login_id and channel_id', async () => {
+        const auth = new Auth(config)
+        await auth.getPasswordLessAccessToken({
+            pwdlessLoginToken: '12345678',
+            login_id: 'shopper@example.com',
+            channel_id: 'customChannelId'
+        })
+        expect(helpers.getPasswordLessAccessToken).toHaveBeenCalled()
+        const functionArg = (helpers.getPasswordLessAccessToken as jest.Mock).mock.calls[0][0]
+        expect(functionArg).toMatchObject({
+            parameters: {
+                pwdlessLoginToken: '12345678',
+                login_id: 'shopper@example.com',
+                channel_id: 'customChannelId'
+            }
         })
     })
 
@@ -1169,6 +1195,7 @@ describe('Auth', () => {
         [
             'with all parameters specified',
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123',
                 channel_id: 'customChannelId',
@@ -1177,6 +1204,7 @@ describe('Auth', () => {
                 code_verifier: 'test-code-verifier'
             },
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123',
                 channel_id: 'customChannelId',
@@ -1188,10 +1216,12 @@ describe('Auth', () => {
         [
             'defaults all parameters when only required parameters are specified',
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123'
             },
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123',
                 channel_id: config.siteId,

@@ -45,6 +45,13 @@ const PASSWORD_RESET_FEATURE_UNAVAILABLE_ERRORS = TOKEN_BASED_AUTH_FEATURE_UNAVA
 
 const TOO_MANY_REQUESTS_ERROR = /too many .* requests/i
 
+// SLAS returns 400 when login_id is missing or does not match the passwordless login request
+const MISSING_OR_MISMATCHED_IDENTIFIER_ERROR =
+    /missing.*identifier|mismatched.*identifier|login_id.*(match|mismatch|required)|identifier.*(missing|mismatch)/i
+
+// HTTP 429 rate-limit responses (may include Retry-After)
+const RATE_LIMIT_STATUS_ERROR = /\b429\b/
+
 /**
  * Returns the absolute URL for the passwordless login callback.
  * If the callback URI is already absolute, it is returned as-is; otherwise it is
@@ -74,7 +81,10 @@ export const getAuthorizePasswordlessErrorMessage = (errorMessage) => {
     if (PASSWORDLESS_FEATURE_UNAVAILABLE_ERRORS.some((msg) => msg.test(errorMessage))) {
         return FEATURE_UNAVAILABLE_ERROR_MESSAGE
     }
-    if (TOO_MANY_REQUESTS_ERROR.test(errorMessage)) {
+    if (
+        TOO_MANY_REQUESTS_ERROR.test(errorMessage) ||
+        RATE_LIMIT_STATUS_ERROR.test(String(errorMessage))
+    ) {
         return TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE
@@ -105,7 +115,36 @@ export const getPasswordResetErrorMessage = (errorMessage) => {
  * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
  */
 export const getLoginPasswordlessErrorMessage = (errorMessage) => {
-    if (INVALID_TOKEN_ERROR.test(errorMessage)) {
+    if (
+        INVALID_TOKEN_ERROR.test(errorMessage) ||
+        MISSING_OR_MISMATCHED_IDENTIFIER_ERROR.test(String(errorMessage))
+    ) {
+        return INVALID_TOKEN_ERROR_MESSAGE
+    }
+    if (
+        TOO_MANY_REQUESTS_ERROR.test(errorMessage) ||
+        RATE_LIMIT_STATUS_ERROR.test(String(errorMessage))
+    ) {
+        return TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
+    }
+    return API_ERROR_MESSAGE
+}
+
+/**
+ * Maps error message from resetPassword (password/action) mutation to the appropriate
+ * user-friendly error message descriptor. Rate-limit responses are shaped like invalid
+ * token (401) so the existing reset-password UX is reused.
+ *
+ * @param {string} errorMessage - The error message from the API
+ * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
+ */
+export const getResetPasswordActionErrorMessage = (errorMessage) => {
+    if (
+        INVALID_TOKEN_ERROR.test(errorMessage) ||
+        TOO_MANY_REQUESTS_ERROR.test(errorMessage) ||
+        RATE_LIMIT_STATUS_ERROR.test(String(errorMessage)) ||
+        MISSING_OR_MISMATCHED_IDENTIFIER_ERROR.test(String(errorMessage))
+    ) {
         return INVALID_TOKEN_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE
