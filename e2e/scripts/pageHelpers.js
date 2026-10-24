@@ -630,7 +630,12 @@ export const checkoutProduct = async ({page, userCredentials, a11y = {checkA11y:
     await orderConfirmationHeading.waitFor()
 }
 
-export const registeredUserHappyPath = async ({page, registeredUserCredentials, a11y = {}}) => {
+export const registeredUserHappyPath = async ({
+    page,
+    registeredUserCredentials,
+    a11y = {},
+    includeOrderHistory = true
+}) => {
     const {checkA11y = false, snapShotName} = a11y
     // Since we're re-using the same account, we need to check if the user is already registered.
     // This ensures the tests are independent and not dependent on the order they are run in.
@@ -744,8 +749,9 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
             'checkout-a11y-violations-step-4-order-confirmation.json'
         ])
     }
-    // order history
-    await validateOrderHistory({page, a11y})
+    if (includeOrderHistory) {
+        await validateOrderHistory({page, a11y})
+    }
 }
 
 /**
