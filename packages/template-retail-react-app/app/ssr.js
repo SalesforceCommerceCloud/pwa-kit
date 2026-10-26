@@ -183,7 +183,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
     // To extend the SLAS private-client proxy allow-list, supply
     // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
@@ -350,6 +350,7 @@ async function sendMagicLinkEmail(req, res, landingPath, notifyType, redirectUrl
     const {email_id, token} = req.body
 
     let magicLinkPath = `${landingPath}?token=${encodeURIComponent(token)}`
+    // redirect_url is only meaningful for returning users; new-user registration has no prior destination.
     if (notifyType === 'passwordless-login' && redirectUrl) {
         magicLinkPath += `&redirect_url=${encodeURIComponent(redirectUrl)}`
     }
@@ -550,6 +551,41 @@ export function handleCallback(req, res, next) {
     res.send()
 }
 
+export async function passwordlessLoginCallbackHandler(req, res) {
+    const appConfig = getConfig()?.app
+    if (appConfig?.login?.passwordless?.mode !== 'callback') {
+        return res.status(400).json({error: 'Passwordless callback mode not enabled'})
+    }
+    const slasCallbackToken = req.headers['x-slas-callback-token']
+    if (!slasCallbackToken) {
+        return res.status(400).json({error: 'Missing x-slas-callback-token header'})
+    }
+    const redirectUrl = req.query.redirectUrl
+    try {
+        const validatedPayload = await validateSlasCallbackToken(slasCallbackToken)
+        const {email_id} = req.body
+        if (validatedPayload.email_id !== email_id) {
+            return res
+                .status(401)
+                .json({error: 'callback body fields do not match SLAS callback token claims'})
+        }
+        const isRegistration = req.query.register === 'true'
+        await sendMagicLinkEmail(
+            req,
+            res,
+            config.app.login?.passwordless?.landingPath,
+            isRegistration ? 'passwordless-registration' : 'passwordless-login',
+            redirectUrl
+        )
+    } catch (err) {
+        logger.error('passwordless callback failed', {
+            namespace: 'slas-callback',
+            additionalProperties: {error: err?.message}
+        })
+        res.status(500).json({error: 'Failed to send notification'})
+    }
+}
+
 // Always require Secure on the cc-goa_* cookie regardless of cookie-forwarding config.
 // For local dev, set localAllowCookies: true AND use HTTPS (pwa-kit-dev --https) so
 // the browser accepts the Secure cookie; plain-HTTP local runs cannot complete the flow.
@@ -666,34 +702,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     // endpoint sending the email address and passwordless token. Then this endpoint calls
     // the sendMagicLinkEmail function to send an email with the passwordless login magic link.
     // https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-passwordless-login.html#receive-the-callback
-    app.post(passwordlessLoginCallback, async (req, res) => {
-        const appConfig = getConfig()?.app
-        if (appConfig?.login?.passwordless?.mode !== 'callback') {
-            return res.status(400).json({error: 'Passwordless callback mode not enabled'})
-        }
-        const slasCallbackToken = req.headers['x-slas-callback-token']
-        if (!slasCallbackToken) {
-            return res.status(400).json({error: 'Missing x-slas-callback-token header'})
-        }
-        const redirectUrl = req.query.redirectUrl
-        try {
-            await validateSlasCallbackToken(slasCallbackToken)
-            const isRegistration = req.query.register === 'true'
-            await sendMagicLinkEmail(
-                req,
-                res,
-                config.app.login?.passwordless?.landingPath,
-                isRegistration ? 'passwordless-registration' : 'passwordless-login',
-                redirectUrl
-            )
-        } catch (err) {
-            logger.error('passwordless callback failed', {
-                namespace: 'slas-callback',
-                additionalProperties: {error: err?.message}
-            })
-            res.status(500).json({error: 'Failed to send notification'})
-        }
-    })
+    app.post(passwordlessLoginCallback, passwordlessLoginCallbackHandler)
 
     // Handles the reset password callback route. SLAS makes a POST request to this
     // endpoint sending the email address and reset password token. Then this endpoint calls
