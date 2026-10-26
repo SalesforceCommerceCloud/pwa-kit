@@ -1,4 +1,5 @@
 ## v3.22.0-dev (Oct 09, 2026)
+-   [Feature] Enable OpenTelemetry and distributed tracing when either `OTEL_TRACING_ENABLED=true` or MRT's `MRT_DISTRIBUTED_TRACING_ENABLED=true` is set.
 ## v3.21.0 (Oct 08, 2026)
 - Version alignment release; no functional changes to `pwa-kit-react-sdk` since v3.20.0.
 
