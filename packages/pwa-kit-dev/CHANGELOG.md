@@ -1,4 +1,5 @@
 ## v3.22.0-dev (Oct 09, 2026)
+- Fix `pwa-kit-dev push` masking unrelated errors (e.g. `400`/`404`/`500`) as Managed Runtime maintenance mode. Because MRT stamps the `X-MRT-Read-Only` header on every response during a read-only window, the maintenance message now additionally requires an HTTP `503` status, so non-maintenance failures surface their real cause. [#XXXX](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/XXXX)
 ## v3.21.0 (Oct 08, 2026)
 - `pwa-kit-dev push` now detects Managed Runtime read-only (maintenance) mode via the `X-MRT-Read-Only` response header and fails with an actionable message pointing to the MRT status page, instead of a generic HTTP error.
 ## v3.20.0 (Aug 12, 2026)
