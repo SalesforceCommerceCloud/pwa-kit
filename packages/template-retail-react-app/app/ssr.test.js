@@ -561,8 +561,7 @@ describe('passwordlessLoginCallback route handler', () => {
     })
 
     test('returns 401 when email_id in body does not match token claim', async () => {
-        const {jwtVerify} = require('jose')
-        jwtVerify.mockResolvedValueOnce({
+        jose.jwtVerify.mockResolvedValueOnce({
             payload: {iss: 'prefix/prefix2/test_001/oauth2', email_id: 'real@example.com'}
         })
         const req = makeReq({
@@ -577,8 +576,7 @@ describe('passwordlessLoginCallback route handler', () => {
     })
 
     test('sends passwordless-registration type when register=true and email_id matches', async () => {
-        const {jwtVerify} = require('jose')
-        jwtVerify.mockResolvedValueOnce({
+        jose.jwtVerify.mockResolvedValueOnce({
             payload: {iss: 'prefix/prefix2/test_001/oauth2', email_id: 'user@example.com'}
         })
         const req = makeReq({
@@ -593,8 +591,7 @@ describe('passwordlessLoginCallback route handler', () => {
     })
 
     test('sends passwordless-login type when register param is absent and email_id matches', async () => {
-        const {jwtVerify} = require('jose')
-        jwtVerify.mockResolvedValueOnce({
+        jose.jwtVerify.mockResolvedValueOnce({
             payload: {iss: 'prefix/prefix2/test_001/oauth2', email_id: 'user@example.com'}
         })
         const req = makeReq({
