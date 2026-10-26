@@ -58,6 +58,30 @@ function isNotifyEnabled() {
 }
 
 /**
+ * Resolves the storefront host, builds the full magic-link URL, and extracts
+ * the inline access code from the path. Returns null (after rendering the
+ * host-not-configured error) when the storefront host is unavailable.
+ */
+function buildMagicLinkContext(magicLinkPath) {
+    var host = getStorefrontHost();
+    if (!host) {
+        renderHostNotConfigured();
+        return null;
+    }
+    var link = 'https://' + host + magicLinkPath;
+    var tokenMatch = magicLinkPath.match(/[?&]token=([^&]+)/);
+    var accessCode = null;
+    if (tokenMatch) {
+        try {
+            accessCode = decodeURIComponent(tokenMatch[1]);
+        } catch (e) {
+            accessCode = tokenMatch[1];
+        }
+    }
+    return {magicLink: link, accessCode: accessCode};
+}
+
+/**
  * SCAPI Custom API handler for PWA Kit Notify.
  *
  * Authentication and scope enforcement (ShopperToken + c_pwakit_notify) are
@@ -137,25 +161,11 @@ exports.notify = function () {
             ).render();
             return;
         }
-        var plHost = getStorefrontHost();
-        if (!plHost) {
-            renderHostNotConfigured();
-            return;
-        }
-        magicLink = 'https://' + plHost + body.data.magicLinkPath;
-        // Extract the token from the magicLinkPath for inline display in the email
-        var tokenMatch = body.data.magicLinkPath.match(/[?&]token=([^&]+)/);
-        var inlineAccessCode = null;
-        if (tokenMatch) {
-            try {
-                inlineAccessCode = decodeURIComponent(tokenMatch[1]);
-            } catch (e) {
-                inlineAccessCode = tokenMatch[1];
-            }
-        }
+        context = buildMagicLinkContext(body.data.magicLinkPath);
+        if (!context) return;
+        magicLink = context.magicLink;
         subject = Resource.msg('passwordlessLogin.subject', 'email', 'Your Magic Sign-In Link');
         templateName = 'email/passwordlessLogin';
-        context = { magicLink: magicLink, accessCode: inlineAccessCode };
     } else if (type === 'passwordless-registration') {
         // New-user registration flow — no B2C profile exists yet; SLAS creates it after
         // the shopper exchanges the token. No account existence check here.
@@ -168,24 +178,11 @@ exports.notify = function () {
             ).render();
             return;
         }
-        var prHost = getStorefrontHost();
-        if (!prHost) {
-            renderHostNotConfigured();
-            return;
-        }
-        magicLink = 'https://' + prHost + body.data.magicLinkPath;
-        var regTokenMatch = body.data.magicLinkPath.match(/[?&]token=([^&]+)/);
-        var regAccessCode = null;
-        if (regTokenMatch) {
-            try {
-                regAccessCode = decodeURIComponent(regTokenMatch[1]);
-            } catch (e) {
-                regAccessCode = regTokenMatch[1];
-            }
-        }
+        context = buildMagicLinkContext(body.data.magicLinkPath);
+        if (!context) return;
+        magicLink = context.magicLink;
         subject = Resource.msg('passwordlessRegistration.subject', 'email', 'Complete Your Registration');
         templateName = 'email/passwordlessRegistration';
-        context = { magicLink: magicLink, accessCode: regAccessCode };
     } else if (type === 'password-reset') {
         // Password reset requires a pre-existing registered account. Succeed
         // silently for unrecognised addresses — this prevents email enumeration
