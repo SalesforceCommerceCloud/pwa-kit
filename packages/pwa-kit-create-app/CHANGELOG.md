@@ -1,4 +1,5 @@
 ## v3.22.0-dev
+- Keep the generated `ssr.js.hbs` template in sync with `template-retail-react-app`: extract the passwordless-login callback handler to a named exported function (`passwordlessLoginCallbackHandler`), add `email_id` claim cross-validation against the request body to prevent email-relay attacks, and differentiate the notification type between `passwordless-registration` and `passwordless-login` based on the `?register=true` query parameter. [#4072](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4072)
 - [Security] Keep the generated `ssr.js.hbs` templates in sync with `template-retail-react-app`: fix the registration-verification callback guard to check `registrationVerification.callbackURI` instead of `passwordless.mode` (non-extended template variant), and bind the `email_id` claim in the SLAS callback token to the request body to prevent email-relay attacks. [#4067](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4067)
 - [Bugfix] Temporarily pin transitive Vitest to 4.1.11 in the create-app package and generated extensible apps to avoid an npm 10 dependency resolver crash while the Vitest browser packages require 4.1.11.
 
