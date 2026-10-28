@@ -27,13 +27,15 @@ const useExpressPaymentBasket = ({enabled = true} = {}) => {
         {enabled: shouldResolveBasket && !isServer}
     )
     const basket = selectExpressPaymentBasket(query.data?.baskets)
-    const status = basket
-        ? 'ready'
-        : query.isError
-        ? 'error'
-        : shouldResolveBasket && (isServer || query.isLoading)
-        ? 'loading'
-        : 'empty'
+    let status = 'empty'
+
+    if (basket) {
+        status = 'ready'
+    } else if (query.isError) {
+        status = 'error'
+    } else if (shouldResolveBasket && (isServer || query.isLoading)) {
+        status = 'loading'
+    }
 
     return {
         ...query,

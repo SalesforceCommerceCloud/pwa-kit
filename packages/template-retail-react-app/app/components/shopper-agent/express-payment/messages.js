@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+
 // Keep this wire-event set aligned with Commerce Client; new events require coordinated host support.
 export const EXPRESS_PAYMENT_EVENTS = Object.freeze({
     AVAILABLE: 'express.payment.available',
@@ -101,7 +103,12 @@ export const postExpressPaymentEvent = ({parentOrigin, type, payload = {}}) => {
 
     const message = {type, payload}
     try {
-        if (JSON.stringify(message).length > MAX_EXPRESS_PAYMENT_MESSAGE_LENGTH) return false
+        if (JSON.stringify(message).length > MAX_EXPRESS_PAYMENT_MESSAGE_LENGTH) {
+            logger.warn('Express-payment message exceeds the maximum allowed length.', {
+                namespace: 'shopper-agent.express-payment.messages'
+            })
+            return false
+        }
         window.parent.postMessage(message, parentOrigin)
     } catch (error) {
         return false

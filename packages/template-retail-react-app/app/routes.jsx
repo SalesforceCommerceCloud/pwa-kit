@@ -148,12 +148,14 @@ export const routes = [
     {
         path: '/Payments-Express',
         component: ShopperAgentExpressPaymentPage,
-        exact: true
+        exact: true,
+        sensitive: true
     },
     {
         path: '/Payments-ExpressProduct',
         component: ShopperAgentExpressPaymentPage,
-        exact: true
+        exact: true,
+        sensitive: true
     }
 ]
 

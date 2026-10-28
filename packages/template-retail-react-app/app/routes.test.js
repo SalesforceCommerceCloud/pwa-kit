@@ -28,6 +28,15 @@ describe('Routes', () => {
         expect(lastRoute.path).toBe('*')
     })
 
+    test.each(['/Payments-Express', '/Payments-ExpressProduct'])(
+        'matches the Shopper Agent route %s case-sensitively',
+        (path) => {
+            const route = routes().find((candidate) => candidate.path === path)
+
+            expect(route).toMatchObject({exact: true, sensitive: true})
+        }
+    )
+
     describe('Dynamic routes', () => {
         describe('Reset password landing route', () => {
             test.each([

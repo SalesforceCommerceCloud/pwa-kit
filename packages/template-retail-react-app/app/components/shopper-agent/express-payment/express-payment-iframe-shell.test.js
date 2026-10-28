@@ -112,7 +112,7 @@ describe('ExpressPaymentIframeShell', () => {
             expect(mockPostExpressPaymentEvent).toHaveBeenCalledWith({
                 parentOrigin: 'https://store.example.com',
                 type: 'express.payment.available',
-                payload: {height: 400}
+                payload: {height: 800}
             })
         )
     })

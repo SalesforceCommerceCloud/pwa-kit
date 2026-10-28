@@ -19,10 +19,15 @@ describe('isShopperAgentExpressPaymentPath', () => {
         expect(isShopperAgentExpressPaymentPath(path)).toBe(true)
     })
 
-    test.each(['', '/', '/cart', '/Payments-ExpressCheckout', '/Payments-ExpressProduct/details'])(
-        'does not recognize the storefront route %s',
-        (path) => {
-            expect(isShopperAgentExpressPaymentPath(path)).toBe(false)
-        }
-    )
+    test.each([
+        '',
+        '/',
+        '/cart',
+        '/payments-express',
+        '/payments-expressproduct',
+        '/Payments-ExpressCheckout',
+        '/Payments-ExpressProduct/details'
+    ])('does not recognize the storefront route %s', (path) => {
+        expect(isShopperAgentExpressPaymentPath(path)).toBe(false)
+    })
 })

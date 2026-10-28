@@ -141,6 +141,7 @@ const AppConfig = ({children, locals = {}}) => {
                     <ChakraProvider theme={theme}>{children}</ChakraProvider>
                 </StoreLocatorProvider>
             </MultiSiteProvider>
+            {/* The floating devtools launcher can obscure the compact express-payment iframe. */}
             {!isShopperAgentExpressPaymentRoute && <ReactQueryDevtools />}
         </CommerceApiProvider>
     )

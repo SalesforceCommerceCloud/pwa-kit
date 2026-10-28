@@ -115,6 +115,7 @@ describe('express-payment messages', () => {
     ])('enforces the serialized-message boundary at %i characters', (length, expected) => {
         const originalParent = window.parent
         const postMessage = jest.fn()
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
         Object.defineProperty(window, 'parent', {
             configurable: true,
             value: {postMessage}
@@ -135,7 +136,9 @@ describe('express-payment messages', () => {
                 payload: {error: 'Payment failed'}
             })
         ).toBe(expected)
+        expect(warn).toHaveBeenCalledTimes(expected ? 0 : 1)
 
+        warn.mockRestore()
         Object.defineProperty(window, 'parent', {configurable: true, value: originalParent})
     })
 

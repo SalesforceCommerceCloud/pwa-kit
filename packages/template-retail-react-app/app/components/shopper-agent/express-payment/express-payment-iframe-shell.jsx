@@ -19,9 +19,9 @@ import {createExpressPaymentLifecycle} from '@salesforce/retail-react-app/app/co
 import useExpressPaymentContext from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/use-express-payment-context'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 
-// Keep these frame bounds aligned with the Commerce Client express-payment host.
+// Match the minimum interactive height used by the Commerce Client host. The shell
+// reports the full measured height; the host owns any maximum-height policy.
 const MIN_IFRAME_HEIGHT = 44
-const MAX_IFRAME_HEIGHT = 400
 
 const ExpressPaymentIframeShell = ({Provider = ExpressPaymentProvider}) => {
     const location = useLocation()
@@ -45,7 +45,7 @@ const ExpressPaymentIframeShell = ({Provider = ExpressPaymentProvider}) => {
         if (successSentRef.current || !availableDetailsRef.current) return
 
         const measuredHeight = Math.ceil(containerRef.current?.getBoundingClientRect().height || 0)
-        const height = Math.max(MIN_IFRAME_HEIGHT, Math.min(MAX_IFRAME_HEIGHT, measuredHeight))
+        const height = Math.max(MIN_IFRAME_HEIGHT, measuredHeight)
         notifyParent(EXPRESS_PAYMENT_EVENTS.AVAILABLE, {
             height,
             ...availableDetailsRef.current
