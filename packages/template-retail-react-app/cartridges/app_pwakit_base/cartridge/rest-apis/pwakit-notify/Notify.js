@@ -58,6 +58,30 @@ function isNotifyEnabled() {
 }
 
 /**
+ * Resolves the storefront host, builds the full magic-link URL, and extracts
+ * the inline access code from the path. Returns null (after rendering the
+ * host-not-configured error) when the storefront host is unavailable.
+ */
+function buildMagicLinkContext(magicLinkPath) {
+    var host = getStorefrontHost();
+    if (!host) {
+        renderHostNotConfigured();
+        return null;
+    }
+    var link = 'https://' + host + magicLinkPath;
+    var tokenMatch = magicLinkPath.match(/[?&]token=([^&]+)/);
+    var accessCode = null;
+    if (tokenMatch) {
+        try {
+            accessCode = decodeURIComponent(tokenMatch[1]);
+        } catch (e) {
+            accessCode = tokenMatch[1];
+        }
+    }
+    return {magicLink: link, accessCode: accessCode};
+}
+
+/**
  * SCAPI Custom API handler for PWA Kit Notify.
  *
  * Authentication and scope enforcement (ShopperToken + c_pwakit_notify) are
@@ -120,13 +144,11 @@ exports.notify = function () {
     var context;
     var magicLink; // set for magic-link types; returned in the success response
 
-    if (type === 'passwordless-magic-link') {
-        // Passwordless login requires a pre-existing registered account. Succeed
-        // silently for unrecognised addresses — this prevents email enumeration
-        // while avoiding delivery to non-existent accounts.
+    if (type === 'passwordless-login') {
+        // Skip send silently for unrecognised addresses — prevents email enumeration.
         var plCustomer = CustomerMgr.getCustomerByLogin(recipient);
         if (!plCustomer || !plCustomer.registered) {
-            log.debug('passwordless-magic-link: no registered customer found for recipient — skipping send');
+            log.debug('passwordless-login: no registered customer found for recipient — skipping send');
             RESTResponseMgr.createSuccess({success: true}).render();
             return;
         }
@@ -135,29 +157,32 @@ exports.notify = function () {
                 400,
                 'missing-magic-link-path',
                 'Bad Request',
-                'Missing data.magicLinkPath for passwordless-magic-link type'
+                'Missing data.magicLinkPath for passwordless-login type'
             ).render();
             return;
         }
-        var plHost = getStorefrontHost();
-        if (!plHost) {
-            renderHostNotConfigured();
-            return;
-        }
-        magicLink = 'https://' + plHost + body.data.magicLinkPath;
-        // Extract the token from the magicLinkPath for inline display in the email
-        var tokenMatch = body.data.magicLinkPath.match(/[?&]token=([^&]+)/);
-        var inlineAccessCode = null;
-        if (tokenMatch) {
-            try {
-                inlineAccessCode = decodeURIComponent(tokenMatch[1]);
-            } catch (e) {
-                inlineAccessCode = tokenMatch[1];
-            }
-        }
+        context = buildMagicLinkContext(body.data.magicLinkPath);
+        if (!context) return;
+        magicLink = context.magicLink;
         subject = Resource.msg('passwordlessLogin.subject', 'email', 'Your Magic Sign-In Link');
         templateName = 'email/passwordlessLogin';
-        context = { magicLink: magicLink, accessCode: inlineAccessCode };
+    } else if (type === 'passwordless-registration') {
+        // New-user registration flow — no B2C profile exists yet; SLAS creates it after
+        // the shopper exchanges the token. No account existence check here.
+        if (!body.data.magicLinkPath) {
+            RESTResponseMgr.createError(
+                400,
+                'missing-magic-link-path',
+                'Bad Request',
+                'Missing data.magicLinkPath for passwordless-registration type'
+            ).render();
+            return;
+        }
+        context = buildMagicLinkContext(body.data.magicLinkPath);
+        if (!context) return;
+        magicLink = context.magicLink;
+        subject = Resource.msg('passwordlessRegistration.subject', 'email', 'Complete Your Registration');
+        templateName = 'email/passwordlessRegistration';
     } else if (type === 'password-reset') {
         // Password reset requires a pre-existing registered account. Succeed
         // silently for unrecognised addresses — this prevents email enumeration
@@ -186,7 +211,7 @@ exports.notify = function () {
         subject = Resource.msg('passwordReset.subject', 'email', 'Reset Your Password');
         templateName = 'email/passwordReset';
         context = { magicLink: magicLink };
-    } else if (type === 'otp') {
+    } else if (type === 'password-registration') {
         // Used by the account registration / email verification flow. The `token`
         // field is a short 6-8 digit SLAS TOTP (not a JWT).
         //
@@ -198,7 +223,7 @@ exports.notify = function () {
                 400,
                 'missing-token',
                 'Bad Request',
-                'Missing data.token for otp type'
+                'Missing data.token for password-registration type'
             ).render();
             return;
         }
