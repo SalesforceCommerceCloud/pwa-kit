@@ -1,3 +1,4 @@
+## v3.22.0-nightly-20261028080319 (Oct 28, 2026)
 ## v3.22.0-dev (Oct 09, 2026)
 -   [Feature] Enable OpenTelemetry and distributed tracing when either `OTEL_TRACING_ENABLED=true` or MRT's `MRT_DISTRIBUTED_TRACING_ENABLED=true` is set.
 ## v3.21.0 (Oct 08, 2026)
