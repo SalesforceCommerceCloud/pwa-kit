@@ -30,8 +30,6 @@ import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
-// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
-import {getLocalCommerceClientCspSources} from './utils/commerce-client-security.js'
 import {ShopperOrders} from 'commerce-sdk-isomorphic'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {getSiteByReference} from './utils/site-utils.js'
@@ -171,10 +169,8 @@ const options = {
     // The contents of the config file for the current environment
     mobify: config,
 
-    // TODO (before merging to develop): This starter branch uses 3001 so it can
-    // run beside the other local worktree. Restore the template default unless
-    // the final product design requires a dedicated port.
-    port: 3001,
+    // The port that the local dev server listens on
+    port: 3000,
 
     // The protocol on which the development Express app listens.
     // Set DEV_SERVER_PROTOCOL to 'https' for HTTPS; defaults to 'http' when unset.
@@ -186,15 +182,12 @@ const options = {
     // self-signed cert for localhost; set DEV_SERVER_SSL_FILE_PATH when using https.
     sslFilePath: process.env.DEV_SERVER_SSL_FILE_PATH,
 
-    // TODO (before merging to develop): This is enabled for the private SLAS
-    // client used by the starter branch's local configuration. Reconcile it
-    // with the generated-app default as part of productization.
     // Option for whether to set up a special endpoint for handling
     // private SLAS clients
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: true,
+    useSLASPrivateClient: false,
 
     // To extend the SLAS private-client proxy allow-list, supply
     // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
@@ -558,12 +551,6 @@ export function handleCallback(req, res, next) {
 // For local dev, set localAllowCookies: true AND use HTTPS (pwa-kit-dev --https) so
 // the browser accepts the Secure cookie; plain-HTTP local runs cannot complete the flow.
 const cookieSecureFlag = ' Secure;'
-// TODO (before merging to develop): Temporary cross-repository development support.
-// It lets this starter app load a Commerce Client build from localhost and is not
-// required by the express-payment iframe. Remove it (and its helper/import) from
-// the product PR unless local Commerce Client development becomes supported tooling.
-const localCommerceClientCspSources = getLocalCommerceClientCspSources(config.app.commerceAgent)
-
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
     app.use(express.urlencoded({extended: true}))
@@ -585,9 +572,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Commerce Client messaging widget images
                         'cimulate.ai',
                         '*.cimulate.ai',
-                        // Images bundled with a locally served Commerce Client build.
-                        // Loopback sources are omitted from MRT/production CSP.
-                        ...localCommerceClientCspSources,
                         // Commerce Client image upload (cc_enableImageUpload): the widget
                         // renders images locally only — never from an external host. The
                         // pre-send preview uses a blob: URL (URL.createObjectURL) and the
@@ -602,8 +586,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.cimulate.ai',
                         // Commerce Client bundle served from the SFCC static CDN
                         '*.sfcc-store-internal.net',
-                        // Locally served Commerce Client bundle in development only.
-                        ...localCommerceClientCspSources,
                         // Origin of the merchant-hosted Commerce Client component-override
                         // script, added only when cc_overridesUrl holds a valid HTTPS URL.
                         // Serving that script from a different host than the configured one

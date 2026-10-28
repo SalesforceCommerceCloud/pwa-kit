@@ -120,12 +120,9 @@ const AppConfig = ({children, locals = {}}) => {
             proxy={proxy}
             headers={headers}
             defaultDnt={DEFAULT_DNT_STATE}
-            // TODO (before merging to develop): Enabled for the starter branch's
-            // local private SLAS client. Restore the template default or make this
-            // derive from generated-app configuration during productization.
             // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
-            enablePWAKitPrivateClient={true}
+            enablePWAKitPrivateClient={false}
             privateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
             publicClientProxyEndpoint={slasPublicClientProxyEndpoint}
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.

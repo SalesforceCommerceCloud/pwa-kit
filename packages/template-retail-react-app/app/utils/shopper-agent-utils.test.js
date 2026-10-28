@@ -605,28 +605,6 @@ describe('shopper-agent-utils', () => {
             ).toBe(true)
         })
 
-        test('allows localhost bundles only in development', () => {
-            expect(
-                validateCommerceClientDomain(
-                    'http://localhost:4173/messaging.umd.js',
-                    'development'
-                )
-            ).toBe(true)
-            expect(
-                validateCommerceClientDomain(
-                    'http://127.0.0.1:4173/messaging.umd.js',
-                    'development'
-                )
-            ).toBe(true)
-            expect(
-                validateCommerceClientDomain('http://localhost:4173/messaging.umd.js', 'production')
-            ).toBe(false)
-        })
-
-        test('requires HTTPS for non-loopback trusted domains', () => {
-            expect(validateCommerceClientDomain('http://cimulate.ai/messaging.umd.js')).toBe(false)
-        })
-
         test('returns false for an untrusted domain', () => {
             expect(validateCommerceClientDomain('https://evil.example.com/messaging.umd.js')).toBe(
                 false
@@ -676,32 +654,6 @@ describe('shopper-agent-utils', () => {
             })
 
             expect(result).toBe(true)
-        })
-
-        test('returns true for a localhost override in development', () => {
-            const result = validateCommerceClientAgentSettings(
-                {
-                    ...validConfig,
-                    cc_cdnVersion: undefined,
-                    commerceClientScriptSourceUrl: 'http://localhost:4173/messaging.umd.js'
-                },
-                'development'
-            )
-
-            expect(result).toBe(true)
-        })
-
-        test('rejects a localhost override outside development', () => {
-            const result = validateCommerceClientAgentSettings(
-                {
-                    ...validConfig,
-                    cc_cdnVersion: undefined,
-                    commerceClientScriptSourceUrl: 'http://localhost:4173/messaging.umd.js'
-                },
-                'production'
-            )
-
-            expect(result).toBe(false)
         })
 
         test('falls back to embeddedServiceName when cc_esDeveloperName is absent', () => {
@@ -777,7 +729,7 @@ describe('shopper-agent-utils', () => {
 
             expect(result).toBe(false)
             expect(consoleErrorSpy).toHaveBeenCalledWith(
-                'Commerce Client script URL must use HTTPS and be served from a trusted cimulate.ai or sfcc-store-internal.net domain. Localhost script URLs are allowed only when NODE_ENV=development.'
+                'Commerce Client script URL must be served from a trusted cimulate.ai or sfcc-store-internal.net domain.'
             )
         })
 
