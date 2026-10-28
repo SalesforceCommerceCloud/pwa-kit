@@ -30,7 +30,14 @@ export const DEFAULT_DOCS_URL =
     'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
 
 // MRT sets this response header to "true" in read-only (maintenance) mode.
+// It is stamped on every /api/ response while the window is active (reads, the
+// write rejection, and unrelated errors alike), so it advertises the *mode* and
+// is NOT by itself proof that a given request was rejected for maintenance.
 export const MRT_READ_ONLY_HEADER = 'X-MRT-Read-Only'
+// MRT rejects a write that is blocked by read-only mode with HTTP 503
+// (ServiceReadOnlyError). Pairing this with the header is what distinguishes a
+// genuine maintenance block from other errors that merely ride the same window.
+export const MRT_READ_ONLY_STATUS = 503
 export const MRT_MAINTENANCE_STATUS_URL =
     'https://status.salesforce.com/instances/MANAGEDRUNTIMEADMIN'
 
@@ -264,8 +271,11 @@ export class CloudAPIClient {
             return
         }
 
-        // A failing response with the read-only header means the write was rejected for maintenance.
-        if (isMrtReadOnlyResponse(res)) {
+        // A 503 carrying the read-only header means the write was rejected because MRT is in
+        // maintenance mode. The header rides on other errors (400/404/500) during the same
+        // window too, so we must require the 503 status as well — otherwise those unrelated
+        // failures get masked as maintenance and their real cause is hidden (W-24415510).
+        if (res.status === MRT_READ_ONLY_STATUS && isMrtReadOnlyResponse(res)) {
             throw new MrtMaintenanceError()
         }
 
