@@ -10,18 +10,13 @@ import PropTypes from 'prop-types'
 
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import SFPaymentsExpressButtons from '@salesforce/retail-react-app/app/components/sf-payments-express-buttons'
-import {EXPRESS_PAYMENT_MODES} from '@salesforce/retail-react-app/app/constants/express-payment'
 import {EXPRESS_PAY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 const SFPaymentsExpress = ({
     expressButtonLayout = 'vertical',
     maximumButtonCount = undefined,
     onPaymentMethodsRendered,
-    onExpressPaymentCompleted,
-    onExpressPaymentCancelled,
-    onExpressPaymentFailed,
-    paymentMethodSet,
-    mode = EXPRESS_PAYMENT_MODES.STOREFRONT
+    onExpressPaymentCompleted
 }) => {
     // keepPreviousData: true prevents components from unmounting during refetches triggered by
     // SFPaymentsExpressButtons mutations. While mutations typically update the cache immediately,
@@ -60,10 +55,6 @@ const SFPaymentsExpress = ({
                 maximumButtonCount={maximumButtonCount}
                 onPaymentMethodsRendered={onPaymentMethodsRendered}
                 onExpressPaymentCompleted={onExpressPaymentCompleted}
-                onExpressPaymentCancelled={onExpressPaymentCancelled}
-                onExpressPaymentFailed={onExpressPaymentFailed}
-                paymentMethodSet={paymentMethodSet}
-                mode={mode}
             />
         </div>
     )
@@ -73,14 +64,7 @@ SFPaymentsExpress.propTypes = {
     expressButtonLayout: PropTypes.string,
     maximumButtonCount: PropTypes.number,
     onPaymentMethodsRendered: PropTypes.func,
-    onExpressPaymentCompleted: PropTypes.func,
-    onExpressPaymentCancelled: PropTypes.func,
-    onExpressPaymentFailed: PropTypes.func,
-    paymentMethodSet: PropTypes.shape({
-        paymentMethods: PropTypes.array.isRequired,
-        paymentMethodSetAccounts: PropTypes.array.isRequired
-    }),
-    mode: PropTypes.oneOf(Object.values(EXPRESS_PAYMENT_MODES))
+    onExpressPaymentCompleted: PropTypes.func
 }
 
 export default SFPaymentsExpress

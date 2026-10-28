@@ -46,13 +46,13 @@ describe('express-payment messages', () => {
             postExpressPaymentEvent({
                 parentOrigin: 'https://store.example.com',
                 type: EXPRESS_PAYMENT_EVENTS.AVAILABLE,
-                payload: {height: 44, paymentMethods: ['CONTRACT_TEST']}
+                payload: {height: 44}
             })
         ).toBe(true)
         expect(postMessage).toHaveBeenCalledWith(
             {
                 type: 'express.payment.available',
-                payload: {height: 44, paymentMethods: ['CONTRACT_TEST']}
+                payload: {height: 44}
             },
             'https://store.example.com'
         )
@@ -61,9 +61,9 @@ describe('express-payment messages', () => {
     })
 
     test.each([
-        [EXPRESS_PAYMENT_EVENTS.AVAILABLE, {height: 44, paymentMethods: ['wallet-a']}],
+        [EXPRESS_PAYMENT_EVENTS.AVAILABLE, {height: 44}],
         [EXPRESS_PAYMENT_EVENTS.UNAVAILABLE, {}],
-        [EXPRESS_PAYMENT_EVENTS.SUCCESS, {orderId: 'ORDER-1', PAYMENT_METHOD: 'wallet-a'}],
+        [EXPRESS_PAYMENT_EVENTS.SUCCESS, {orderId: 'ORDER-1'}],
         [EXPRESS_PAYMENT_EVENTS.FAILURE, {error: 'Try again'}],
         [EXPRESS_PAYMENT_EVENTS.CANCEL, {cancel: 'Canceled'}]
     ])('accepts the %s payload shape', (type, payload) => {
@@ -71,12 +71,13 @@ describe('express-payment messages', () => {
     })
 
     test.each([
-        [EXPRESS_PAYMENT_EVENTS.AVAILABLE, {height: 0, paymentMethods: []}],
-        [EXPRESS_PAYMENT_EVENTS.AVAILABLE, {height: 44, paymentMethods: [42]}],
+        [EXPRESS_PAYMENT_EVENTS.AVAILABLE, {height: 0}],
+        [EXPRESS_PAYMENT_EVENTS.AVAILABLE, {height: 44, details: ['unsupported']}],
         [EXPRESS_PAYMENT_EVENTS.UNAVAILABLE, {reason: 'not allowed'}],
         [EXPRESS_PAYMENT_EVENTS.SUCCESS, {orderId: ''}],
         [EXPRESS_PAYMENT_EVENTS.SUCCESS, {orderId: 'ORDER-1', token: 'secret'}],
         [EXPRESS_PAYMENT_EVENTS.FAILURE, {error: 'x'.repeat(201)}],
+        [EXPRESS_PAYMENT_EVENTS.FAILURE, {error: 'Try again', details: 'unsupported'}],
         [EXPRESS_PAYMENT_EVENTS.CANCEL, {cancel: 'x'.repeat(201)}]
     ])('rejects an invalid %s payload', (type, payload) => {
         expect(isValidExpressPaymentPayload(type, payload)).toBe(false)

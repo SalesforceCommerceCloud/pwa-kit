@@ -27,59 +27,40 @@ describe('createExpressPaymentLifecycle', () => {
         })
     })
 
-    test('normalizes and de-duplicates payment methods when reporting availability', () => {
-        lifecycle.available({
-            paymentMethods: ['wallet-a', 'merchant.custom', 'wallet-a', '  wallet-b  ', 42]
-        })
+    test('records availability without provider-specific details', () => {
+        lifecycle.available()
 
-        expect(availableDetailsRef.current).toEqual({
-            paymentMethods: ['wallet-a', 'merchant.custom', 'wallet-b']
-        })
+        expect(availableDetailsRef.current).toEqual({})
         expect(notifyParentOfAvailability).toHaveBeenCalledTimes(1)
-    })
-
-    test('limits availability to twenty payment methods', () => {
-        const paymentMethods = Array.from({length: 25}, (_, index) => `method-${index}`)
-
-        lifecycle.available({paymentMethods})
-
-        expect(availableDetailsRef.current.paymentMethods).toEqual(paymentMethods.slice(0, 20))
     })
 
     test('translates neutral fields and ignores provider-specific success data', () => {
         lifecycle.success({
             orderId: ' ORDER-1 ',
-            paymentMethod: 'merchant.custom',
             providerOrderId: 'PROVIDER-1',
             approvalData: {token: 'must-not-cross-frame-boundary'}
         })
 
-        expect(notifyParent).toHaveBeenCalledWith('express.payment.success', {
-            orderId: 'ORDER-1',
-            PAYMENT_METHOD: 'merchant.custom'
-        })
+        expect(notifyParent).toHaveBeenCalledWith('express.payment.success', {orderId: 'ORDER-1'})
         expect(successSentRef.current).toBe(true)
     })
 
     test('translates retryable failure and cancellation messages', () => {
-        lifecycle.failure({shopperMessage: 'Declined', paymentMethod: 'wallet-a'})
-        lifecycle.cancel({shopperMessage: 'Canceled', paymentMethod: 'wallet-b'})
+        lifecycle.failure({shopperMessage: 'Declined'})
+        lifecycle.cancel({shopperMessage: 'Canceled'})
 
         expect(notifyParent).toHaveBeenNthCalledWith(1, 'express.payment.failure', {
-            error: 'Declined',
-            PAYMENT_METHOD: 'wallet-a'
+            error: 'Declined'
         })
         expect(notifyParent).toHaveBeenNthCalledWith(2, 'express.payment.cancel', {
-            cancel: 'Canceled',
-            PAYMENT_METHOD: 'wallet-b'
+            cancel: 'Canceled'
         })
         expect(successSentRef.current).toBe(false)
     })
 
     test('bounds provider-controlled strings before creating parent payloads', () => {
         lifecycle.failure({
-            shopperMessage: `  ${'x'.repeat(250)}  `,
-            paymentMethod: 'y'.repeat(101)
+            shopperMessage: `  ${'x'.repeat(250)}  `
         })
 
         expect(notifyParent).toHaveBeenCalledWith('express.payment.failure', {
@@ -109,7 +90,7 @@ describe('createExpressPaymentLifecycle', () => {
         lifecycle.success({orderId: 'ORDER-1'})
         jest.clearAllMocks()
 
-        lifecycle.available({paymentMethods: ['wallet-a']})
+        lifecycle.available()
         lifecycle.unavailable()
         lifecycle.failure({shopperMessage: 'late failure'})
         lifecycle.cancel()

@@ -622,9 +622,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'places.googleapis.com'
                     ],
                     'connect-src': [
-                        // Allow browser-side calls to storefront endpoints such as
-                        // /api/payment-metadata. This is required for client-only surfaces.
-                        "'self'",
                         // Connect to Einstein APIs
                         'api.cquotient.com',
                         // Connect to Commerce Client widget APIs

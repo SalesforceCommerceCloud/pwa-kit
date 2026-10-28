@@ -19,7 +19,7 @@ const MinimalProviderFixture = ({context, lifecycle}) => {
 
     const beginAttempt = () => {
         setAttempt((value) => value + 1)
-        lifecycle.available({paymentMethods: ['LOCAL_STATE_FIXTURE']})
+        lifecycle.available()
     }
 
     return (

@@ -16,8 +16,6 @@ export const EXPRESS_PAYMENT_EVENTS = Object.freeze({
 
 const EVENT_TYPES = new Set(Object.values(EXPRESS_PAYMENT_EVENTS))
 export const MAX_EXPRESS_PAYMENT_MESSAGE_LENGTH = 4096
-export const MAX_EXPRESS_PAYMENT_METHODS = 20
-export const MAX_EXPRESS_PAYMENT_METHOD_LENGTH = 100
 export const MAX_EXPRESS_PAYMENT_ORDER_ID_LENGTH = 128
 export const MAX_EXPRESS_PAYMENT_SHOPPER_MESSAGE_LENGTH = 200
 
@@ -31,11 +29,6 @@ const isOptionalBoundedString = (value, maxLength) =>
     value === undefined ||
     (typeof value === 'string' && value.length > 0 && value.length <= maxLength)
 
-const isPaymentMethod = (value) =>
-    typeof value === 'string' &&
-    value.length > 0 &&
-    value.length <= MAX_EXPRESS_PAYMENT_METHOD_LENGTH
-
 /**
  * Validates the released Shopper Agent message envelope. Provider-facing fields
  * are translated by lifecycle.js before reaching this boundary.
@@ -46,40 +39,28 @@ export const isValidExpressPaymentPayload = (type, payload) => {
     switch (type) {
         case EXPRESS_PAYMENT_EVENTS.AVAILABLE:
             return (
-                hasOnlyKeys(payload, ['height', 'paymentMethods']) &&
+                hasOnlyKeys(payload, ['height']) &&
                 Number.isSafeInteger(payload.height) &&
-                payload.height > 0 &&
-                Array.isArray(payload.paymentMethods) &&
-                payload.paymentMethods.length <= MAX_EXPRESS_PAYMENT_METHODS &&
-                payload.paymentMethods.every(isPaymentMethod)
+                payload.height > 0
             )
         case EXPRESS_PAYMENT_EVENTS.UNAVAILABLE:
             return Object.keys(payload).length === 0
         case EXPRESS_PAYMENT_EVENTS.SUCCESS:
             return (
-                hasOnlyKeys(payload, ['orderId', 'PAYMENT_METHOD']) &&
+                hasOnlyKeys(payload, ['orderId']) &&
                 typeof payload.orderId === 'string' &&
                 payload.orderId.length > 0 &&
-                payload.orderId.length <= MAX_EXPRESS_PAYMENT_ORDER_ID_LENGTH &&
-                isOptionalBoundedString(payload.PAYMENT_METHOD, MAX_EXPRESS_PAYMENT_METHOD_LENGTH)
+                payload.orderId.length <= MAX_EXPRESS_PAYMENT_ORDER_ID_LENGTH
             )
         case EXPRESS_PAYMENT_EVENTS.FAILURE:
             return (
-                hasOnlyKeys(payload, ['error', 'PAYMENT_METHOD']) &&
-                isOptionalBoundedString(
-                    payload.error,
-                    MAX_EXPRESS_PAYMENT_SHOPPER_MESSAGE_LENGTH
-                ) &&
-                isOptionalBoundedString(payload.PAYMENT_METHOD, MAX_EXPRESS_PAYMENT_METHOD_LENGTH)
+                hasOnlyKeys(payload, ['error']) &&
+                isOptionalBoundedString(payload.error, MAX_EXPRESS_PAYMENT_SHOPPER_MESSAGE_LENGTH)
             )
         case EXPRESS_PAYMENT_EVENTS.CANCEL:
             return (
-                hasOnlyKeys(payload, ['cancel', 'PAYMENT_METHOD']) &&
-                isOptionalBoundedString(
-                    payload.cancel,
-                    MAX_EXPRESS_PAYMENT_SHOPPER_MESSAGE_LENGTH
-                ) &&
-                isOptionalBoundedString(payload.PAYMENT_METHOD, MAX_EXPRESS_PAYMENT_METHOD_LENGTH)
+                hasOnlyKeys(payload, ['cancel']) &&
+                isOptionalBoundedString(payload.cancel, MAX_EXPRESS_PAYMENT_SHOPPER_MESSAGE_LENGTH)
             )
         default:
             return false

@@ -10,7 +10,6 @@ import React, {useEffect, useState} from 'react'
 import {Box, Button, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {expressPaymentProviderPropTypes} from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/contract'
 
-export const CONTRACT_TEST_PAYMENT_METHOD = 'CONTRACT_TEST'
 export const CONTRACT_TEST_ORDER_ID = 'CONTRACT-TEST-ORDER'
 
 /**
@@ -22,11 +21,11 @@ const ContractTestProvider = ({context, lifecycle}) => {
     const [successSubmitted, setSuccessSubmitted] = useState(false)
 
     useEffect(() => {
-        lifecycle.available({paymentMethods: [CONTRACT_TEST_PAYMENT_METHOD]})
+        lifecycle.available()
     }, [lifecycle])
 
     const reportAvailable = () => {
-        lifecycle.available({paymentMethods: [CONTRACT_TEST_PAYMENT_METHOD]})
+        lifecycle.available()
         setStatus('Available')
     }
 
@@ -36,26 +35,17 @@ const ContractTestProvider = ({context, lifecycle}) => {
     }
 
     const reportFailure = () => {
-        lifecycle.failure({
-            shopperMessage: 'Contract-test failure',
-            paymentMethod: CONTRACT_TEST_PAYMENT_METHOD
-        })
+        lifecycle.failure({shopperMessage: 'Contract-test failure'})
         setStatus('Failure reported; retry remains available')
     }
 
     const reportCancellation = () => {
-        lifecycle.cancel({
-            shopperMessage: 'Contract-test cancellation',
-            paymentMethod: CONTRACT_TEST_PAYMENT_METHOD
-        })
+        lifecycle.cancel({shopperMessage: 'Contract-test cancellation'})
         setStatus('Cancellation reported; retry remains available')
     }
 
     const reportSuccess = () => {
-        lifecycle.success({
-            orderId: CONTRACT_TEST_ORDER_ID,
-            paymentMethod: CONTRACT_TEST_PAYMENT_METHOD
-        })
+        lifecycle.success({orderId: CONTRACT_TEST_ORDER_ID})
         setSuccessSubmitted(true)
         setStatus('Simulated success submitted; fixture controls are now disabled')
     }

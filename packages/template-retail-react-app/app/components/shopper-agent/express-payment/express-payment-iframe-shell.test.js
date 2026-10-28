@@ -75,7 +75,7 @@ describe('ExpressPaymentIframeShell', () => {
             expect(mockPostExpressPaymentEvent).toHaveBeenCalledWith({
                 parentOrigin: 'https://store.example.com',
                 type: 'express.payment.available',
-                payload: {height: 44, paymentMethods: ['CONTRACT_TEST']}
+                payload: {height: 44}
             })
         )
     })
@@ -101,7 +101,7 @@ describe('ExpressPaymentIframeShell', () => {
             expect(mockPostExpressPaymentEvent).toHaveBeenCalledWith({
                 parentOrigin: 'https://store.example.com',
                 type: 'express.payment.available',
-                payload: {height: 173, paymentMethods: ['CONTRACT_TEST']}
+                payload: {height: 173}
             })
         )
 
@@ -112,7 +112,7 @@ describe('ExpressPaymentIframeShell', () => {
             expect(mockPostExpressPaymentEvent).toHaveBeenCalledWith({
                 parentOrigin: 'https://store.example.com',
                 type: 'express.payment.available',
-                payload: {height: 400, paymentMethods: ['CONTRACT_TEST']}
+                payload: {height: 400}
             })
         )
     })
@@ -193,7 +193,7 @@ describe('ExpressPaymentIframeShell', () => {
             expect(mockPostExpressPaymentEvent).toHaveBeenCalledWith({
                 parentOrigin: 'https://store.example.com',
                 type: 'express.payment.available',
-                payload: {height: 44, paymentMethods: ['LOCAL_STATE_FIXTURE']}
+                payload: {height: 44}
             })
         )
     })

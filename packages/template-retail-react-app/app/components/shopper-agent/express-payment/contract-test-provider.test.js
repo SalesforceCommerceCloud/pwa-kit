@@ -11,8 +11,7 @@ import userEvent from '@testing-library/user-event'
 
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import ContractTestProvider, {
-    CONTRACT_TEST_ORDER_ID,
-    CONTRACT_TEST_PAYMENT_METHOD
+    CONTRACT_TEST_ORDER_ID
 } from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/contract-test-provider'
 
 const context = {
@@ -41,11 +40,7 @@ describe('ContractTestProvider', () => {
         renderWithProviders(<ContractTestProvider context={context} lifecycle={lifecycle} />)
 
         expect(screen.getByText('Product: sku-1, quantity: 2')).toBeInTheDocument()
-        await waitFor(() =>
-            expect(lifecycle.available).toHaveBeenCalledWith({
-                paymentMethods: [CONTRACT_TEST_PAYMENT_METHOD]
-            })
-        )
+        await waitFor(() => expect(lifecycle.available).toHaveBeenCalledWith())
     })
 
     test('exercises retryable unavailable, failure, and cancellation states', async () => {
@@ -57,21 +52,15 @@ describe('ContractTestProvider', () => {
         expect(lifecycle.unavailable).toHaveBeenCalledTimes(1)
 
         await user.click(screen.getByRole('button', {name: 'Report failure'}))
-        expect(lifecycle.failure).toHaveBeenCalledWith({
-            shopperMessage: 'Contract-test failure',
-            paymentMethod: CONTRACT_TEST_PAYMENT_METHOD
-        })
+        expect(lifecycle.failure).toHaveBeenCalledWith({shopperMessage: 'Contract-test failure'})
 
         await user.click(screen.getByRole('button', {name: 'Report cancellation'}))
         expect(lifecycle.cancel).toHaveBeenCalledWith({
-            shopperMessage: 'Contract-test cancellation',
-            paymentMethod: CONTRACT_TEST_PAYMENT_METHOD
+            shopperMessage: 'Contract-test cancellation'
         })
 
         await user.click(screen.getByRole('button', {name: 'Report available'}))
-        expect(lifecycle.available).toHaveBeenLastCalledWith({
-            paymentMethods: [CONTRACT_TEST_PAYMENT_METHOD]
-        })
+        expect(lifecycle.available).toHaveBeenLastCalledWith()
         expect(screen.getByRole('status')).toHaveTextContent('Available')
     })
 
@@ -82,10 +71,7 @@ describe('ContractTestProvider', () => {
 
         await user.click(screen.getByRole('button', {name: 'Report simulated success'}))
 
-        expect(lifecycle.success).toHaveBeenCalledWith({
-            orderId: CONTRACT_TEST_ORDER_ID,
-            paymentMethod: CONTRACT_TEST_PAYMENT_METHOD
-        })
+        expect(lifecycle.success).toHaveBeenCalledWith({orderId: CONTRACT_TEST_ORDER_ID})
         expect(screen.getByRole('status')).toHaveTextContent(
             'Simulated success submitted; fixture controls are now disabled'
         )

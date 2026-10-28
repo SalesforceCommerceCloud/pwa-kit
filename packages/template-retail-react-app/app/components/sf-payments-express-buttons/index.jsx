@@ -55,18 +55,6 @@ import {PAYMENT_GATEWAYS} from '@salesforce/retail-react-app/app/constants'
 */
 import {useCommerceApi, useAccessToken} from '@salesforce/commerce-sdk-react'
 import {useQueryClient} from '@tanstack/react-query'
-import {EXPRESS_PAYMENT_MODES} from '@salesforce/retail-react-app/app/constants/express-payment'
-
-const getPaymentErrorMessage = (detail) => {
-    if (typeof detail === 'string' && detail.trim()) return detail
-    if (!detail || typeof detail !== 'object') return 'Payment processing failed'
-    if (typeof detail.message === 'string' && detail.message.trim()) return detail.message
-    if (typeof detail.error === 'string' && detail.error.trim()) return detail.error
-    if (typeof detail.error?.message === 'string' && detail.error.message.trim()) {
-        return detail.error.message
-    }
-    return 'Payment processing failed'
-}
 
 const SFPaymentsExpressButtons = ({
     usage,
@@ -77,11 +65,7 @@ const SFPaymentsExpressButtons = ({
     expressButtonLayout = 'vertical',
     maximumButtonCount = undefined,
     onPaymentMethodsRendered,
-    onExpressPaymentCompleted,
-    onExpressPaymentCancelled,
-    onExpressPaymentFailed,
-    paymentMethodSet: providedPaymentMethodSet,
-    mode = EXPRESS_PAYMENT_MODES.STOREFRONT
+    onExpressPaymentCompleted
 }) => {
     const intl = useIntl()
     const navigate = useNavigation()
@@ -89,7 +73,6 @@ const SFPaymentsExpressButtons = ({
     const queryClient = useQueryClient()
     const {countryCode: fallbackCountryCode} = useSFPaymentsCountry()
     const {sfp, metadata, startConfirming, endConfirming} = useSFPayments()
-    const isShopperAgentMode = mode === EXPRESS_PAYMENT_MODES.SHOPPER_AGENT
 
     // Fetch payment configuration for the buyer's country. Falls back to 'US' if country
     // detection hasn't resolved yet; React Query will re-fetch with the correct country once available.
@@ -198,8 +181,6 @@ const SFPaymentsExpressButtons = ({
     }
 
     const showErrorMessage = (messageKey = 'DEFAULT') => {
-        if (isShopperAgentMode) return
-
         // If messageKey is a valid key in ERROR_MESSAGES, use it
         if (ERROR_MESSAGES[messageKey]) {
             toast({
@@ -431,10 +412,6 @@ const SFPaymentsExpressButtons = ({
     }
 
     useEffect(() => {
-        let paymentElement
-        let lifecycleEventHandlers
-        let handlePaymentMethodsRendered
-
         // Remove containerElementRef.current from effect dependencies to prevent unnecessary re-renders
         // instead use it in the if statement to check if the container element is attached to the DOM
         if (metadata && sfp && paymentConfig && containerElementRef.current) {
@@ -559,7 +536,6 @@ const SFPaymentsExpressButtons = ({
                 endConfirming()
                 await cleanupExpressBasket()
                 showErrorMessage(ERROR_MESSAGE_KEYS.DEFAULT)
-                onExpressPaymentCancelled?.({paymentMethod: paymentMethodType})
             }
 
             const onShippingAddressChange = async (shippingAddress, callback) => {
@@ -1055,24 +1031,16 @@ const SFPaymentsExpressButtons = ({
 
                     // Close modal if callback provided (for mini cart)
                     if (onExpressPaymentCompleted) {
-                        onExpressPaymentCompleted({
-                            orderId: orderRef.current?.orderNo,
-                            paymentMethod: paymentMethodType
-                        })
+                        onExpressPaymentCompleted()
                     }
 
                     endConfirming()
 
-                    if (!isShopperAgentMode) {
-                        navigate(`/checkout/confirmation/${orderRef.current?.orderNo}`)
-                    }
+                    // Navigate to confirmation page with the order number
+                    navigate(`/checkout/confirmation/${orderRef.current?.orderNo}`)
                     isPaymentInProgress.current = false
                 } catch (error) {
                     endConfirming()
-                    onExpressPaymentFailed?.({
-                        error: getPaymentErrorMessage(error),
-                        paymentMethod: paymentMethodType
-                    })
                 }
             }
 
@@ -1082,9 +1050,8 @@ const SFPaymentsExpressButtons = ({
              * Only calls failOrder if the order status supports the transition.
              * @returns {Promise<void>}
              */
-            const paymentError = async (event) => {
+            const paymentError = async () => {
                 isPaymentInProgress.current = false
-                const error = getPaymentErrorMessage(event?.detail)
 
                 const basketRecovered = await attemptFailOrder(orderRef.current?.orderNo)
 
@@ -1098,16 +1065,15 @@ const SFPaymentsExpressButtons = ({
                         navigate('/cart')
                     }
                 }
-                onExpressPaymentFailed?.({error, paymentMethod: paymentMethodType})
             }
 
-            handlePaymentMethodsRendered = (details) => {
+            const handlePaymentMethodsRendered = (details) => {
                 if (onPaymentMethodsRendered && details.detail.rendered.length > 0) {
-                    onPaymentMethodsRendered(details.detail.rendered)
+                    onPaymentMethodsRendered()
                 }
             }
 
-            const paymentMethodSet = providedPaymentMethodSet || {
+            const paymentMethodSet = {
                 paymentMethods: paymentConfig.paymentMethods,
                 paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts || []
             }
@@ -1152,27 +1118,11 @@ const SFPaymentsExpressButtons = ({
 
             containerElementRef.current.innerHTML = '<div></div>'
 
-            paymentElement = containerElementRef.current.firstChild
+            const paymentElement = containerElementRef.current.firstChild
 
-            // SFP implementations have emitted lifecycle events from both the supplied
-            // payment element and `document`. Listen at both boundaries while ensuring a
-            // bubbling event is handled only once.
-            const handledLifecycleEvents = new WeakSet()
-            const handleLifecycleEvent = (handler) => (event) => {
-                if (handledLifecycleEvents.has(event)) return
-                handledLifecycleEvents.add(event)
-                handler(event)
-            }
-            lifecycleEventHandlers = {
-                'sfp:paymentcancel': handleLifecycleEvent(onCancel),
-                'sfp:paymentapprove': handleLifecycleEvent(onApproveEvent),
-                'sfp:paymenterror': handleLifecycleEvent(paymentError)
-            }
-
-            Object.entries(lifecycleEventHandlers).forEach(([eventName, handler]) => {
-                paymentElement.addEventListener(eventName, handler)
-                document.addEventListener(eventName, handler)
-            })
+            paymentElement.addEventListener('sfp:paymentcancel', onCancel)
+            paymentElement.addEventListener('sfp:paymentapprove', onApproveEvent)
+            paymentElement.addEventListener('sfp:paymenterror', paymentError)
             paymentElement.addEventListener(
                 'sfp:paymentmethodsrendered',
                 handlePaymentMethodsRendered
@@ -1190,22 +1140,12 @@ const SFPaymentsExpressButtons = ({
 
         // Cleanup on unmount
         return () => {
-            if (paymentElement && lifecycleEventHandlers) {
-                Object.entries(lifecycleEventHandlers).forEach(([eventName, handler]) => {
-                    paymentElement.removeEventListener(eventName, handler)
-                    document.removeEventListener(eventName, handler)
-                })
-                paymentElement.removeEventListener(
-                    'sfp:paymentmethodsrendered',
-                    handlePaymentMethodsRendered
-                )
-            }
             if (!isPaymentInProgress.current) {
                 expressComponent.current?.destroy()
                 expressComponent.current = null
             }
         }
-    }, [sfp, metadata, paymentConfig, providedPaymentMethodSet, cardCaptureAutomatic])
+    }, [sfp, metadata, paymentConfig, cardCaptureAutomatic])
 
     return <Box ref={containerElementRef} data-testid={'sf-payments-express'} />
 }
@@ -1219,14 +1159,7 @@ SFPaymentsExpressButtons.propTypes = {
     expressButtonLayout: PropTypes.oneOf(['horizontal', 'vertical']),
     maximumButtonCount: PropTypes.number,
     onPaymentMethodsRendered: PropTypes.func,
-    onExpressPaymentCompleted: PropTypes.func,
-    onExpressPaymentCancelled: PropTypes.func,
-    onExpressPaymentFailed: PropTypes.func,
-    paymentMethodSet: PropTypes.shape({
-        paymentMethods: PropTypes.array.isRequired,
-        paymentMethodSetAccounts: PropTypes.array.isRequired
-    }),
-    mode: PropTypes.oneOf(Object.values(EXPRESS_PAYMENT_MODES))
+    onExpressPaymentCompleted: PropTypes.func
 }
 
 export default SFPaymentsExpressButtons

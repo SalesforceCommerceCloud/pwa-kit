@@ -9,7 +9,6 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import SFPaymentsExpressButtons from '@salesforce/retail-react-app/app/components/sf-payments-express-buttons'
-import {EXPRESS_PAYMENT_MODES} from '@salesforce/retail-react-app/app/constants/express-payment'
 import {
     EXPRESS_PAY_NOW,
     EXPRESS_BUY_NOW
@@ -235,9 +234,8 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => {
             if (mockValidateTestCaptureConfig) {
                 return {
                     sfp: {
-                        express: (_metadata, paymentMethodSet, config) => {
+                        express: (_metadata, _paymentMethodSet, config) => {
                             mockValidateTestCaptureConfig.config = config
-                            mockValidateTestCaptureConfig.paymentMethodSet = paymentMethodSet
                             return {destroy: jest.fn()}
                         }
                     },
@@ -358,13 +356,9 @@ function getPaymentElement() {
     return box.firstChild
 }
 
-function dispatchPaymentEvent(eventName, detail) {
+function dispatchPaymentEvent(eventName) {
     const el = getPaymentElement()
-    if (el) el.dispatchEvent(new CustomEvent(eventName, {detail}))
-}
-
-function dispatchDocumentPaymentEvent(eventName, detail) {
-    document.dispatchEvent(new CustomEvent(eventName, {detail}))
+    if (el) el.dispatchEvent(new CustomEvent(eventName))
 }
 
 // --- Shared mock data factories ---
@@ -460,18 +454,12 @@ describe('SFPaymentsExpressButtons', () => {
         expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
     })
 
-    test('reports the payment methods rendered by SFP', async () => {
+    test('renders with onPaymentMethodsRendered callback', () => {
         const mockCallback = jest.fn()
-        mockValidateTestCaptureConfig = {}
-
-        await renderAndGetConfig({onPaymentMethodsRendered: mockCallback})
-
-        dispatchPaymentEvent('sfp:paymentmethodsrendered', {
-            rendered: ['applepay', 'googlepay']
-        })
-
-        expect(mockCallback).toHaveBeenCalledWith(['applepay', 'googlepay'])
-        mockValidateTestCaptureConfig = null
+        renderWithProviders(
+            <SFPaymentsExpressButtons {...defaultProps} onPaymentMethodsRendered={mockCallback} />
+        )
+        expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
     })
 
     test('renders with custom prepareBasket function', () => {
@@ -479,19 +467,6 @@ describe('SFPaymentsExpressButtons', () => {
             <SFPaymentsExpressButtons {...defaultProps} prepareBasket={jest.fn()} />
         )
         expect(screen.getByTestId('sf-payments-express')).toBeInTheDocument()
-    })
-
-    test('uses an optional payment method set supplied by the caller', async () => {
-        mockValidateTestCaptureConfig = {}
-        const filteredMethodSet = {
-            paymentMethods: [{paymentMethodType: 'applepay', accountId: 'stripe'}],
-            paymentMethodSetAccounts: [{accountId: 'stripe', vendor: 'Stripe'}]
-        }
-
-        await renderAndGetConfig({paymentMethodSet: filteredMethodSet})
-
-        expect(mockValidateTestCaptureConfig.paymentMethodSet).toEqual(filteredMethodSet)
-        mockValidateTestCaptureConfig = null
     })
 
     test('renders with onExpressPaymentCompleted callback', () => {
@@ -2083,7 +2058,7 @@ describe('cleanupExpressBasket', () => {
         await config.actions.onClick('card')
         await flush()
 
-        dispatchDocumentPaymentEvent('sfp:paymentcancel')
+        dispatchPaymentCancel()
         await waitFor(() => {
             expect(
                 mockCleanupExpressBasketMocks.removePaymentInstrumentFromBasket
@@ -2205,16 +2180,14 @@ describe('onCancel', () => {
     })
 
     test('calls endConfirming, cleanupExpressBasket, and showErrorMessage when user cancels', async () => {
-        const onExpressPaymentCancelled = jest.fn()
         const {config} = await renderAndGetConfig({
-            prepareBasket: jest.fn().mockResolvedValue(basketWithSfInstrument),
-            onExpressPaymentCancelled
+            prepareBasket: jest.fn().mockResolvedValue(basketWithSfInstrument)
         })
 
         await config.actions.onClick('card')
         await flush()
 
-        dispatchDocumentPaymentEvent('sfp:paymentcancel')
+        dispatchPaymentCancel()
 
         await waitFor(() => {
             expect(mockOnCancelMocks.endConfirming).toHaveBeenCalled()
@@ -2235,9 +2208,6 @@ describe('onCancel', () => {
                 title: expect.any(String)
             })
         )
-        expect(onExpressPaymentCancelled).toHaveBeenCalledWith({
-            paymentMethod: expect.any(String)
-        })
     })
 
     test('shows error toast with DEFAULT message when user cancels', async () => {
@@ -2257,23 +2227,6 @@ describe('onCancel', () => {
         expect(toastCall.status).toBe('error')
         expect(toastCall.title).toBeDefined()
         expect(typeof toastCall.title).toBe('string')
-    })
-
-    test('does not show an SFP toast in Shopper Agent mode', async () => {
-        const onExpressPaymentCancelled = jest.fn()
-        const {config} = await renderAndGetConfig({
-            prepareBasket: jest.fn().mockResolvedValue(basketWithoutSfInstrument),
-            onExpressPaymentCancelled,
-            mode: EXPRESS_PAYMENT_MODES.SHOPPER_AGENT
-        })
-
-        await config.actions.onClick('card')
-        await flush()
-
-        dispatchDocumentPaymentEvent('sfp:paymentcancel')
-
-        await waitFor(() => expect(onExpressPaymentCancelled).toHaveBeenCalled())
-        expect(mockOnCancelMocks.toast).not.toHaveBeenCalled()
     })
 })
 
@@ -2318,10 +2271,7 @@ describe('onApproveEvent', () => {
                 body: {basketId}
             })
         })
-        expect(onExpressPaymentCompleted).toHaveBeenCalledWith({
-            orderId: orderNo,
-            paymentMethod: expect.any(String)
-        })
+        expect(onExpressPaymentCompleted).toHaveBeenCalled()
         expect(mockOnCancelMocks.endConfirming).toHaveBeenCalled()
         expect(mockNavigate).toHaveBeenCalledWith(`/checkout/confirmation/${orderNo}`)
 
@@ -2331,7 +2281,7 @@ describe('onApproveEvent', () => {
         mockAttemptFailOrderMocks = null
     })
 
-    test('can report completion without navigating inside an embedded payment surface', async () => {
+    test('calls onExpressPaymentCompleted, endConfirming, and navigate with orderRef when non-PayPal approve event fires after createIntent', async () => {
         mockValidateTestCaptureConfig = {}
         mockOnCancelMocks = {endConfirming: jest.fn(), toast: jest.fn()}
         mockAttemptFailOrderMocks = createAttemptFailOrderMocks({
@@ -2342,8 +2292,7 @@ describe('onApproveEvent', () => {
         const onExpressPaymentCompleted = jest.fn()
         const {config} = await renderAndGetConfig({
             prepareBasket: jest.fn().mockResolvedValue(mockBasket),
-            onExpressPaymentCompleted,
-            mode: EXPRESS_PAYMENT_MODES.SHOPPER_AGENT
+            onExpressPaymentCompleted
         })
 
         await config.actions.onClick('card')
@@ -2353,12 +2302,10 @@ describe('onApproveEvent', () => {
 
         dispatchPaymentApprove()
 
-        await waitFor(() => expect(onExpressPaymentCompleted).toHaveBeenCalled())
-        expect(onExpressPaymentCompleted).toHaveBeenCalledWith({
-            orderId: orderNo,
-            paymentMethod: expect.any(String)
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith(`/checkout/confirmation/${orderNo}`)
         })
-        expect(mockNavigate).not.toHaveBeenCalled()
+        expect(onExpressPaymentCompleted).toHaveBeenCalled()
         expect(mockOnCancelMocks.endConfirming).toHaveBeenCalled()
         expect(mockAttemptFailOrderMocks.createOrder).toHaveBeenCalledTimes(1)
 
@@ -2420,10 +2367,8 @@ describe('paymentError', () => {
             orderFromUpdate: mockOrderFromUpdatePayment
         })
 
-        const onExpressPaymentFailed = jest.fn()
         const {config} = await renderAndGetConfig({
-            prepareBasket: jest.fn().mockResolvedValue(mockBasket),
-            onExpressPaymentFailed
+            prepareBasket: jest.fn().mockResolvedValue(mockBasket)
         })
 
         await config.actions.onClick('card')
@@ -2431,9 +2376,7 @@ describe('paymentError', () => {
         await config.actions.createIntent()
         await flush()
 
-        dispatchDocumentPaymentEvent('sfp:paymenterror', {
-            error: {message: 'Card declined'}
-        })
+        dispatchPaymentError()
 
         await waitFor(() => {
             expect(mockOnCancelMocks.endConfirming).toHaveBeenCalled()
@@ -2446,10 +2389,6 @@ describe('paymentError', () => {
             body: {reasonCode: 'payment_confirm_failure'}
         })
         expect(mockNavigate).not.toHaveBeenCalled()
-        expect(onExpressPaymentFailed).toHaveBeenCalledWith({
-            error: 'Card declined',
-            paymentMethod: expect.any(String)
-        })
 
         mockValidateTestCaptureConfig = null
         mockOnCancelMocks = null

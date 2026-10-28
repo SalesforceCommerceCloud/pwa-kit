@@ -7,8 +7,6 @@
 
 import {
     EXPRESS_PAYMENT_EVENTS,
-    MAX_EXPRESS_PAYMENT_METHOD_LENGTH,
-    MAX_EXPRESS_PAYMENT_METHODS,
     MAX_EXPRESS_PAYMENT_ORDER_ID_LENGTH,
     MAX_EXPRESS_PAYMENT_SHOPPER_MESSAGE_LENGTH
 } from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/messages'
@@ -19,27 +17,10 @@ const normalizeOptionalString = (value, maxLength) => {
     return normalized && normalized.length <= maxLength ? normalized : null
 }
 
-const optionalPaymentMethod = (paymentMethod) => {
-    const normalized = normalizeOptionalString(paymentMethod, MAX_EXPRESS_PAYMENT_METHOD_LENGTH)
-    return normalized ? {PAYMENT_METHOD: normalized} : {}
-}
-
 const optionalParentMessage = (field, shopperMessage) => {
     if (typeof shopperMessage !== 'string') return {}
     const normalized = shopperMessage.trim().slice(0, MAX_EXPRESS_PAYMENT_SHOPPER_MESSAGE_LENGTH)
     return normalized ? {[field]: normalized} : {}
-}
-
-const normalizePaymentMethods = (paymentMethods) => {
-    if (!Array.isArray(paymentMethods)) return []
-
-    return [
-        ...new Set(
-            paymentMethods
-                .map((value) => normalizeOptionalString(value, MAX_EXPRESS_PAYMENT_METHOD_LENGTH))
-                .filter(Boolean)
-        )
-    ].slice(0, MAX_EXPRESS_PAYMENT_METHODS)
 }
 
 /**
@@ -52,11 +33,9 @@ export const createExpressPaymentLifecycle = ({
     notifyParent,
     notifyParentOfAvailability
 }) => ({
-    available: (details = {}) => {
+    available: () => {
         if (successSentRef.current) return
-        availableDetailsRef.current = {
-            paymentMethods: normalizePaymentMethods(details.paymentMethods)
-        }
+        availableDetailsRef.current = {}
         notifyParentOfAvailability()
     },
     unavailable: () => {
@@ -64,31 +43,26 @@ export const createExpressPaymentLifecycle = ({
         availableDetailsRef.current = null
         notifyParent(EXPRESS_PAYMENT_EVENTS.UNAVAILABLE)
     },
-    success: ({orderId, paymentMethod} = {}) => {
+    success: ({orderId} = {}) => {
         const normalizedOrderId = normalizeOptionalString(
             orderId,
             MAX_EXPRESS_PAYMENT_ORDER_ID_LENGTH
         )
         if (successSentRef.current || !normalizedOrderId) return
 
-        const sent = notifyParent(EXPRESS_PAYMENT_EVENTS.SUCCESS, {
-            orderId: normalizedOrderId,
-            ...optionalPaymentMethod(paymentMethod)
-        })
+        const sent = notifyParent(EXPRESS_PAYMENT_EVENTS.SUCCESS, {orderId: normalizedOrderId})
         if (sent) successSentRef.current = true
     },
-    failure: ({shopperMessage, paymentMethod} = {}) => {
+    failure: ({shopperMessage} = {}) => {
         if (successSentRef.current) return
         notifyParent(EXPRESS_PAYMENT_EVENTS.FAILURE, {
-            ...optionalParentMessage('error', shopperMessage),
-            ...optionalPaymentMethod(paymentMethod)
+            ...optionalParentMessage('error', shopperMessage)
         })
     },
-    cancel: ({shopperMessage, paymentMethod} = {}) => {
+    cancel: ({shopperMessage} = {}) => {
         if (successSentRef.current) return
         notifyParent(EXPRESS_PAYMENT_EVENTS.CANCEL, {
-            ...optionalParentMessage('cancel', shopperMessage),
-            ...optionalPaymentMethod(paymentMethod)
+            ...optionalParentMessage('cancel', shopperMessage)
         })
     }
 })
