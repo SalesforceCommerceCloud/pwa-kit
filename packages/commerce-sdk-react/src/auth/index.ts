@@ -1637,39 +1637,23 @@ class Auth {
 
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
-     * Requires `login_id` and `channel_id`; forwards them to the isomorphic helper once
-     * its typings include these fields.
+     * Requires `login_id` and `channel_id`; forwards them to the helper as camelCase
+     * `loginId` / `channelId` (commerce-sdk-isomorphic@6.0.0 maps these to the wire body).
      */
     async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
         const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
         const dntPref = this.getDnt({includeDefaults: true})
-        const usid = this.get('usid')
-        // login_id / channel_id / register_customer / usid are forwarded to the isomorphic
-        // helper. Cast until commerce-sdk-isomorphic helper typings include these fields.
-        const helperParameters = {
-            pwdlessLoginToken,
-            dnt: dntPref !== undefined ? String(dntPref) : undefined,
-            login_id: parameters.login_id,
-            channel_id: parameters.channel_id,
-            ...(usid && {usid}),
-            ...(parameters.register_customer !== undefined && {
-                register_customer:
-                    typeof parameters.register_customer === 'boolean'
-                        ? String(parameters.register_customer)
-                        : parameters.register_customer
-            })
-        } as Parameters<typeof helpers.getPasswordLessAccessToken>[0]['parameters'] & {
-            login_id: string
-            channel_id: string
-            usid?: string
-            register_customer?: string
-        }
         const token = await helpers.getPasswordLessAccessToken({
             slasClient: this.client,
             credentials: {
                 clientSecret: this.clientSecret
             },
-            parameters: helperParameters,
+            parameters: {
+                pwdlessLoginToken,
+                loginId: parameters.login_id,
+                channelId: parameters.channel_id,
+                dnt: dntPref !== undefined ? String(dntPref) : undefined
+            },
             enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
         })
         const isGuest = false

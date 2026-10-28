@@ -49,9 +49,6 @@ const TOO_MANY_REQUESTS_ERROR = /too many .* requests/i
 const MISSING_OR_MISMATCHED_IDENTIFIER_ERROR =
     /missing.*identifier|mismatched.*identifier|login_id.*(match|mismatch|required)|identifier.*(missing|mismatch)/i
 
-// HTTP 429 rate-limit responses (may include Retry-After)
-const RATE_LIMIT_STATUS_ERROR = /\b429\b/
-
 /**
  * Returns the absolute URL for the passwordless login callback.
  * If the callback URI is already absolute, it is returned as-is; otherwise it is
@@ -71,6 +68,25 @@ export const getPasswordlessCallbackUrl = (callbackURI) => {
 }
 
 /**
+ * Safely read an error message from a ResponseError-like object's JSON body.
+ * Guards against missing responses and empty/non-JSON bodies.
+ *
+ * @param {Error & {response?: Response}} error
+ * @returns {Promise<string|undefined>}
+ */
+export const readErrorResponseMessage = async (error) => {
+    if (typeof error?.response?.json !== 'function') {
+        return error?.message
+    }
+    try {
+        const errorData = await error.response.json()
+        return errorData?.message ?? error?.message
+    } catch {
+        return error?.message
+    }
+}
+
+/**
  * Maps error message from authorizePasswordless mutation to the appropriate user-friendly error message descriptor
  * for passwordless login feature errors.
  *
@@ -81,10 +97,7 @@ export const getAuthorizePasswordlessErrorMessage = (errorMessage) => {
     if (PASSWORDLESS_FEATURE_UNAVAILABLE_ERRORS.some((msg) => msg.test(errorMessage))) {
         return FEATURE_UNAVAILABLE_ERROR_MESSAGE
     }
-    if (
-        TOO_MANY_REQUESTS_ERROR.test(errorMessage) ||
-        RATE_LIMIT_STATUS_ERROR.test(String(errorMessage))
-    ) {
+    if (TOO_MANY_REQUESTS_ERROR.test(errorMessage)) {
         return TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE
@@ -121,10 +134,7 @@ export const getLoginPasswordlessErrorMessage = (errorMessage) => {
     ) {
         return INVALID_TOKEN_ERROR_MESSAGE
     }
-    if (
-        TOO_MANY_REQUESTS_ERROR.test(errorMessage) ||
-        RATE_LIMIT_STATUS_ERROR.test(String(errorMessage))
-    ) {
+    if (TOO_MANY_REQUESTS_ERROR.test(errorMessage)) {
         return TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE
@@ -133,7 +143,7 @@ export const getLoginPasswordlessErrorMessage = (errorMessage) => {
 /**
  * Maps error message from resetPassword (password/action) mutation to the appropriate
  * user-friendly error message descriptor. Rate-limit responses are shaped like invalid
- * token (401) so the existing reset-password UX is reused.
+ * token so the existing reset-password UX is reused.
  *
  * @param {string} errorMessage - The error message from the API
  * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
@@ -142,7 +152,6 @@ export const getResetPasswordActionErrorMessage = (errorMessage) => {
     if (
         INVALID_TOKEN_ERROR.test(errorMessage) ||
         TOO_MANY_REQUESTS_ERROR.test(errorMessage) ||
-        RATE_LIMIT_STATUS_ERROR.test(String(errorMessage)) ||
         MISSING_OR_MISMATCHED_IDENTIFIER_ERROR.test(String(errorMessage))
     ) {
         return INVALID_TOKEN_ERROR_MESSAGE

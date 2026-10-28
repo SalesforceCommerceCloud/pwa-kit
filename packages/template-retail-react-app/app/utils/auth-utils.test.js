@@ -15,6 +15,7 @@ import {
     getPasswordResetErrorMessage,
     getLoginPasswordlessErrorMessage,
     getResetPasswordActionErrorMessage,
+    readErrorResponseMessage,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE,
     TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
@@ -37,6 +38,17 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths', () => {
         getEnvBasePath: jest.fn(() => '/test')
     }
 })
+
+const mockResponseError = ({status, body, jsonThrows = false}) => {
+    const error = new Error('request failed')
+    error.response = {
+        status,
+        json: jsonThrows
+            ? jest.fn().mockRejectedValue(new SyntaxError('Unexpected end of JSON input'))
+            : jest.fn().mockResolvedValue(body)
+    }
+    return error
+}
 
 describe('getPasswordlessCallbackUrl', function () {
     test.each([undefined, null, ''])('return undefined when callbackURI is %s', (callbackURI) => {
@@ -72,7 +84,6 @@ describe('getAuthorizePasswordlessErrorMessage', () => {
             'Too many login requests were made. Please try again later.',
             TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
         ],
-        ['429 Too Many Requests', TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE],
         ['unexpected error message', API_ERROR_MESSAGE],
         [null, API_ERROR_MESSAGE]
     ])(
@@ -108,14 +119,16 @@ describe('getPasswordResetErrorMessage', () => {
 describe('getLoginPasswordlessErrorMessage', () => {
     test.each([
         ['invalid token', INVALID_TOKEN_ERROR_MESSAGE],
-        ['login_id does not match the passwordless login request', INVALID_TOKEN_ERROR_MESSAGE],
+        [
+            'login_id does not match the passwordless login request',
+            INVALID_TOKEN_ERROR_MESSAGE
+        ],
         ['Missing identifier for passwordless token request', INVALID_TOKEN_ERROR_MESSAGE],
         ['mismatched identifier', INVALID_TOKEN_ERROR_MESSAGE],
         [
             'Too many login requests were made. Please try again later.',
             TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
         ],
-        ['429 Too Many Requests', TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE],
         ['unexpected error message', API_ERROR_MESSAGE],
         [null, API_ERROR_MESSAGE]
     ])(
@@ -133,14 +146,34 @@ describe('getResetPasswordActionErrorMessage', () => {
             'Too many password reset requests were made. Please try again later.',
             INVALID_TOKEN_ERROR_MESSAGE
         ],
-        ['429 Too Many Requests', INVALID_TOKEN_ERROR_MESSAGE],
         ['login_id does not match', INVALID_TOKEN_ERROR_MESSAGE],
         ['unexpected error message', API_ERROR_MESSAGE],
         [null, API_ERROR_MESSAGE]
     ])(
-        'maps password action error "%s" to the correct message descriptor',
+        'maps reset password action error "%s" to the correct message descriptor',
         (errorMessage, expectedMessage) => {
             expect(getResetPasswordActionErrorMessage(errorMessage)).toBe(expectedMessage)
         }
     )
+})
+
+describe('readErrorResponseMessage', () => {
+    test('reads message from JSON body', async () => {
+        const error = mockResponseError({
+            status: 400,
+            body: {message: 'invalid token'}
+        })
+        await expect(readErrorResponseMessage(error)).resolves.toBe('invalid token')
+    })
+
+    test('falls back to error.message when JSON parse fails', async () => {
+        const error = mockResponseError({status: 500, body: null, jsonThrows: true})
+        error.message = 'request failed'
+        await expect(readErrorResponseMessage(error)).resolves.toBe('request failed')
+    })
+
+    test('falls back to error.message when response.json is missing', async () => {
+        const error = new Error('network error')
+        await expect(readErrorResponseMessage(error)).resolves.toBe('network error')
+    })
 })

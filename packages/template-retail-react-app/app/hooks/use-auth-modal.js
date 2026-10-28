@@ -35,8 +35,10 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {
     getAuthorizePasswordlessErrorMessage,
+    getLoginPasswordlessErrorMessage,
     getPasswordResetErrorMessage,
-    getLoginPasswordlessErrorMessage
+    readErrorResponseMessage,
+    TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
@@ -227,8 +229,14 @@ export const AuthModal = ({
             })
             return {success: true}
         } catch (e) {
-            const errorData = await e.response?.json()
-            const message = formatMessage(getLoginPasswordlessErrorMessage(errorData.message))
+            if (e.response?.status === 429) {
+                return {
+                    success: false,
+                    error: formatMessage(TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE)
+                }
+            }
+            const errorMessage = await readErrorResponseMessage(e)
+            const message = formatMessage(getLoginPasswordlessErrorMessage(errorMessage))
             return {success: false, error: message}
         }
     }
