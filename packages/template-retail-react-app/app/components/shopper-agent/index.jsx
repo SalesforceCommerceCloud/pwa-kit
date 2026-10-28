@@ -664,6 +664,7 @@ const toOptionalWidgetBoolean = (value) => {
  */
 const CommerceClientAgentWindow = ({
     commerceAgentConfiguration,
+    domainUrl,
     lastAuthLinkKeyRef,
     lastCommerceClientJWTRef,
     authLinkGenerationRef,
@@ -732,14 +733,18 @@ const CommerceClientAgentWindow = ({
     getTokenWhenReadyRef.current = getTokenWhenReady
 
     const {organizationId, siteId: configSiteId} = useConfig()
+    const {locale} = useMultiSite()
+    const sfLanguage = normalizeLocaleToSalesforce(locale.id)
 
     // Fetch my_domain from the Shopper Configurations API. Auth-linking calls
     // Core (via the Token Bridge), which is only reachable once my_domain has
     // resolved, so we gate performAuthLink on it exactly like the MIAW provider.
     const {data: configurationsData} = useConfigurations({})
-    const myDomain = configurationsData?.configurations?.find(
-        (config) => config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
-    )?.value
+    const myDomain =
+        configurationsData?.configurations?.find(
+            (config) =>
+                config.configurationType === 'globalConfiguration' && config.id === 'my_domain'
+        )?.value || commerceAgentConfiguration.cc_myDomainOverride
 
     const configRef = useRef({organizationId, configSiteId, myDomain})
     configRef.current = {organizationId, configSiteId, myDomain}
@@ -758,6 +763,17 @@ const CommerceClientAgentWindow = ({
     // window listeners always see current values without re-subscribing.
     const identityRef = useRef({usid, customerType})
     identityRef.current = {usid, customerType}
+    const prechatRef = useRef({})
+    prechatRef.current = {
+        SiteId: commerceAgentConfiguration.siteId,
+        Locale: locale.id,
+        OrganizationId: commerceAgentConfiguration.commerceOrgId,
+        UsId: usid,
+        IsCartMgmtSupported: 'true',
+        Currency: locale.preferredCurrency,
+        Language: sfLanguage,
+        DomainUrl: domainUrl
+    }
 
     const commerceClientStorageScope = `${salesforceOrgId}_${
         cc_esDeveloperName || embeddedServiceName
@@ -997,25 +1013,53 @@ const CommerceClientAgentWindow = ({
     // latest performAuthLink closure (which reads current config/identity).
     const performAuthLinkRef = useRef(performAuthLink)
     performAuthLinkRef.current = performAuthLink
+    const handledWidgetReadyEventsRef = useRef(new WeakSet())
 
     /**
      * Trigger 1 — new Commerce Client conversation.
      * `onCimulateWidgetReady` is a cancelable handshake the widget dispatches
      * ONLY when it creates a NEW conversation (not on sessionStorage resume).
-     * We use it purely as the "new conversation identity" signal and run the
-     * link asynchronously — we do NOT call preventDefault()/done() here, so the
-     * widget proceeds immediately; the JWT poll in performAuthLink waits for the
-     * new conversation's token to land.
+     * Before the conversation is created, provide the storefront session context
+     * through the widget's cancelable pre-chat handshake. Then release the widget
+     * and asynchronously link the new conversation to the current SLAS shopper.
      */
     useEffect(() => {
         if (!isCommerceClientReady) {
             return
         }
-        const handleWidgetReady = () => {
+        const handleWidgetReady = (event) => {
+            if (handledWidgetReadyEventsRef.current.has(event)) return
+            handledWidgetReadyEventsRef.current.add(event)
+
             // Clear-chat can dispatch this event before storage rotates. Wait for
             // the new token rather than authenticating the previous conversation.
             const excludedJWT =
                 lastAttemptedCommerceClientJWTRef.current || lastCommerceClientJWTRef.current
+
+            const setHiddenPrechatFields = event?.detail?.setHiddenPrechatFields
+            const done = event?.detail?.done
+            if (
+                event?.cancelable &&
+                typeof setHiddenPrechatFields === 'function' &&
+                typeof done === 'function'
+            ) {
+                event.preventDefault()
+                try {
+                    setHiddenPrechatFields(prechatRef.current)
+                } catch (error) {
+                    console.error('[Commerce Client] Failed to set prechat fields', error)
+                } finally {
+                    try {
+                        done()
+                    } catch (error) {
+                        console.error(
+                            '[Commerce Client] Failed to release prechat handshake',
+                            error
+                        )
+                    }
+                }
+            }
+
             performAuthLinkRef.current({
                 reason: 'widget-ready',
                 excludedJWT: excludedJWT || null
@@ -1216,6 +1260,7 @@ CommerceClientAgentWindow.propTypes = {
      * @required
      */
     commerceAgentConfiguration: PropTypes.object.isRequired,
+    domainUrl: PropTypes.string.isRequired,
     lastAuthLinkKeyRef: PropTypes.shape({current: PropTypes.string}).isRequired,
     lastCommerceClientJWTRef: PropTypes.shape({current: PropTypes.string}).isRequired,
     authLinkGenerationRef: PropTypes.shape({current: PropTypes.number}).isRequired,
@@ -1306,6 +1351,7 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
             <div data-testid="shopper-agent">
                 <CommerceClientAgentWindow
                     commerceAgentConfiguration={commerceAgentConfiguration}
+                    domainUrl={domainUrl}
                     lastAuthLinkKeyRef={lastAuthLinkKeyRef}
                     lastCommerceClientJWTRef={lastCommerceClientJWTRef}
                     authLinkGenerationRef={authLinkGenerationRef}

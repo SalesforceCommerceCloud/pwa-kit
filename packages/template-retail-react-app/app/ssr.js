@@ -758,12 +758,14 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Browser POSTs an auth_link_key and siteId (as x-site-id header).
     // In HttpOnly mode, tokens are read from cookies server-side.
     // In non-HttpOnly mode, SLAS access token is sent in request body.
-    // Server extracts my_domain from AGENT_MYDOMAIN environment variable,
+    // Server resolves my_domain from PWA Kit configuration or AGENT_MYDOMAIN,
     // validates it's a trusted Salesforce host (SSRF prevention), then
     // forwards the tokens to Core's `/agent/identity/bridge` endpoint with
     // the access token in an `Authorization: SLAS` header and the refresh
     // token in the body.
-    registerTokenBridgeRoute(app)
+    registerTokenBridgeRoute(app, {
+        myDomain: config.app?.commerceAgent?.cc_myDomainOverride
+    })
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))

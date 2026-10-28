@@ -33,15 +33,15 @@ import {isTrustedSalesforceDomain} from './salesforce-domain-allowlist.js'
  *   2. Server route (registerTokenBridgeRoute, mounted in app/ssr.js):
  *      - Reads siteId from x-site-id header (standard PWA Kit pattern)
  *      - Reads tokens from cookies (HttpOnly mode) or the request body (non-HttpOnly)
- *      - Reads my_domain directly from AGENT_MYDOMAIN environment variable
+ *      - Resolves my_domain from PWA Kit configuration or AGENT_MYDOMAIN
  *      - Validates my_domain against Salesforce domain allowlist (SSRF prevention)
  *      - Forwards to Core with `Authorization: SLAS <access_token>` and
  *        `refresh_token` in the body.
  *   3. Core's response (status + body) is forwarded verbatim so the caller
  *      can branch on documented errors (INVALID_SLAS_TOKEN, SLAS_TOKEN_EXPIRED, ...).
  *
- * My Domain resolution: read directly from AGENT_MYDOMAIN environment variable,
- * then validated against a Salesforce domain allowlist (prevents SSRF).
+ * My Domain resolution: use the configured PWA Kit override, with AGENT_MYDOMAIN
+ * as a compatibility fallback, then validate it against a Salesforce domain allowlist.
  * ------------------------------------------------------------------------- */
 
 export const TOKEN_BRIDGE_PROXY_PATH = '/api/agent/identity/bridge'
@@ -91,7 +91,7 @@ export function resolveAgentforceMyDomain(myDomain) {
 // check and the CSRF Origin check.
 
 /** Express handler for POST /api/agent/identity/bridge. */
-export async function handleTokenBridge(req, res) {
+export async function handleTokenBridge(req, res, {myDomain: configuredMyDomain} = {}) {
     try {
         const {auth_link_key: authLinkKey, slas_access_token: bodySlasAccessToken} = req.body || {}
 
@@ -184,17 +184,16 @@ export async function handleTokenBridge(req, res) {
             }
         }
 
-        // Read the Agentforce My Domain from the AGENT_MYDOMAIN environment
-        // variable and normalize it to an absolute origin. AGENT_MYDOMAIN may be
-        // scheme-less (e.g. `orgfarm-...my.salesforce.com`); resolveAgentforceMyDomain
-        // prepends `https://` so `new URL()` in isTrustedSalesforceDomain and the
-        // downstream fetch can parse it.
-        const myDomain = resolveAgentforceMyDomain(process.env.AGENT_MYDOMAIN)
+        // Prefer the resolved PWA Kit configuration while retaining the environment
+        // variable as a compatibility fallback.
+        const myDomain = resolveAgentforceMyDomain(
+            configuredMyDomain || process.env.AGENT_MYDOMAIN
+        )
 
         if (!myDomain) {
             console.error(
                 '[token-bridge] Agentforce My Domain is not configured. ' +
-                    'Set the AGENT_MYDOMAIN environment variable.'
+                    'Set commerceAgent.cc_myDomainOverride or AGENT_MYDOMAIN.'
             )
             return res.status(500).json({error: 'MYDOMAIN_NOT_CONFIGURED'})
         }
@@ -243,8 +242,8 @@ export async function handleTokenBridge(req, res) {
 }
 
 /** Mount the Token Bridge proxy on the given Express app (called from app/ssr.js). */
-export function registerTokenBridgeRoute(app) {
-    app.post(TOKEN_BRIDGE_PROXY_PATH, handleTokenBridge)
+export function registerTokenBridgeRoute(app, options = {}) {
+    app.post(TOKEN_BRIDGE_PROXY_PATH, (req, res) => handleTokenBridge(req, res, options))
 }
 
 /**
@@ -254,7 +253,7 @@ export function registerTokenBridgeRoute(app) {
  * the access token is read from localStorage and sent in the request body,
  * while the refresh token is read from cookies server-side.
  *
- * myDomain is now derived server-side from AGENT_MYDOMAIN environment variable.
+ * myDomain is derived server-side from PWA Kit configuration or AGENT_MYDOMAIN.
  *
  * @param {string} authLinkKey - Auth link key from the embedded messaging API
  * @param {string} [slasAccessToken] - SLAS access token (non-HttpOnly mode only)

@@ -14,9 +14,12 @@ import {
     useShopperBasketsV2Mutation as useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 
-import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
 import SFPaymentsExpressButtons from '@salesforce/retail-react-app/app/components/sf-payments-express-buttons'
-import {EXPRESS_BUY_NOW} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
+import {
+    EXPRESS_BUY_NOW,
+    EXPRESS_PAY_NOW,
+    useSFPayments
+} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {useSFPaymentsCountry} from '@salesforce/retail-react-app/app/hooks/use-sf-payments-country'
 import {useCleanupTemporaryBaskets} from '@salesforce/retail-react-app/app/hooks/use-cleanup-temporary-baskets'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
@@ -122,17 +125,21 @@ const useSalesforcePaymentsLifecycle = (lifecycle) =>
 const SalesforcePaymentsCartProvider = ({context, lifecycle}) => {
     const callbacks = useSalesforcePaymentsLifecycle(lifecycle)
     const {data: basket} = useExpressPaymentBasket()
+    const {confirmingBasket} = useSFPayments()
+    const effectiveBasket = basket?.basketId ? basket : confirmingBasket
     const {
         paymentMethodSet,
         isLoading: isPaymentConfigurationLoading,
         isError: isPaymentConfigurationError
     } = useShopperAgentPaymentMethodSet({
-        currency: context.currency,
-        countryCode: basket?.billingAddress?.countryCode
+        currency: context.currency
     })
-    const basketIsReady =
+    const activeBasketIsReady =
         context.basket.status === EXPRESS_PAYMENT_BASKET_STATUSES.READY && context.basket.id
+    const basketIsReady = Boolean(activeBasketIsReady || confirmingBasket?.basketId)
     const paymentMethodsAreReady = Boolean(paymentMethodSet?.paymentMethods.length)
+    const initialAmount = effectiveBasket?.orderTotal || effectiveBasket?.productSubTotal
+    const prepareBasket = useCallback(async () => effectiveBasket, [effectiveBasket])
 
     useEffect(() => {
         if (!basketIsReady) lifecycle.unavailable()
@@ -152,10 +159,23 @@ const SalesforcePaymentsCartProvider = ({context, lifecycle}) => {
         paymentMethodsAreReady
     ])
 
-    if (!basketIsReady || isPaymentConfigurationLoading || !paymentMethodsAreReady) return null
+    if (
+        !basketIsReady ||
+        !effectiveBasket?.basketId ||
+        !initialAmount ||
+        isPaymentConfigurationLoading ||
+        !paymentMethodsAreReady
+    ) {
+        return null
+    }
 
     return (
-        <SFPaymentsExpress
+        <SFPaymentsExpressButtons
+            usage={EXPRESS_PAY_NOW}
+            paymentCurrency={effectiveBasket.currency || context.currency}
+            paymentCountryCode={null}
+            initialAmount={initialAmount}
+            prepareBasket={prepareBasket}
             expressButtonLayout="horizontal"
             onPaymentMethodsRendered={callbacks.onPaymentMethodsRendered}
             onExpressPaymentCompleted={callbacks.onExpressPaymentCompleted}

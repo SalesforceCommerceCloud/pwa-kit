@@ -8,4 +8,5 @@
 // Application-owned replacement point. The shell imports only this entry file.
 // The neutral default renders nothing and reports unavailable until the application
 // explicitly selects a supported payment provider.
-export {default} from './providers/unavailable-express-payment-provider'
+//export {default} from './providers/unavailable-express-payment-provider'
+export {default} from './providers/salesforce-payments-express-payment-provider'
