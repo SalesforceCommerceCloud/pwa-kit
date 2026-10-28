@@ -306,12 +306,21 @@ describe('_matchSlasAllowlistEntry', () => {
         expect(entry?.injectAuth).toBe('sfdc-header')
     })
 
-    test('matches oauth2/login with no credential injection', () => {
+    test('matches oauth2/login with slas-client-auth mode', () => {
         const entry = RemoteServerFactory._matchSlasAllowlistEntry(
             `/shopper/auth/v1/organizations/${ORG}/oauth2/login`,
             'POST'
         )
-        expect(entry?.injectAuth).toBe('none')
+        expect(entry?.injectAuth).toBe('slas-client-auth')
+    })
+
+    test('matches oauth2/authorize with slas-client-auth mode', () => {
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v1/organizations/${ORG}/oauth2/authorize`,
+            'GET'
+        )
+        expect(entry?.segments).toEqual(['oauth2', 'authorize'])
+        expect(entry?.injectAuth).toBe('slas-client-auth')
     })
 
     test('matches future API versions via structural prefix', () => {

@@ -34,7 +34,8 @@ import {
     DWSID_COOKIE_NAME,
     SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG,
     X_GRANT_TYPE,
-    X_PREVIEW_PARENT
+    X_PREVIEW_PARENT,
+    X_SLAS_CLIENT_AUTH
 } from '../constant'
 
 import {Logger} from '../types'
@@ -1273,6 +1274,36 @@ class Auth {
     }
 
     /**
+     * Returns a SLAS client that sends the `x-slas-client-auth` header when a
+     * client secret is configured directly (not via the PWA Kit proxy).
+     *
+     * In PWA Kit private client mode the secret is a placeholder and the proxy
+     * injects the header server-side, so the shared client is returned as-is.
+     * The header is only needed on /oauth2/login and /oauth2/authorize, but the
+     * helpers do not accept per-request headers, so it is set on a copy of the
+     * client config.
+     *
+     * Note: authorizeIDP is not covered. It navigates the browser to SLAS and a
+     * navigation cannot carry custom headers, so strict client auth for IDP
+     * login requires the PWA Kit proxy.
+     */
+    private getSlasClientWithClientAuth(): ShopperLogin<ApiClientConfigParams> {
+        if (!this.clientSecret || this.clientSecret === SLAS_SECRET_PLACEHOLDER) {
+            return this.client
+        }
+        const {clientConfig} = this.client
+        return new ShopperLogin({
+            ...clientConfig,
+            headers: {
+                ...clientConfig.headers,
+                [X_SLAS_CLIENT_AUTH]: stringToBase64(
+                    `${clientConfig.parameters.clientId}:${this.clientSecret}`
+                )
+            }
+        })
+    }
+
+    /**
      * A wrapper method for commerce-sdk-isomorphic helper: loginRegisteredUserB2C.
      *
      * This method uses a body-based API similar to the register function for consistency.
@@ -1291,7 +1322,7 @@ class Auth {
         const {username, password, customParameters} = body
 
         const loginParams: LoginRegisteredUserB2CCredentials = {
-            slasClient: this.client,
+            slasClient: this.getSlasClientWithClientAuth(),
             credentials: {
                 username,
                 password,

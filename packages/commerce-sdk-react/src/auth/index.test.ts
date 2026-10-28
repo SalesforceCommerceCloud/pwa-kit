@@ -1336,6 +1336,27 @@ describe('Auth', () => {
             credentials: {clientSecret: 'someSecret'}
         })
     })
+    test('loginRegisteredUserB2C sends x-slas-client-auth when a client secret is set directly', async () => {
+        const auth = new Auth({...config, clientSecret: 'someSecret'})
+        await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
+        const funcArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][0]
+        // Raw base64 of clientId:clientSecret, no `Basic ` prefix
+        expect(funcArg.slasClient.clientConfig.headers['x-slas-client-auth']).toBe(
+            Buffer.from('clientId:someSecret').toString('base64')
+        )
+    })
+    test('loginRegisteredUserB2C does not send x-slas-client-auth in PWA Kit private client mode', async () => {
+        const auth = new Auth(configSLASPrivate)
+        await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
+        const funcArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][0]
+        expect(funcArg.slasClient.clientConfig.headers['x-slas-client-auth']).toBeUndefined()
+    })
+    test('loginRegisteredUserB2C does not send x-slas-client-auth for a public client', async () => {
+        const auth = new Auth(config)
+        await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
+        const funcArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][0]
+        expect(funcArg.slasClient.clientConfig.headers['x-slas-client-auth']).toBeUndefined()
+    })
 
     test('running on the server uses a shared context memory store', () => {
         const refreshTokenGuest = 'guest'
