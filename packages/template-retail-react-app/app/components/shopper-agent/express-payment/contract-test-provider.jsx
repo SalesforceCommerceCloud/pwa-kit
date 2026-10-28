@@ -13,8 +13,9 @@ import {expressPaymentProviderPropTypes} from '@salesforce/retail-react-app/app/
 export const CONTRACT_TEST_ORDER_ID = 'CONTRACT-TEST-ORDER'
 
 /**
- * Temporary provider used to validate the iframe shell before a real payment
- * provider is connected. Replace the export in provider.jsx to change providers.
+ * Reference provider that demonstrates the iframe context and lifecycle contract.
+ * It is not selected by default. Replace the export in provider.jsx to use it or
+ * connect a merchant payment integration.
  */
 const ContractTestProvider = ({context, lifecycle}) => {
     const [status, setStatus] = useState('Available')

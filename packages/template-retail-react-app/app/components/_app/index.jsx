@@ -233,6 +233,7 @@ const StorefrontApp = (props) => {
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
+
     const {l10n} = site
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency

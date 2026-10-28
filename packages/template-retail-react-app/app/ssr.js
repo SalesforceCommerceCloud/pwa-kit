@@ -551,6 +551,7 @@ export function handleCallback(req, res, next) {
 // For local dev, set localAllowCookies: true AND use HTTPS (pwa-kit-dev --https) so
 // the browser accepts the Secure cookie; plain-HTTP local runs cannot complete the flow.
 const cookieSecureFlag = ' Secure;'
+
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
     app.use(express.urlencoded({extended: true}))

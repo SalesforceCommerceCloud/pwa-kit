@@ -102,8 +102,8 @@ const ExpressPaymentIframeShell = ({Provider = ExpressPaymentProvider}) => {
 }
 
 ExpressPaymentIframeShell.propTypes = {
-    // Test seam for proving that contrasting providers use the same shell. The
-    // production route relies on provider.jsx rather than passing this prop.
+    // Optional provider injection supports contract and integration validation.
+    // Production routes rely on the default export from provider.jsx.
     Provider: PropTypes.elementType
 }
 
