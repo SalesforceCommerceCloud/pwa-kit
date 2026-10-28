@@ -151,9 +151,10 @@ module.exports = {
             // If the env var `OTP_TOKEN_LENGTH` is set, it will override the config value. Valid values are 6 or 8. Defaults to: 8
             tokenLength: validateOtpTokenLength(process.env.OTP_TOKEN_LENGTH),
             passwordless: {
-                enabled: false,
-                mode: 'email',
-                landingPath: '/passwordless-login-landing'
+                enabled: true,
+                mode: 'callback',
+                landingPath: '/passwordless-login-landing',
+                callbackURI: '/passwordless-login-callback'
             },
             social: {
                 enabled: false,
@@ -161,8 +162,12 @@ module.exports = {
                 redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
             },
             resetPassword: {
-                mode: 'email',
-                landingPath: '/reset-password-landing'
+                mode: 'callback',
+                landingPath: '/reset-password-landing',
+                callbackURI: '/reset-password-callback'
+            },
+            registrationVerification: {
+                callbackURI: '/registration-verification-callback'
             }
         },
         defaultSite: 'RefArchGlobal',
@@ -175,6 +180,7 @@ module.exports = {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
                 clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                notifyClientId: 'cdaa0bde-f866-4bf9-941a-e0fe5076db42',
                 organizationId: 'f_ecom_zzrf_001',
                 shortCode: 'kv7kzm78',
                 siteId: 'RefArchGlobal'
@@ -218,7 +224,7 @@ module.exports = {
         },
         storeLocatorEnabled: true,
         guestOrderLookup: {
-            enabled: false,
+            enabled: true,
             orderNumberRegex: '^[a-zA-Z0-9-]{6,32}$',
             requestCodeThrottle: {
                 windowMs: 60000,
