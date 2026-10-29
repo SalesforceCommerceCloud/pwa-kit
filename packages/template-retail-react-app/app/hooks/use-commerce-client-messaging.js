@@ -85,7 +85,8 @@ const injectCommerceClientWidget = ({
     openLinksInNewTab,
     showProductDescription,
     showProductCaptions,
-    promptsConfig
+    promptsConfig,
+    layoutPreset
 } = {}) => {
     if (!onClient) return false
 
@@ -143,7 +144,8 @@ const injectCommerceClientWidget = ({
             ...(typeof autoScroll === 'boolean' ? {autoScroll} : {}),
             ...(typeof openLinksInNewTab === 'boolean' ? {openLinksInNewTab} : {}),
             ...(typeof showProductDescription === 'boolean' ? {showProductDescription} : {}),
-            ...(promptsConfig && typeof promptsConfig === 'object' ? {promptsConfig} : {})
+            ...(promptsConfig && typeof promptsConfig === 'object' ? {promptsConfig} : {}),
+            ...(layoutPreset ? {layoutPreset} : {})
         })
         return true
     } catch (err) {

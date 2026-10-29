@@ -1750,6 +1750,15 @@ describe('ShopperAgent Component', () => {
             expect(widgetOptions).not.toHaveProperty('overrides')
         })
 
+        test('forwards cc_layoutPreset to the widget options as layoutPreset', () => {
+            renderCommerceClient({cc_layoutPreset: 'commerce'})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({layoutPreset: 'commerce'})
+            )
+        })
+
         test('opens the widget automatically when cc_isOpen is true', () => {
             renderCommerceClient({cc_isOpen: 'true'})
 

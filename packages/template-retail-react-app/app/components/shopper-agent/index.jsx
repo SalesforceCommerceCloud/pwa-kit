@@ -700,7 +700,8 @@ const CommerceClientAgentWindow = ({
         cc_openLinksInNewTab,
         cc_showProductDescription,
         cc_showProductCaptions,
-        cc_promptsConfig
+        cc_promptsConfig,
+        cc_layoutPreset
     } = commerceAgentConfiguration
 
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
@@ -1094,6 +1095,7 @@ const CommerceClientAgentWindow = ({
                 }
             },
             theme: cc_theme,
+            layoutPreset: cc_layoutPreset || undefined,
             ...resolveCommerceClientOverrideOptions({cc_overrides, cc_overridesUrl}),
             // Optional widget presentation/behavior configs. Passed through as-is (or
             // string→boolean converted); the injection hook omits any that are unset so
@@ -1132,6 +1134,7 @@ const CommerceClientAgentWindow = ({
             cc_widgetPosition,
             cc_dialogWidth,
             cc_theme,
+            cc_layoutPreset,
             cc_overridesUrl,
             cc_overrides,
             cc_headerConfig,
