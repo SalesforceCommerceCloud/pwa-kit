@@ -18,6 +18,11 @@
  *   Cmd/Ctrl-click, middle-click and links set to open in a new tab all use it;
  * - opens the product through the router on an unmodified, same-tab primary click.
  *
+ * When the id cannot be read from the URL with certainty, it is looked up through Shopper SEO
+ * `getUrlMapping`, which applies the site's own URL rules. Until the lookup answers, and when it finds
+ * no product, the link keeps the backend URL: the shopper lands on the backend product page, never on
+ * a storefront 404.
+ *
  * Only links in the widget's product slots are touched, never links in agent message text. Those
  * slots are found by the widget's CSS classes (`cim-widget-*`). If a widget release renames them,
  * links keep the backend URL and nothing breaks.
@@ -45,26 +50,20 @@ const PRODUCT_NAME_SCOPE =
 const PRODUCT_NAME_SELECTOR =
     '.cim-widget-msg-product-card__title-link, .cim-widget-msg-product-card__title, .cim-widget-product-comparison__name-link'
 
-/** The URL slug B2C derives from a product name, e.g. 'Dipsea Tie Headband' -> 'dipsea-tie-headband'. */
-const toSlug = (name) =>
-    name
+/** Text reduced to unaccented letters and digits, e.g. 'Café Chair' and 'cafe-chair' -> 'cafechair'. */
+const toKey = (text) =>
+    text
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
-        .replace(/['\u2019]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
+        .replace(/[^a-z0-9]/g, '')
 
 /**
- * Returns the product id in a backend product URL. The last path segment minus `.html` is either the
- * bare id (`/<slug>/<id>.html`) or the name slug and id joined by `-` (`/<slug>-<id>.html`); in the
- * latter case the slug of `productName` is stripped. Ids may themselves contain `-`, so the slug is
- * only stripped when it matches the name.
- *
- * @param {string} href - Link address
- * @param {string} [currentOrigin] - Storefront origin; links on it are already routable
- * @param {string} [productName] - Product name shown with the link
- * @returns {string|undefined} Product id, or undefined when the URL is not a product link on another origin
+ * @returns {{url: URL, segment: string, isProductId: boolean}|undefined} The URL and its product
+ *   segment (the `pid` parameter, or the last path segment minus `.html`), or undefined when `href`
+ *   is not a product link on another origin
  */
-export const getBackendProductId = (href, currentOrigin = window.location.origin, productName) => {
+const parseBackendProductUrl = (href, currentOrigin) => {
     let url
     try {
         url = new URL(href, currentOrigin)
@@ -74,6 +73,8 @@ export const getBackendProductId = (href, currentOrigin = window.location.origin
     if ((url.protocol !== 'https:' && url.protocol !== 'http:') || url.origin === currentOrigin) {
         return undefined
     }
+    const pid = url.searchParams.get('pid') // `Product-Show?pid=<id>` when URL rules are off
+    if (pid) return {url, segment: pid, isProductId: true}
 
     const lastSegment = url.pathname.split('/').filter(Boolean).pop()
     if (!lastSegment || !/\.html$/i.test(lastSegment)) return undefined
@@ -83,11 +84,64 @@ export const getBackendProductId = (href, currentOrigin = window.location.origin
     } catch {
         return undefined // malformed percent-escape
     }
-    const slugPrefix = productName ? `${toSlug(productName)}-` : ''
-    if (slugPrefix.length > 1 && segment.toLowerCase().startsWith(slugPrefix)) {
-        segment = segment.slice(slugPrefix.length)
+    return segment ? {url, segment, isProductId: false} : undefined
+}
+
+/**
+ * Returns the product id in a backend product URL, when the URL alone tells it for certain.
+ *
+ * The id is the `pid` parameter, or comes from the last path segment minus `.html`, which is either
+ * the bare id (`/<slug>/<id>.html`) or the name slug and id joined by `-` (`/<slug>-<id>.html`). Ids
+ * may themselves contain `-`, and the slug follows the site's URL rules, so a segment with a `-` is
+ * only split where the part before it matches `productName`, both reduced to unaccented letters and
+ * digits. Any other segment with a `-` is ambiguous; look it up with `getProductUrlSegments`.
+ *
+ * @param {string} href - Link address
+ * @param {string} [currentOrigin] - Storefront origin; links on it are already routable
+ * @param {string} [productName] - Product name shown with the link
+ * @returns {string|undefined} Product id, or undefined when it is ambiguous or the URL is not a product link on another origin
+ */
+export const getBackendProductId = (href, currentOrigin = window.location.origin, productName) => {
+    const parsed = parseBackendProductUrl(href, currentOrigin)
+    if (!parsed) return undefined
+    const {segment, isProductId} = parsed
+    if (isProductId || !segment.includes('-')) return segment
+
+    const nameKey = productName ? toKey(productName) : ''
+    if (!nameKey) return undefined
+    // The last split that matches wins, so a repeated separator after the name stays out of the id.
+    let productId
+    for (let i = segment.indexOf('-'); i !== -1; i = segment.indexOf('-', i + 1)) {
+        if (i + 1 < segment.length && toKey(segment.slice(0, i)) === nameKey) {
+            productId = segment.slice(i + 1)
+        }
     }
-    return segment || undefined
+    return productId
+}
+
+/**
+ * The URL segments to look a backend product URL up with in Shopper SEO `getUrlMapping`, most likely
+ * first: the path without an SFRA `/s/<site>` prefix, then that path without a leading locale.
+ *
+ * @param {string} href - Link address
+ * @param {string} [currentOrigin] - Storefront origin
+ * @returns {string[]} Decoded URL segments; none when `href` is not a backend product link or already names the id
+ */
+export const getProductUrlSegments = (href, currentOrigin = window.location.origin) => {
+    const parsed = parseBackendProductUrl(href, currentOrigin)
+    if (!parsed || parsed.isProductId) return []
+    let parts
+    try {
+        parts = parsed.url.pathname.split('/').filter(Boolean).map(decodeURIComponent)
+    } catch {
+        return []
+    }
+    if (parts[0] === 's' && parts.length > 2) parts = parts.slice(2)
+    const segments = [parts.join('/')]
+    if (parts.length > 1 && /^[a-z]{2}([_-][a-z]{2})?$/i.test(parts[0])) {
+        segments.push(parts.slice(1).join('/'))
+    }
+    return segments
 }
 
 /** The product name shown with a widget product link, or '' when none is found. */
@@ -124,16 +178,14 @@ const findAgentProductLinksIn = (node) => {
  */
 const rewritten = new WeakMap()
 
-/** The product a link points at: the one we rewrote it for, else the one in a backend address. */
-const getLinkedProductId = (anchor) => {
-    const own = rewritten.get(anchor)
-    if (own && anchor.getAttribute('href') === own.href) return own.productId
-    return getBackendProductId(anchor.href, window.location.origin, getProductName(anchor))
-}
-
 /**
  * Starts pointing agent product links at the storefront. Links already rewritten keep their
  * storefront address after it stops.
+ *
+ * A link whose id the URL does not tell for certain is looked up once per address with
+ * `lookupProductId`, trying each of `getProductUrlSegments` in turn, and rewritten when the answer
+ * comes back if it still has that address. A click before then, or on a link no lookup resolved,
+ * is left to the browser.
  *
  * The click listener runs in the bubble phase, after the widget's own click handler, and skips an
  * event that is already `defaultPrevented`.
@@ -145,20 +197,70 @@ const getLinkedProductId = (anchor) => {
  * @param {Object} options
  * @param {function(string): void} options.navigateToProduct - Opens the product page through the router
  * @param {function(string): string} options.getProductHref - Storefront product address, site and locale prefix included
+ * @param {function(string): Promise<string|undefined>} [options.lookupProductId] - Product id a URL segment maps to, if any
  * @param {Document} [options.root] - Document to watch
  * @returns {function(): void} Stops the routing
  */
 export const attachAgentProductLinkRouting = ({
     navigateToProduct,
     getProductHref,
+    lookupProductId,
     root = document
 }) => {
-    const rewrite = (anchor) => {
-        const productId = getLinkedProductId(anchor)
-        if (!productId) return
+    let stopped = false
+    /** Backend address -> product id, or null when it maps to none; set once its lookup answers. */
+    const lookedUp = new Map()
+    /** Backend addresses with a lookup in flight. */
+    const pending = new Set()
+
+    /** The product a link points at: the one we rewrote it for, else the one its backend address names. */
+    const getLinkedProductId = (anchor) => {
+        const own = rewritten.get(anchor)
+        if (own && anchor.getAttribute('href') === own.href) return own.productId
+        return (
+            getBackendProductId(anchor.href, window.location.origin, getProductName(anchor)) ||
+            lookedUp.get(anchor.href) ||
+            undefined
+        )
+    }
+
+    const writeHref = (anchor, productId) => {
         const href = getProductHref(productId)
         rewritten.set(anchor, {productId, href})
         if (anchor.getAttribute('href') !== href) anchor.setAttribute('href', href)
+    }
+
+    const lookUp = async (backendHref) => {
+        for (const urlSegment of getProductUrlSegments(backendHref)) {
+            try {
+                const productId = await lookupProductId(urlSegment)
+                if (productId) return productId
+            } catch {
+                // Not a known URL; try the next segment
+            }
+        }
+        return undefined
+    }
+
+    const rewrite = (anchor) => {
+        const productId = getLinkedProductId(anchor)
+        if (productId) {
+            writeHref(anchor, productId)
+            return
+        }
+        const backendHref = anchor.href
+        if (!lookupProductId || lookedUp.has(backendHref) || pending.has(backendHref)) return
+        if (!getProductUrlSegments(backendHref).length) return
+        pending.add(backendHref)
+        lookUp(backendHref).then((foundId) => {
+            pending.delete(backendHref)
+            lookedUp.set(backendHref, foundId || null)
+            if (stopped || !foundId) return
+            // Every link still on that address, including ones drawn while the lookup ran
+            findAgentProductLinksIn(root)
+                .filter((link) => link.href === backendHref)
+                .forEach((link) => writeHref(link, foundId))
+        })
     }
 
     const onClick = (event) => {
@@ -204,6 +306,7 @@ export const attachAgentProductLinkRouting = ({
     root.addEventListener('click', onClick)
 
     return () => {
+        stopped = true
         observer.disconnect()
         root.removeEventListener('click', onClick)
     }

@@ -7,7 +7,8 @@
 import {
     attachAgentProductLinkRouting,
     findAgentProductLink,
-    getBackendProductId
+    getBackendProductId,
+    getProductUrlSegments
 } from '@salesforce/retail-react-app/app/utils/shopper-agent-product-links'
 
 const ORIGIN = 'https://storefront.example.com'
@@ -43,7 +44,10 @@ const byId = (id) => document.getElementById(id)
 const hrefOf = (id) => byId(id).getAttribute('href')
 const productHref = (productId) => `/us/en-US/product/${productId}`
 
-/** Lets the MutationObserver deliver its records. */
+/** What Shopper SEO `getUrlMapping` maps each URL segment to in these tests. */
+const SEO_PRODUCTS = {'chairs/DH-387.html': 'DH-387', 'cafe-chair-DH-388.html': 'DH-388'}
+
+/** Lets the MutationObserver deliver its records and pending lookups answer. */
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0))
 
 /** Dispatches a click and returns whether our listener prevented the browser's navigation. */
@@ -64,10 +68,14 @@ const click = (element, init = {}) => {
 
 describe('getBackendProductId', () => {
     test.each([
-        [SFRA_SITE_URL, 'DH-387'],
-        ['https://backend.example.com/en_US/x-2040793A5H.html#reviews', 'x-2040793A5H'],
+        ['https://backend.example.com/en_US/x2040793A5H.html#reviews', 'x2040793A5H'],
         ['https://backend.example.com/s/RefArch/x/25589712M.HTML', '25589712M'],
-        ['https://backend.example.com/s/RefArch/x/red%20shoe.html', 'red shoe']
+        ['https://backend.example.com/s/RefArch/x/red%20shoe.html', 'red shoe'],
+        ['https://backend.example.com/s/RefArch/Product-Show?pid=DH-387', 'DH-387'],
+        [
+            'https://backend.example.com/on/demandware.store/Sites-RefArch-Site/en_US/Product-Show?pid=25589712M',
+            '25589712M'
+        ]
     ])('reads the product id from %s', (href, id) => {
         expect(getBackendProductId(href, ORIGIN)).toBe(id)
     })
@@ -75,10 +83,30 @@ describe('getBackendProductId', () => {
     test.each([
         [SFRA_URL, 'Dipsea Tie Headband', '2040793A5H'],
         ['https://backend.example.com/en_US/womens-v-neck-DH-387.html', "Women's V-Neck", 'DH-387'],
-        [SFRA_SITE_URL, 'Dream Chair', 'DH-387'],
-        [SFRA_URL, 'Some Other Product', 'dipsea-tie-headband-2040793A5H']
+        ['https://backend.example.com/en_US/cafe-chair-DH-387.html', 'Café Chair', 'DH-387'],
+        ['https://backend.example.com/en_US/caf-chair-DH-387.html', 'Caf Chair', 'DH-387'],
+        [
+            'https://backend.example.com/en_US/dream--chair--25589712M.html',
+            'Dream Chair',
+            '25589712M'
+        ],
+        ['https://backend.example.com/en_US/t-shirt-TS-1.html', 'T-Shirt', 'TS-1']
     ])('strips the name slug from %s when the product is %s', (href, name, id) => {
         expect(getBackendProductId(href, ORIGIN, name)).toBe(id)
+    })
+
+    test.each([
+        ['the name does not match the slug', SFRA_URL, 'Some Other Product'],
+        ['there is no name', SFRA_URL, undefined],
+        ['the name reduces to nothing', SFRA_URL, '—'],
+        ['the id itself has a dash', SFRA_SITE_URL, undefined],
+        [
+            'the name is the whole segment',
+            'https://backend.example.com/en_US/dream-chair.html',
+            'Dream Chair'
+        ]
+    ])('gives no id, to look up instead, when %s', (_label, href, name) => {
+        expect(getBackendProductId(href, ORIGIN, name)).toBeUndefined()
     })
 
     test.each([
@@ -91,6 +119,35 @@ describe('getBackendProductId', () => {
         ['text that is not a URL', 'http://']
     ])('ignores %s', (_label, href) => {
         expect(getBackendProductId(href, ORIGIN)).toBeUndefined()
+    })
+})
+
+describe('getProductUrlSegments', () => {
+    test.each([
+        [
+            SFRA_URL,
+            ['en_US/dipsea-tie-headband-2040793A5H.html', 'dipsea-tie-headband-2040793A5H.html']
+        ],
+        [SFRA_SITE_URL, ['chairs/DH-387.html']],
+        [
+            'https://backend.example.com/s/RefArch/en-GB/caf%C3%A9-chair-1.html',
+            ['en-GB/café-chair-1.html', 'café-chair-1.html']
+        ],
+        ['https://backend.example.com/dream-chair-1.html', ['dream-chair-1.html']]
+    ])('looks %s up as %j', (href, segments) => {
+        expect(getProductUrlSegments(href, ORIGIN)).toEqual(segments)
+    })
+
+    test.each([
+        ['a link on the storefront itself', `${ORIGIN}/x/dream-chair-1.html`],
+        [
+            'a link that names the id',
+            'https://backend.example.com/s/RefArch/Product-Show?pid=DH-387'
+        ],
+        ['a backend link that is not a product page', 'https://backend.example.com/s/RefArch/cart'],
+        ['a malformed percent-escape', 'https://backend.example.com/%E0%A4/x-1.html']
+    ])('looks nothing up for %s', (_label, href) => {
+        expect(getProductUrlSegments(href, ORIGIN)).toEqual([])
     })
 })
 
@@ -126,10 +183,18 @@ describe('attachAgentProductLinkRouting', () => {
     let navigateToProduct
     let stop
 
-    beforeEach(() => {
+    let lookupProductId
+
+    beforeEach(async () => {
         document.body.innerHTML = WIDGET_MARKUP
         navigateToProduct = jest.fn()
-        stop = attachAgentProductLinkRouting({navigateToProduct, getProductHref: productHref})
+        lookupProductId = jest.fn(async (urlSegment) => SEO_PRODUCTS[urlSegment])
+        stop = attachAgentProductLinkRouting({
+            navigateToProduct,
+            getProductHref: productHref,
+            lookupProductId
+        })
+        await flush() // the product detail and comparison links (`DH-387`) are looked up
     })
 
     afterEach(() => {
@@ -223,7 +288,7 @@ describe('attachAgentProductLinkRouting', () => {
             ['pdp-title', 'DH-387'],
             ['comparison-image', 'DH-387'],
             ['comparison-name', 'DH-387']
-        ])('points %s at the storefront product page as soon as it attaches', (id, productId) => {
+        ])('points %s at the storefront product page once attached', (id, productId) => {
             expect(hrefOf(id)).toBe(`/us/en-US/product/${productId}`)
         })
 
@@ -283,7 +348,11 @@ describe('attachAgentProductLinkRouting', () => {
         test('settles instead of rewriting forever', async () => {
             const getProductHref = jest.fn(productHref)
             stop()
-            stop = attachAgentProductLinkRouting({navigateToProduct, getProductHref})
+            stop = attachAgentProductLinkRouting({
+                navigateToProduct,
+                getProductHref,
+                lookupProductId
+            })
 
             byId('card-name').setAttribute('href', SFRA_SITE_URL) // the widget reuses the link
             await flush()
@@ -304,6 +373,105 @@ describe('attachAgentProductLinkRouting', () => {
             await flush()
             expect(hrefOf('card-name')).toBe('/us/en-US/product/2040793A5H')
             expect(hrefOf('after-stop')).toBe(SFRA_SITE_URL)
+        })
+
+        test('reads the id from the URL without a lookup when the name matches', () => {
+            expect(lookupProductId).not.toHaveBeenCalledWith(
+                expect.stringContaining('dipsea-tie-headband')
+            )
+        })
+
+        test('looks each backend address up once, however many links share it', () => {
+            expect(lookupProductId).toHaveBeenCalledTimes(1)
+            expect(lookupProductId).toHaveBeenCalledWith('chairs/DH-387.html')
+        })
+
+        test('looks up a card whose name does not match its slug, and points it at the product found', async () => {
+            const href = 'https://backend.example.com/cafe-chair-DH-388.html'
+            byId('widget').insertAdjacentHTML(
+                'beforeend',
+                `<div class="cim-widget-msg-product-card"><a id="late-cafe" href="${href}">Cozy Chair</a></div>`
+            )
+            await flush()
+            expect(lookupProductId).toHaveBeenCalledWith('cafe-chair-DH-388.html')
+            expect(hrefOf('late-cafe')).toBe('/us/en-US/product/DH-388')
+            expect(click(byId('late-cafe'))).toBe(true)
+            expect(navigateToProduct).toHaveBeenCalledWith('DH-388')
+        })
+
+        test('tries the path without its locale when the full path is not known', async () => {
+            const href = 'https://backend.example.com/en_US/cafe-chair-DH-388.html'
+            byId('widget').insertAdjacentHTML(
+                'beforeend',
+                `<div class="cim-widget-msg-product-card"><a id="late-cafe" href="${href}">Cozy Chair</a></div>`
+            )
+            await flush()
+            expect(lookupProductId).toHaveBeenCalledWith('en_US/cafe-chair-DH-388.html')
+            expect(lookupProductId).toHaveBeenCalledWith('cafe-chair-DH-388.html')
+            expect(hrefOf('late-cafe')).toBe('/us/en-US/product/DH-388')
+        })
+
+        test('leaves a link to the browser while its lookup runs', async () => {
+            let answer
+            lookupProductId.mockImplementationOnce(
+                () => new Promise((resolve) => (answer = resolve))
+            )
+            const href = 'https://backend.example.com/cafe-chair-DH-388.html'
+            byId('widget').insertAdjacentHTML(
+                'beforeend',
+                `<div class="cim-widget-msg-product-card"><a id="late-cafe" href="${href}">Cozy Chair</a></div>`
+            )
+            await flush()
+            expect(click(byId('late-cafe'))).toBe(false)
+            expect(hrefOf('late-cafe')).toBe(href)
+
+            answer('DH-388')
+            await flush()
+            expect(hrefOf('late-cafe')).toBe('/us/en-US/product/DH-388')
+        })
+
+        test.each([
+            ['finds no product', async () => undefined],
+            ['fails', async () => Promise.reject(new Error('404'))]
+        ])(
+            'keeps the backend address, never a storefront 404, when the lookup %s',
+            async (_label, impl) => {
+                lookupProductId.mockImplementation(impl)
+                const href = 'https://backend.example.com/en_US/cafe-chair-DH-388.html'
+                byId('widget').insertAdjacentHTML(
+                    'beforeend',
+                    `<div class="cim-widget-msg-product-card"><a id="late-cafe" href="${href}">Cozy Chair</a></div>`
+                )
+                await flush()
+                expect(hrefOf('late-cafe')).toBe(href)
+                expect(click(byId('late-cafe'))).toBe(false)
+                expect(navigateToProduct).not.toHaveBeenCalled()
+            }
+        )
+
+        test('keeps the backend address of an ambiguous link when there is no lookup', () => {
+            stop()
+            document.body.innerHTML = WIDGET_MARKUP
+            stop = attachAgentProductLinkRouting({navigateToProduct, getProductHref: productHref})
+            expect(hrefOf('card-name')).toBe('/us/en-US/product/2040793A5H')
+            expect(hrefOf('pdp-title')).toBe(SFRA_SITE_URL)
+        })
+
+        test('does not rewrite links once detached, even when a lookup answers later', async () => {
+            let answer
+            lookupProductId.mockImplementationOnce(
+                () => new Promise((resolve) => (answer = resolve))
+            )
+            const href = 'https://backend.example.com/cafe-chair-DH-388.html'
+            byId('widget').insertAdjacentHTML(
+                'beforeend',
+                `<div class="cim-widget-msg-product-card"><a id="late-cafe" href="${href}">Cozy Chair</a></div>`
+            )
+            await flush()
+            stop()
+            answer('DH-388')
+            await flush()
+            expect(hrefOf('late-cafe')).toBe(href)
         })
 
         test('rewrites links again, and still routes them, when attached with a new address (locale switch)', () => {

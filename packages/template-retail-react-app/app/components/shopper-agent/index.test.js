@@ -115,8 +115,10 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-miaw', () => ({
 
 // Mock commerce-sdk-react hooks. useAccessToken returns a stable object so the
 // component can read getTokenWhenReady() during the conversation-started flow.
+const mockGetUrlMapping = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useAccessToken: jest.fn(),
+    useCommerceApi: () => ({getUrlMapping: mockGetUrlMapping}),
     useUsid: jest.fn(),
     useConfig: jest.fn(),
     useCustomerType: jest.fn(),
@@ -2088,6 +2090,25 @@ describe('ShopperAgent Component', () => {
 
             unmount()
             expect(mockStopProductLinkRouting).toHaveBeenCalled()
+        })
+
+        test('looks agent product links up through Shopper SEO', async () => {
+            renderCommerceClient()
+            const calls = attachAgentProductLinkRouting.mock.calls
+            const {lookupProductId} = calls[calls.length - 1][0]
+
+            mockGetUrlMapping.mockResolvedValueOnce({resourceType: 'PRODUCT', resourceId: 'DH-387'})
+            await expect(lookupProductId('chairs/DH-387.html')).resolves.toBe('DH-387')
+            expect(mockGetUrlMapping).toHaveBeenLastCalledWith({
+                parameters: {urlSegment: 'chairs/DH-387.html'},
+                headers: {Authorization: 'Bearer test-slas-access-token'}
+            })
+
+            mockGetUrlMapping.mockResolvedValueOnce({
+                resourceType: 'CATEGORY',
+                resourceId: 'chairs'
+            })
+            await expect(lookupProductId('chairs.html')).resolves.toBeUndefined()
         })
 
         test('leaves the new optional widget fields undefined when not configured so the widget default wins', () => {
