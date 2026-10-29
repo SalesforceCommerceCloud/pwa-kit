@@ -90,6 +90,12 @@ module.exports = {
             // CHANGELOG entry for details. Forwarded as
             // `messagingConfig.enableImageUpload`. Defaults to 'false'.
             cc_enableImageUpload: 'false',
+            // Layout preset for the Commerce Client widget: 'standard' (default) or
+            // 'commerce'. The 'commerce' preset activates premium visual styling
+            // (unified product cards, rounded input, sparkle loading indicator).
+            // Forwarded as `layoutPreset`. Empty string means the widget uses its own
+            // default ('standard').
+            cc_layoutPreset: '',
             // Optional URL to customer's component override script. Must use HTTPS;
             // a non-HTTPS or malformed URL is dropped and the widget keeps its defaults.
             // The script defines Web Components that replace default product cards, carousels,
