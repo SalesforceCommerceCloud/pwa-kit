@@ -673,6 +673,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.demandware.net'
                     ],
                     'frame-src': [
+                        // The Shopper Agent embeds the storefront-owned express-payment
+                        // routes in a same-origin iframe.
+                        "'self'",
                         // Allow frames from Salesforce site.com (Needed for MIAW)
                         '*.site.com',
                         // Payment gateways
@@ -684,7 +687,10 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'frame-ancestors': [
                         // Allow Page Designer to embed the storefront in an iframe
-                        '*.demandware.net'
+                        '*.demandware.net',
+                        // Allow same-origin framing, including express-payment routes embedded by
+                        // Shopper Agent.
+                        "'self'"
                     ]
                 }
             }
