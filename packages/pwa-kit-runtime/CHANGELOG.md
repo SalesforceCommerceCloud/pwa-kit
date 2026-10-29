@@ -1,4 +1,5 @@
 ## v3.22.0-dev (Oct 09, 2026)
+- The SLAS private client proxy now sends the `x-slas-client-auth` header (raw base64 private client credentials) on `/oauth2/login` and `/oauth2/authorize`, so private clients work with SLAS strict client auth. `/oauth2/authorize` (GET) is added to the default `SLAS_PRIVATE_PROXY_ALLOWLIST`, and `SlasProxyAuthType.SLAS_CLIENT_AUTH` is added for custom allow-lists. `/oauth2/trusted-agent/token` continues to use `_sfdc_client_auth`.
 ## v3.21.0 (Oct 08, 2026)
 - Version alignment release; no functional changes to `pwa-kit-runtime` since v3.20.0.
 
