@@ -96,7 +96,8 @@ const injectCommerceClientWidget = ({
     showProductDescription,
     showProductCaptions,
     promptsConfig,
-    enablePageContext
+    enablePageContext,
+    layoutPreset
 } = {}) => {
     if (!onClient) return false
 
@@ -179,7 +180,8 @@ const injectCommerceClientWidget = ({
             ...(typeof openLinksInNewTab === 'boolean' ? {openLinksInNewTab} : {}),
             ...(typeof onNavigate === 'function' ? {onNavigate} : {}),
             ...(typeof showProductDescription === 'boolean' ? {showProductDescription} : {}),
-            ...(promptsConfig && typeof promptsConfig === 'object' ? {promptsConfig} : {})
+            ...(promptsConfig && typeof promptsConfig === 'object' ? {promptsConfig} : {}),
+            ...(layoutPreset ? {layoutPreset} : {})
         })
         return true
     } catch (err) {
