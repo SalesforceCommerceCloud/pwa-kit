@@ -726,7 +726,10 @@ const App = (props) => {
         return <ComponentPreviewApp {...props} />
     }
 
-    if (isShopperAgentExpressPaymentPath(pathname)) {
+    if (
+        getCommerceAgentConfig()?.enabled === 'true' &&
+        isShopperAgentExpressPaymentPath(pathname)
+    ) {
         return <ShopperAgentExpressPaymentApp {...props} />
     }
 

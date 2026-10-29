@@ -16,6 +16,7 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
 describe('Routes', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        getConfig.mockReturnValue(mockConfig)
     })
 
     test('exports a valid react-router configuration', () => {
@@ -28,16 +29,38 @@ describe('Routes', () => {
         expect(lastRoute.path).toBe('*')
     })
 
-    test.each(['/Payments-Express', '/Payments-ExpressProduct'])(
-        'matches the Shopper Agent route %s case-sensitively',
-        (path) => {
-            const route = routes().find((candidate) => candidate.path === path)
-
-            expect(route).toMatchObject({exact: true, sensitive: true})
-        }
-    )
-
     describe('Dynamic routes', () => {
+        describe('Shopper Agent express-payment routes', () => {
+            test.each(['/Payments-Express', '/Payments-ExpressProduct'])(
+                'adds %s case-sensitively when Shopper Agent is enabled',
+                (path) => {
+                    getConfig.mockReturnValue({
+                        ...mockConfig,
+                        app: {
+                            ...mockConfig.app,
+                            commerceAgent: {
+                                ...mockConfig.app.commerceAgent,
+                                enabled: 'true'
+                            }
+                        }
+                    })
+
+                    const route = routes().find((candidate) => candidate.path === path)
+
+                    expect(route).toMatchObject({exact: true, sensitive: true})
+                }
+            )
+
+            test.each(['/Payments-Express', '/Payments-ExpressProduct'])(
+                'does not add %s when Shopper Agent is disabled',
+                (path) => {
+                    const route = routes().find((candidate) => candidate.path === path)
+
+                    expect(route).toBeUndefined()
+                }
+            )
+        })
+
         describe('Reset password landing route', () => {
             test.each([
                 ['path is null', null],

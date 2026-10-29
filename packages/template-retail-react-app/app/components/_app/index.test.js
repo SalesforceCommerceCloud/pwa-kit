@@ -95,6 +95,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+    mockConfig.app.commerceAgent.enabled = 'false'
     windowSpy.mockRestore()
     StorefrontPreview.mockClear()
     jest.restoreAllMocks()
@@ -206,6 +207,7 @@ describe('App', () => {
 
     test('stretches the Shopper Agent express payment surface to the iframe width', () => {
         useMultiSite.mockImplementation(() => resultUseMultiSite)
+        mockConfig.app.commerceAgent.enabled = 'true'
         window.history.pushState({}, '', '/Payments-ExpressProduct?pid=product-1&quantity=1')
 
         renderWithProviders(
@@ -217,6 +219,22 @@ describe('App', () => {
         expect(screen.getByTestId('shopper-agent-express-payment-app')).toHaveStyle({
             width: '100%'
         })
+    })
+
+    test('uses the normal storefront surface for an express-payment path when Shopper Agent is disabled', async () => {
+        useMultiSite.mockImplementation(() => resultUseMultiSite)
+        window.history.pushState({}, '', '/Payments-ExpressProduct?pid=product-1&quantity=1')
+
+        renderWithProviders(
+            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+                <p>Disabled express payment child</p>
+            </App>
+        )
+
+        await waitFor(() => {
+            expect(screen.getByText('Disabled express payment child')).toBeInTheDocument()
+        })
+        expect(screen.queryByTestId('shopper-agent-express-payment-app')).not.toBeInTheDocument()
     })
 
     test('SSR-renders the embedded header when its component is only lazily registered', () => {

@@ -19,6 +19,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -144,18 +145,6 @@ export const routes = [
     {
         path: '/preview/component',
         component: ComponentPreview
-    },
-    {
-        path: '/Payments-Express',
-        component: ShopperAgentExpressPaymentPage,
-        exact: true,
-        sensitive: true
-    },
-    {
-        path: '/Payments-ExpressProduct',
-        component: ShopperAgentExpressPaymentPage,
-        exact: true,
-        sensitive: true
     }
 ]
 
@@ -168,6 +157,7 @@ export default () => {
     const passwordlessLoginEnabled = loginConfig?.passwordless?.enabled
     const passwordlessLoginLandingPath = loginConfig?.passwordless?.landingPath
     const guestOrderLookupEnabled = getConfig()?.app?.guestOrderLookup?.enabled
+    const commerceAgentEnabled = getCommerceAgentConfig()?.enabled === 'true'
 
     // Add dynamic routes conditionally (only if features are enabled and paths are defined)
     const dynamicRoutes = [
@@ -207,6 +197,18 @@ export default () => {
             path: '/order-lookup/results/:orderNo',
             component: GuestOrderLookupResults,
             exact: true
+        },
+        commerceAgentEnabled && {
+            path: '/Payments-Express',
+            component: ShopperAgentExpressPaymentPage,
+            exact: true,
+            sensitive: true
+        },
+        commerceAgentEnabled && {
+            path: '/Payments-ExpressProduct',
+            component: ShopperAgentExpressPaymentPage,
+            exact: true,
+            sensitive: true
         }
     ].filter(Boolean)
 

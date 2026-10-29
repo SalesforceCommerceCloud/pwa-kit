@@ -688,7 +688,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'frame-ancestors': [
                         // Allow Page Designer to embed the storefront in an iframe
                         '*.demandware.net',
-                        // Express-payment routes are framed by the same-origin Shopper Agent.
+                        // Allow same-origin framing, including express-payment routes embedded by
+                        // Shopper Agent.
                         "'self'"
                     ]
                 }
