@@ -705,7 +705,8 @@ const CommerceClientAgentWindow = ({
         cc_openLinksInNewTab,
         cc_showProductDescription,
         cc_showProductCaptions,
-        cc_promptsConfig
+        cc_promptsConfig,
+        cc_enablePageContext
     } = commerceAgentConfiguration
 
     const navigate = useNavigation()
@@ -1150,7 +1151,8 @@ const CommerceClientAgentWindow = ({
             onNavigate,
             showProductDescription: toOptionalWidgetBoolean(cc_showProductDescription),
             showProductCaptions: toOptionalWidgetBoolean(cc_showProductCaptions),
-            promptsConfig: cc_promptsConfig
+            promptsConfig: cc_promptsConfig,
+            enablePageContext: toOptionalWidgetBoolean(cc_enablePageContext)
         }),
         [
             commerceClientElementId,
@@ -1187,7 +1189,8 @@ const CommerceClientAgentWindow = ({
             onNavigate,
             cc_showProductDescription,
             cc_showProductCaptions,
-            cc_promptsConfig
+            cc_promptsConfig,
+            cc_enablePageContext
         ]
     )
 

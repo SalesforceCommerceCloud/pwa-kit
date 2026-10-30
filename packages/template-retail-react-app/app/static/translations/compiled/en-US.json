@@ -3261,6 +3261,34 @@
       "value": "Secure"
     }
   ],
+  "inline_agent_widget.redirect.input_placeholder": [
+    {
+      "type": 0,
+      "value": "Ask me anything"
+    }
+  ],
+  "inline_agent_widget.redirect.input_placeholder_with_product": [
+    {
+      "type": 0,
+      "value": "Ask me anything about "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "inline_agent_widget.redirect.submit": [
+    {
+      "type": 0,
+      "value": "Ask"
+    }
+  ],
+  "inline_agent_widget.redirect.title": [
+    {
+      "type": 0,
+      "value": "Have a question?"
+    }
+  ],
   "item_attributes.label.bonus_product": [
     {
       "type": 0,
