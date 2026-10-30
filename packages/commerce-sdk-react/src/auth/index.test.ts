@@ -1055,13 +1055,79 @@ describe('Auth', () => {
 
     test('getPasswordLessAccessToken calls isomorphic getPasswordLessAccessToken', async () => {
         const auth = new Auth(config)
-        await auth.getPasswordLessAccessToken({pwdlessLoginToken: '12345678'})
+        await auth.getPasswordLessAccessToken({
+            pwdlessLoginToken: '12345678',
+            login_id: 'shopper@example.com',
+            channel_id: config.siteId
+        })
         expect(helpers.getPasswordLessAccessToken).toHaveBeenCalled()
         const functionArg = (helpers.getPasswordLessAccessToken as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
-            parameters: {pwdlessLoginToken: '12345678'}
+            parameters: {
+                pwdlessLoginToken: '12345678',
+                loginId: 'shopper@example.com',
+                channelId: config.siteId
+            }
         })
     })
+
+    test('getPasswordLessAccessToken forwards loginId and channelId to the helper', async () => {
+        const auth = new Auth(config)
+        await auth.getPasswordLessAccessToken({
+            pwdlessLoginToken: '12345678',
+            login_id: 'shopper@example.com',
+            channel_id: 'customChannelId'
+        })
+        expect(helpers.getPasswordLessAccessToken).toHaveBeenCalled()
+        const functionArg = (helpers.getPasswordLessAccessToken as jest.Mock).mock.calls[0][0]
+        expect(functionArg).toMatchObject({
+            parameters: {
+                pwdlessLoginToken: '12345678',
+                loginId: 'shopper@example.com',
+                channelId: 'customChannelId'
+            }
+        })
+    })
+
+    // Requires commerce-sdk-isomorphic@6.0.0+, which maps helper loginId/channelId onto the wire body.
+    const isomorphicMajor = Number(
+        (jest.requireActual('commerce-sdk-isomorphic/package.json') as {version: string}).version.split(
+            '.'
+        )[0]
+    )
+    ;(isomorphicMajor >= 6 ? test : test.skip)(
+        'getPasswordLessAccessToken maps loginId/channelId onto the SLAS request body',
+        async () => {
+            // Drive the real isomorphic helper so we assert the wire body, not only our wrapper args.
+            const {helpers: actualHelpers} = jest.requireActual(
+                'commerce-sdk-isomorphic'
+            ) as typeof import('commerce-sdk-isomorphic')
+            const getPasswordLessAccessTokenSpy = jest.fn().mockResolvedValue(TOKEN_RESPONSE)
+
+            const auth = new Auth(configSLASPrivate)
+            // @ts-expect-error private property
+            auth.client.getPasswordLessAccessToken = getPasswordLessAccessTokenSpy
+            ;(helpers.getPasswordLessAccessToken as jest.Mock).mockImplementationOnce((options) =>
+                actualHelpers.getPasswordLessAccessToken(options)
+            )
+
+            await auth.getPasswordLessAccessToken({
+                pwdlessLoginToken: '12345678',
+                login_id: 'shopper@example.com',
+                channel_id: 'customChannelId'
+            })
+
+            expect(getPasswordLessAccessTokenSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    body: expect.objectContaining({
+                        pwdless_login_token: '12345678',
+                        login_id: 'shopper@example.com',
+                        channel_id: 'customChannelId'
+                    })
+                })
+            )
+        }
+    )
 
     test.each([
         [
@@ -1169,6 +1235,7 @@ describe('Auth', () => {
         [
             'with all parameters specified',
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123',
                 channel_id: 'customChannelId',
@@ -1177,6 +1244,7 @@ describe('Auth', () => {
                 code_verifier: 'test-code-verifier'
             },
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123',
                 channel_id: 'customChannelId',
@@ -1188,10 +1256,12 @@ describe('Auth', () => {
         [
             'defaults all parameters when only required parameters are specified',
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123'
             },
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123',
                 channel_id: config.siteId,

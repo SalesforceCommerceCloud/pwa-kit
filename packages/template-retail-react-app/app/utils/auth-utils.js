@@ -28,6 +28,12 @@ export const TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE = defineMessage({
     id: 'global.error.too_many_password_reset_requests'
 })
 
+export const MISSING_PASSWORDLESS_LOGIN_ID_ERROR = defineMessage({
+    defaultMessage:
+        'Your email is missing for this verification. Click Resend Code and try again.',
+    id: 'global.error.missing_passwordless_login_id'
+})
+
 // Shared error patterns for token-based auth features (passwordless login, password reset)
 const TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS = [
     /no callback_uri is registered/i,
@@ -45,6 +51,18 @@ const PASSWORD_RESET_FEATURE_UNAVAILABLE_ERRORS = TOKEN_BASED_AUTH_FEATURE_UNAVA
 
 const TOO_MANY_REQUESTS_ERROR = /too many .* requests/i
 
+// Exact SLAS ValidationUtil messages for missing/mismatched login_id
+const MISSING_OR_MISMATCHED_LOGIN_ID_ERRORS = [
+    'login_id does not match stored login_id',
+    'login_id is required',
+    'login id is required for Passwordless Login authentication'
+]
+
+const isMissingOrMismatchedLoginIdError = (errorMessage) => {
+    const normalized = String(errorMessage).toLowerCase()
+    return MISSING_OR_MISMATCHED_LOGIN_ID_ERRORS.some((msg) => msg.toLowerCase() === normalized)
+}
+
 /**
  * Returns the absolute URL for the passwordless login callback.
  * If the callback URI is already absolute, it is returned as-is; otherwise it is
@@ -61,6 +79,25 @@ export const getPasswordlessCallbackUrl = (callbackURI) => {
         return callbackURI
     }
     return `${getAppOrigin()}${getEnvBasePath()}${callbackURI}`
+}
+
+/**
+ * Safely read an error message from a ResponseError-like object's JSON body.
+ * Guards against missing responses and empty/non-JSON bodies.
+ *
+ * @param {Error & {response?: Response}} error
+ * @returns {Promise<string|undefined>}
+ */
+export const readErrorResponseMessage = async (error) => {
+    if (typeof error?.response?.json !== 'function') {
+        return error?.message
+    }
+    try {
+        const errorData = await error.response.json()
+        return errorData?.message ?? error?.message
+    } catch {
+        return error?.message
+    }
 }
 
 /**
@@ -105,7 +142,29 @@ export const getPasswordResetErrorMessage = (errorMessage) => {
  * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
  */
 export const getLoginPasswordlessErrorMessage = (errorMessage) => {
-    if (INVALID_TOKEN_ERROR.test(errorMessage)) {
+    if (INVALID_TOKEN_ERROR.test(errorMessage) || isMissingOrMismatchedLoginIdError(errorMessage)) {
+        return INVALID_TOKEN_ERROR_MESSAGE
+    }
+    if (TOO_MANY_REQUESTS_ERROR.test(errorMessage)) {
+        return TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
+    }
+    return API_ERROR_MESSAGE
+}
+
+/**
+ * Maps error message from resetPassword (password/action) mutation to the appropriate
+ * user-friendly error message descriptor. Rate-limit responses are shaped like invalid
+ * token so the existing reset-password UX is reused.
+ *
+ * @param {string} errorMessage - The error message from the API
+ * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
+ */
+export const getResetPasswordActionErrorMessage = (errorMessage) => {
+    if (
+        INVALID_TOKEN_ERROR.test(errorMessage) ||
+        TOO_MANY_REQUESTS_ERROR.test(errorMessage) ||
+        isMissingOrMismatchedLoginIdError(errorMessage)
+    ) {
         return INVALID_TOKEN_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE

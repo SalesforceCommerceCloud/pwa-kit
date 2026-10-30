@@ -32,7 +32,9 @@ import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     getAuthorizePasswordlessErrorMessage,
     getLoginPasswordlessErrorMessage,
-    getPasswordlessCallbackUrl
+    getPasswordlessCallbackUrl,
+    readErrorResponseMessage,
+    TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
@@ -52,7 +54,7 @@ const Login = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const {isRegistered, customerType} = useCustomerType()
-    const {locale} = useMultiSite()
+    const {site, locale} = useMultiSite()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
@@ -121,11 +123,23 @@ const Login = () => {
 
     const handleOtpVerification = async (pwdlessLoginToken) => {
         try {
-            await loginPasswordless.mutateAsync({pwdlessLoginToken})
+            const loginId =
+                form.getValues('email') || queryParams.get('login_id')
+            await loginPasswordless.mutateAsync({
+                pwdlessLoginToken,
+                login_id: loginId,
+                channel_id: site.id
+            })
             return {success: true}
         } catch (e) {
-            const errorData = await e.response?.json()
-            const message = formatMessage(getLoginPasswordlessErrorMessage(errorData.message))
+            if (e.response?.status === 429) {
+                return {
+                    success: false,
+                    error: formatMessage(TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE)
+                }
+            }
+            const errorMessage = await readErrorResponseMessage(e)
+            const message = formatMessage(getLoginPasswordlessErrorMessage(errorMessage))
             return {success: false, error: message}
         }
     }
