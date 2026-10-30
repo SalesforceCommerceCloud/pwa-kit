@@ -739,10 +739,17 @@ const CommerceClientAgentWindow = ({
                 getProductHref: (productId) => buildUrl(productUrlBuilder({id: productId})),
                 lookupProductId: async (urlSegment) => {
                     const token = await getTokenWhenReadyRef.current()
-                    const mapping = await shopperSeo.getUrlMapping({
-                        parameters: {urlSegment},
-                        headers: {Authorization: `Bearer ${token}`}
-                    })
+                    let mapping
+                    try {
+                        mapping = await shopperSeo.getUrlMapping({
+                            parameters: {urlSegment},
+                            headers: {Authorization: `Bearer ${token}`}
+                        })
+                    } catch (error) {
+                        // 404 means the segment maps to nothing; anything else is a failed lookup
+                        if (error?.response?.status === 404) return undefined
+                        throw error
+                    }
                     return mapping?.resourceType === 'PRODUCT' ? mapping.resourceId : undefined
                 }
             }),

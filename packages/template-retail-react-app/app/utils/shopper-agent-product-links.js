@@ -182,10 +182,11 @@ const rewritten = new WeakMap()
  * Starts pointing agent product links at the storefront. Links already rewritten keep their
  * storefront address after it stops.
  *
- * A link whose id the URL does not tell for certain is looked up once per address with
- * `lookupProductId`, trying each of `getProductUrlSegments` in turn, and rewritten when the answer
- * comes back if it still has that address. A click before then, or on a link no lookup resolved,
- * is left to the browser.
+ * A link whose id the URL does not tell for certain is looked up with `lookupProductId`, trying each
+ * of `getProductUrlSegments` in turn, and rewritten when the answer comes back if it still has that
+ * address. An address no segment maps to is not looked up again; one whose lookup failed is retried
+ * the next time the widget draws it. A click before then, or on a link no lookup resolved, is left
+ * to the browser.
  *
  * The click listener runs in the bubble phase, after the widget's own click handler, and skips an
  * event that is already `defaultPrevented`.
@@ -197,7 +198,8 @@ const rewritten = new WeakMap()
  * @param {Object} options
  * @param {function(string): void} options.navigateToProduct - Opens the product page through the router
  * @param {function(string): string} options.getProductHref - Storefront product address, site and locale prefix included
- * @param {function(string): Promise<string|undefined>} [options.lookupProductId] - Product id a URL segment maps to, if any
+ * @param {function(string): Promise<string|undefined>} [options.lookupProductId] - Product id a URL
+ *   segment maps to, or undefined when it maps to none; rejects when the lookup fails
  * @param {Document} [options.root] - Document to watch
  * @returns {function(): void} Stops the routing
  */
@@ -230,14 +232,11 @@ export const attachAgentProductLinkRouting = ({
         if (anchor.getAttribute('href') !== href) anchor.setAttribute('href', href)
     }
 
+    /** Resolves to the product id, or undefined when no segment maps to one; rejects when a lookup fails. */
     const lookUp = async (backendHref) => {
         for (const urlSegment of getProductUrlSegments(backendHref)) {
-            try {
-                const productId = await lookupProductId(urlSegment)
-                if (productId) return productId
-            } catch {
-                // Not a known URL; try the next segment
-            }
+            const productId = await lookupProductId(urlSegment)
+            if (productId) return productId
         }
         return undefined
     }
@@ -252,15 +251,21 @@ export const attachAgentProductLinkRouting = ({
         if (!lookupProductId || lookedUp.has(backendHref) || pending.has(backendHref)) return
         if (!getProductUrlSegments(backendHref).length) return
         pending.add(backendHref)
-        lookUp(backendHref).then((foundId) => {
-            pending.delete(backendHref)
-            lookedUp.set(backendHref, foundId || null)
-            if (stopped || !foundId) return
-            // Every link still on that address, including ones drawn while the lookup ran
-            findAgentProductLinksIn(root)
-                .filter((link) => link.href === backendHref)
-                .forEach((link) => writeHref(link, foundId))
-        })
+        lookUp(backendHref).then(
+            (foundId) => {
+                pending.delete(backendHref)
+                lookedUp.set(backendHref, foundId || null)
+                if (stopped || !foundId) return
+                // Every link still on that address, including ones drawn while the lookup ran
+                findAgentProductLinksIn(root)
+                    .filter((link) => link.href === backendHref)
+                    .forEach((link) => writeHref(link, foundId))
+            },
+            () => {
+                // Offline, token not ready or a server error: keep the backend URL, and look it up again next time
+                pending.delete(backendHref)
+            }
+        )
     }
 
     const onClick = (event) => {

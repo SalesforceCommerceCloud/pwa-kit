@@ -2111,6 +2111,24 @@ describe('ShopperAgent Component', () => {
             await expect(lookupProductId('chairs.html')).resolves.toBeUndefined()
         })
 
+        test('treats a Shopper SEO 404 as no product, and lets any other failure reject', async () => {
+            renderCommerceClient()
+            const calls = attachAgentProductLinkRouting.mock.calls
+            const {lookupProductId} = calls[calls.length - 1][0]
+
+            const notFound = Object.assign(new Error('Not Found'), {response: {status: 404}})
+            mockGetUrlMapping.mockRejectedValueOnce(notFound)
+            await expect(lookupProductId('unknown.html')).resolves.toBeUndefined()
+
+            const serverError = Object.assign(new Error('Bad Gateway'), {response: {status: 502}})
+            mockGetUrlMapping.mockRejectedValueOnce(serverError)
+            await expect(lookupProductId('chairs/DH-387.html')).rejects.toBe(serverError)
+
+            const offline = new TypeError('Failed to fetch')
+            mockGetUrlMapping.mockRejectedValueOnce(offline)
+            await expect(lookupProductId('chairs/DH-387.html')).rejects.toBe(offline)
+        })
+
         test('leaves the new optional widget fields undefined when not configured so the widget default wins', () => {
             renderCommerceClient()
 

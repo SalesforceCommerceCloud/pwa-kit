@@ -432,7 +432,7 @@ describe('attachAgentProductLinkRouting', () => {
 
         test.each([
             ['finds no product', async () => undefined],
-            ['fails', async () => Promise.reject(new Error('404'))]
+            ['fails', async () => Promise.reject(new Error('offline'))]
         ])(
             'keeps the backend address, never a storefront 404, when the lookup %s',
             async (_label, impl) => {
@@ -448,6 +448,48 @@ describe('attachAgentProductLinkRouting', () => {
                 expect(navigateToProduct).not.toHaveBeenCalled()
             }
         )
+
+        test('does not look up again an address no segment maps to', async () => {
+            lookupProductId.mockResolvedValue(undefined)
+            const href = 'https://backend.example.com/cafe-chair-DH-388.html'
+            const card = `<div class="cim-widget-msg-product-card"><a href="${href}">Cozy Chair</a></div>`
+            byId('widget').insertAdjacentHTML('beforeend', card)
+            await flush()
+            const callsAfterFirst = lookupProductId.mock.calls.length
+
+            byId('widget').insertAdjacentHTML('beforeend', card) // the widget draws it again
+            await flush()
+            expect(lookupProductId).toHaveBeenCalledTimes(callsAfterFirst)
+        })
+
+        test('looks up again, the next time the widget draws it, an address whose lookup failed', async () => {
+            lookupProductId.mockRejectedValueOnce(new Error('offline'))
+            const href = 'https://backend.example.com/cafe-chair-DH-388.html'
+            const card = (id) =>
+                `<div class="cim-widget-msg-product-card"><a id="${id}" href="${href}">Cozy Chair</a></div>`
+            byId('widget').insertAdjacentHTML('beforeend', card('first-try'))
+            await flush()
+            expect(hrefOf('first-try')).toBe(href)
+            expect(lookupProductId).toHaveBeenCalledTimes(2) // `chairs/DH-387.html`, then this one
+
+            byId('widget').insertAdjacentHTML('beforeend', card('second-try'))
+            await flush()
+            expect(lookupProductId).toHaveBeenCalledTimes(3)
+            expect(hrefOf('first-try')).toBe('/us/en-US/product/DH-388')
+            expect(hrefOf('second-try')).toBe('/us/en-US/product/DH-388')
+        })
+
+        test('stops at the first segment whose lookup fails, so it is retried whole', async () => {
+            lookupProductId.mockRejectedValueOnce(new Error('offline'))
+            const href = 'https://backend.example.com/en_US/cafe-chair-DH-388.html'
+            byId('widget').insertAdjacentHTML(
+                'beforeend',
+                `<div class="cim-widget-msg-product-card"><a id="late-cafe" href="${href}">Cozy Chair</a></div>`
+            )
+            await flush()
+            expect(lookupProductId).toHaveBeenLastCalledWith('en_US/cafe-chair-DH-388.html')
+            expect(lookupProductId).not.toHaveBeenCalledWith('cafe-chair-DH-388.html')
+        })
 
         test('keeps the backend address of an ambiguous link when there is no lookup', () => {
             stop()
