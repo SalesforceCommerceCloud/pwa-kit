@@ -815,6 +815,7 @@ const ProductDetail = () => {
                                             productResponse?.c_pdpQuestions
                                         )}
                                         productName={productResponse?.name}
+                                        productId={productResponse?.id}
                                     />
                                 }
                             />

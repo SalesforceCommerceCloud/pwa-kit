@@ -87,7 +87,8 @@ const injectCommerceClientWidget = ({
     onNavigate,
     showProductDescription,
     showProductCaptions,
-    promptsConfig
+    promptsConfig,
+    enablePageContext
 } = {}) => {
     if (!onClient) return false
 
@@ -114,6 +115,9 @@ const injectCommerceClientWidget = ({
         }
         if (typeof showProductCaptions === 'boolean') {
             messagingConfig.showProductCaptions = showProductCaptions
+        }
+        if (typeof enablePageContext === 'boolean') {
+            messagingConfig.enablePageContext = enablePageContext
         }
 
         commerceClient.injectMessagingWidget({
