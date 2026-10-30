@@ -279,11 +279,16 @@ export const HttpMethod = Object.freeze({
  *
  *  - `BASIC`       attaches `Authorization: Basic <private-client-creds>`
  *  - `SFDC_HEADER` attaches `_sfdc_client_auth: <private-client-creds>`
+ *  - `SLAS_CLIENT_AUTH` attaches `x-slas-client-auth: <private-client-creds>`
+ *    (raw base64, no `Basic ` prefix). Used on `/oauth2/login` and
+ *    `/oauth2/authorize`, where `Authorization` is unavailable for client
+ *    credentials, so SLAS strict client auth can verify the client secret.
  *  - `NONE`        forwards the request without credential injection
  */
 export const SlasProxyAuthType = Object.freeze({
     BASIC: 'basic',
     SFDC_HEADER: 'sfdc-header',
+    SLAS_CLIENT_AUTH: 'slas-client-auth',
     NONE: 'none'
 })
 
@@ -315,7 +320,12 @@ export const SLAS_PRIVATE_PROXY_ALLOWLIST = Object.freeze([
     {
         segments: ['oauth2', 'login'],
         methods: [HttpMethod.POST],
-        injectAuth: SlasProxyAuthType.NONE
+        injectAuth: SlasProxyAuthType.SLAS_CLIENT_AUTH
+    },
+    {
+        segments: ['oauth2', 'authorize'],
+        methods: [HttpMethod.GET],
+        injectAuth: SlasProxyAuthType.SLAS_CLIENT_AUTH
     },
     {
         segments: ['oauth2', 'passwordless', 'login'],
@@ -1368,6 +1378,8 @@ export const RemoteServerFactory = {
 
                         if (injectAuth === SlasProxyAuthType.SFDC_HEADER) {
                             proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
+                        } else if (injectAuth === SlasProxyAuthType.SLAS_CLIENT_AUTH) {
+                            proxyRequest.setHeader('x-slas-client-auth', encodedSlasCredentials)
                         } else if (injectAuth === SlasProxyAuthType.BASIC) {
                             proxyRequest.setHeader(
                                 'Authorization',
