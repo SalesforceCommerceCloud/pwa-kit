@@ -1,3 +1,6 @@
+## v5.6.0-nightly-20261030080312 (Oct 30, 2026)
+## v5.6.0-dev (Oct 30, 2026)
+## v3.22.0-nightly-20261030080312 (Oct 30, 2026)
 ## v5.6.0-dev (Oct 09, 2026)
 - [Feature] When a SLAS private client secret is set directly via `clientSecret` (not PWA Kit private client mode), `loginRegisteredUserB2C` now sends the `x-slas-client-auth` header so the login works with SLAS strict client auth.
 ## v5.5.0 (Oct 08, 2026)
