@@ -124,7 +124,7 @@ const Login = () => {
     const handleOtpVerification = async (pwdlessLoginToken) => {
         try {
             const loginId =
-                form.getValues('email') || decodeURIComponent(queryParams.get('login_id') || '')
+                form.getValues('email') || queryParams.get('login_id')
             await loginPasswordless.mutateAsync({
                 pwdlessLoginToken,
                 login_id: loginId,

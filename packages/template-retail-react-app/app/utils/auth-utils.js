@@ -28,6 +28,12 @@ export const TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE = defineMessage({
     id: 'global.error.too_many_password_reset_requests'
 })
 
+export const MISSING_PASSWORDLESS_LOGIN_ID_ERROR = defineMessage({
+    defaultMessage:
+        'Your email is missing for this verification. Click Resend Code and try again.',
+    id: 'global.error.missing_passwordless_login_id'
+})
+
 // Shared error patterns for token-based auth features (passwordless login, password reset)
 const TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS = [
     /no callback_uri is registered/i,
@@ -45,9 +51,17 @@ const PASSWORD_RESET_FEATURE_UNAVAILABLE_ERRORS = TOKEN_BASED_AUTH_FEATURE_UNAVA
 
 const TOO_MANY_REQUESTS_ERROR = /too many .* requests/i
 
-// SLAS returns 400 when login_id is missing or does not match the passwordless login request
-const MISSING_OR_MISMATCHED_IDENTIFIER_ERROR =
-    /missing.*identifier|mismatched.*identifier|login_id.*(match|mismatch|required)|identifier.*(missing|mismatch)/i
+// Exact SLAS ValidationUtil messages for missing/mismatched login_id
+const MISSING_OR_MISMATCHED_LOGIN_ID_ERRORS = [
+    'login_id does not match stored login_id',
+    'login_id is required',
+    'login id is required for Passwordless Login authentication'
+]
+
+const isMissingOrMismatchedLoginIdError = (errorMessage) => {
+    const normalized = String(errorMessage).toLowerCase()
+    return MISSING_OR_MISMATCHED_LOGIN_ID_ERRORS.some((msg) => msg.toLowerCase() === normalized)
+}
 
 /**
  * Returns the absolute URL for the passwordless login callback.
@@ -128,10 +142,7 @@ export const getPasswordResetErrorMessage = (errorMessage) => {
  * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
  */
 export const getLoginPasswordlessErrorMessage = (errorMessage) => {
-    if (
-        INVALID_TOKEN_ERROR.test(errorMessage) ||
-        MISSING_OR_MISMATCHED_IDENTIFIER_ERROR.test(String(errorMessage))
-    ) {
+    if (INVALID_TOKEN_ERROR.test(errorMessage) || isMissingOrMismatchedLoginIdError(errorMessage)) {
         return INVALID_TOKEN_ERROR_MESSAGE
     }
     if (TOO_MANY_REQUESTS_ERROR.test(errorMessage)) {
@@ -152,7 +163,7 @@ export const getResetPasswordActionErrorMessage = (errorMessage) => {
     if (
         INVALID_TOKEN_ERROR.test(errorMessage) ||
         TOO_MANY_REQUESTS_ERROR.test(errorMessage) ||
-        MISSING_OR_MISMATCHED_IDENTIFIER_ERROR.test(String(errorMessage))
+        isMissingOrMismatchedLoginIdError(errorMessage)
     ) {
         return INVALID_TOKEN_ERROR_MESSAGE
     }

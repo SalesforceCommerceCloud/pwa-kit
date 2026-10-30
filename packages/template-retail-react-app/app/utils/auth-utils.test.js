@@ -119,12 +119,12 @@ describe('getPasswordResetErrorMessage', () => {
 describe('getLoginPasswordlessErrorMessage', () => {
     test.each([
         ['invalid token', INVALID_TOKEN_ERROR_MESSAGE],
+        ['login_id does not match stored login_id', INVALID_TOKEN_ERROR_MESSAGE],
+        ['login_id is required', INVALID_TOKEN_ERROR_MESSAGE],
         [
-            'login_id does not match the passwordless login request',
+            'login id is required for Passwordless Login authentication',
             INVALID_TOKEN_ERROR_MESSAGE
         ],
-        ['Missing identifier for passwordless token request', INVALID_TOKEN_ERROR_MESSAGE],
-        ['mismatched identifier', INVALID_TOKEN_ERROR_MESSAGE],
         [
             'Too many login requests were made. Please try again later.',
             TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
@@ -146,7 +146,8 @@ describe('getResetPasswordActionErrorMessage', () => {
             'Too many password reset requests were made. Please try again later.',
             INVALID_TOKEN_ERROR_MESSAGE
         ],
-        ['login_id does not match', INVALID_TOKEN_ERROR_MESSAGE],
+        ['login_id does not match stored login_id', INVALID_TOKEN_ERROR_MESSAGE],
+        ['login_id is required', INVALID_TOKEN_ERROR_MESSAGE],
         ['unexpected error message', API_ERROR_MESSAGE],
         [null, API_ERROR_MESSAGE]
     ])(
