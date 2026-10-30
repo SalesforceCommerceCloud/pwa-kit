@@ -115,8 +115,10 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-miaw', () => ({
 
 // Mock commerce-sdk-react hooks. useAccessToken returns a stable object so the
 // component can read getTokenWhenReady() during the conversation-started flow.
+const mockGetUrlMapping = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useAccessToken: jest.fn(),
+    useCommerceApi: () => ({getUrlMapping: mockGetUrlMapping}),
     useUsid: jest.fn(),
     useConfig: jest.fn(),
     useCustomerType: jest.fn(),
@@ -127,6 +129,17 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     __esModule: true,
     default: jest.fn()
+}))
+
+const mockNavigate = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
+    __esModule: true,
+    default: () => mockNavigate
+}))
+
+const mockStopProductLinkRouting = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/utils/shopper-agent-product-links', () => ({
+    attachAgentProductLinkRouting: jest.fn(() => mockStopProductLinkRouting)
 }))
 
 // Mock the useTheme hook
@@ -147,6 +160,7 @@ import {
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import {attachAgentProductLinkRouting} from '@salesforce/retail-react-app/app/utils/shopper-agent-product-links'
 
 // Get mocked functions
 const mockedUseScript = useScript
@@ -2057,6 +2071,62 @@ describe('ShopperAgent Component', () => {
             const calls = mockedUseCommerceClientMessaging.mock.calls
             const widgetOptions = calls[calls.length - 1][1]
             expect(typeof widgetOptions.onNavigate).toBe('function')
+        })
+
+        test('points agent product links at the storefront product page and stops on unmount', () => {
+            const buildUrl = jest.fn((path) => `/us/en-US${path}`)
+            mockedUseMultiSite.mockReturnValue({
+                locale: {id: 'en-US', preferredCurrency: 'USD'},
+                buildUrl
+            })
+
+            const {unmount} = renderCommerceClient()
+
+            const calls = attachAgentProductLinkRouting.mock.calls
+            const {navigateToProduct, getProductHref} = calls[calls.length - 1][0]
+            expect(getProductHref('DH-387')).toBe('/us/en-US/product/DH-387')
+            navigateToProduct('2040793A5H')
+            expect(mockNavigate).toHaveBeenCalledWith('/product/2040793A5H')
+
+            unmount()
+            expect(mockStopProductLinkRouting).toHaveBeenCalled()
+        })
+
+        test('looks agent product links up through Shopper SEO', async () => {
+            renderCommerceClient()
+            const calls = attachAgentProductLinkRouting.mock.calls
+            const {lookupProductId} = calls[calls.length - 1][0]
+
+            mockGetUrlMapping.mockResolvedValueOnce({resourceType: 'PRODUCT', resourceId: 'DH-387'})
+            await expect(lookupProductId('chairs/DH-387.html')).resolves.toBe('DH-387')
+            expect(mockGetUrlMapping).toHaveBeenLastCalledWith({
+                parameters: {urlSegment: 'chairs/DH-387.html'},
+                headers: {Authorization: 'Bearer test-slas-access-token'}
+            })
+
+            mockGetUrlMapping.mockResolvedValueOnce({
+                resourceType: 'CATEGORY',
+                resourceId: 'chairs'
+            })
+            await expect(lookupProductId('chairs.html')).resolves.toBeUndefined()
+        })
+
+        test('treats a Shopper SEO 404 as no product, and lets any other failure reject', async () => {
+            renderCommerceClient()
+            const calls = attachAgentProductLinkRouting.mock.calls
+            const {lookupProductId} = calls[calls.length - 1][0]
+
+            const notFound = Object.assign(new Error('Not Found'), {response: {status: 404}})
+            mockGetUrlMapping.mockRejectedValueOnce(notFound)
+            await expect(lookupProductId('unknown.html')).resolves.toBeUndefined()
+
+            const serverError = Object.assign(new Error('Bad Gateway'), {response: {status: 502}})
+            mockGetUrlMapping.mockRejectedValueOnce(serverError)
+            await expect(lookupProductId('chairs/DH-387.html')).rejects.toBe(serverError)
+
+            const offline = new TypeError('Failed to fetch')
+            mockGetUrlMapping.mockRejectedValueOnce(offline)
+            await expect(lookupProductId('chairs/DH-387.html')).rejects.toBe(offline)
         })
 
         test('leaves the new optional widget fields undefined when not configured so the widget default wins', () => {
