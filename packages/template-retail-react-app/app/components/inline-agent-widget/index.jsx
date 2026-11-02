@@ -11,9 +11,10 @@ import PropTypes from 'prop-types'
 import useInlineAgentWidget, {
     isConfigured
 } from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
-import InlineAgentRedirectShim from '@salesforce/retail-react-app/app/components/inline-agent-widget/InlineAgentRedirectShim'
+import {handoffToShopperAgent} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
 
-const VALID_MODES = ['inline', 'agent-redirect', 'hybrid']
+const VALID_MODES = ['inline', 'main-agent', 'hybrid']
+const HANDOFF_EVENT = 'inline-agent-widget:handoff'
 
 const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
     const containerRef = useInlineAgentWidget(config, {pdpQuestions, productName})
@@ -26,22 +27,35 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
         }
     }, [config.mode])
 
+    // Main-agent: the UMD paints a non-conversational shim and emits a
+    // bubbling `inline-agent-widget:handoff` CustomEvent whenever the shopper
+    // clicks a pill or submits the input. The host owns the handoff — opens
+    // the main Shopper Agent drawer with the question seeded + PDP context.
+    useEffect(() => {
+        if (config.mode !== 'main-agent') return
+        if (typeof window === 'undefined') return
+
+        const onHandoff = (ev) => {
+            const question = ev.detail?.question
+            if (!question) return
+            handoffToShopperAgent({
+                question,
+                productContext: {
+                    productId,
+                    productName,
+                    pdpUrl: window.location.href
+                }
+            })
+        }
+
+        document.addEventListener(HANDOFF_EVENT, onHandoff)
+        return () => {
+            document.removeEventListener(HANDOFF_EVENT, onHandoff)
+        }
+    }, [config.mode, productId, productName])
+
     if (!isConfigured(config)) return null
 
-    // Agent-redirect: no local SCRT2 session — the shim hands the question
-    // (pill or typed) off to the main Shopper Agent drawer.
-    if (config.mode === 'agent-redirect') {
-        return (
-            <InlineAgentRedirectShim
-                pdpQuestions={pdpQuestions}
-                productName={productName}
-                productId={productId}
-            />
-        )
-    }
-
-    // 'hybrid' is reserved — PDP-scoped questions stay inline, non-PDP routes
-    // to the main drawer. Until that split lands, hybrid renders the inline UMD.
     return (
         <>
             <Helmet>
@@ -61,12 +75,14 @@ InlineAgentWidget.propTypes = {
         placeholder: PropTypes.string,
         /**
          * `'inline'` (default) runs the UMD custom element with its own SCRT2 session.
-         * `'agent-redirect'` renders a non-conversational shim that hands shopper
-         * questions off to the main Shopper Agent drawer.
+         * `'main-agent'` renders a non-conversational shim (owned by the UMD)
+         * that dispatches an `inline-agent-widget:handoff` CustomEvent on pill
+         * click / submit; this component catches it and hands off to the main
+         * Shopper Agent drawer.
          * `'hybrid'` is reserved for future per-pill routing (PDP questions inline,
          * discovery/comparison to the main drawer); currently falls back to inline.
          */
-        mode: PropTypes.oneOf(['inline', 'agent-redirect', 'hybrid'])
+        mode: PropTypes.oneOf(['inline', 'main-agent', 'hybrid'])
     }),
     /**
      * Opener questions for the current product — rendered as tappable pills
@@ -83,9 +99,9 @@ InlineAgentWidget.propTypes = {
      */
     productName: PropTypes.string,
     /**
-     * Current product id. Forwarded as `productContext.productId` when a
-     * handoff fires in agent-redirect mode so the main drawer can attach it
-     * to the Agentforce routing attributes.
+     * Current product id. Attached to `productContext.productId` in the
+     * handoff payload so the main drawer can prime its page context and
+     * agent routing attributes with the PDP the shopper is on.
      */
     productId: PropTypes.string
 }

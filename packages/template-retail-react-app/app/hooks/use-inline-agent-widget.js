@@ -39,8 +39,12 @@ const ensureWidget = () => {
     return readyPromise
 }
 
-const isConfigured = (config) =>
-    Boolean(config?.enabled && config?.scrt2Url && config?.orgId && config?.esDeveloperName)
+const isConfigured = (config) => {
+    if (!config?.enabled) return false
+    // main-agent never opens a SCRT2 session — only `enabled` matters.
+    if (config?.mode === 'main-agent') return true
+    return Boolean(config?.scrt2Url && config?.orgId && config?.esDeveloperName)
+}
 
 // Stable string key for the pdpQuestions array so the sync effect's dependency
 // is by value, not identity. An empty/undefined list serializes to "" so it
@@ -53,6 +57,7 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
     const containerRef = useRef(null)
     const configured = isConfigured(config)
     const questionsKey = pdpQuestionsKey(pdpQuestions)
+    const mode = config?.mode
 
     useEffect(() => {
         if (typeof window === 'undefined') return
@@ -72,9 +77,13 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
         if (containerRef.current.querySelector('inline-agent-widget')) return
 
         const el = document.createElement('inline-agent-widget')
-        el.setAttribute('scrt2-url', config.scrt2Url)
-        el.setAttribute('org-id', config.orgId)
-        el.setAttribute('es-developer-name', config.esDeveloperName)
+        if (mode) el.setAttribute('mode', mode)
+        // SCRT2 fields are only set when they're real — main-agent mode
+        // doesn't need them and the UMD's config-validation skips the check
+        // when `mode="main-agent"`.
+        if (config.scrt2Url) el.setAttribute('scrt2-url', config.scrt2Url)
+        if (config.orgId) el.setAttribute('org-id', config.orgId)
+        if (config.esDeveloperName) el.setAttribute('es-developer-name', config.esDeveloperName)
         el.setAttribute('capabilities-version', DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION)
         if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
         if (config.persistSession !== false) el.setAttribute('persist-session', '')
@@ -94,7 +103,7 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
         return () => {
             el.remove()
         }
-    }, [configured, ready, config])
+    }, [configured, ready, config, mode])
 
     // Keep the pdp-questions attribute in sync with the current product. Runs
     // separately from element creation so a variant switch / SPA nav to a new

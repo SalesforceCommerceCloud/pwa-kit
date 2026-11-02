@@ -138,7 +138,7 @@ module.exports = {
             // `elementId` to mount, plus optional fields like `staticQuestions` and `promptsDisplay`.
             // Optional: pass `cc_enablePageContext` ('true' | 'false') via COMMERCE_AGENT_SETTINGS,
             // forwarded as the boolean `enablePageContext`. Enables window.CimulateMessaging.
-            // eventHandlers.pageContext.set — required for the agent-redirect handoff to prime
+            // eventHandlers.pageContext.set — required for the main-agent handoff to prime
             // product context before the drawer opens.
             // None of the above set a storefront default — the widget applies its own defaults when
             // a value is omitted.
@@ -256,7 +256,7 @@ module.exports = {
             persistSession: true,
             enableLogging: false,
             // 'inline' (default) renders the UMD custom element with its own SCRT2 session.
-            // 'agent-redirect' renders a non-conversational shim that hands shopper
+            // 'main-agent' renders a non-conversational shim that hands shopper
             // questions off to the main Shopper Agent drawer. 'hybrid' is reserved —
             // PDP-scoped questions stay inline, non-PDP routes to the main drawer;
             // currently falls back to inline until the per-pill routing lands.

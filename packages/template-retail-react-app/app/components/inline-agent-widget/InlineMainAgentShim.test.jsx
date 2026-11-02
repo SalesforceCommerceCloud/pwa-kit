@@ -8,7 +8,7 @@ import React from 'react'
 import {screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import InlineAgentRedirectShim from '@salesforce/retail-react-app/app/components/inline-agent-widget/InlineAgentRedirectShim'
+import InlineMainAgentShim from '@salesforce/retail-react-app/app/components/inline-agent-widget/InlineMainAgentShim'
 import {handoffToShopperAgent} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
 
 jest.mock('@salesforce/retail-react-app/app/utils/shopper-agent-handoff', () => ({
@@ -21,10 +21,10 @@ beforeEach(() => {
     jest.clearAllMocks()
 })
 
-describe('InlineAgentRedirectShim', () => {
+describe('InlineMainAgentShim', () => {
     test('renders opener pills from pdpQuestions', () => {
         renderWithProviders(
-            <InlineAgentRedirectShim
+            <InlineMainAgentShim
                 pdpQuestions={PILLS}
                 productName="Ultimune Serum"
                 productId="500400"
@@ -38,7 +38,7 @@ describe('InlineAgentRedirectShim', () => {
     test('clicking a pill hands off the question + product context', async () => {
         const user = userEvent.setup()
         renderWithProviders(
-            <InlineAgentRedirectShim
+            <InlineMainAgentShim
                 pdpQuestions={PILLS}
                 productName="Ultimune Serum"
                 productId="500400"
@@ -57,7 +57,7 @@ describe('InlineAgentRedirectShim', () => {
     test('submitting the input hands off the typed question', async () => {
         const user = userEvent.setup()
         renderWithProviders(
-            <InlineAgentRedirectShim productName="Ultimune Serum" productId="500400" />
+            <InlineMainAgentShim productName="Ultimune Serum" productId="500400" />
         )
         const input = screen.getByPlaceholderText(/Ask me anything about Ultimune Serum/)
         await user.type(input, 'does it have retinol?')
@@ -68,13 +68,13 @@ describe('InlineAgentRedirectShim', () => {
     })
 
     test('submit button is disabled when input is empty', () => {
-        renderWithProviders(<InlineAgentRedirectShim />)
+        renderWithProviders(<InlineMainAgentShim />)
         expect(screen.getByRole('button', {name: 'Ask'})).toBeDisabled()
     })
 
     test('clears input after submit', async () => {
         const user = userEvent.setup()
-        renderWithProviders(<InlineAgentRedirectShim productName="X" productId="x1" />)
+        renderWithProviders(<InlineMainAgentShim productName="X" productId="x1" />)
         const input = screen.getByPlaceholderText(/Ask me anything about X/)
         await user.type(input, 'why?')
         await user.click(screen.getByRole('button', {name: 'Ask'}))
@@ -83,7 +83,7 @@ describe('InlineAgentRedirectShim', () => {
 
     test('whitespace-only submissions are ignored', async () => {
         const user = userEvent.setup()
-        renderWithProviders(<InlineAgentRedirectShim productName="X" productId="x1" />)
+        renderWithProviders(<InlineMainAgentShim productName="X" productId="x1" />)
         const input = screen.getByPlaceholderText(/Ask me anything about X/)
         await user.type(input, '   ')
         // Button stays disabled with just whitespace trimmed-non-empty check? It only disables on === '',
@@ -93,12 +93,12 @@ describe('InlineAgentRedirectShim', () => {
     })
 
     test('renders generic placeholder when productName is absent', () => {
-        renderWithProviders(<InlineAgentRedirectShim />)
+        renderWithProviders(<InlineMainAgentShim />)
         expect(screen.getByPlaceholderText('Ask me anything')).toBeInTheDocument()
     })
 
     test('omits the pills row when there are no pdpQuestions', () => {
-        renderWithProviders(<InlineAgentRedirectShim productName="X" productId="x1" />)
-        expect(screen.queryByTestId('inline-agent-redirect-pills')).not.toBeInTheDocument()
+        renderWithProviders(<InlineMainAgentShim productName="X" productId="x1" />)
+        expect(screen.queryByTestId('inline-main-agent-pills')).not.toBeInTheDocument()
     })
 })

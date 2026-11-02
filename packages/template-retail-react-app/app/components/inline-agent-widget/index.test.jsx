@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {screen, act} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import InlineAgentWidget from '@salesforce/retail-react-app/app/components/inline-agent-widget'
 
@@ -14,10 +14,21 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-inline-agent-widget', () =
     return {
         __esModule: true,
         default: () => React.createRef(),
-        isConfigured: (config) =>
-            Boolean(config?.enabled && config?.scrt2Url && config?.orgId && config?.esDeveloperName)
+        isConfigured: (config) => {
+            if (!config?.enabled) return false
+            if (config?.mode === 'main-agent') return true
+            return Boolean(config?.scrt2Url && config?.orgId && config?.esDeveloperName)
+        }
     }
 })
+
+jest.mock('@salesforce/retail-react-app/app/utils/shopper-agent-handoff', () => ({
+    __esModule: true,
+    handoffToShopperAgent: jest.fn()
+}))
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {handoffToShopperAgent: handoffMock} = require('@salesforce/retail-react-app/app/utils/shopper-agent-handoff')
 
 const BASE_CONFIG = {
     enabled: true,
@@ -27,35 +38,102 @@ const BASE_CONFIG = {
 }
 
 describe('InlineAgentWidget', () => {
+    beforeEach(() => {
+        handoffMock.mockReset()
+    })
+
     test('renders nothing meaningful when config is not configured', () => {
         renderWithProviders(<InlineAgentWidget config={{enabled: false}} />)
-        expect(screen.queryByTestId('inline-agent-redirect-shim')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('inline-main-agent-shim')).not.toBeInTheDocument()
     })
 
-    test('does not render the redirect shim in default (inline) mode', () => {
-        renderWithProviders(<InlineAgentWidget config={BASE_CONFIG} />)
-        expect(screen.queryByTestId('inline-agent-redirect-shim')).not.toBeInTheDocument()
+    test('renders the UMD mount container in inline mode (default)', () => {
+        const {container} = renderWithProviders(<InlineAgentWidget config={BASE_CONFIG} />)
+        // The local React shim (removed in favor of the UMD shim) should NOT render.
+        expect(screen.queryByTestId('inline-main-agent-shim')).not.toBeInTheDocument()
+        // The hook mount container is a plain div (ref target); the UMD custom
+        // element is mounted into it imperatively — not visible in enzyme.
+        expect(container.querySelector('div')).toBeInTheDocument()
     })
 
-    test('renders the redirect shim when mode === "agent-redirect"', () => {
+    test('mode === "main-agent" wires a document-level handoff listener', () => {
         renderWithProviders(
             <InlineAgentWidget
-                config={{...BASE_CONFIG, mode: 'agent-redirect'}}
+                config={{...BASE_CONFIG, mode: 'main-agent'}}
                 pdpQuestions={['A?', 'B?']}
                 productName="Serum"
                 productId="500400"
             />
         )
-        expect(screen.getByTestId('inline-agent-redirect-shim')).toBeInTheDocument()
-        expect(screen.getByRole('button', {name: 'A?'})).toBeInTheDocument()
-        expect(screen.getByRole('button', {name: 'B?'})).toBeInTheDocument()
+
+        // The local React shim is gone — the UMD paints the pills now.
+        expect(screen.queryByTestId('inline-main-agent-shim')).not.toBeInTheDocument()
+
+        // Simulate the UMD firing its handoff event; the host should call
+        // handoffToShopperAgent with productId/productName context.
+        act(() => {
+            document.dispatchEvent(
+                new CustomEvent('inline-agent-widget:handoff', {
+                    bubbles: true,
+                    detail: {question: 'Is it waterproof?', source: 'pill'}
+                })
+            )
+        })
+
+        expect(handoffMock).toHaveBeenCalledTimes(1)
+        const payload = handoffMock.mock.calls[0][0]
+        expect(payload.question).toBe('Is it waterproof?')
+        expect(payload.productContext.productId).toBe('500400')
+        expect(payload.productContext.productName).toBe('Serum')
     })
 
-    test('mode === "hybrid" falls back to the inline UMD (reserved — no shim yet)', () => {
+    test('ignores handoff events with no question', () => {
         renderWithProviders(
-            <InlineAgentWidget config={{...BASE_CONFIG, mode: 'hybrid'}} />
+            <InlineAgentWidget
+                config={{...BASE_CONFIG, mode: 'main-agent'}}
+                productId="500400"
+            />
         )
-        expect(screen.queryByTestId('inline-agent-redirect-shim')).not.toBeInTheDocument()
+
+        act(() => {
+            document.dispatchEvent(
+                new CustomEvent('inline-agent-widget:handoff', {detail: {}})
+            )
+        })
+
+        expect(handoffMock).not.toHaveBeenCalled()
+    })
+
+    test('does not attach a handoff listener in inline mode', () => {
+        renderWithProviders(
+            <InlineAgentWidget config={BASE_CONFIG} productId="500400" />
+        )
+
+        act(() => {
+            document.dispatchEvent(
+                new CustomEvent('inline-agent-widget:handoff', {
+                    detail: {question: 'Hi?'}
+                })
+            )
+        })
+
+        expect(handoffMock).not.toHaveBeenCalled()
+    })
+
+    test('mode === "hybrid" falls back to the inline UMD (no handoff listener)', () => {
+        renderWithProviders(
+            <InlineAgentWidget config={{...BASE_CONFIG, mode: 'hybrid'}} productId="500400" />
+        )
+
+        act(() => {
+            document.dispatchEvent(
+                new CustomEvent('inline-agent-widget:handoff', {
+                    detail: {question: 'Hi?'}
+                })
+            )
+        })
+
+        expect(handoffMock).not.toHaveBeenCalled()
     })
 
     test('warns in the console when config.mode is an unknown value', () => {

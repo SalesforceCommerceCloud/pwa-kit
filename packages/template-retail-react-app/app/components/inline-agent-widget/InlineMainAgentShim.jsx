@@ -22,7 +22,7 @@ import {
 import {SparkleIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {handoffToShopperAgent} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
 
-const InlineAgentRedirectShim = ({pdpQuestions = [], productName, productId}) => {
+const InlineMainAgentShim = ({pdpQuestions = [], productName, productId}) => {
     const intl = useIntl()
     const [value, setValue] = useState('')
 
@@ -38,19 +38,19 @@ const InlineAgentRedirectShim = ({pdpQuestions = [], productName, productId}) =>
     const placeholder = productName
         ? intl.formatMessage(
               {
-                  id: 'inline_agent_widget.redirect.input_placeholder_with_product',
+                  id: 'inline_agent_widget.main_agent.input_placeholder_with_product',
                   defaultMessage: 'Ask me anything about {productName}'
               },
               {productName}
           )
         : intl.formatMessage({
-              id: 'inline_agent_widget.redirect.input_placeholder',
+              id: 'inline_agent_widget.main_agent.input_placeholder',
               defaultMessage: 'Ask me anything'
           })
 
     return (
         <Box
-            data-testid="inline-agent-redirect-shim"
+            data-testid="inline-main-agent-shim"
             borderWidth="1px"
             borderRadius="lg"
             p={4}
@@ -60,14 +60,14 @@ const InlineAgentRedirectShim = ({pdpQuestions = [], productName, productId}) =>
                 <SparkleIcon boxSize={4} />
                 <Text fontSize="sm" fontWeight="semibold">
                     {intl.formatMessage({
-                        id: 'inline_agent_widget.redirect.title',
+                        id: 'inline_agent_widget.main_agent.title',
                         defaultMessage: 'Have a question?'
                     })}
                 </Text>
             </HStack>
 
             {pdpQuestions.length > 0 && (
-                <Wrap spacing={2} mb={3} data-testid="inline-agent-redirect-pills">
+                <Wrap spacing={2} mb={3} data-testid="inline-main-agent-pills">
                     {pdpQuestions.map((q) => (
                         <WrapItem key={q}>
                             <Button
@@ -105,7 +105,7 @@ const InlineAgentRedirectShim = ({pdpQuestions = [], productName, productId}) =>
                             isDisabled={value.trim() === ''}
                         >
                             {intl.formatMessage({
-                                id: 'inline_agent_widget.redirect.submit',
+                                id: 'inline_agent_widget.main_agent.submit',
                                 defaultMessage: 'Ask'
                             })}
                         </Button>
@@ -116,10 +116,10 @@ const InlineAgentRedirectShim = ({pdpQuestions = [], productName, productId}) =>
     )
 }
 
-InlineAgentRedirectShim.propTypes = {
+InlineMainAgentShim.propTypes = {
     pdpQuestions: PropTypes.arrayOf(PropTypes.string),
     productName: PropTypes.string,
     productId: PropTypes.string
 }
 
-export default InlineAgentRedirectShim
+export default InlineMainAgentShim
