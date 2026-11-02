@@ -23,10 +23,10 @@ import PasswordRequirements from '@salesforce/retail-react-app/app/components/fo
 import useUpdatePasswordFields from '@salesforce/retail-react-app/app/components/forms/useUpdatePasswordFields'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {INVALID_TOKEN_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {
     getResetPasswordActionErrorMessage,
-    readErrorResponseMessage
+    readErrorResponseMessage,
+    TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const ResetPasswordLanding = () => {
@@ -47,9 +47,11 @@ const ResetPasswordLanding = () => {
             await resetPassword({email: values.email, token, newPassword: values.password})
             navigate('/login')
         } catch (error) {
+            // /password/action 429 responses have an empty body — check status, not message.
+            // Do not show "request a new link" (INVALID_TOKEN); that would hit the limit again.
             const messageDescriptor =
                 error.response?.status === 429
-                    ? INVALID_TOKEN_ERROR_MESSAGE
+                    ? TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
                     : getResetPasswordActionErrorMessage(await readErrorResponseMessage(error))
             form.setError('global', {type: 'manual', message: formatMessage(messageDescriptor)})
         }

@@ -153,8 +153,8 @@ export const getLoginPasswordlessErrorMessage = (errorMessage) => {
 
 /**
  * Maps error message from resetPassword (password/action) mutation to the appropriate
- * user-friendly error message descriptor. Rate-limit responses are shaped like invalid
- * token so the existing reset-password UX is reused.
+ * user-friendly error message descriptor. Rate limits on this endpoint are empty-body 429s
+ * and must be handled via response.status at the call site (not message matching here).
  *
  * @param {string} errorMessage - The error message from the API
  * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
@@ -162,7 +162,6 @@ export const getLoginPasswordlessErrorMessage = (errorMessage) => {
 export const getResetPasswordActionErrorMessage = (errorMessage) => {
     if (
         INVALID_TOKEN_ERROR.test(errorMessage) ||
-        TOO_MANY_REQUESTS_ERROR.test(errorMessage) ||
         isMissingOrMismatchedLoginIdError(errorMessage)
     ) {
         return INVALID_TOKEN_ERROR_MESSAGE
