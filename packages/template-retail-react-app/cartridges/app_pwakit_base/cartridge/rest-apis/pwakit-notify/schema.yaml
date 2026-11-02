@@ -40,7 +40,23 @@ paths:
                   properties:
                     type:
                       type: string
-                      enum: [passwordless-magic-link]
+                      enum: [passwordless-login]
+                    recipient:
+                      type: string
+                    data:
+                      type: object
+                      required: [magicLinkPath]
+                      properties:
+                        magicLinkPath:
+                          type: string
+                          pattern: '^/'
+                          description: Path portion of the magic link (no hostname). The cartridge prepends the validated storefront hostname.
+                - type: object
+                  required: [type, recipient, data]
+                  properties:
+                    type:
+                      type: string
+                      enum: [passwordless-registration]
                     recipient:
                       type: string
                     data:
@@ -72,7 +88,7 @@ paths:
                   properties:
                     type:
                       type: string
-                      enum: [otp]
+                      enum: [password-registration]
                     recipient:
                       type: string
                     data:

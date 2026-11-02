@@ -547,6 +547,48 @@ describe('scriptUtils', () => {
             expect(await client.push(bundle, projectSlug, 'production')).toBe(goodResponseBody)
         })
 
+        // W-24415510: MRT stamps X-MRT-Read-Only: true on EVERY /api/ response during a
+        // read-only window (except 401/403), so unrelated errors (400 validation, 404, 500)
+        // also carry it. Only a genuine read-only write rejection returns HTTP 503, so the
+        // header alone must NOT be treated as maintenance for other statuses.
+        it.each([
+            [400, 'a validation error'],
+            [404, 'a not-found error'],
+            [500, 'a server error']
+        ])(
+            'W-24415510: a %i (%s) carrying the read-only header must NOT be masked as maintenance',
+            async (status) => {
+                readJson.mockReturnValue(pkg)
+                execSync.mockReturnValue(JSON.stringify(dependencyTreeMockData.noPwaKitPackages))
+
+                const projectSlug = 'project-slug'
+                const bundle = await scriptUtils.createBundle({
+                    message: 'message',
+                    ssr_parameters: {},
+                    ssr_only: ['*.js'],
+                    ssr_shared: ['**/*.*'],
+                    buildDirectory: path.join(__dirname, 'test-fixtures', 'minimal-built-app'),
+                    projectSlug
+                })
+
+                const fetchMock = jest.fn(async () => ({
+                    status,
+                    headers: makeHeaders('true'),
+                    text: () => Promise.resolve('The real error'),
+                    json: () => Promise.reject()
+                }))
+                const client = new scriptUtils.CloudAPIClient({
+                    credentials: {username: 'user123', api_key: '123'},
+                    fetch: fetchMock
+                })
+
+                const fn = async () => await client.push(bundle, projectSlug, 'production')
+
+                await expect(fn).rejects.not.toThrow('maintenance mode')
+                await expect(fn).rejects.toThrow('For more information visit')
+            }
+        )
+
         it('lets non-maintenance errors fall through to normal handling', async () => {
             readJson.mockReturnValue(pkg)
             execSync.mockReturnValue(JSON.stringify(dependencyTreeMockData.noPwaKitPackages))

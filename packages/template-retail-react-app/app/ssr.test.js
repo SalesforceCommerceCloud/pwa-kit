@@ -25,6 +25,7 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
         app: {
             login: {
                 passwordless: {
+                    mode: 'callback',
                     callbackURI: '/passwordless-login-callback',
                     landingPath: '/passwordless-login'
                 },
@@ -40,6 +41,7 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
                 proxyPath: '/mobify/proxy/api',
                 parameters: {
                     clientId: 'test-client-id',
+                    notifyClientId: 'test-notify-client-id',
                     shortCode: 'test-shortcode',
                     organizationId: 'f_ecom_test_001',
                     siteId: 'RefArch'
@@ -119,7 +121,8 @@ import {
     getNotifyToken,
     sendViaB2cCartridge,
     _resetNotifyTokenCacheForTest,
-    extractLocaleFromUrl
+    extractLocaleFromUrl,
+    passwordlessLoginCallbackHandler
 } from '@salesforce/retail-react-app/app/ssr.js'
 import {ShopperLogin, helpers} from 'commerce-sdk-isomorphic'
 
@@ -377,11 +380,11 @@ describe('sendViaB2cCartridge', () => {
         })
     }
 
-    test('sends passwordless-magic-link with correct payload', async () => {
+    test('sends passwordless-login with correct payload', async () => {
         mockFetchOk({success: true, data: {magicLink: 'https://example.com/magic'}})
 
         const result = await sendViaB2cCartridge(
-            'passwordless-magic-link',
+            'passwordless-login',
             'user@example.com',
             {magicLinkPath: '/en-US/passwordless?token=abc'},
             TEST_API_PARAMS
@@ -391,7 +394,7 @@ describe('sendViaB2cCartridge', () => {
         const [url, opts] = fetchSpy.mock.calls[0]
         expect(url).toContain('/f_ecom_test_001/notify')
         const sentBody = JSON.parse(opts.body)
-        expect(sentBody.type).toBe('passwordless-magic-link')
+        expect(sentBody.type).toBe('passwordless-login')
         expect(sentBody.recipient).toBe('user@example.com')
         expect(sentBody.data.magicLinkPath).toBe('/en-US/passwordless?token=abc')
         expect(opts.headers['Authorization']).toBe('Bearer notify-token')
@@ -411,13 +414,18 @@ describe('sendViaB2cCartridge', () => {
         expect(sentBody.type).toBe('password-reset')
     })
 
-    test('sends otp with correct payload', async () => {
+    test('sends password-registration with correct payload', async () => {
         mockFetchOk()
 
-        await sendViaB2cCartridge('otp', 'user@example.com', {token: '123456'}, TEST_API_PARAMS)
+        await sendViaB2cCartridge(
+            'password-registration',
+            'user@example.com',
+            {token: '123456'},
+            TEST_API_PARAMS
+        )
 
         const sentBody = JSON.parse(fetchSpy.mock.calls[0][1].body)
-        expect(sentBody.type).toBe('otp')
+        expect(sentBody.type).toBe('password-registration')
         expect(sentBody.data.token).toBe('123456')
     })
 
@@ -451,7 +459,7 @@ describe('sendViaB2cCartridge', () => {
             })
 
         const result = await sendViaB2cCartridge(
-            'otp',
+            'password-registration',
             'user@example.com',
             {token: '654321'},
             TEST_API_PARAMS
@@ -467,13 +475,23 @@ describe('sendViaB2cCartridge', () => {
         mockFetchError(503, 'Service Unavailable')
 
         await expect(
-            sendViaB2cCartridge('otp', 'user@example.com', {token: '999'}, TEST_API_PARAMS)
+            sendViaB2cCartridge(
+                'password-registration',
+                'user@example.com',
+                {token: '999'},
+                TEST_API_PARAMS
+            )
         ).rejects.toThrow('pwakit-notify returned 503')
 
         // Token should still be cached (503 is not 401)
         helpers.loginGuestUserPrivate.mockClear()
         mockFetchOk()
-        await sendViaB2cCartridge('otp', 'user@example.com', {token: '111'}, TEST_API_PARAMS)
+        await sendViaB2cCartridge(
+            'password-registration',
+            'user@example.com',
+            {token: '111'},
+            TEST_API_PARAMS
+        )
         expect(helpers.loginGuestUserPrivate).not.toHaveBeenCalled()
     })
 
@@ -481,7 +499,7 @@ describe('sendViaB2cCartridge', () => {
         mockFetchOk()
 
         await sendViaB2cCartridge(
-            'otp',
+            'password-registration',
             'user@example.com',
             {token: '123'},
             {
@@ -497,10 +515,94 @@ describe('sendViaB2cCartridge', () => {
     test('omits locale from URL when not provided', async () => {
         mockFetchOk()
 
-        await sendViaB2cCartridge('otp', 'user@example.com', {token: '123'}, TEST_API_PARAMS)
+        await sendViaB2cCartridge(
+            'password-registration',
+            'user@example.com',
+            {token: '123'},
+            TEST_API_PARAMS
+        )
 
         const [url] = fetchSpy.mock.calls[0]
         expect(url).not.toContain('locale')
+    })
+})
+
+describe('passwordlessLoginCallback route handler', () => {
+    let mockRes
+    let fetchSpy
+
+    beforeEach(() => {
+        _resetNotifyTokenCacheForTest()
+        process.env.PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET = 'notify-secret'
+        helpers.loginGuestUserPrivate.mockResolvedValue({access_token: 'notify-token'})
+        fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValue({
+            ok: true,
+            json: jest.fn().mockResolvedValue({success: true}),
+            text: jest.fn().mockResolvedValue('')
+        })
+        mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        }
+    })
+
+    afterEach(() => {
+        delete process.env.PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET
+        fetchSpy.mockRestore()
+    })
+
+    const makeReq = ({body = {}, headers = {}, query = {}} = {}) => ({body, headers, query})
+
+    test('returns 400 when x-slas-callback-token header is missing', async () => {
+        const req = makeReq({body: {email_id: 'user@example.com', token: 'tok'}})
+        await passwordlessLoginCallbackHandler(req, mockRes)
+        expect(mockRes.status).toHaveBeenCalledWith(400)
+        expect(mockRes.json).toHaveBeenCalledWith({error: 'Missing x-slas-callback-token header'})
+    })
+
+    test('returns 401 when email_id in body does not match token claim', async () => {
+        jose.jwtVerify.mockResolvedValueOnce({
+            payload: {iss: 'prefix/prefix2/test_001/oauth2', email_id: 'real@example.com'}
+        })
+        const req = makeReq({
+            body: {email_id: 'attacker@evil.com', token: 'tok'},
+            headers: {'x-slas-callback-token': 'valid-token'}
+        })
+        await passwordlessLoginCallbackHandler(req, mockRes)
+        expect(mockRes.status).toHaveBeenCalledWith(401)
+        expect(mockRes.json).toHaveBeenCalledWith({
+            error: 'callback body fields do not match SLAS callback token claims'
+        })
+    })
+
+    test('sends passwordless-registration type when register=true and email_id matches', async () => {
+        jose.jwtVerify.mockResolvedValueOnce({
+            payload: {iss: 'prefix/prefix2/test_001/oauth2', email_id: 'user@example.com'}
+        })
+        const req = makeReq({
+            body: {email_id: 'user@example.com', token: 'tok'},
+            headers: {'x-slas-callback-token': 'valid-token'},
+            query: {register: 'true'}
+        })
+        await passwordlessLoginCallbackHandler(req, mockRes)
+        expect(fetchSpy).toHaveBeenCalled()
+        const sentBody = JSON.parse(fetchSpy.mock.calls[0][1].body)
+        expect(sentBody.type).toBe('passwordless-registration')
+    })
+
+    test('sends passwordless-login type when register param is absent and email_id matches', async () => {
+        jose.jwtVerify.mockResolvedValueOnce({
+            payload: {iss: 'prefix/prefix2/test_001/oauth2', email_id: 'user@example.com'}
+        })
+        const req = makeReq({
+            body: {email_id: 'user@example.com', token: 'tok'},
+            headers: {'x-slas-callback-token': 'valid-token'},
+            query: {}
+        })
+        await passwordlessLoginCallbackHandler(req, mockRes)
+        expect(fetchSpy).toHaveBeenCalled()
+        const sentBody = JSON.parse(fetchSpy.mock.calls[0][1].body)
+        expect(sentBody.type).toBe('passwordless-login')
     })
 })
 
