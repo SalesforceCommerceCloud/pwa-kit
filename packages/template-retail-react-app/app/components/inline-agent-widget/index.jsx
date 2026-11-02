@@ -13,21 +13,10 @@ import useInlineAgentWidget, {
 } from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 import InlineAgentRedirectShim from '@salesforce/retail-react-app/app/components/inline-agent-widget/InlineAgentRedirectShim'
 
-const VALID_MODES = ['inline', 'agent-redirect']
-
-// Demo override: ?mode=inline / ?mode=agent-redirect flips the behavior for
-// the current tab without a rebuild. Returns undefined on SSR and for any
-// value outside VALID_MODES so the server-rendered default always wins.
-const readUrlModeOverride = () => {
-    if (typeof window === 'undefined') return undefined
-    const override = new URLSearchParams(window.location.search).get('mode')
-    return VALID_MODES.includes(override) ? override : undefined
-}
+const VALID_MODES = ['inline', 'agent-redirect', 'hybrid']
 
 const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
-    const effectiveMode = readUrlModeOverride() || config.mode
-    const effectiveConfig = effectiveMode === config.mode ? config : {...config, mode: effectiveMode}
-    const containerRef = useInlineAgentWidget(effectiveConfig, {pdpQuestions, productName})
+    const containerRef = useInlineAgentWidget(config, {pdpQuestions, productName})
 
     useEffect(() => {
         if (config.mode !== undefined && !VALID_MODES.includes(config.mode)) {
@@ -37,11 +26,11 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
         }
     }, [config.mode])
 
-    if (!isConfigured(effectiveConfig)) return null
+    if (!isConfigured(config)) return null
 
-    // Agent-redirect mode: no local SCRT2 session. The shim hands the question
+    // Agent-redirect: no local SCRT2 session — the shim hands the question
     // (pill or typed) off to the main Shopper Agent drawer.
-    if (effectiveMode === 'agent-redirect') {
+    if (config.mode === 'agent-redirect') {
         return (
             <InlineAgentRedirectShim
                 pdpQuestions={pdpQuestions}
@@ -51,6 +40,8 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
         )
     }
 
+    // 'hybrid' is reserved — PDP-scoped questions stay inline, non-PDP routes
+    // to the main drawer. Until that split lands, hybrid renders the inline UMD.
     return (
         <>
             <Helmet>
@@ -72,8 +63,10 @@ InlineAgentWidget.propTypes = {
          * `'inline'` (default) runs the UMD custom element with its own SCRT2 session.
          * `'agent-redirect'` renders a non-conversational shim that hands shopper
          * questions off to the main Shopper Agent drawer.
+         * `'hybrid'` is reserved for future per-pill routing (PDP questions inline,
+         * discovery/comparison to the main drawer); currently falls back to inline.
          */
-        mode: PropTypes.oneOf(['inline', 'agent-redirect'])
+        mode: PropTypes.oneOf(['inline', 'agent-redirect', 'hybrid'])
     }),
     /**
      * Opener questions for the current product — rendered as tappable pills
