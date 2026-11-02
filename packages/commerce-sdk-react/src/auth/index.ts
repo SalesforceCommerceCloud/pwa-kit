@@ -1643,6 +1643,7 @@ class Auth {
     async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
         const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
         const dntPref = this.getDnt({includeDefaults: true})
+        const usid = this.get('usid')
         const token = await helpers.getPasswordLessAccessToken({
             slasClient: this.client,
             credentials: {
@@ -1652,7 +1653,14 @@ class Auth {
                 pwdlessLoginToken,
                 loginId: parameters.login_id,
                 channelId: parameters.channel_id,
-                dnt: dntPref !== undefined ? String(dntPref) : undefined
+                dnt: dntPref !== undefined ? String(dntPref) : undefined,
+                ...(usid && {usid}),
+                ...(parameters.register_customer !== undefined && {
+                    registerCustomer:
+                        typeof parameters.register_customer === 'boolean'
+                            ? String(parameters.register_customer)
+                            : parameters.register_customer
+                })
             },
             enableHttpOnlySessionCookies: this.enableHttpOnlySessionCookies
         })

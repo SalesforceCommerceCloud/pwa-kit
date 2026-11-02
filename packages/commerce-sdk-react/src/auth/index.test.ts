@@ -1071,12 +1071,15 @@ describe('Auth', () => {
         })
     })
 
-    test('getPasswordLessAccessToken forwards loginId and channelId to the helper', async () => {
+    test('getPasswordLessAccessToken forwards loginId, channelId, usid, and registerCustomer', async () => {
         const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('usid', 'test-usid')
         await auth.getPasswordLessAccessToken({
             pwdlessLoginToken: '12345678',
             login_id: 'shopper@example.com',
-            channel_id: 'customChannelId'
+            channel_id: 'customChannelId',
+            register_customer: true
         })
         expect(helpers.getPasswordLessAccessToken).toHaveBeenCalled()
         const functionArg = (helpers.getPasswordLessAccessToken as jest.Mock).mock.calls[0][0]
@@ -1084,7 +1087,9 @@ describe('Auth', () => {
             parameters: {
                 pwdlessLoginToken: '12345678',
                 loginId: 'shopper@example.com',
-                channelId: 'customChannelId'
+                channelId: 'customChannelId',
+                usid: 'test-usid',
+                registerCustomer: true
             }
         })
     })
