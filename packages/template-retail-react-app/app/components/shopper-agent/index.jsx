@@ -27,10 +27,7 @@ import {
     COMMERCE_CLIENT_UI_STATE_EVENT
 } from '@salesforce/retail-react-app/app/constants'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {
-    productUrlBuilder,
-    toStorefrontNavigatePath
-} from '@salesforce/retail-react-app/app/utils/url'
+import {toStorefrontNavigatePath} from '@salesforce/retail-react-app/app/utils/url'
 import {attachAgentProductLinkRouting} from '@salesforce/retail-react-app/app/utils/shopper-agent-product-links'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -732,29 +729,31 @@ const CommerceClientAgentWindow = ({
     const {getTokenWhenReady} = useAccessToken()
     const getTokenWhenReadyRef = useRef(getTokenWhenReady)
     getTokenWhenReadyRef.current = getTokenWhenReady
-    useEffect(
-        () =>
-            attachAgentProductLinkRouting({
-                navigateToProduct: (productId) => navigate(productUrlBuilder({id: productId})),
-                getProductHref: (productId) => buildUrl(productUrlBuilder({id: productId})),
-                lookupProductId: async (urlSegment) => {
-                    const token = await getTokenWhenReadyRef.current()
-                    let mapping
-                    try {
-                        mapping = await shopperSeo.getUrlMapping({
-                            parameters: {urlSegment},
-                            headers: {Authorization: `Bearer ${token}`}
-                        })
-                    } catch (error) {
-                        // 404 means the segment maps to nothing; anything else is a failed lookup
-                        if (error?.response?.status === 404) return undefined
-                        throw error
-                    }
-                    return mapping?.resourceType === 'PRODUCT' ? mapping.resourceId : undefined
+    useEffect(() => {
+        // The id comes from the backend URL, so it is encoded as one path segment. `productUrlBuilder`
+        // uses `encodeURI`, which leaves `/`, `?` and `#` in place (`../account` would leave the PDP),
+        // and would encode an already encoded id twice.
+        const toProductPath = (productId) => `/product/${encodeURIComponent(productId)}`
+        return attachAgentProductLinkRouting({
+            navigateToProduct: (productId) => navigate(toProductPath(productId)),
+            getProductHref: (productId) => buildUrl(toProductPath(productId)),
+            lookupProductId: async (urlSegment) => {
+                const token = await getTokenWhenReadyRef.current()
+                let mapping
+                try {
+                    mapping = await shopperSeo.getUrlMapping({
+                        parameters: {urlSegment},
+                        headers: {Authorization: `Bearer ${token}`}
+                    })
+                } catch (error) {
+                    // 404 means the segment maps to nothing; anything else is a failed lookup
+                    if (error?.response?.status === 404) return undefined
+                    throw error
                 }
-            }),
-        [navigate, buildUrl, shopperSeo]
-    )
+                return mapping?.resourceType === 'PRODUCT' ? mapping.resourceId : undefined
+            }
+        })
+    }, [navigate, buildUrl, shopperSeo])
 
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
     const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))

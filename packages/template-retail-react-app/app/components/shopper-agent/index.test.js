@@ -2092,6 +2092,21 @@ describe('ShopperAgent Component', () => {
             expect(mockStopProductLinkRouting).toHaveBeenCalled()
         })
 
+        test('escapes the product id as one path segment', () => {
+            mockedUseMultiSite.mockReturnValue({
+                locale: {id: 'en-US', preferredCurrency: 'USD'},
+                buildUrl: (path) => `/us/en-US${path}`
+            })
+            renderCommerceClient()
+
+            const calls = attachAgentProductLinkRouting.mock.calls
+            const {navigateToProduct, getProductHref} = calls[calls.length - 1][0]
+            expect(getProductHref('../account')).toBe('/us/en-US/product/..%2Faccount')
+            expect(getProductHref('a?b#c')).toBe('/us/en-US/product/a%3Fb%23c')
+            navigateToProduct('red shoe')
+            expect(mockNavigate).toHaveBeenCalledWith('/product/red%20shoe')
+        })
+
         test('looks agent product links up through Shopper SEO', async () => {
             renderCommerceClient()
             const calls = attachAgentProductLinkRouting.mock.calls

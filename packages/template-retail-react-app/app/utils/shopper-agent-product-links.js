@@ -44,20 +44,6 @@ const PRODUCT_LINK_SELECTOR = PRODUCT_LINK_SCOPES.flatMap((scope) => [
 /** Free text inside a card (the description) can hold any link, so it is never touched. */
 const FREE_TEXT_SCOPE = '.cim-widget-msg-product-card__description'
 
-/** Widget markup around a product link that also holds the product name. */
-const PRODUCT_NAME_SCOPE =
-    '.cim-widget-msg-product-card, .cim-widget-product-comparison__product-col'
-const PRODUCT_NAME_SELECTOR =
-    '.cim-widget-msg-product-card__title-link, .cim-widget-msg-product-card__title, .cim-widget-product-comparison__name-link'
-
-/** Text reduced to unaccented letters and digits, e.g. 'Café Chair' and 'cafe-chair' -> 'cafechair'. */
-const toKey = (text) =>
-    text
-        .normalize('NFKD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, '')
-
 /**
  * @returns {{url: URL, segment: string, isProductId: boolean}|undefined} The URL and its product
  *   segment (the `pid` parameter, or the last path segment minus `.html`), or undefined when `href`
@@ -90,33 +76,20 @@ const parseBackendProductUrl = (href, currentOrigin) => {
 /**
  * Returns the product id in a backend product URL, when the URL alone tells it for certain.
  *
- * The id is the `pid` parameter, or comes from the last path segment minus `.html`, which is either
- * the bare id (`/<slug>/<id>.html`) or the name slug and id joined by `-` (`/<slug>-<id>.html`). Ids
- * may themselves contain `-`, and the slug follows the site's URL rules, so a segment with a `-` is
- * only split where the part before it matches `productName`, both reduced to unaccented letters and
- * digits. Any other segment with a `-` is ambiguous; look it up with `getProductUrlSegments`.
+ * The id is the `pid` parameter, or the last path segment minus `.html` when that segment has no
+ * `-`, i.e. the bare id of `/<slug>/<id>.html`. A segment with a `-` may be the name slug and id
+ * joined by `-` (`/<slug>-<id>.html`), or an id that itself contains `-` (`t-shirt-123`); no split
+ * tells them apart, so it is ambiguous. Look it up with `getProductUrlSegments` instead.
  *
  * @param {string} href - Link address
  * @param {string} [currentOrigin] - Storefront origin; links on it are already routable
- * @param {string} [productName] - Product name shown with the link
  * @returns {string|undefined} Product id, or undefined when it is ambiguous or the URL is not a product link on another origin
  */
-export const getBackendProductId = (href, currentOrigin = window.location.origin, productName) => {
+export const getBackendProductId = (href, currentOrigin = window.location.origin) => {
     const parsed = parseBackendProductUrl(href, currentOrigin)
     if (!parsed) return undefined
     const {segment, isProductId} = parsed
-    if (isProductId || !segment.includes('-')) return segment
-
-    const nameKey = productName ? toKey(productName) : ''
-    if (!nameKey) return undefined
-    // The last split that matches wins, so a repeated separator after the name stays out of the id.
-    let productId
-    for (let i = segment.indexOf('-'); i !== -1; i = segment.indexOf('-', i + 1)) {
-        if (i + 1 < segment.length && toKey(segment.slice(0, i)) === nameKey) {
-            productId = segment.slice(i + 1)
-        }
-    }
-    return productId
+    return isProductId || !segment.includes('-') ? segment : undefined
 }
 
 /**
@@ -142,14 +115,6 @@ export const getProductUrlSegments = (href, currentOrigin = window.location.orig
         segments.push(parts.slice(1).join('/'))
     }
     return segments
-}
-
-/** The product name shown with a widget product link, or '' when none is found. */
-const getProductName = (anchor) => {
-    const scope = anchor.closest(PRODUCT_NAME_SCOPE)
-    const nameElement = scope ? scope.querySelector(PRODUCT_NAME_SELECTOR) : anchor
-    const image = anchor.querySelector('img[alt]')
-    return (nameElement?.textContent || '').trim() || (image?.getAttribute('alt') || '').trim()
 }
 
 const isAgentProductLink = (anchor) =>
@@ -219,11 +184,7 @@ export const attachAgentProductLinkRouting = ({
     const getLinkedProductId = (anchor) => {
         const own = rewritten.get(anchor)
         if (own && anchor.getAttribute('href') === own.href) return own.productId
-        return (
-            getBackendProductId(anchor.href, window.location.origin, getProductName(anchor)) ||
-            lookedUp.get(anchor.href) ||
-            undefined
-        )
+        return getBackendProductId(anchor.href) || lookedUp.get(anchor.href) || undefined
     }
 
     const writeHref = (anchor, productId) => {
