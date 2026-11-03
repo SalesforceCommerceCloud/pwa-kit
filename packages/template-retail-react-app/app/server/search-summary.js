@@ -21,7 +21,7 @@ export function buildGrounding(query, result) {
     return {
         query: query.slice(0, 200),
         currency: result.currency,
-        scope: 'The first three ranked matches, not the full result set.',
+        scope: 'Selected highlights, not the full result set. The shopper can browse all matching products in the search results below.',
         products: (result.hits || []).slice(0, 3).map((hit) => {
             return {
                 name: String(hit.productName || '').slice(0, 120),

@@ -51,7 +51,10 @@ const gatewaySettings = [
     'LLM_GATEWAY_ECA_ORIGIN',
     'LLM_GATEWAY_ECA_MODEL',
     'LLM_GATEWAY_ECA_CLIENT_FEATURE',
-    'LLM_GATEWAY_ECA_TENANT_ID'
+    'LLM_GATEWAY_ECA_TENANT_ID',
+    'LLM_GATEWAY_BM_TOKEN_URL',
+    'LLM_GATEWAY_BM_AM_CLIENT_ID',
+    'LLM_GATEWAY_BM_AM_CLIENT_SECRET'
 ]
 for (const key of gatewaySettings) if (!env[key] && source[key]) env[key] = source[key]
 Object.assign(env, {

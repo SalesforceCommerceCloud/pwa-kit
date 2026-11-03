@@ -12,7 +12,7 @@ import {
 import {createEcaAuth} from '@salesforce/retail-react-app/app/server/llm-gateway/auth/eca'
 
 const env = {
-    LLM_GATEWAY_AUTH_MODE: 'eca',
+    LLM_GATEWAY_AUTH_MODE: 'eca_direct',
     LLM_GATEWAY_ECA_TOKEN_URL: 'https://shop.my.salesforce.com/services/oauth2/token',
     LLM_GATEWAY_ECA_CLIENT_ID: 'test-client',
     LLM_GATEWAY_ECA_CLIENT_SECRET: 'test-secret',
@@ -44,7 +44,7 @@ const collect = async (client) => {
     for await (const delta of client.stream([{role: 'user', content: 'shirt'}])) text += delta
     return text
 }
-test('one auth-mode switch selects ECA OAuth, Bearer and the public Gateway request shape', async () => {
+test('explicit direct mode selects ECA OAuth, Bearer and the public Gateway request shape', async () => {
     const token = jwt(Date.now() / 1000 + 1800)
     const fetchImpl = jest
         .fn()

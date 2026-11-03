@@ -198,7 +198,7 @@ const SearchSummary = ({
                 )}
                 <Picks products={picks} currency={currency} />
                 <Text fontSize="xs" color="#7b8772" mt={3}>
-                    Highlights from the top search matches. Ask below to check more product details.
+                    A few highlights from your search. Browse all matching products below.
                 </Text>
             </Box>
             {(config.followUps || config.agentHandoff) && (

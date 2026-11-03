@@ -49,7 +49,7 @@ Hero images must be a same-origin absolute path or an HTTPS URL without embedded
 
 ## Server-only Gateway authentication
 
-The mode is selected by `LLM_GATEWAY_AUTH_MODE=api_key|eca`. `api_key` remains the default and active development path. Authentication adapters live separately in `app/server/llm-gateway/auth/api-key.js` and `auth/eca.js`; routes and prompts use a common Gateway client.
+The mode is selected by `LLM_GATEWAY_AUTH_MODE=api_key|eca|eca_direct`. `api_key` remains the default and active development path. `eca` uses the Business Manager credential bridge; `eca_direct` explicitly selects local ECA credentials for development. Separate adapters live in `app/server/llm-gateway/auth/`; routes and prompts use a common Gateway client.
 
 ### Current API-key path
 
@@ -64,11 +64,30 @@ LLM_GATEWAY_SFDC_CORE_TENANT_ID=<authorized-tenant>
 
 The URL must be your approved internal Gateway base URL. Requests use `Authorization: API_KEY …` and call `{LLM_GATEWAY_URL}/{LLM_GATEWAY_API_VERSION}/chat/generations[/stream]`. Optional variables are `LLM_GATEWAY_API_VERSION` (default `v1.0`), `LLM_GATEWAY_MODEL`, `LLM_GATEWAY_CLIENT_FEATURE`, and `LLM_GATEWAY_APP_CONTEXT` (default `EinsteinGPT`). Existing development model/feature defaults are preserved. An invalid API key is not retried. The internal Gateway can require corporate VPN/network access.
 
-### Future ECA path
+### Business Manager ECA path
+
+**The PWA consumer is implemented; the required native ECOM broker API is not part of this PR and must be deployed before this mode can be used.** See the [companion ECOM API contract](BM-ECA-TOKEN-BROKER.md). Its endpoint and `sfcc.llm-auth` scope are proposed platform additions, not shipped capabilities.
+
+Keep the ECA Client ID, Client Secret, and My Domain in **BM → Administration → Global Preferences → Agentforce → Setup**. PWA does not read or duplicate these values. Configure only its dedicated server-to-server AM identity and the deployed broker URL:
+
+```sh
+LLM_GATEWAY_AUTH_MODE=eca
+LLM_GATEWAY_BM_TOKEN_URL=https://your-short-code.api.commercecloud.salesforce.com/merchant/llm-auth/v1/organizations/f_ecom_yourrealm_yourinstance/access-tokens
+LLM_GATEWAY_BM_AM_CLIENT_ID=<dedicated-account-manager-client-id>
+LLM_GATEWAY_BM_AM_CLIENT_SECRET=<server-only-account-manager-secret>
+LLM_GATEWAY_ECA_ORIGIN=https://api.salesforce.com
+LLM_GATEWAY_ECA_MODEL=sfdc_ai__DefaultGPT4Omni
+```
+
+The AM identity must be authorized for the broker scope and the exact B2C instance. The adapter derives the tenant scope from the fixed server URL, authenticates against Account Manager, then requests a short-lived Gateway JWT. It sends no shopper token, prompt, credential selector, or ECA secret to that endpoint. Routing tenancy comes only from the broker/JWT, rather than an old development environment setting. Overviews and follow-ups still stream directly from Gateway through PWA.
+
+A broker failure returns the existing generic overview error while preserving products. The adapter never falls back to API-key or direct-ECA credentials. The internal BM credential is protected from cartridge access: deploying a PWA cartridge alone cannot provide this native platform bridge. Live enablement remains blocked until that companion API is available and tested.
+
+### Explicit direct ECA development path
 
 First configure an External Client App with client credentials, an authorized Run As user, `sfap_api` access, and JWT access tokens. Follow the [Salesforce Models API authentication guide](https://developer.salesforce.com/docs/ai/agentforce/guide/models-api-authentication.html). Confirm the org, model, feature permissions, and Gateway environment before rollout.
 
-Provision these server settings without changing components, controllers, or prompts:
+For development without the BM bridge, explicitly select `LLM_GATEWAY_AUTH_MODE=eca_direct` and provision these server settings:
 
 ```sh
 LLM_GATEWAY_ECA_TOKEN_URL=https://your-org.my.salesforce.com/services/oauth2/token
@@ -82,9 +101,9 @@ LLM_GATEWAY_ECA_CLIENT_FEATURE=ai-platform-models-connected-app
 # LLM_GATEWAY_ECA_TENANT_ID=<authorized-tenant>
 ```
 
-Once ECA is enabled and provisioned, switch **only** `LLM_GATEWAY_AUTH_MODE=eca` and restart/redeploy. Roll back by selecting `api_key` with its existing settings. The ECA profile deliberately does not inherit the internal API-key URL, tenant, model, or feature settings. ECA uses the public SFAP `/ai/gpt/v1/chat/generations[/stream]` routes and `generation_settings: {parameters: {}}` payload. Its allowed origins are `api`, `test.api`, `dev.api`, and `perf.api` on `salesforce.com`; token exchange uses the configured Salesforce My Domain HTTPS endpoint. Redirects are rejected.
+Once direct ECA is enabled and provisioned, select `LLM_GATEWAY_AUTH_MODE=eca_direct` and restart/redeploy. Roll back by selecting `api_key` with its existing settings. Both ECA modes use a shared SFAP request profile that deliberately does not inherit the internal API-key URL, tenant, model, or feature settings. ECA uses the public SFAP `/ai/gpt/v1/chat/generations[/stream]` routes and `generation_settings: {parameters: {}}` payload. Its allowed origins are `api`, `test.api`, `dev.api`, and `perf.api` on `salesforce.com`; token exchange uses the configured Salesforce My Domain HTTPS endpoint. Redirects are rejected.
 
-The ECA adapter exchanges credentials server-side, caches until shortly before JWT expiry, and shares concurrent refreshes. A Gateway HTTP 401 invalidates only the failed token and retries once before streaming output. It never restarts a partial answer. This adapter is covered with mocked OAuth/Gateway responses; **live ECA enablement has not been tested in this draft**. ECA output-token parameter support must be confirmed with the Gateway contract; no unverified parameter is sent. Both modes retain stream deadlines and a 16,000-character client-side consumption cap (this does not substitute for an upstream billing/token limit).
+The direct adapter exchanges local credentials server-side; the BM adapter obtains a JWT from ECOM without local ECA credentials. Both cache until shortly before JWT expiry and share concurrent refreshes. A Gateway HTTP 401 invalidates only the failed token and retries once before streaming output. It never restarts a partial answer. Both adapters are covered with mocked authentication/Gateway responses; **live ECA enablement has not been tested in this draft**. ECA output-token parameter support must be confirmed with the Gateway contract; no unverified parameter is sent. Both modes retain stream deadlines and a 16,000-character client-side consumption cap (this does not substitute for an upstream billing/token limit).
 
 ## Commerce Agent and embedded PDP configuration
 
