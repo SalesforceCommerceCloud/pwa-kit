@@ -1324,16 +1324,16 @@
   "icons.assistive_msg.lock": {
     "defaultMessage": "Secure"
   },
-  "inline_agent_widget.redirect.input_placeholder": {
+  "inline_agent_widget.shopper_agent.input_placeholder": {
     "defaultMessage": "Ask me anything"
   },
-  "inline_agent_widget.redirect.input_placeholder_with_product": {
+  "inline_agent_widget.shopper_agent.input_placeholder_with_product": {
     "defaultMessage": "Ask me anything about {productName}"
   },
-  "inline_agent_widget.redirect.submit": {
+  "inline_agent_widget.shopper_agent.submit": {
     "defaultMessage": "Ask"
   },
-  "inline_agent_widget.redirect.title": {
+  "inline_agent_widget.shopper_agent.title": {
     "defaultMessage": "Have a question?"
   },
   "item_attributes.label.bonus_product": {

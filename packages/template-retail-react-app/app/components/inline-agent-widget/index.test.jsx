@@ -16,7 +16,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-inline-agent-widget', () =
         default: () => React.createRef(),
         isConfigured: (config) => {
             if (!config?.enabled) return false
-            if (config?.mode === 'main-agent') return true
+            if (config?.mode === 'shopper-agent') return true
             return Boolean(config?.scrt2Url && config?.orgId && config?.esDeveloperName)
         }
     }
@@ -44,22 +44,22 @@ describe('InlineAgentWidget', () => {
 
     test('renders nothing meaningful when config is not configured', () => {
         renderWithProviders(<InlineAgentWidget config={{enabled: false}} />)
-        expect(screen.queryByTestId('inline-main-agent-shim')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('inline-shopper-agent-shim')).not.toBeInTheDocument()
     })
 
     test('renders the UMD mount container in inline mode (default)', () => {
         const {container} = renderWithProviders(<InlineAgentWidget config={BASE_CONFIG} />)
         // The local React shim (removed in favor of the UMD shim) should NOT render.
-        expect(screen.queryByTestId('inline-main-agent-shim')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('inline-shopper-agent-shim')).not.toBeInTheDocument()
         // The hook mount container is a plain div (ref target); the UMD custom
         // element is mounted into it imperatively — not visible in enzyme.
         expect(container.querySelector('div')).toBeInTheDocument()
     })
 
-    test('mode === "main-agent" wires a document-level handoff listener', () => {
+    test('mode === "shopper-agent" wires a document-level handoff listener', () => {
         renderWithProviders(
             <InlineAgentWidget
-                config={{...BASE_CONFIG, mode: 'main-agent'}}
+                config={{...BASE_CONFIG, mode: 'shopper-agent'}}
                 pdpQuestions={['A?', 'B?']}
                 productName="Serum"
                 productId="500400"
@@ -67,7 +67,7 @@ describe('InlineAgentWidget', () => {
         )
 
         // The local React shim is gone — the UMD paints the pills now.
-        expect(screen.queryByTestId('inline-main-agent-shim')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('inline-shopper-agent-shim')).not.toBeInTheDocument()
 
         // Simulate the UMD firing its handoff event; the host should call
         // handoffToShopperAgent with productId/productName context.
@@ -90,7 +90,7 @@ describe('InlineAgentWidget', () => {
     test('ignores handoff events with no question', () => {
         renderWithProviders(
             <InlineAgentWidget
-                config={{...BASE_CONFIG, mode: 'main-agent'}}
+                config={{...BASE_CONFIG, mode: 'shopper-agent'}}
                 productId="500400"
             />
         )

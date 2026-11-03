@@ -41,8 +41,8 @@ const ensureWidget = () => {
 
 const isConfigured = (config) => {
     if (!config?.enabled) return false
-    // main-agent never opens a SCRT2 session — only `enabled` matters.
-    if (config?.mode === 'main-agent') return true
+    // shopper-agent never opens a SCRT2 session — only `enabled` matters.
+    if (config?.mode === 'shopper-agent') return true
     return Boolean(config?.scrt2Url && config?.orgId && config?.esDeveloperName)
 }
 
@@ -78,9 +78,9 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
 
         const el = document.createElement('inline-agent-widget')
         if (mode) el.setAttribute('mode', mode)
-        // SCRT2 fields are only set when they're real — main-agent mode
+        // SCRT2 fields are only set when they're real — shopper-agent mode
         // doesn't need them and the UMD's config-validation skips the check
-        // when `mode="main-agent"`.
+        // when `mode="shopper-agent"`.
         if (config.scrt2Url) el.setAttribute('scrt2-url', config.scrt2Url)
         if (config.orgId) el.setAttribute('org-id', config.orgId)
         if (config.esDeveloperName) el.setAttribute('es-developer-name', config.esDeveloperName)

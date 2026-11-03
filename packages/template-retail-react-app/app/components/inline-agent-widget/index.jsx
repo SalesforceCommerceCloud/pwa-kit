@@ -13,7 +13,7 @@ import useInlineAgentWidget, {
 } from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 import {handoffToShopperAgent} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
 
-const VALID_MODES = ['inline', 'main-agent', 'hybrid']
+const VALID_MODES = ['inline', 'shopper-agent', 'hybrid']
 const HANDOFF_EVENT = 'inline-agent-widget:handoff'
 
 const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
@@ -27,12 +27,12 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
         }
     }, [config.mode])
 
-    // Main-agent: the UMD paints a non-conversational shim and emits a
+    // Shopper-agent: the UMD paints a non-conversational shim and emits a
     // bubbling `inline-agent-widget:handoff` CustomEvent whenever the shopper
     // clicks a pill or submits the input. The host owns the handoff — opens
     // the main Shopper Agent drawer with the question seeded + PDP context.
     useEffect(() => {
-        if (config.mode !== 'main-agent') return
+        if (config.mode !== 'shopper-agent') return
         if (typeof window === 'undefined') return
 
         const onHandoff = (ev) => {
@@ -75,14 +75,14 @@ InlineAgentWidget.propTypes = {
         placeholder: PropTypes.string,
         /**
          * `'inline'` (default) runs the UMD custom element with its own SCRT2 session.
-         * `'main-agent'` renders a non-conversational shim (owned by the UMD)
+         * `'shopper-agent'` renders a non-conversational shim (owned by the UMD)
          * that dispatches an `inline-agent-widget:handoff` CustomEvent on pill
          * click / submit; this component catches it and hands off to the main
          * Shopper Agent drawer.
          * `'hybrid'` is reserved for future per-pill routing (PDP questions inline,
          * discovery/comparison to the main drawer); currently falls back to inline.
          */
-        mode: PropTypes.oneOf(['inline', 'main-agent', 'hybrid'])
+        mode: PropTypes.oneOf(['inline', 'shopper-agent', 'hybrid'])
     }),
     /**
      * Opener questions for the current product — rendered as tappable pills

@@ -6781,7 +6781,7 @@
       "value": "]"
     }
   ],
-  "inline_agent_widget.redirect.input_placeholder": [
+  "inline_agent_widget.shopper_agent.input_placeholder": [
     {
       "type": 0,
       "value": "["
@@ -6795,7 +6795,7 @@
       "value": "]"
     }
   ],
-  "inline_agent_widget.redirect.input_placeholder_with_product": [
+  "inline_agent_widget.shopper_agent.input_placeholder_with_product": [
     {
       "type": 0,
       "value": "["
@@ -6813,7 +6813,7 @@
       "value": "]"
     }
   ],
-  "inline_agent_widget.redirect.submit": [
+  "inline_agent_widget.shopper_agent.submit": [
     {
       "type": 0,
       "value": "["
@@ -6827,7 +6827,7 @@
       "value": "]"
     }
   ],
-  "inline_agent_widget.redirect.title": [
+  "inline_agent_widget.shopper_agent.title": [
     {
       "type": 0,
       "value": "["
