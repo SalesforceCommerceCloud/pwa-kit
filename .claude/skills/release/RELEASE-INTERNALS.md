@@ -24,9 +24,19 @@ Read the independent-package list in `scripts/bump-version/index.js` and matchin
 - Confirm the complete target map before running bumps. Run the SDK bump first, then commerce-sdk-react and retail-react-app with the default dependency-sync behavior. Prefix each command with `npm_config_allow_same_version=true` (for example, `npm_config_allow_same_version=true npm run bump-version:commerce-sdk-react -- <csr-next-dev>`), since the scripts call `npm version` even when a target already matches. Explicit independent next-dev bumps are required even when their targets were already present on `develop`; MCP needs no merge-back bump.
 - Require `npx lerna list --long --all` to match all four targets, root/lerna versions to match the SDK target, and `npm run check-dep-version` to pass. Review lockfile changes and changelog headers using "Stamping the changelogs" below; keep shipped entries under their stable headings and SDK/commerce-sdk-react/retail next-cycle entries under a single matching dev heading. Surface discrepancies before pushing.
 
+## Older-line npm tags
+
+Before the first preview or stable publish of a patch to an older release line, run `npm dist-tag ls @salesforce/<pkg>` for every selected package. Record existing `latest`/`next` targets, including absent tags, and get operator approval for the intended targets after each preview and the stable release. Retain this baseline across preview iterations; capture newly selected packages before publishing them. On resume, recover the recorded baseline; if missing, ask the operator to establish intended targets rather than treating an already-published preview's tags as the original state.
+
+Preview publication moves `next`; stable publication moves `latest`. State this temporary change at the publish gate. After each publish (including partial publication or a retry), compare every selected package's tags with the approved targets. **GATE each restoration:** state the exact `npm dist-tag add @salesforce/<pkg>@<approved-version> <tag>` command, or `npm dist-tag rm @salesforce/<pkg> <tag>` for an approved absent tag, and its effect. Wait for approval, execute, and verify with `npm dist-tag ls`. Restore tags before announcements or testing handoff; exact-version generation remains available afterward. Repeat verification after each publish attempt. Restoration limits disruption but does not prevent the temporary tag change during publishing.
+
+Completion: every selected package's `latest`/`next` matches its approved targets. Retain the original baseline for subsequent previews and stable closeout; if it was lost, record that history is unknown and retain the operator-approved replacement targets instead.
+
 ## The bump-and-PR cycle
 
 Steps 2 and 4 run the same cycle; the only difference is the version shape. **Preview** carries `-preview.N` and gets a git tag; **final** is the clean stable version, no suffix.
+
+For patches to older release lines, load "Older-line npm tags" before the first publish gate. Require its recorded baseline (or documented missing-history decision) and approved targets before opening any bump PR; retain them for subsequent previews and stable publication.
 
 1. **Ensure the release branch exists.** Derive `release-<major>.<minor>.x` from the monorepo version. Check origin:
    ```

@@ -106,6 +106,8 @@ Goal: the base is clean and all four version numbers are chosen.
 
    State the resulting `release-<major>.<minor>.x` name back and get a yes.
 
+For a patch to an older release line (for example, `3.19.1` when `3.21.0` is already released), load "Older-line npm tags" in `RELEASE-INTERNALS.md` and capture the baseline before the first preview or stable publish. Confirm the post-publish tag targets with the operator and retain them across preview iterations.
+
 Completion: the operator approves the exact release range and version map, compatibility coverage is complete, and every finding is recorded with its disposition. Audit completion permits previews; unresolved accidental breaks or missing migration guidance block stable shipment.
 
 ## Step 2 — Bump, stamp changelogs, open the PR
@@ -120,6 +122,8 @@ Run **the bump-and-PR cycle** with **preview** versions (`-preview.N`), document
 
 If publication is partial, inspect the publishing leg for the exact merged SHA and repair its failure. **GATE** a retry of the failed workflow jobs at that same SHA/version map (`gh run rerun <run-id> --failed`), stating which missing packages may publish. Already-published versions are skipped. Recheck every selected version; keep testing and post-release blocked until all resolve.
 
+For older-line patches, apply "Older-line npm tags" after every publish attempt, including partial publication and retries. Verify approved tag targets before announcing or handing off testing; retain the original baseline for the next preview and stable release.
+
 **Release scope:** load "Categorized release scope" in `RELEASE-INTERNALS.md`, dispatch its read-only report, and present the verified scope to the operator before testing. Include it with the preview announcement so feature owners know what to exercise; reuse it for final Highlights.
 
 1. **Generate from the just-published preview**, and give the operator this same command to paste into a Slack **announcement** so each team tests its own features against the preview — testing is shared across teams, not the operator's alone:
@@ -132,11 +136,11 @@ If publication is partial, inspect the publishing leg for the exact merged SHA a
 
 ## Step 4 — Final release
 
-Before publishing a patch to an older release line (for example, `3.19.1` when `3.21.0` is already released), capture existing npm `latest`/`next` tags and confirm their intended post-release targets with the operator. Stable publication moves `latest`; if a newer line must remain the default, include separately gated restoration commands in the publish plan and verify restoration before announcing. For a normal top-of-line release, both tags target the shipped stable versions.
+For an older-line patch, use the baseline and targets recorded before its first publish, following "Older-line npm tags" in `RELEASE-INTERNALS.md`. For a normal top-of-line release, both tags target the shipped stable versions.
 
 Run **the bump-and-PR cycle** again (`RELEASE-INTERNALS.md`) with the clean stable versions (no suffix). Re-verify every changelog reads final — no `-preview` left, dates correct — tag `v<version>`, and **GATE** the final PR into `release-X.Y.x` stating it publishes stable to `latest`. You open it; the **operator merges it.**
 
-Completion: every selected stable version passes the publication checkpoint from Step 3; only then proceed to post-release.
+Completion: every selected stable version passes the publication checkpoint from Step 3 and older-line tag restoration is verified; only then proceed to post-release.
 
 ## Step 5 — Post-release
 
@@ -154,7 +158,7 @@ Completion: every selected stable version passes the publication checkpoint from
      ```
      https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/references/about-pwa-kit-managed-runtime/about.html#pwa-kit-<XYZ>-changes
      ```
-2. **npm dist-tags** (stable releases only). Publishing already tagged the release: previews land on `next`, stables land on `latest` (lerna's default). For a normal top-of-line stable, move `next` off the preview onto the shipped stable. For patches to older release lines, apply the tag targets approved in Step 4 instead. Previews need nothing here. **GATE**, since it writes to the public registry. Use the approved tag/version map, never develop's `package.json`. Normal top-of-line commands:
+2. **npm dist-tags.** Publishing already tagged the release: previews land on `next`, stables land on `latest` (lerna's default). For a normal top-of-line stable, move `next` off the preview onto the shipped stable; top-of-line previews need no adjustment. For patches to older release lines, verify the targets approved before the first publish using "Older-line npm tags" in `RELEASE-INTERNALS.md`. **GATE**, since tag changes write to the public registry. Use the approved tag/version map, never develop's `package.json`. Normal top-of-line commands:
    ```
    npm dist-tag add @salesforce/pwa-kit-react-sdk@<sdk-v> next
    npm dist-tag add @salesforce/pwa-kit-runtime@<sdk-v> next
