@@ -5147,6 +5147,12 @@
       "value": "We're unable to submit this return."
     }
   ],
+  "search.action.ask_ai": [
+    {
+      "type": 0,
+      "value": "Ask AI"
+    }
+  ],
   "search.action.cancel": [
     {
       "type": 0,

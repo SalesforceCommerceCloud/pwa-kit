@@ -10,6 +10,7 @@ import {
     Input,
     InputGroup,
     InputLeftElement,
+    InputRightElement,
     Popover,
     PopoverTrigger,
     PopoverContent,
@@ -20,7 +21,7 @@ import {
     Spinner
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import SearchSuggestions from '@salesforce/retail-react-app/app/components/search/partials/search-suggestions'
-import {SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ArrowRightIcon, SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     capitalize,
     getSessionJSONItem,
@@ -42,7 +43,11 @@ import {
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
-import {launchChat as launchChatFromUtils} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
+import {
+    launchChat as launchChatFromUtils,
+    openCommerceClientWidget,
+    sendCommerceClientMessage
+} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import {useLocation} from 'react-router-dom'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
@@ -154,6 +159,9 @@ const Search = (props) => {
         [commerceAgentConfig]
     )
     const enableAgentFromSearchSuggestions = commerceAgentConfig?.enableAgentFromSearchSuggestions
+    const showAskAIButton =
+        commerceAgentConfig?.enabled === 'true' &&
+        commerceAgentConfig?.enableAgentFromSearchBar === 'true'
 
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
@@ -174,7 +182,10 @@ const Search = (props) => {
     const searchInputRef = useRef()
     const miawChatRef = useRef({
         newChatLaunched: false,
-        hasFired: false
+        hasFired: false,
+        // Message to send once a newly launched chat greets the shopper (Ask AI button).
+        // Falls back to the search input value (ask agent on search).
+        pendingMessage: null
     })
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
     const searchSuggestions = useMemo(
@@ -263,16 +274,17 @@ const Search = (props) => {
     useEffect(() => {
         const handleEmbeddedMessageSent = (e) => {
             if (!miawChatRef.current.hasFired && miawChatRef.current.newChatLaunched) {
+                const message =
+                    miawChatRef.current.pendingMessage || searchInputRef?.current?.value?.trim()
                 if (
                     e.detail.conversationEntry?.sender?.role === 'Chatbot' &&
-                    searchInputRef?.current?.value &&
+                    message &&
                     window.embeddedservice_bootstrap?.utilAPI
                 ) {
                     miawChatRef.current.hasFired = true
+                    miawChatRef.current.pendingMessage = null
                     setTimeout(() => {
-                        window.embeddedservice_bootstrap.utilAPI.sendTextMessage(
-                            searchInputRef.current.value.trim()
-                        )
+                        window.embeddedservice_bootstrap.utilAPI.sendTextMessage(message)
                     }, 500)
                 }
             }
@@ -358,6 +370,39 @@ const Search = (props) => {
         clearInput()
     }, [setPrechatFieldsForNewSession, clearInput])
 
+    const onAskAIClick = useCallback(() => {
+        const searchText = searchInputRef.current?.value?.trim()
+        clearInput()
+
+        // Commerce Client widget: open it and send the query. The widget queues the message
+        // until its session is connected.
+        if (window.CimulateMessaging?.eventHandlers?.components?.toggleWidgetOpen) {
+            openCommerceClientWidget(true)
+            sendCommerceClientMessage(searchText)
+            return
+        }
+
+        const utilAPI = window.embeddedservice_bootstrap?.utilAPI
+        if (!searchText || !utilAPI) {
+            setPrechatFieldsForNewSession()
+            launchChatFromUtils()
+            return
+        }
+
+        // MIAW: send the query to an open conversation, otherwise start a new one and
+        // send the query once the agent greets the shopper.
+        utilAPI
+            .sendTextMessage(searchText)
+            .then(() => launchChatFromUtils())
+            .catch(() => {
+                setPrechatFieldsForNewSession()
+                miawChatRef.current.pendingMessage = searchText
+                miawChatRef.current.hasFired = false
+                miawChatRef.current.newChatLaunched = true
+                launchChatFromUtils()
+            })
+    }, [setPrechatFieldsForNewSession, clearInput])
+
     const shouldOpenPopover = () => {
         // As per design we only want to show the popover if the input is focused and we have recent searches saved
         // or we have search suggestions available and have inputed some text (empty text in this scenario should show recent searches)
@@ -394,9 +439,31 @@ const Search = (props) => {
                                     onBlur={() => setIsOpen(false)}
                                     type="search"
                                     ref={searchInputRef}
+                                    {...(showAskAIButton && {paddingRight: '7.5rem'})}
                                     {...props}
                                     variant="filled"
                                 />
+                                {showAskAIButton && (
+                                    <InputRightElement width="auto" height="100%" paddingRight={1}>
+                                        <Button
+                                            data-testid="search-ask-ai-button"
+                                            type="button"
+                                            size="sm"
+                                            borderRadius="full"
+                                            backgroundColor="gray.100"
+                                            color="gray.900"
+                                            fontWeight="medium"
+                                            _hover={{backgroundColor: 'gray.200'}}
+                                            rightIcon={<ArrowRightIcon boxSize={4} />}
+                                            onClick={onAskAIClick}
+                                        >
+                                            <FormattedMessage
+                                                defaultMessage="Ask AI"
+                                                id="search.action.ask_ai"
+                                            />
+                                        </Button>
+                                    </InputRightElement>
+                                )}
                             </InputGroup>
                             <HideOnDesktop>
                                 <Button

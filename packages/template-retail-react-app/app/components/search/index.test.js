@@ -825,3 +825,118 @@ test('verifies DomainUrl is correctly constructed with appOrigin and buildUrl', 
     const prechatFieldsCall = setHiddenPrechatFieldsSpy.mock.calls[0][0]
     expect(prechatFieldsCall.DomainUrl).toMatch(/^https:\/\/www\.domain\.com\/.*$/)
 })
+
+describe('Ask AI button', () => {
+    const getAskAIConfig = (enableAgentFromSearchBar = 'true') => ({
+        ...mockConfig,
+        app: {
+            ...mockConfig.app,
+            commerceAgent: {
+                ...mockConfig.app.commerceAgent,
+                enabled: 'true',
+                enableAgentFromSearchBar
+            }
+        }
+    })
+
+    afterEach(() => {
+        delete window.embeddedservice_bootstrap
+        delete window.CimulateMessaging
+    })
+
+    test('is not rendered when enableAgentFromSearchBar is false', () => {
+        getConfig.mockImplementation(() => getAskAIConfig('false'))
+        renderWithProviders(<SearchInput />)
+        expect(screen.queryByTestId('search-ask-ai-button')).not.toBeInTheDocument()
+    })
+
+    test('is rendered when enableAgentFromSearchBar is true', () => {
+        getConfig.mockImplementation(() => getAskAIConfig())
+        renderWithProviders(<SearchInput />)
+        expect(screen.getByTestId('search-ask-ai-button')).toHaveTextContent('Ask AI')
+    })
+
+    test('sends the query to an open MIAW conversation', async () => {
+        const user = setupUserEvent()
+        getConfig.mockImplementation(() => getAskAIConfig())
+        const sendTextMessage = jest.fn().mockResolvedValue()
+        const launchChat = jest.fn().mockResolvedValue()
+        window.embeddedservice_bootstrap = {utilAPI: {sendTextMessage, launchChat}}
+
+        renderWithProviders(<SearchInput />)
+        const searchInput = document.querySelector('input[type="search"]')
+        await user.type(searchInput, '  red dress ')
+        await user.click(screen.getByTestId('search-ask-ai-button'))
+
+        expect(sendTextMessage).toHaveBeenCalledWith('red dress')
+        await waitFor(() => expect(launchChat).toHaveBeenCalled())
+    })
+
+    test('starts a new MIAW chat and sends the query after the agent greets', async () => {
+        const user = setupUserEvent()
+        getConfig.mockImplementation(() => getAskAIConfig())
+        const sendTextMessage = jest
+            .fn()
+            .mockRejectedValueOnce(
+                'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
+            )
+            .mockResolvedValue()
+        const launchChat = jest.fn().mockResolvedValue()
+        const setHiddenPrechatFields = jest.fn()
+        window.embeddedservice_bootstrap = {
+            utilAPI: {sendTextMessage, launchChat},
+            prechatAPI: {setHiddenPrechatFields}
+        }
+
+        renderWithProviders(<SearchInput />)
+        const searchInput = document.querySelector('input[type="search"]')
+        await user.type(searchInput, 'red dress')
+        await user.click(screen.getByTestId('search-ask-ai-button'))
+
+        await waitFor(() => expect(launchChat).toHaveBeenCalled())
+        expect(setHiddenPrechatFields).toHaveBeenCalled()
+
+        window.dispatchEvent(
+            new CustomEvent('onEmbeddedMessageSent', {
+                detail: {conversationEntry: {sender: {role: 'Chatbot'}}}
+            })
+        )
+        jest.advanceTimersByTime(500)
+
+        expect(sendTextMessage).toHaveBeenCalledTimes(2)
+        expect(sendTextMessage).toHaveBeenLastCalledWith('red dress')
+    })
+
+    test('opens the Commerce Client widget and sends the query', async () => {
+        const user = setupUserEvent()
+        getConfig.mockImplementation(() => getAskAIConfig())
+        const toggleWidgetOpen = jest.fn()
+        const sendMessage = jest.fn().mockResolvedValue()
+        window.CimulateMessaging = {
+            eventHandlers: {components: {toggleWidgetOpen}, session: {sendMessage}}
+        }
+
+        renderWithProviders(<SearchInput />)
+        await user.type(document.querySelector('input[type="search"]'), ' tops ')
+        await user.click(screen.getByTestId('search-ask-ai-button'))
+
+        expect(toggleWidgetOpen).toHaveBeenCalledWith(true)
+        expect(sendMessage).toHaveBeenCalledWith('tops')
+    })
+
+    test('opens the Commerce Client widget without sending when the input is empty', async () => {
+        const user = setupUserEvent()
+        getConfig.mockImplementation(() => getAskAIConfig())
+        const toggleWidgetOpen = jest.fn()
+        const sendMessage = jest.fn()
+        window.CimulateMessaging = {
+            eventHandlers: {components: {toggleWidgetOpen}, session: {sendMessage}}
+        }
+
+        renderWithProviders(<SearchInput />)
+        await user.click(screen.getByTestId('search-ask-ai-button'))
+
+        expect(toggleWidgetOpen).toHaveBeenCalledWith(true)
+        expect(sendMessage).not.toHaveBeenCalled()
+    })
+})
