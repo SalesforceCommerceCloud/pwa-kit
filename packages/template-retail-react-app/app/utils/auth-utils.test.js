@@ -121,10 +121,7 @@ describe('getLoginPasswordlessErrorMessage', () => {
         ['invalid token', INVALID_TOKEN_ERROR_MESSAGE],
         ['login_id does not match stored login_id', INVALID_TOKEN_ERROR_MESSAGE],
         ['login_id is required', INVALID_TOKEN_ERROR_MESSAGE],
-        [
-            'login id is required for Passwordless Login authentication',
-            INVALID_TOKEN_ERROR_MESSAGE
-        ],
+        ['login id is required for Passwordless Login authentication', INVALID_TOKEN_ERROR_MESSAGE],
         [
             'Too many login requests were made. Please try again later.',
             TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
@@ -145,10 +142,7 @@ describe('getResetPasswordActionErrorMessage', () => {
         ['login_id does not match stored login_id', INVALID_TOKEN_ERROR_MESSAGE],
         ['login_id is required', INVALID_TOKEN_ERROR_MESSAGE],
         // "Too many password reset requests…" is from /password/reset (400), not /password/action
-        [
-            'Too many password reset requests were made. Please try again later.',
-            API_ERROR_MESSAGE
-        ],
+        ['Too many password reset requests were made. Please try again later.', API_ERROR_MESSAGE],
         ['unexpected error message', API_ERROR_MESSAGE],
         [null, API_ERROR_MESSAGE]
     ])(

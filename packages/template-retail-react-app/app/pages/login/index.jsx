@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
 import {Box, Container, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -33,6 +33,7 @@ import {
     getAuthorizePasswordlessErrorMessage,
     getLoginPasswordlessErrorMessage,
     getPasswordlessCallbackUrl,
+    MISSING_PASSWORDLESS_LOGIN_ID_ERROR,
     readErrorResponseMessage,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
@@ -77,6 +78,8 @@ const Login = () => {
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const [redirectPath, setRedirectPath] = useState('')
     const [isOtpAuthOpen, setIsOtpAuthOpen] = useState(false)
+    // Exact email sent to authorizePasswordless — SLAS compares login_id case-sensitively
+    const lastEmailSentRef = useRef(null)
 
     const handleMergeBasket = () => {
         const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
@@ -108,12 +111,14 @@ const Login = () => {
 
     const handlePasswordlessLogin = async (email) => {
         try {
+            const authorizeEmail = email?.trim() || ''
             await authorizePasswordlessLogin.mutateAsync({
-                userid: email,
+                userid: authorizeEmail,
                 mode: passwordlessMode,
                 locale: locale.id,
                 ...(passwordlessConfigCallback && {callbackURI: passwordlessConfigCallback})
             })
+            lastEmailSentRef.current = authorizeEmail
             setIsOtpAuthOpen(true)
         } catch (error) {
             const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
@@ -123,8 +128,15 @@ const Login = () => {
 
     const handleOtpVerification = async (pwdlessLoginToken) => {
         try {
-            const loginId =
-                form.getValues('email') || queryParams.get('login_id')
+            // Prefer authorize-time email; fall back to magic-link login_id query param.
+            // Do not re-read the editable form — SLAS compares login_id case-sensitively.
+            const loginId = lastEmailSentRef.current || queryParams.get('login_id')
+            if (!loginId) {
+                return {
+                    success: false,
+                    error: formatMessage(MISSING_PASSWORDLESS_LOGIN_ID_ERROR)
+                }
+            }
             await loginPasswordless.mutateAsync({
                 pwdlessLoginToken,
                 login_id: loginId,

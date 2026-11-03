@@ -26,8 +26,11 @@ import {useCustomerType, useAuthHelper, AuthHelpers} from '@salesforce/commerce-
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {
+    getLoginPasswordlessErrorMessage,
     getPasswordlessCallbackUrl,
-    MISSING_PASSWORDLESS_LOGIN_ID_ERROR
+    MISSING_PASSWORDLESS_LOGIN_ID_ERROR,
+    readErrorResponseMessage,
+    TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
@@ -213,9 +216,18 @@ export default function UserRegistration({
             handleOtpClose()
             setRegistrationSucceeded(true)
             return {success: true}
-        } catch (_e) {
-            // Let OtpAuth surface errors via its own UI/toast
-            return {success: false}
+        } catch (e) {
+            if (e.response?.status === 429) {
+                return {
+                    success: false,
+                    error: formatMessage(TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE)
+                }
+            }
+            const errorMessage = await readErrorResponseMessage(e)
+            return {
+                success: false,
+                error: formatMessage(getLoginPasswordlessErrorMessage(errorMessage))
+            }
         }
     }
 

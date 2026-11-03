@@ -30,7 +30,7 @@ jest.mock('@salesforce/commerce-sdk-react/components', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react/components')
     return {
         ...actual,
-        // eslint-disable-next-line react/prop-types
+
         StorefrontPreview: jest.fn(({children}) => children)
     }
 })

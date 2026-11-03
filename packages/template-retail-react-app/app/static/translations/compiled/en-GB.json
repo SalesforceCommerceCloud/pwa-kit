@@ -2625,6 +2625,12 @@
       "value": "Invalid token, please try again."
     }
   ],
+  "global.error.missing_passwordless_login_id": [
+    {
+      "type": 0,
+      "value": "Your email is missing for this verification. Click Resend Code and try again."
+    }
+  ],
   "global.error.something_went_wrong": [
     {
       "type": 0,

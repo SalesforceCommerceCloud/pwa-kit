@@ -29,8 +29,7 @@ export const TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE = defineMessage({
 })
 
 export const MISSING_PASSWORDLESS_LOGIN_ID_ERROR = defineMessage({
-    defaultMessage:
-        'Your email is missing for this verification. Click Resend Code and try again.',
+    defaultMessage: 'Your email is missing for this verification. Click Resend Code and try again.',
     id: 'global.error.missing_passwordless_login_id'
 })
 
@@ -160,10 +159,7 @@ export const getLoginPasswordlessErrorMessage = (errorMessage) => {
  * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
  */
 export const getResetPasswordActionErrorMessage = (errorMessage) => {
-    if (
-        INVALID_TOKEN_ERROR.test(errorMessage) ||
-        isMissingOrMismatchedLoginIdError(errorMessage)
-    ) {
+    if (INVALID_TOKEN_ERROR.test(errorMessage) || isMissingOrMismatchedLoginIdError(errorMessage)) {
         return INVALID_TOKEN_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE

@@ -1089,50 +1089,39 @@ describe('Auth', () => {
                 loginId: 'shopper@example.com',
                 channelId: 'customChannelId',
                 usid: 'test-usid',
-                registerCustomer: true
+                registerCustomer: 'true'
             }
         })
     })
 
-    // Requires commerce-sdk-isomorphic@6.0.0+, which maps helper loginId/channelId onto the wire body.
-    const isomorphicMajor = Number(
-        (jest.requireActual('commerce-sdk-isomorphic/package.json') as {version: string}).version.split(
-            '.'
-        )[0]
-    )
-    ;(isomorphicMajor >= 6 ? test : test.skip)(
-        'getPasswordLessAccessToken maps loginId/channelId onto the SLAS request body',
-        async () => {
-            // Drive the real isomorphic helper so we assert the wire body, not only our wrapper args.
-            const {helpers: actualHelpers} = jest.requireActual(
-                'commerce-sdk-isomorphic'
-            ) as typeof import('commerce-sdk-isomorphic')
-            const getPasswordLessAccessTokenSpy = jest.fn().mockResolvedValue(TOKEN_RESPONSE)
+    test('getPasswordLessAccessToken maps loginId/channelId onto the SLAS request body', async () => {
+        // Drive the real isomorphic helper so we assert the wire body, not only our wrapper args.
+        const {helpers: actualHelpers} = jest.requireActual('commerce-sdk-isomorphic')
+        const getPasswordLessAccessTokenSpy = jest.fn().mockResolvedValue(TOKEN_RESPONSE)
 
-            const auth = new Auth(configSLASPrivate)
-            // @ts-expect-error private property
-            auth.client.getPasswordLessAccessToken = getPasswordLessAccessTokenSpy
-            ;(helpers.getPasswordLessAccessToken as jest.Mock).mockImplementationOnce((options) =>
-                actualHelpers.getPasswordLessAccessToken(options)
-            )
+        const auth = new Auth(configSLASPrivate)
+        // @ts-expect-error private property
+        auth.client.getPasswordLessAccessToken = getPasswordLessAccessTokenSpy
+        ;(helpers.getPasswordLessAccessToken as jest.Mock).mockImplementationOnce((options) =>
+            actualHelpers.getPasswordLessAccessToken(options)
+        )
 
-            await auth.getPasswordLessAccessToken({
-                pwdlessLoginToken: '12345678',
-                login_id: 'shopper@example.com',
-                channel_id: 'customChannelId'
-            })
+        await auth.getPasswordLessAccessToken({
+            pwdlessLoginToken: '12345678',
+            login_id: 'shopper@example.com',
+            channel_id: 'customChannelId'
+        })
 
-            expect(getPasswordLessAccessTokenSpy).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    body: expect.objectContaining({
-                        pwdless_login_token: '12345678',
-                        login_id: 'shopper@example.com',
-                        channel_id: 'customChannelId'
-                    })
+        expect(getPasswordLessAccessTokenSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                body: expect.objectContaining({
+                    pwdless_login_token: '12345678',
+                    login_id: 'shopper@example.com',
+                    channel_id: 'customChannelId'
                 })
-            )
-        }
-    )
+            })
+        )
+    })
 
     test.each([
         [
