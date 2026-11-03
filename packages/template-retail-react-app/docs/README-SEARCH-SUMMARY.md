@@ -161,6 +161,8 @@ The launcher defaults to port 3001 and enables system CA trust on supported Node
 
 One opaque shopper session persists across searches. History is scoped by query, filters, site, locale, currency, and sort; pagination preserves the scope. Changing a search selects only that search's conversation for UI, model, suggestions, and handoff. Follow-up chips derive from real result facets, product names, and prices. The initial overview is shown once, separately from follow-up turns. Prompt text lives in `app/server/search-assistant/prompts.js`.
 
+Overview and follow-up answers render Markdown paragraphs, emphasis, headings, lists, links, blockquotes, code, and tables as streaming chunks arrive. The pinned browser parser disables raw HTML, rejects unsafe URLs, and displays model-authored images as alt text; product images stay in validated catalog cards. Conversation history retains the original Markdown.
+
 Tokens, keys, prompts, and model text must never appear in diagnostics. Server errors expose fixed messages/statuses, not upstream response bodies. SessionStorage holds only an opaque conversation ID; raw shopper tokens are hashed for ownership checks and are not retained in the store.
 
 ## Preview rollout limits
@@ -181,5 +183,6 @@ node ../pwa-kit-dev/node_modules/jest/bin/jest.js \
   app/utils/search-agent-handoff.test.js app/utils/sse.test.js \
   app/hooks/use-search-with-summary.test.js \
   app/pages/product-list/partials/search-summary.test.jsx \
+  app/components/ai-markdown/index.test.jsx \
   --runInBand --coverage=false
 ```

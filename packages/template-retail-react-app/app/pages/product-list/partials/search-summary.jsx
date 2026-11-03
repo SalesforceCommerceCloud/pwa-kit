@@ -21,14 +21,13 @@ import {
     Wrap
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import Link from '@salesforce/retail-react-app/app/components/link'
+import AiMarkdown from '@salesforce/retail-react-app/app/components/ai-markdown'
 import {SparkleIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {useShopperAgent} from '@salesforce/retail-react-app/app/hooks/use-shopper-agent'
 
 import {useSearchAssistantSession} from '@salesforce/retail-react-app/app/contexts/search-assistant-session'
 
 const DEFAULT_CONFIG = {followUps: true, agentHandoff: false, title: 'Your AI shopping guide'}
-
-const cleanText = (text) => String(text || '').replace(/\*\*([^*]+)\*\*/g, '$1')
 
 const Picks = ({products = [], currency = 'USD', compact = false}) => {
     const {locale} = useIntl()
@@ -177,20 +176,20 @@ const SearchSummary = ({
                         New search from your question: “{refinedFrom}”
                     </Text>
                 )}
-                <Text
+                <AiMarkdown
                     fontSize={{base: 'sm', md: 'md'}}
                     lineHeight="1.8"
                     color="#35402f"
-                    whiteSpace="pre-wrap"
+                    whiteSpace="normal"
                     data-testid="search-ai-overview-text"
                 >
-                    {cleanText(text) ||
+                    {text ||
                         (isStreaming
                             ? 'Your results are ready. Finding a few highlights for you…'
                             : !total
                             ? 'No matches this time. Try a broader keyword, or let the Commerce Agent help you find something.'
                             : '')}
-                </Text>
+                </AiMarkdown>
                 {error && (
                     <Text role="status" color="#846b38" fontSize="sm" mt={3}>
                         {error}
@@ -289,15 +288,15 @@ const SearchSummary = ({
                                                     {turn.question}
                                                 </Text>
                                             </Flex>
-                                            <Text
-                                                whiteSpace="pre-wrap"
+                                            <AiMarkdown
+                                                whiteSpace="normal"
                                                 lineHeight="1.8"
                                                 color="#35402f"
                                                 fontSize="sm"
                                                 data-testid="search-follow-up-answer"
                                             >
-                                                {cleanText(turn.text)}
-                                            </Text>
+                                                {turn.text}
+                                            </AiMarkdown>
                                             {turn.busy && (
                                                 <HStack mt={2} color="#7a876d">
                                                     <Spinner size="xs" />

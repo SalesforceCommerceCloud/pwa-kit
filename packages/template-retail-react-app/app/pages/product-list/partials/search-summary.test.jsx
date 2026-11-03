@@ -86,3 +86,27 @@ test('per-site switches hide follow-up and agent controls while retaining the ov
     ).not.toBeInTheDocument()
     expect(screen.getByTestId('ai-pick-0')).toBeInTheDocument()
 })
+
+test('renders Markdown in both the overview and follow-up answer', () => {
+    renderSummary(
+        <SearchSummary
+            {...props}
+            text={'**Featured** jackets\n\n- Waterproof\n- Lightweight'}
+            followUps={[
+                {
+                    id: 'markdown-answer',
+                    question: 'Which ones?',
+                    text: '### Details\n\n1. **Jacket one**\n2. Jacket two'
+                }
+            ]}
+        />
+    )
+    expect(screen.getByTestId('search-ai-overview-text').querySelector('strong')).toHaveTextContent(
+        'Featured'
+    )
+    expect(screen.getByTestId('search-ai-overview-text').querySelectorAll('li')).toHaveLength(2)
+    expect(screen.getByTestId('search-follow-up-answer').querySelector('strong')).toHaveTextContent(
+        'Jacket one'
+    )
+    expect(screen.getByTestId('search-follow-up-answer').querySelector('ol')).toBeInTheDocument()
+})

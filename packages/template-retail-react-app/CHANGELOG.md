@@ -1,4 +1,5 @@
 ## v10.4.0-dev (Oct 20, 2026)
+- [Bugfix] Render streamed AI overview and follow-up Markdown with formatted lists, emphasis, links, and tables; keep raw HTML, unsafe links, and model-authored remote images disabled.
 - [Bugfix] Describe AI overview products as selected highlights and invite shoppers to browse all matching products below, without announcing a fixed number of options.
 - [Feature] Make AI search `eca` authentication consume a server-authenticated ECOM broker for Business Manager credentials; keep local ECA secrets in an explicit `eca_direct` mode. Document the required companion ECOM endpoint and scope, which must be deployed before BM-backed ECA can be enabled.
 - [Feature] Add opt-in AI-assisted search with global/per-site configuration, product-first streamed overviews, search-scoped follow-ups, and Commerce Agent context handoff. Isolate API-key and ECA Gateway authentication behind a server-only mode switch. The preview uses process-local conversation storage; scaled deployments require shared storage and distributed controls. Increase the `main.js` budget from 111 kB to 112 kB for the shared feature configuration and session helpers.
