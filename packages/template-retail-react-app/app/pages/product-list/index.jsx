@@ -13,7 +13,6 @@ import {Helmet} from 'react-helmet'
 import {
     useCategory,
     useCustomerId,
-    useProductSearch,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
@@ -96,6 +95,8 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import useSearchWithSummary from '@salesforce/retail-react-app/app/hooks/use-search-with-summary'
+import SearchSummary from '@salesforce/retail-react-app/app/pages/product-list/partials/search-summary'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
@@ -161,8 +162,19 @@ const ProductList = (props) => {
         isLoading,
         isFetched,
         isRefetching,
-        data: productSearchResult
-    } = useProductSearch(
+        data: productSearchResult,
+        summary,
+        summaryError,
+        isSummarizing,
+        picks,
+        contextId,
+        followUps,
+        askFollowUp,
+        summaryCurrency,
+        summaryEnabled,
+        suggestions,
+        featureConfig
+    } = useSearchWithSummary(
         {
             parameters: {
                 ...restOfParams,
@@ -182,7 +194,12 @@ const ProductList = (props) => {
         },
         {
             keepPreviousData: true
-        }
+        },
+        isSearch,
+        (query, question) =>
+            navigate(`/search?q=${encodeURIComponent(query)}`, 'push', {
+                searchAssistantQuestion: question
+            })
     )
 
     const {error, data: category} = useCategory(
@@ -460,6 +477,23 @@ const ProductList = (props) => {
             <>
                 <AbovePageHeader />
                 <PageDesignerPromotionalBanner />
+                {summaryEnabled && !isLoading && (productSearchResult || summaryError) && (
+                    <SearchSummary
+                        config={featureConfig}
+                        text={summary}
+                        isStreaming={isSummarizing}
+                        error={summaryError}
+                        picks={picks}
+                        total={productSearchResult?.total || 0}
+                        query={searchQuery}
+                        currency={summaryCurrency}
+                        contextId={contextId}
+                        followUps={followUps}
+                        suggestions={suggestions}
+                        onFollowUp={askFollowUp}
+                        refinedFrom={location.state?.searchAssistantQuestion}
+                    />
+                )}
 
                 {/* Header */}
                 <Stack

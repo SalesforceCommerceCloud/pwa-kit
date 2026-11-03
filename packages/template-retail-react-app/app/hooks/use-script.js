@@ -8,70 +8,62 @@
 import {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 
-const SCRIPT_STATUS_ATTR = 'data-script-status'
-
-const applyStatusFromEvent = (script, eventType) => {
-    const status = eventType === 'load' ? 'ready' : 'error'
-    script.setAttribute(SCRIPT_STATUS_ATTR, status)
-    return status
-}
-
-const subscribeToScript = (script, setScriptLoadStatus) => {
-    const onScriptLoad = (event) => {
-        const status = applyStatusFromEvent(script, event.type)
-        setScriptLoadStatus({
-            loaded: status === 'ready',
-            error: status === 'error'
-        })
-    }
-
-    script.addEventListener('load', onScriptLoad)
-    script.addEventListener('error', onScriptLoad)
-
-    return () => {
-        script.removeEventListener('load', onScriptLoad)
-        script.removeEventListener('error', onScriptLoad)
-    }
-}
-
 /**
  * Custom hook to handle script loading
  * @param {string} src - The source URL for the script
  * @returns {Object} The script load status
  */
 const useScript = (src) => {
-    const [scriptLoadStatus, setScriptLoadStatus] = useState({loaded: false, error: false})
+    const [scriptLoadStatus, setScriptLoadStatus] = useState({
+        src: null,
+        loaded: false,
+        error: false
+    })
     // Effect to load and initialize the script
     useEffect(() => {
         if (!src) {
             return
         }
 
-        const scriptAlreadyOnPage = document.querySelector(`script[src="${src}"]`)
-
-        if (scriptAlreadyOnPage) {
-            const existingStatus = scriptAlreadyOnPage.getAttribute(SCRIPT_STATUS_ATTR)
-            if (existingStatus === 'ready') {
-                setScriptLoadStatus({loaded: true, error: false})
-                return
-            }
-            if (existingStatus === 'error') {
-                setScriptLoadStatus({loaded: false, error: true})
-                return
-            }
-            // Tag is in the DOM but still downloading — wait for load/error.
-            return subscribeToScript(scriptAlreadyOnPage, setScriptLoadStatus)
+        let script = document.querySelector(`script[src="${src}"]`)
+        const isNew = !script
+        if (isNew) {
+            script = document.createElement('script')
+            script.src = src
+            script.defer = true
         }
 
-        const script = document.createElement('script')
-        script.src = src
-        script.defer = true
-        document.body.appendChild(script)
+        // Keep status on the shared tag so remounts can reuse a completed load.
+        // These tag listeners remain active even while there are no consumers.
+        const statusAttribute = 'data-script-status'
+        if (!script.hasAttribute(statusAttribute)) {
+            script.setAttribute(statusAttribute, 'loading')
+            script.addEventListener('load', () => script.setAttribute(statusAttribute, 'ready'), {
+                once: true
+            })
+            script.addEventListener('error', () => script.setAttribute(statusAttribute, 'error'), {
+                once: true
+            })
+        }
+        const updateStatus = () => {
+            const status = script.getAttribute(statusAttribute)
+            setScriptLoadStatus({src, loaded: status === 'ready', error: status === 'error'})
+        }
+        script.addEventListener('load', updateStatus)
+        script.addEventListener('error', updateStatus)
+        updateStatus()
+        if (isNew) document.body.appendChild(script)
 
-        return subscribeToScript(script, setScriptLoadStatus)
+        return () => {
+            script.removeEventListener('load', updateStatus)
+            script.removeEventListener('error', updateStatus)
+        }
     }, [src])
 
-    return scriptLoadStatus
+    // A changed URL cannot inherit the preceding script's ready state during render.
+    return src && scriptLoadStatus.src === src
+        ? {loaded: scriptLoadStatus.loaded, error: scriptLoadStatus.error}
+        : {loaded: false, error: false}
 }
 
 useScript.propTypes = {

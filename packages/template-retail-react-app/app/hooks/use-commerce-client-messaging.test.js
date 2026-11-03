@@ -516,3 +516,20 @@ describe('useCommerceClientMessaging', () => {
         expect(mockInject).toHaveBeenCalledTimes(1)
     })
 })
+
+test('injects supported initial search context and enables context-aware message sends', () => {
+    const injectMessagingWidget = jest.fn()
+    window.CimulateMessaging = {injectMessagingWidget}
+    const initialPageContext = {type: 'srp', query: 'boots'}
+    expect(
+        injectCommerceClientWidget({
+            ...messagingFields,
+            enablePageContext: true,
+            initialPageContext
+        })
+    ).toBe(true)
+    expect(injectMessagingWidget.mock.calls[0][0].messagingConfig).toEqual(
+        expect.objectContaining({enablePageContext: true, initialPageContext})
+    )
+    delete window.CimulateMessaging
+})

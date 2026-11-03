@@ -45,6 +45,9 @@ import {callTokenBridge} from '@salesforce/retail-react-app/app/components/shopp
 import CommerceClientFab from '@salesforce/retail-react-app/app/components/shopper-agent/commerce-client-fab'
 import {callAuthLink} from '@salesforce/retail-react-app/app/components/shopper-agent/auth-link-client'
 
+import {useSearchSummaryConfig} from '@salesforce/retail-react-app/app/hooks/use-storefront-config'
+import {searchPageContext} from '@salesforce/retail-react-app/app/utils/search-page-context'
+
 const onClient = typeof window !== 'undefined'
 
 const HTTP_OK = 200
@@ -673,6 +676,7 @@ const CommerceClientAgentWindow = ({
     lastAttemptedCommerceClientJWTRef,
     prevSlasIdentityRef
 }) => {
+    const searchSettings = useSearchSummaryConfig()
     const {
         scrt2Url,
         salesforceOrgId,
@@ -1110,6 +1114,15 @@ const CommerceClientAgentWindow = ({
         performAuthLinkRef.current({reason: 'slas-identity-change'})
     }, [customerType, usid, isCommerceClientReady])
 
+    const enablePageContext =
+        commerceAgentConfiguration.cc_enablePageContext === 'true' ||
+        (searchSettings.enabled && searchSettings.agentHandoff)
+    const initialPageContext = useMemo(() => {
+        if (!onClient || !enablePageContext) return undefined
+        const params = new URLSearchParams(window.location.search)
+        return searchPageContext(params.get('q'), params.getAll('refine'))
+    }, [enablePageContext])
+
     const isDialog = cc_displayType === 'dialog'
     const isFullHeight = isDialog && cc_dialogFullHeight === 'true'
     const showFab = cc_showFab === 'true'
@@ -1152,6 +1165,8 @@ const CommerceClientAgentWindow = ({
                 cc_cdnVersion,
                 commerceClientScriptSourceUrl
             }),
+            enablePageContext,
+            initialPageContext,
             logoUrl: cc_logoUrl,
             headerText: cc_headerText,
             disclaimerMarkdown: cc_disclaimerMarkdown,
@@ -1197,6 +1212,8 @@ const CommerceClientAgentWindow = ({
             cc_routingAttributes,
             cc_cdnVersion,
             commerceClientScriptSourceUrl,
+            enablePageContext,
+            initialPageContext,
             cc_logoUrl,
             cc_headerText,
             cc_disclaimerMarkdown,
@@ -1317,14 +1334,18 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     const domainUrl = `${appOrigin}${buildUrl('')}`
 
     // Fetch configurations to ensure myDomain is resolved before rendering
-    const {isLoading: isConfigurationsLoading} = useConfigurations({})
+    const {isLoading: isConfigurationsLoading} = useConfigurations(
+        {},
+        {enabled: provider !== 'commerce-client'}
+    )
 
     // Only render when the agent is enabled (client-side), the basket has loaded, and configurations API has completed.
     // Once the Commerce Client widget has mounted, keep it mounted through later
     // basket reloads (login/logout swap the basket query): remounting re-injects
     // the bundle, leaving a second widget instance whose stale client keeps its
     // SSE stream open and double-handles conversation lifecycle calls.
-    const isReady = basketDoneLoading && !isConfigurationsLoading
+    const isReady =
+        provider === 'commerce-client' || (basketDoneLoading && !isConfigurationsLoading)
     if (isReady && provider === 'commerce-client') {
         hasMountedCommerceClientRef.current = true
     }

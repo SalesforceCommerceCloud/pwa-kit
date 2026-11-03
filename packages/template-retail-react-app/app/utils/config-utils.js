@@ -8,7 +8,7 @@
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION} from '@salesforce/retail-react-app/app/constants'
 
-export const getCommerceAgentConfig = () => {
+export const getCommerceAgentConfig = (siteId) => {
     const defaults = {
         enabled: 'false',
         askAgentOnSearch: 'false',
@@ -44,5 +44,9 @@ export const getCommerceAgentConfig = () => {
         cc_enableDownloadTranscript: 'true',
         cc_enableImageUpload: 'false'
     }
-    return getConfig().app.commerceAgent ?? defaults
+    const app = getConfig().app
+    const site = (app.sites || []).find((site) => site.id === siteId)
+    return site?.commerceAgent
+        ? {...(app.commerceAgent || defaults), ...site.commerceAgent}
+        : app.commerceAgent ?? defaults
 }

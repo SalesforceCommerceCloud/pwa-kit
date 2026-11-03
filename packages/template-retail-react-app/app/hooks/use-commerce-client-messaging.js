@@ -69,6 +69,8 @@ const injectCommerceClientWidget = ({
     enableDownloadTranscript = true,
     enableImageUpload = false,
     routingAttributes,
+    enablePageContext = false,
+    initialPageContext,
     logoUrl,
     headerText,
     disclaimerMarkdown,
@@ -108,6 +110,10 @@ const injectCommerceClientWidget = ({
             enableEscalationToAgent,
             enableDownloadTranscript,
             enableImageUpload
+        }
+        if (enablePageContext) {
+            messagingConfig.enablePageContext = true
+            if (initialPageContext) messagingConfig.initialPageContext = initialPageContext
         }
         if (routingAttributes && typeof routingAttributes === 'object') {
             messagingConfig.routingAttributes = routingAttributes

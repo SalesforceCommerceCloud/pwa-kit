@@ -188,4 +188,65 @@ describe('useScript hook', () => {
         const script2 = document.querySelector(`script[src="${src1}"]`)
         expect(script2.src).toBe(src1)
     })
+    test('reuses a loaded script after the component remounts', () => {
+        const src = 'https://test-script.js/'
+        const first = render(<TestComponent src={src} />)
+        const script = document.querySelector(`script[src="${src}"]`)
+        act(() => script.dispatchEvent(new Event('load')))
+        first.unmount()
+        const second = render(<TestComponent src={src} />)
+        expect(JSON.parse(second.getByTestId('script-status').textContent)).toEqual({
+            loaded: true,
+            error: false
+        })
+        expect(document.querySelectorAll(`script[src="${src}"]`)).toHaveLength(1)
+    })
+
+    test('all consumers observe a shared script finishing loading', () => {
+        const src = 'https://test-script.js/'
+        const view = render(
+            <>
+                <TestComponent src={src} />
+                <TestComponent src={src} />
+            </>
+        )
+        act(() => document.querySelector(`script[src="${src}"]`).dispatchEvent(new Event('load')))
+        expect(
+            view.getAllByTestId('script-status').map((el) => JSON.parse(el.textContent))
+        ).toEqual([
+            {loaded: true, error: false},
+            {loaded: true, error: false}
+        ])
+    })
+
+    test('records a load that completes while no component is mounted', () => {
+        const src = 'https://test-script.js/'
+        const first = render(<TestComponent src={src} />)
+        const script = document.querySelector(`script[src="${src}"]`)
+        first.unmount()
+        act(() => script.dispatchEvent(new Event('load')))
+        const second = render(<TestComponent src={src} />)
+        expect(JSON.parse(second.getByTestId('script-status').textContent)).toEqual({
+            loaded: true,
+            error: false
+        })
+    })
+    test('switching storefront script URLs waits for the new bundle', () => {
+        const first = 'https://store-a.example/widget.js'
+        const second = 'https://store-b.example/widget.js'
+        const view = render(<TestComponent src={first} />)
+        act(() => document.querySelector(`script[src="${first}"]`).dispatchEvent(new Event('load')))
+        view.rerender(<TestComponent src={second} />)
+        expect(JSON.parse(view.getByTestId('script-status').textContent)).toEqual({
+            loaded: false,
+            error: false
+        })
+        act(() =>
+            document.querySelector(`script[src="${second}"]`).dispatchEvent(new Event('load'))
+        )
+        expect(JSON.parse(view.getByTestId('script-status').textContent)).toEqual({
+            loaded: true,
+            error: false
+        })
+    })
 })

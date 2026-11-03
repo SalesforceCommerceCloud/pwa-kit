@@ -254,6 +254,15 @@ module.exports = {
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
+        },
+        // Optional AI-assisted search. Sites can override this with app.sites[].searchSummary.
+        // All values here are public; Gateway credentials must stay in server environment variables.
+        searchSummary: {
+            enabled: process.env.ENABLE_SEARCH_SUMMARY === 'true',
+            headerSearch: true,
+            followUps: true,
+            agentHandoff: false,
+            homeHero: {enabled: false}
         }
     },
     externals: [],
@@ -283,4 +292,13 @@ module.exports = {
             }
         ]
     }
+}
+
+// Optional local public store profile; never put credentials in this file or the profile.
+// Deployment configurations should set app.searchSummary and per-site overrides directly.
+if (process.env.PWA_STORE_CONFIG_FILE && process.env.NODE_ENV !== 'production') {
+    const path = require('path')
+    const profile = require(path.resolve(process.env.PWA_STORE_CONFIG_FILE))
+    Object.assign(module.exports.app, profile.app)
+    if (profile.proxyConfigs) module.exports.ssrParameters.proxyConfigs = profile.proxyConfigs
 }
