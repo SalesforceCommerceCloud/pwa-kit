@@ -2117,6 +2117,9 @@
   "search.action.ask_ai": {
     "defaultMessage": "Ask AI"
   },
+  "search.action.ask_ai.tooltip": {
+    "defaultMessage": "Ask Shopper Agent"
+  },
   "search.action.cancel": {
     "defaultMessage": "Cancel"
   },

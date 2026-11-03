@@ -856,6 +856,16 @@ describe('Ask AI button', () => {
         expect(screen.getByTestId('search-ask-ai-button')).toHaveTextContent('Ask AI')
     })
 
+    test('shows the Ask Shopper Agent tooltip on hover', async () => {
+        const user = setupUserEvent()
+        getConfig.mockImplementation(() => getAskAIConfig())
+        renderWithProviders(<SearchInput />)
+
+        await user.hover(screen.getByTestId('search-ask-ai-button'))
+
+        expect(await screen.findByText('Ask Shopper Agent')).toBeInTheDocument()
+    })
+
     test('sends the query to an open MIAW conversation', async () => {
         const user = setupUserEvent()
         getConfig.mockImplementation(() => getAskAIConfig())
