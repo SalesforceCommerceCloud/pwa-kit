@@ -2114,6 +2114,9 @@
   "return_items_modal.text.terminal_error_title": {
     "defaultMessage": "We're unable to submit this return."
   },
+  "search.action.ask_ai": {
+    "defaultMessage": "Ask AI"
+  },
   "search.action.cancel": {
     "defaultMessage": "Cancel"
   },
