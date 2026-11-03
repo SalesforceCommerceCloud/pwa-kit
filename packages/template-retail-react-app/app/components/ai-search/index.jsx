@@ -67,6 +67,8 @@ const AiSearch = ({hero = false}) => {
             <SearchIcon color="#72816f" boxSize={5} ml={2} flexShrink={0} />
             <Input
                 type="search"
+                color="#233d24"
+                bg="#fff"
                 aria-label={hero ? 'AI product search' : 'Search or ask AI'}
                 placeholder={hero ? 'What are you looking for?' : settings.searchPlaceholder}
                 value={value}

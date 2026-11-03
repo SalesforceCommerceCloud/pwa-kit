@@ -77,3 +77,14 @@ test('compact search uses site placeholder and routes the shopper query', () => 
     fireEvent.submit(input.closest('form'))
     expect(mockNavigate).toHaveBeenCalledWith('/search?q=blue%20jacket')
 })
+
+// The hero inherits white text for its artwork; the white input must keep its own ink color.
+test.each([true, false])('search text stays readable on the white field (hero=%s)', (hero) => {
+    renderSearch('shop-a', hero)
+    const input = screen.getByRole('searchbox')
+    fireEvent.change(input, {target: {value: 'linen shirt'}})
+    fireEvent.focus(input)
+    expect(input).toHaveValue('linen shirt')
+    expect(getComputedStyle(input).color).toBe('rgb(35, 61, 36)')
+    expect(getComputedStyle(input).backgroundColor).toBe('rgb(255, 255, 255)')
+})
