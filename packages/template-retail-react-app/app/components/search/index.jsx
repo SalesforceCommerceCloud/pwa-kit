@@ -11,6 +11,7 @@ import {
     InputGroup,
     InputLeftElement,
     InputRightElement,
+    Tooltip,
     Popover,
     PopoverTrigger,
     PopoverContent,
@@ -21,7 +22,7 @@ import {
     Spinner
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import SearchSuggestions from '@salesforce/retail-react-app/app/components/search/partials/search-suggestions'
-import {ArrowRightIcon, SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {SearchIcon, SparkleIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     capitalize,
     getSessionJSONItem,
@@ -29,7 +30,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import debounce from 'lodash/debounce'
 import {
     RECENT_SEARCH_KEY,
@@ -137,6 +138,7 @@ const formatSuggestions = (searchSuggestions) => {
  */
 const Search = (props) => {
     const config = getConfig()
+    const intl = useIntl()
 
     // Add new hooks for chat functionality
     const {locale, siteId, commerceOrgId, buildUrl} = useMultiSite()
@@ -445,23 +447,64 @@ const Search = (props) => {
                                 />
                                 {showAskAIButton && (
                                     <InputRightElement width="auto" height="100%" paddingRight={1}>
-                                        <Button
-                                            data-testid="search-ask-ai-button"
-                                            type="button"
-                                            size="sm"
-                                            borderRadius="full"
-                                            backgroundColor="gray.100"
-                                            color="gray.900"
-                                            fontWeight="medium"
-                                            _hover={{backgroundColor: 'gray.200'}}
-                                            rightIcon={<ArrowRightIcon boxSize={4} />}
-                                            onClick={onAskAIClick}
+                                        <Tooltip
+                                            hasArrow
+                                            placement="bottom"
+                                            label={intl.formatMessage({
+                                                defaultMessage: 'Ask Shopper Agent',
+                                                id: 'search.action.ask_ai.tooltip'
+                                            })}
                                         >
-                                            <FormattedMessage
-                                                defaultMessage="Ask AI"
-                                                id="search.action.ask_ai"
-                                            />
-                                        </Button>
+                                            <Button
+                                                data-testid="search-ask-ai-button"
+                                                type="button"
+                                                size="sm"
+                                                borderRadius="full"
+                                                border="1px solid"
+                                                borderColor="blue.200"
+                                                bgGradient="linear(to-r, blue.50, purple.50)"
+                                                color="blue.700"
+                                                fontWeight="medium"
+                                                leftIcon={
+                                                    <SparkleIcon boxSize={4} color="blue.600" />
+                                                }
+                                                transition="border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease"
+                                                sx={{
+                                                    '.chakra-button__icon': {
+                                                        transition: 'transform 0.3s ease'
+                                                    },
+                                                    '@media (prefers-reduced-motion: reduce)': {
+                                                        '&, .chakra-button__icon': {
+                                                            transition: 'none'
+                                                        }
+                                                    }
+                                                }}
+                                                _hover={{
+                                                    bgGradient:
+                                                        'linear(to-r, blue.100, purple.100)',
+                                                    borderColor: 'purple.300',
+                                                    boxShadow:
+                                                        '0 0 0 3px rgba(173, 123, 238, 0.15)',
+                                                    '.chakra-button__icon': {
+                                                        transform: 'rotate(20deg) scale(1.1)'
+                                                    }
+                                                }}
+                                                _active={{
+                                                    bgGradient:
+                                                        'linear(to-r, blue.100, purple.100)',
+                                                    transform: 'scale(0.97)'
+                                                }}
+                                                _focusVisible={{
+                                                    boxShadow: '0 0 0 3px rgba(1, 118, 211, 0.4)'
+                                                }}
+                                                onClick={onAskAIClick}
+                                            >
+                                                <FormattedMessage
+                                                    defaultMessage="Ask AI"
+                                                    id="search.action.ask_ai"
+                                                />
+                                            </Button>
+                                        </Tooltip>
                                     </InputRightElement>
                                 )}
                             </InputGroup>

@@ -17,7 +17,6 @@ import {Icon, useTheme} from '@salesforce/retail-react-app/app/components/shared
 import '@salesforce/retail-react-app/app/assets/svg/account.svg'
 import '@salesforce/retail-react-app/app/assets/svg/alert.svg'
 import '@salesforce/retail-react-app/app/assets/svg/apple.svg'
-import '@salesforce/retail-react-app/app/assets/svg/arrow-right.svg'
 import '@salesforce/retail-react-app/app/assets/svg/basket.svg'
 import '@salesforce/retail-react-app/app/assets/svg/check.svg'
 import '@salesforce/retail-react-app/app/assets/svg/check-circle.svg'
@@ -148,7 +147,6 @@ export const AmexIcon = icon('cc-amex', {viewBox: AmexSymbol.viewBox})
 export const AppleIcon = icon('apple')
 export const BrandLogo = icon('brand-logo', {viewBox: BrandLogoSymbol.viewBox})
 export const BasketIcon = icon('basket')
-export const ArrowRightIcon = icon('arrow-right')
 export const CheckIcon = icon('check')
 export const CheckCircleIcon = icon('check-circle')
 export const ChevronDownIcon = icon('chevron-down')

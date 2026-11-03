@@ -23,7 +23,7 @@ export default {
         },
         searchContainer: {
             order: [2, 2, 2, 'inherit'],
-            width: ['full', 'full', 'full', 60],
+            width: ['full', 'full', 'full', 88, 96],
             marginBottom: [1, 1, 2, 0]
         },
         bodyContainer: {
