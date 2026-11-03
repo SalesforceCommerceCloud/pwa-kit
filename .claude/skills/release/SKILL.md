@@ -175,14 +175,14 @@ Completion: GitHub notes pass read-back, every released package's `latest` and `
 
 ## Step 6 — Merge back to develop
 
-Get the release commits onto `develop` and reset it to the next dev version.
+Get the release commits onto `develop`, advance SDK/commerce-sdk-react/retail-react-app to their next dev versions, and keep MCP on its published stable version.
 
-Before merging, capture the release tip SHA, the shipped version map, and all four versions on `origin/develop`. Derive next-dev targets with "Next-dev versions" in `RELEASE-INTERNALS.md` and confirm the map with the operator.
+Before merging, capture the release tip SHA, the shipped version map, and all four versions on `origin/develop`. Derive the target map with "Next-dev versions" in `RELEASE-INTERNALS.md`, including MCP's stable-version exception, and confirm it with the operator.
 
 1. Create an **intermediary branch** off the release branch. Merge the latest `develop` *into it* — resolve conflicts here, not on `develop`.
    - **The merge is a slog — dispatch it to a subagent.** Supply the intermediary/release/`develop` branch names, captured version maps, and approved next-dev targets. Require it to merge `develop` into the intermediary locally and return every conflict resolution. Preserve develop's version strings during conflict resolution; Step 2 applies the target map. Reconcile code by intent, preserving shipped fixes and newer develop work, and flag uncertain resolutions for operator review. The subagent stops before pushing or opening a PR and leaves `develop` untouched. **Surface its resolution list and resolve uncertainties with the operator before moving on.**
-2. Apply **all four next-dev targets**, SDK first and independent packages afterward, following "Next-dev versions" in `RELEASE-INTERNALS.md`. Verify versions, dependency pins, lockfiles, and changelog headings before opening the PR.
+2. Apply **SDK, commerce-sdk-react, and retail-react-app next-dev targets**, SDK first, following "Next-dev versions" in `RELEASE-INTERNALS.md`. Verify MCP remains at its approved published stable version, plus all versions, dependency pins, lockfiles, and changelog headings before opening the PR.
 3. **GATE — open a PR from the intermediary branch targeting `develop`.** You open it; the **operator merges it** using GitHub's **Create a merge commit**, preserving original release commits rather than squashing or rebasing.
-4. Fetch origin and run `git merge-base --is-ancestor <captured-release-tip> origin/develop`; require exit code 0. Verify all four next-dev targets and dependency pins on the merged `develop`.
+4. Fetch origin and run `git merge-base --is-ancestor <captured-release-tip> origin/develop`; require exit code 0. Verify all four targets (three next-dev units and stable MCP) and dependency pins on the merged `develop`.
 
-Release complete when publication, scope/testing, and post-release criteria pass, the captured release tip is an ancestor of `origin/develop`, and every version unit is on its approved next-dev target.
+Release complete when publication, scope/testing, and post-release criteria pass, the captured release tip is an ancestor of `origin/develop`, and every version unit is on its approved target.
