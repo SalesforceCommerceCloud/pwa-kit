@@ -8,6 +8,62 @@
 import {textOnly} from '../catalog-facts'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths -- SSR modules execute directly in Node.
 import {conversationHistory} from './session-store'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths -- SSR modules execute directly in Node.
+import {suggestionMessages} from './prompts'
+
+const questionKey = (text) =>
+    text
+        .toLocaleLowerCase()
+        .replace(/[^\p{L}\p{N}]+/gu, ' ')
+        .trim()
+
+// Suggestion failure must never discard an already generated answer.
+export async function refreshSuggestions(entry, gateway, signal, picks) {
+    if (!entry.total || !entry.products.size || signal.aborted) return []
+    const history = conversationHistory(entry)
+    const excluded = new Set([
+        ...history.map(({question}) => questionKey(question)),
+        ...(entry.suggestions || []).map(({question}) => questionKey(question))
+    ])
+    const controller = new AbortController()
+    const abort = () => controller.abort()
+    signal.addEventListener('abort', abort, {once: true})
+    const timeout = setTimeout(abort, 5000)
+    let questions = []
+    try {
+        const text = await gateway.complete(
+            suggestionMessages(entry, history, picks),
+            controller.signal,
+            256
+        )
+        const values = JSON.parse(text.replace(/^\s*```(?:json)?\s*|\s*```\s*$/gi, ''))
+        if (Array.isArray(values))
+            for (const value of values.slice(0, 12)) {
+                if (typeof value !== 'string') continue
+                const question = value.trim()
+                const key = questionKey(question)
+                if (
+                    !key ||
+                    question.length > 130 ||
+                    /[\p{Cc}<>]|https?:/iu.test(question) ||
+                    excluded.has(key)
+                )
+                    continue
+                excluded.add(key)
+                questions.push({id: `next:${key}`, question})
+                if (questions.length === 3) break
+            }
+    } catch {
+        // Keep products and the answer available, even on timeout or malformed metadata.
+    } finally {
+        clearTimeout(timeout)
+        signal.removeEventListener('abort', abort)
+    }
+    if (signal.aborted) return []
+    if (!questions.length) questions = followUpSuggestions(entry, picks)
+    entry.suggestions = questions
+    return questions
+}
 
 export function followUpSuggestions(entry, picks = [...entry.products.values()].slice(0, 3)) {
     if (!entry.total || !picks.length) return []
@@ -55,6 +111,10 @@ export function followUpSuggestions(entry, picks = [...entry.products.values()].
         const question = `Compare ${picks[0].name} with ${picks[1].name}.`
         if (question.length <= 130)
             candidates.unshift({id: `compare:${picks[0].id}:${picks[1].id}`, question})
+    }
+    for (const product of picks) {
+        add(`details:${product.id}`, `What else should I check about ${product.name}?`)
+        add(`choice:${product.id}`, `How does ${product.name} fit the preferences we discussed?`)
     }
     const asked = new Set(conversationHistory(entry).map((turn) => turn.question.toLowerCase()))
     return candidates

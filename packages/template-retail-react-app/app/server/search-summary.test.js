@@ -158,8 +158,25 @@ test('products flush before the API-key Gateway call and scoring text is not dup
                     'event: scores\ndata: {"generation_details":{"generations":[{"content":"duplicated"}]}}\n\ndata: [DONE]\n\n'
             )
         })
+        .mockResolvedValueOnce(
+            response({
+                generation_details: {
+                    generations: [
+                        {
+                            content: JSON.stringify([
+                                'Which shirt should I consider next?',
+                                'Which details should I verify?',
+                                'How do these prices compare?'
+                            ])
+                        }
+                    ]
+                }
+            })
+        )
     await createSearchSummaryHandler({config, env, fetchImpl})(request(), res)
-    expect(fetchImpl).toHaveBeenCalledTimes(2)
+    expect(fetchImpl).toHaveBeenCalledTimes(3)
+    expect(JSON.parse(fetchImpl.mock.calls[2][1].body).generation_settings.max_tokens).toBe(256)
+    expect(res.frames.join('')).toContain('Which details should I verify?')
     const [url, options] = fetchImpl.mock.calls[1]
     expect(url.href).toBe(
         'https://test-gateway.sfproxy.example.sfdc.cl/v1.0/chat/generations/stream'

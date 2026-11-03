@@ -1,4 +1,5 @@
 ## v10.4.0-dev (Oct 20, 2026)
+- [Bugfix] Refresh conversation-aware suggested questions after every AI answer and show them below the active conversation.
 - [Bugfix] Keep AI search input text dark and readable on the white hero/header search fields.
 - [Bugfix] Render streamed AI overview and follow-up Markdown with formatted lists, emphasis, links, and tables; keep raw HTML, unsafe links, and model-authored remote images disabled.
 - [Bugfix] Describe AI overview products as selected highlights and invite shoppers to browse all matching products below, without announcing a fixed number of options.

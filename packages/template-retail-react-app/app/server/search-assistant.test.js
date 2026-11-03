@@ -143,7 +143,36 @@ test('cached facts are reused for the next question and history remains bounded'
     for (let i = 0; i < 6; i++) await s.assistant.followUp(s.req, makeResponse())
     expect(s.fetchImpl).toHaveBeenCalledTimes(2)
     expect(s.entry.session.turns).toHaveLength(6)
-    expect(s.gateway.complete).toHaveBeenCalledTimes(6)
+    expect(s.gateway.complete).toHaveBeenCalledTimes(12)
+})
+
+test('each completed follow-up sends new questions generated from the latest answer and current history', async () => {
+    const s = setup()
+    for (let i = 0; i < 3; i++) {
+        const question = `Follow-up ${i}`
+        const suggestions = [
+            `What detail ${i} should I check?`,
+            `Compare option ${i}?`,
+            `What comes after choice ${i}?`
+        ]
+        s.req.body.message = question
+        s.gateway.complete
+            .mockResolvedValueOnce(JSON.stringify({action: 'answer', product_ids: ['1']}))
+            .mockResolvedValueOnce(JSON.stringify(suggestions))
+        const res = makeResponse()
+        await s.assistant.followUp(s.req, res)
+        const completed = res.frames.find((frame) => frame.startsWith('event: completed'))
+        const payload = JSON.parse(completed.split('data: ')[1])
+        expect(payload.suggestions.map((item) => item.question)).toEqual(suggestions)
+        const metadata = s.gateway.complete.mock.calls.at(-1)
+        expect(metadata[2]).toBe(256)
+        const context = JSON.parse(metadata[0][1].content)
+        expect(context.conversation.at(-1)).toEqual({
+            question,
+            answer: 'The cotton shirt can be machine washed cold.'
+        })
+    }
+    expect(s.entry.session.turns).toHaveLength(3)
 })
 
 test('another shopper cannot access a search context or trigger model calls', async () => {

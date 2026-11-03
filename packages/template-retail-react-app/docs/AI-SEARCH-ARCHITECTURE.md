@@ -92,6 +92,8 @@ sequenceDiagram
         end
         GW-->>PWA: DONE
         PWA->>State: Append successful overview to scoped history
+        PWA->>GW: Bounded completed next-question call with answer and history
+        GW-->>PWA: Fresh questions or nonfatal metadata failure
         PWA-->>UI: SSE completed, history, suggestions and timings
     else No matching products
         PWA-->>UI: SSE completed without a model call
@@ -125,10 +127,14 @@ flowchart TD
     Decision -->|No| Picks[SSE picks event with validated catalog products]
     Picks --> Answer[Gateway streamed answer grounded in facts and history]
     Answer --> Render[SSE content_delta, safe Markdown in current turn]
-    Render --> Finish[Append successful turn, completed event and fresh suggestions]
+    Render --> Next[Append turn and generate next questions from answer and history]
+    Next --> Finish[Completed event with fresh suggestions below conversation]
 ```
 
-The completed planner and streamed answer are separate model calls. A `search`
+The completed planner and streamed answer are separate model calls. After an
+answer, one additional small completed call generates next questions from the
+latest answer and active-search history. The five-second bound and validated
+catalog fallback keep metadata failures from discarding the streamed answer. A `search`
 decision emits no answer generation; the hook navigates through the normal
 keyword-search path. The planner cannot supply arbitrary products: selected IDs
 must belong to the server's current catalog context. Material/care facts absent

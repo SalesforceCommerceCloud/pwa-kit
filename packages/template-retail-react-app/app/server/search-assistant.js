@@ -16,7 +16,7 @@ import {
 import {expandCatalogFacts, modelProducts} from './search-assistant/catalog'
 import {routingMessages, answerMessages, agentHandoffMessage} from './search-assistant/prompts'
 import {parseFollowUpPlan} from './search-assistant/plan'
-import {followUpSuggestions} from './search-assistant/suggestions'
+import {followUpSuggestions, refreshSuggestions} from './search-assistant/suggestions'
 import {searchPageContext} from '../utils/search-page-context'
 import {getSearchSummaryConfig} from '../utils/search-summary-config'
 export {parseFollowUpPlan}
@@ -135,15 +135,18 @@ export function createSearchAssistant({
                 answer,
                 picks: plan.ids.map((id) => entry.products.get(id))
             })
+            const suggestions = await refreshSuggestions(
+                entry,
+                gateway,
+                controller.signal,
+                plan.ids.length ? plan.ids.map((id) => entry.products.get(id)) : topPicks(entry)
+            )
             await send('completed', {
                 action: 'answer',
                 session_id: entry.session.id,
                 search_key: entry.searchKey,
                 history: conversationHistory(entry),
-                suggestions: followUpSuggestions(
-                    entry,
-                    plan.ids.length ? plan.ids.map((id) => entry.products.get(id)) : topPicks(entry)
-                ),
+                suggestions,
                 total_ms: Date.now() - started,
                 deltas,
                 coverage

@@ -238,29 +238,6 @@ const SearchSummary = ({
                     )}
                     {config.followUps && (
                         <>
-                            <Wrap spacing={2} mb={4}>
-                                {suggestions.map(({id, question: chip}) => (
-                                    <Button
-                                        key={id}
-                                        size="sm"
-                                        variant="outline"
-                                        fontWeight="400"
-                                        borderColor="#e0e5dc"
-                                        borderRadius="full"
-                                        whiteSpace="normal"
-                                        height="auto"
-                                        py={2}
-                                        textAlign="left"
-                                        color="#53634b"
-                                        bg="#fcfdfb"
-                                        _hover={{bg: '#edf2e8', borderColor: '#9fb593'}}
-                                        onClick={() => ask(chip)}
-                                        isDisabled={busy || !contextId || !total}
-                                    >
-                                        {chip}
-                                    </Button>
-                                ))}
-                            </Wrap>
                             {!!followUps.length && (
                                 <Box
                                     maxH="470px"
@@ -331,6 +308,30 @@ const SearchSummary = ({
                                     ))}
                                 </Box>
                             )}
+                            <Wrap aria-label="Suggested follow-up questions" spacing={2} mb={4}>
+                                {!busy &&
+                                    suggestions.map(({id, question: chip}) => (
+                                        <Button
+                                            key={id}
+                                            size="sm"
+                                            variant="outline"
+                                            fontWeight="400"
+                                            borderColor="#e0e5dc"
+                                            borderRadius="full"
+                                            whiteSpace="normal"
+                                            height="auto"
+                                            py={2}
+                                            textAlign="left"
+                                            color="#53634b"
+                                            bg="#fcfdfb"
+                                            _hover={{bg: '#edf2e8', borderColor: '#9fb593'}}
+                                            onClick={() => ask(chip)}
+                                            isDisabled={busy || !contextId || !total}
+                                        >
+                                            {chip}
+                                        </Button>
+                                    ))}
+                            </Wrap>
                             <Flex
                                 as="form"
                                 align="center"

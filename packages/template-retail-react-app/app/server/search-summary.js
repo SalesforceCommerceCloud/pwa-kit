@@ -14,6 +14,7 @@ import {overviewPrice} from './catalog-facts'
 import {createSearchAssistant} from './search-assistant'
 import {getSearchSummaryConfig, hasSearchSummarySite} from '../utils/search-summary-config'
 import {overviewMessages} from './search-assistant/prompts'
+import {refreshSuggestions} from './search-assistant/suggestions'
 export {buildGatewayUrl, readGatewayEvents}
 
 // Ground a bounded overview in the same search results displayed by the storefront.
@@ -226,11 +227,19 @@ export function createSearchSummaryHandler({config, env = process.env, fetchImpl
                 picks: assistant.topPicks(context),
                 kind: 'overview'
             })
+            const suggestions = getSearchSummaryConfig(config, req.body.parameters.siteId).followUps
+                ? await refreshSuggestions(
+                      context,
+                      gateway,
+                      controller.signal,
+                      assistant.topPicks(context)
+                  )
+                : []
             await send('completed', {
                 session_id: context.session.id,
                 search_key: context.searchKey,
                 history: assistant.history(context),
-                suggestions: assistant.suggestions(context),
+                suggestions,
                 search_ms: searchMs,
                 first_token_ms: firstTokenMs,
                 total_ms: Date.now() - started,

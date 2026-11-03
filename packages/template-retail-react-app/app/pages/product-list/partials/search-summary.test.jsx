@@ -64,7 +64,9 @@ test('quick questions and a custom question use the follow-up callback', () => {
 })
 test('questions wait until the summary or current answer finishes', () => {
     renderSummary(<SearchSummary {...props} isStreaming />)
-    expect(screen.getByRole('button', {name: 'What are my options under £30?'})).toBeDisabled()
+    expect(
+        screen.queryByRole('button', {name: 'What are my options under £30?'})
+    ).not.toBeInTheDocument()
     expect(
         screen.getByRole('textbox', {name: 'Ask a follow-up about these results'})
     ).toBeDisabled()
@@ -109,4 +111,24 @@ test('renders Markdown in both the overview and follow-up answer', () => {
         'Jacket one'
     )
     expect(screen.getByTestId('search-follow-up-answer').querySelector('ol')).toBeInTheDocument()
+})
+
+test('fresh suggestions appear after the latest response instead of above the conversation', () => {
+    renderSummary(
+        <SearchSummary
+            {...props}
+            followUps={[
+                {id: 'one', question: 'Compare these', text: 'The first is lighter.'},
+                {id: 'two', question: 'What about care?', text: 'Care is not specified.'}
+            ]}
+            suggestions={[{id: 'next', question: 'Which details should I check before buying?'}]}
+        />
+    )
+    const conversation = screen.getByTestId('search-follow-up-conversation')
+    const next = screen.getByRole('button', {name: 'Which details should I check before buying?'})
+    expect(
+        conversation.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+    fireEvent.click(next)
+    expect(props.onFollowUp).toHaveBeenCalledWith('Which details should I check before buying?')
 })

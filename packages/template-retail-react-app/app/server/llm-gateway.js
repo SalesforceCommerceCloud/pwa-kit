@@ -80,8 +80,8 @@ export function createGatewayClient({env, fetchImpl = fetch}) {
         return response
     }
     return {
-        async complete(messages, signal) {
-            const response = await open(messages, signal, false, 1024)
+        async complete(messages, signal, maxTokens = 1024) {
+            const response = await open(messages, signal, false, maxTokens)
             const payload = await response.json()
             const content = payload.data || payload
             const text =

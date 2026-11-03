@@ -188,3 +188,16 @@ node ../pwa-kit-dev/node_modules/jest/bin/jest.js \
   app/components/ai-markdown/index.test.jsx \
   --runInBand --coverage=false
 ```
+
+## Suggested questions after each answer
+
+After every successful overview or follow-up, a small completed Gateway call uses
+the latest answer, active-search history and catalog facts to generate up to three
+new shopper questions. It is capped at five seconds and 256 requested tokens for
+the API-key profile. It adds one model call per answered turn when follow-ups are
+enabled; it does not delay the streamed answer text. It may delay final completion
+and question availability by up to five seconds. Invalid, repeated, already-asked
+or unsafe suggestions are discarded. A catalog-grounded fallback preserves the
+answer if question generation fails. Questions appear below the conversation,
+and previous chips are hidden while an answer is in progress. A new search keeps
+its own conversation scope.
