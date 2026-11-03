@@ -10,6 +10,7 @@ import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {
     useAccessToken,
+    useCommerceApi,
     useConfig,
     useConfigurations,
     useCustomerType,
@@ -27,6 +28,7 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {toStorefrontNavigatePath} from '@salesforce/retail-react-app/app/utils/url'
+import {attachAgentProductLinkRouting} from '@salesforce/retail-react-app/app/utils/shopper-agent-product-links'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
@@ -719,6 +721,40 @@ const CommerceClientAgentWindow = ({
         [navigate]
     )
 
+    // The backend sends product links as SFRA `.html` URLs on the backend origin, which `onNavigate`
+    // never sees. Point the widget's product links at the PWA product page instead. When the id is
+    // not certain from the URL, Shopper SEO resolves it with the site's own URL rules.
+    const {buildUrl} = useMultiSite()
+    const shopperSeo = useCommerceApi('shopperSeo')
+    const {getTokenWhenReady} = useAccessToken()
+    const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    getTokenWhenReadyRef.current = getTokenWhenReady
+    useEffect(() => {
+        // The id comes from the backend URL, so it is encoded as one path segment. `productUrlBuilder`
+        // uses `encodeURI`, which leaves `/`, `?` and `#` in place (`../account` would leave the PDP),
+        // and would encode an already encoded id twice.
+        const toProductPath = (productId) => `/product/${encodeURIComponent(productId)}`
+        return attachAgentProductLinkRouting({
+            navigateToProduct: (productId) => navigate(toProductPath(productId)),
+            getProductHref: (productId) => buildUrl(toProductPath(productId)),
+            lookupProductId: async (urlSegment) => {
+                const token = await getTokenWhenReadyRef.current()
+                let mapping
+                try {
+                    mapping = await shopperSeo.getUrlMapping({
+                        parameters: {urlSegment},
+                        headers: {Authorization: `Bearer ${token}`}
+                    })
+                } catch (error) {
+                    // 404 means the segment maps to nothing; anything else is a failed lookup
+                    if (error?.response?.status === 404) return undefined
+                    throw error
+                }
+                return mapping?.resourceType === 'PRODUCT' ? mapping.resourceId : undefined
+            }
+        })
+    }, [navigate, buildUrl, shopperSeo])
+
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
     const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
     const {formatMessage} = useIntl()
@@ -726,11 +762,7 @@ const CommerceClientAgentWindow = ({
     const toastRef = useRef(toast)
     toastRef.current = toast
 
-    // Customer details and auth tokens for Commerce Client session init
-    const {getTokenWhenReady} = useAccessToken()
-    const getTokenWhenReadyRef = useRef(getTokenWhenReady)
-    getTokenWhenReadyRef.current = getTokenWhenReady
-
+    // Customer details for Commerce Client session init
     const {organizationId, siteId: configSiteId} = useConfig()
 
     // Fetch my_domain from the Shopper Configurations API. Auth-linking calls
