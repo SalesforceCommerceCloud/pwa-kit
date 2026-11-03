@@ -33,6 +33,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 
 import Link from '@salesforce/retail-react-app/app/components/link'
 import Search from '@salesforce/retail-react-app/app/components/search'
+import loadable from '@loadable/component'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {
     AccountIcon,
@@ -53,7 +54,12 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
+import {
+    useSearchSummaryConfig,
+    useCommerceAgentConfig
+} from '@salesforce/retail-react-app/app/hooks/use-storefront-config'
+const AiSearch = loadable(() => import('@salesforce/retail-react-app/app/components/ai-search'))
+
 const IconButtonWithRegistration = withRegistration(IconButton)
 
 /**
@@ -123,7 +129,9 @@ const Header = ({
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
-    const commerceAgentConfig = getCommerceAgentConfig()
+    const searchConfig = useSearchSummaryConfig()
+    const aiSearchEnabled = searchConfig.enabled && searchConfig.headerSearch
+    const commerceAgentConfig = useCommerceAgentConfig()
     const showLaunchAgentButton = commerceAgentConfig?.enableAgentFromHeader === 'true'
     const {
         getButtonProps: getAccountMenuButtonProps,
@@ -204,10 +212,20 @@ const Header = ({
                         variant="unstyled"
                         onClick={onLogoClick}
                     />
-                    <Box {...styles.bodyContainer}>{children}</Box>
-                    <HideOnMobile>
-                        <SearchBar />
-                    </HideOnMobile>
+                    <Box {...styles.bodyContainer}>
+                        {aiSearchEnabled ? (
+                            <Box display={{base: 'none', lg: 'block'}} px={5}>
+                                <AiSearch />
+                            </Box>
+                        ) : (
+                            children
+                        )}
+                    </Box>
+                    {!aiSearchEnabled && (
+                        <HideOnMobile>
+                            <SearchBar />
+                        </HideOnMobile>
+                    )}
                     {showLaunchAgentButton && (
                         <IconButton
                             icon={<SparkleIcon />}
@@ -375,10 +393,27 @@ const Header = ({
                         {...styles.icons}
                         onClick={onMyCartClick}
                     />
-                    <HideOnDesktop display={{base: 'contents', lg: 'none'}}>
-                        <SearchBar />
-                    </HideOnDesktop>
+                    {!aiSearchEnabled && (
+                        <HideOnDesktop display={{base: 'contents', lg: 'none'}}>
+                            <SearchBar />
+                        </HideOnDesktop>
+                    )}
                 </Flex>
+                {aiSearchEnabled && (
+                    <>
+                        <Box display={{base: 'block', lg: 'none'}} mt={2}>
+                            <AiSearch />
+                        </Box>
+                        <Box
+                            display={{base: 'none', lg: 'block'}}
+                            mt={3}
+                            borderTop="1px solid #edf0e9"
+                            pt={2}
+                        >
+                            {children}
+                        </Box>
+                    </>
+                )}
             </Box>
         </Box>
     )

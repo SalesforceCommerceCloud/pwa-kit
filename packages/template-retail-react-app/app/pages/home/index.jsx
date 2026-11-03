@@ -6,6 +6,7 @@
  */
 
 import React, {useEffect} from 'react'
+import {useSearchSummaryConfig} from '@salesforce/retail-react-app/app/hooks/use-storefront-config'
 import {useIntl, FormattedMessage} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 
@@ -26,6 +27,7 @@ import {
 
 // Project Components
 import Hero from '@salesforce/retail-react-app/app/components/hero'
+import loadable from '@loadable/component'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import Section from '@salesforce/retail-react-app/app/components/section'
 import ProductScroller from '@salesforce/retail-react-app/app/components/product-scroller'
@@ -55,7 +57,10 @@ import {useProductSearch} from '@salesforce/commerce-sdk-react'
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
  */
+const AiSearch = loadable(() => import('@salesforce/retail-react-app/app/components/ai-search'))
+
 const Home = () => {
+    const searchConfig = useSearchSummaryConfig()
     const intl = useIntl()
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
@@ -98,34 +103,41 @@ const Home = () => {
             />
 
             <Island hydrateOn={'visible'}>
-                <Hero
-                    title={intl.formatMessage({
-                        defaultMessage: 'The React PWA Starter Store for Retail',
-                        id: 'home.title.react_starter_store'
-                    })}
-                    img={{
-                        src: getAssetUrl('static/img/hero.png'),
-                        alt: 'npx pwa-kit-create-app',
-                        fetchPriority: 'high'
-                    }}
-                    actions={
-                        <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
-                            <Button
-                                as={Link}
-                                href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
-                                target="_blank"
-                                width={{base: 'full', md: 'inherit'}}
-                                paddingX={7}
-                                _hover={{textDecoration: 'none'}}
+                {searchConfig.enabled && searchConfig.homeHero.enabled ? (
+                    <AiSearch hero />
+                ) : (
+                    <Hero
+                        title={intl.formatMessage({
+                            defaultMessage: 'The React PWA Starter Store for Retail',
+                            id: 'home.title.react_starter_store'
+                        })}
+                        img={{
+                            src: getAssetUrl('static/img/hero.png'),
+                            alt: 'npx pwa-kit-create-app',
+                            fetchPriority: 'high'
+                        }}
+                        actions={
+                            <Stack
+                                spacing={{base: 4, sm: 6}}
+                                direction={{base: 'column', sm: 'row'}}
                             >
-                                <FormattedMessage
-                                    defaultMessage="Get started"
-                                    id="home.link.get_started"
-                                />
-                            </Button>
-                        </Stack>
-                    }
-                />
+                                <Button
+                                    as={Link}
+                                    href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
+                                    target="_blank"
+                                    width={{base: 'full', md: 'inherit'}}
+                                    paddingX={7}
+                                    _hover={{textDecoration: 'none'}}
+                                >
+                                    <FormattedMessage
+                                        defaultMessage="Get started"
+                                        id="home.link.get_started"
+                                    />
+                                </Button>
+                            </Stack>
+                        }
+                    />
+                )}
             </Island>
 
             <Island hydrateOn={'visible'}>

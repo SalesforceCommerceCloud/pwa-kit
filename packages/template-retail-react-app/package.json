@@ -23,6 +23,7 @@
     "push": "npm run build && pwa-kit-dev push",
     "save-credentials": "pwa-kit-dev save-credentials",
     "start": "set -a; [ -f .env ] && . ./.env; set +a; cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
+    "start:search-summary": "node ./scripts/start-search-summary.cjs",
     "start:inspect": "npm run start -- --inspect",
     "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
     "tail-logs": "pwa-kit-dev tail-logs",
@@ -110,7 +111,7 @@
   "bundlesize": [
     {
       "path": "build/main.js",
-      "maxSize": "111 kB"
+      "maxSize": "112 kB"
     },
     {
       "path": "build/vendor.js",

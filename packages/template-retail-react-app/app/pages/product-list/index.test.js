@@ -547,7 +547,7 @@ test('should filter by inventory when inventory filter is clicked', async () => 
                     refine: expect.arrayContaining(['ilids=inventory_m_store_store12'])
                 })
             }),
-            {keepPreviousData: true}
+            expect.objectContaining({enabled: true, keepPreviousData: true})
         )
     })
 

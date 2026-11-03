@@ -38,6 +38,11 @@ import {ShopperLogin, ShopperOrders, helpers} from 'commerce-sdk-isomorphic'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {getSiteByReference} from './utils/site-utils.js'
 
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths -- Direct Node SSR import.
+import {searchSummaryImageSources} from './utils/search-summary-config'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths -- Direct Node SSR import.
+import {registerSearchSummaryRoute} from './server/search-summary'
+
 const config = getConfig()
 
 // Guest order access helpers
@@ -183,7 +188,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: config.app.commerceAPI.useSLASPrivateClient === true,
 
     // To extend the SLAS private-client proxy allow-list, supply
     // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
@@ -606,6 +611,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
                         '*.demandware.net',
+                        ...(config.app.productImageSources || []),
+                        ...searchSummaryImageSources(config),
                         '*.adyen.com',
                         'pay.google.com', // Google Pay payment handler icon
                         'www.gstatic.com', // optional, if icon is on gstatic
@@ -829,6 +836,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     // the access token in an `Authorization: SLAS` header and the refresh
     // token in the body.
     registerTokenBridgeRoute(app)
+    registerSearchSummaryRoute(app, config)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))

@@ -258,8 +258,8 @@ const StorefrontApp = (props) => {
     }, [basket?.currency])
 
     const commerceAgentConfiguration = useMemo(() => {
-        return getCommerceAgentConfig()
-    }, [config.app.commerceAgent])
+        return getCommerceAgentConfig(site.id)
+    }, [config.app.commerceAgent, site])
 
     // Shifts page content aside for the Commerce Client side panel when page-push
     // is configured; empty (no shift) otherwise.
@@ -410,6 +410,7 @@ const StorefrontApp = (props) => {
 
                         {commerceAgentConfiguration?.enabled === 'true' && (
                             <ShopperAgent
+                                key={site.id}
                                 commerceAgentConfiguration={commerceAgentConfiguration}
                                 basketDoneLoading={basketQueryLastUpdateTime > 0}
                             />

@@ -1563,6 +1563,18 @@ describe('ShopperAgent Component', () => {
             expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
         })
 
+        test('Commerce Client can open before basket or MIAW configuration is ready', () => {
+            mockedUseConfigurations.mockReturnValue({isLoading: true})
+            render(
+                <ShopperAgent
+                    commerceAgentConfiguration={commerceClientSettings}
+                    basketDoneLoading={false}
+                />
+            )
+            expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
+            expect(mockedUseConfigurations).toHaveBeenCalledWith({}, {enabled: false})
+        })
+
         describe('floating action button gating', () => {
             test('renders the FAB once the bundle has loaded when cc_showFab is true', () => {
                 mockedUseScript.mockReturnValue({loaded: true, error: false})

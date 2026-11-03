@@ -14,6 +14,7 @@
  * - assets/templates/@salesforce/retail-react-app/app/components/_app-config
  */
 import React from 'react'
+import {SearchAssistantSessionProvider} from '@salesforce/retail-react-app/app/contexts/search-assistant-session'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared/ui'
 
@@ -122,7 +123,7 @@ const AppConfig = ({children, locals = {}}) => {
             defaultDnt={DEFAULT_DNT_STATE}
             // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
-            enablePWAKitPrivateClient={false}
+            enablePWAKitPrivateClient={commerceApiConfig.useSLASPrivateClient === true}
             privateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
             publicClientProxyEndpoint={slasPublicClientProxyEndpoint}
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
@@ -138,7 +139,9 @@ const AppConfig = ({children, locals = {}}) => {
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <StoreLocatorProvider config={storeLocatorConfig}>
-                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                    <ChakraProvider theme={theme}>
+                        <SearchAssistantSessionProvider>{children}</SearchAssistantSessionProvider>
+                    </ChakraProvider>
                 </StoreLocatorProvider>
             </MultiSiteProvider>
             {/* The floating devtools launcher can obscure the compact express-payment iframe. */}
