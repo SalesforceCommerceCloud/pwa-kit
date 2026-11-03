@@ -2,6 +2,8 @@
 
 This optional Retail React App feature searches the current storefront with SCAPI, returns products first, then streams an AI overview. Shoppers can ask questions grounded in the returned catalog or continue in a configured Commerce Agent. The default is **off**. It has no built-in customer, organization, deployment, image CDN, or sibling widget checkout.
 
+See [AI search architecture](AI-SEARCH-ARCHITECTURE.md) for component boundaries, request sequences, conversation scope and authentication flows, including the differences from SFRA.
+
 The implementation is shared across sites. Each customer's store configuration selects the experience; no customer-specific component fork is needed. Consumers of an existing generated PWA application must adopt these template changes before the flags are available.
 
 ## Public storefront configuration
