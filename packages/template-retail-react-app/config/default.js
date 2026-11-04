@@ -64,6 +64,7 @@ module.exports = {
             // When 'true', a floating action button is rendered at cc_widgetPosition.
             // Clicking it opens the Commerce Client shopping agent. Defaults to 'false'.
             cc_showFab: 'false',
+            cc_welcomeMessageEnabled: 'true',
             // When 'true', storefront content shifts aside for the open side panel
             // instead of being overlaid by it. Handled template-side by
             // useCommerceClientPagePush; needs an enabled agent on a full-height

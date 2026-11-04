@@ -100,6 +100,8 @@ initializeRegistry()
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import {useShopperAgent} from '@salesforce/retail-react-app/app/hooks/use-shopper-agent'
+import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
+import {resolveCommerceClientScriptUrl} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {useCommerceClientPagePush} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-push'
 import {isShopperAgentExpressPaymentPath} from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/routes'
 
@@ -261,6 +263,15 @@ const StorefrontApp = (props) => {
         return getCommerceAgentConfig()
     }, [config.app.commerceAgent])
 
+    // Download the optional widget in parallel with basket/configuration requests.
+    // The widget's own hook reuses this script and still gates injection on readiness.
+    useScript(
+        commerceAgentConfiguration?.enabled === 'true' &&
+            commerceAgentConfiguration?.provider === 'commerce-client'
+            ? resolveCommerceClientScriptUrl(commerceAgentConfiguration)
+            : undefined
+    )
+
     // Shifts page content aside for the Commerce Client side panel when page-push
     // is configured; empty (no shift) otherwise.
     const pagePushProps = useCommerceClientPagePush(commerceAgentConfiguration)
@@ -379,129 +390,134 @@ const StorefrontApp = (props) => {
                     defaultLocale={DEFAULT_LOCALE}
                 >
                     <CurrencyProvider currency={currency}>
-                        <Seo>
-                            <meta name="theme-color" content={THEME_COLOR} />
-                            <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
-                            <link
-                                rel="apple-touch-icon"
-                                href={getAssetUrl('static/img/global/apple-touch-icon.png')}
-                            />
-                            <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
+                        <AddToCartModalProvider>
+                            <Seo>
+                                <meta name="theme-color" content={THEME_COLOR} />
+                                <meta
+                                    name="apple-mobile-web-app-title"
+                                    content={DEFAULT_SITE_TITLE}
+                                />
+                                <link
+                                    rel="apple-touch-icon"
+                                    href={getAssetUrl('static/img/global/apple-touch-icon.png')}
+                                />
+                                <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
 
-                            {/* Urls for all localized versions of this page (including current page)
+                                {/* Urls for all localized versions of this page (including current page)
                             For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                            {site.l10n?.supportedLocales.map((locale) => (
+                                {site.l10n?.supportedLocales.map((locale) => (
+                                    <link
+                                        rel="alternate"
+                                        hrefLang={locale.id.toLowerCase()}
+                                        href={getHrefForLocale(locale.id)}
+                                        key={locale.id}
+                                    />
+                                ))}
+                                {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
                                 <link
                                     rel="alternate"
-                                    hrefLang={locale.id.toLowerCase()}
+                                    hrefLang={site.l10n.defaultLocale.slice(0, 2)}
                                     href={getHrefForLocale(locale.id)}
-                                    key={locale.id}
                                 />
-                            ))}
-                            {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
-                            <link
-                                rel="alternate"
-                                hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={getHrefForLocale(locale.id)}
-                            />
-                            {/* A wider fallback for user locales that the app does not support */}
-                            <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
-                        </Seo>
+                                {/* A wider fallback for user locales that the app does not support */}
+                                <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
+                            </Seo>
 
-                        {commerceAgentConfiguration?.enabled === 'true' && (
-                            <ShopperAgent
-                                commerceAgentConfiguration={commerceAgentConfiguration}
-                                basketDoneLoading={basketQueryLastUpdateTime > 0}
-                            />
-                        )}
-
-                        <ScrollToTop />
-
-                        <Box
-                            id="app"
-                            display="flex"
-                            flexDirection="column"
-                            flex={1}
-                            {...pagePushProps}
-                        >
-                            <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            {storeLocatorEnabled && (
-                                <StoreLocatorModal
-                                    isOpen={isStoreLocatorOpen}
-                                    onClose={onCloseStoreLocator}
+                            {commerceAgentConfiguration?.enabled === 'true' && (
+                                <ShopperAgent
+                                    commerceAgentConfiguration={commerceAgentConfiguration}
+                                    basketDoneLoading={basketQueryLastUpdateTime > 0}
                                 />
                             )}
-                            <Island hydrateOn={'visible'}>
-                                <Box {...styles.headerWrapper}>
-                                    {!isCheckout ? (
-                                        <>
-                                            {embeddedHeader && (
-                                                // The announcement `<Region>` renders in
-                                                // *component mode*, which has no Suspense
-                                                // boundary of its own. In production the
-                                                // registry discovers components via lazy
-                                                // importers, so `<Component>` throws
-                                                // `registry.preload()`'s promise to suspend on
-                                                // first render. `renderToString` (SSR) rethrows
-                                                // an uncaught suspend, blanking the tree (a 500).
-                                                // Provide the boundary here so SSR streams the
-                                                // fallback instead of crashing.
-                                                <Suspense fallback={null}>
-                                                    <EmbeddedSubtreeProvider embedded>
-                                                        <Region
-                                                            component={embeddedHeader}
-                                                            regionId="announcement"
-                                                        />
-                                                    </EmbeddedSubtreeProvider>
-                                                </Suspense>
-                                            )}
-                                            <AboveHeader />
-                                            <Header
-                                                onMenuClick={onOpen}
-                                                onLogoClick={onLogoClick}
-                                                onMyCartClick={onCartClick}
-                                                onMyAccountClick={onAccountClick}
-                                                onWishlistClick={onWishlistClick}
-                                                onStoreLocatorClick={onOpenStoreLocator}
-                                                onAgentClick={shopperAgentActions.open}
-                                            >
-                                                <HideOnDesktop>
-                                                    <DrawerMenu
-                                                        isOpen={isOpen}
-                                                        onClose={onClose}
-                                                        onLogoClick={onLogoClick}
-                                                        root={
-                                                            categories?.[
-                                                                CAT_MENU_DEFAULT_ROOT_CATEGORY
-                                                            ]
-                                                        }
-                                                        itemsKey="categories"
-                                                        itemsCountKey="onlineSubCategoriesCount"
-                                                        itemComponent={DrawerMenuItemWithData}
-                                                    />
-                                                </HideOnDesktop>
 
-                                                <HideOnMobile>
-                                                    <ListMenu
-                                                        root={
-                                                            categories?.[
-                                                                CAT_MENU_DEFAULT_ROOT_CATEGORY
-                                                            ]
-                                                        }
-                                                        itemsKey="categories"
-                                                        itemsCountKey="onlineSubCategoriesCount"
-                                                        contentComponent={ListMenuContentWithData}
-                                                    />
-                                                </HideOnMobile>
-                                            </Header>
-                                        </>
-                                    ) : (
-                                        <CheckoutHeader />
-                                    )}
-                                </Box>
-                            </Island>
-                            {!isOnline && <OfflineBanner />}
-                            <AddToCartModalProvider>
+                            <ScrollToTop />
+
+                            <Box
+                                id="app"
+                                display="flex"
+                                flexDirection="column"
+                                flex={1}
+                                {...pagePushProps}
+                            >
+                                <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+                                {storeLocatorEnabled && (
+                                    <StoreLocatorModal
+                                        isOpen={isStoreLocatorOpen}
+                                        onClose={onCloseStoreLocator}
+                                    />
+                                )}
+                                <Island hydrateOn={'visible'}>
+                                    <Box {...styles.headerWrapper}>
+                                        {!isCheckout ? (
+                                            <>
+                                                {embeddedHeader && (
+                                                    // The announcement `<Region>` renders in
+                                                    // *component mode*, which has no Suspense
+                                                    // boundary of its own. In production the
+                                                    // registry discovers components via lazy
+                                                    // importers, so `<Component>` throws
+                                                    // `registry.preload()`'s promise to suspend on
+                                                    // first render. `renderToString` (SSR) rethrows
+                                                    // an uncaught suspend, blanking the tree (a 500).
+                                                    // Provide the boundary here so SSR streams the
+                                                    // fallback instead of crashing.
+                                                    <Suspense fallback={null}>
+                                                        <EmbeddedSubtreeProvider embedded>
+                                                            <Region
+                                                                component={embeddedHeader}
+                                                                regionId="announcement"
+                                                            />
+                                                        </EmbeddedSubtreeProvider>
+                                                    </Suspense>
+                                                )}
+                                                <AboveHeader />
+                                                <Header
+                                                    onMenuClick={onOpen}
+                                                    onLogoClick={onLogoClick}
+                                                    onMyCartClick={onCartClick}
+                                                    onMyAccountClick={onAccountClick}
+                                                    onWishlistClick={onWishlistClick}
+                                                    onStoreLocatorClick={onOpenStoreLocator}
+                                                    onAgentClick={shopperAgentActions.open}
+                                                >
+                                                    <HideOnDesktop>
+                                                        <DrawerMenu
+                                                            isOpen={isOpen}
+                                                            onClose={onClose}
+                                                            onLogoClick={onLogoClick}
+                                                            root={
+                                                                categories?.[
+                                                                    CAT_MENU_DEFAULT_ROOT_CATEGORY
+                                                                ]
+                                                            }
+                                                            itemsKey="categories"
+                                                            itemsCountKey="onlineSubCategoriesCount"
+                                                            itemComponent={DrawerMenuItemWithData}
+                                                        />
+                                                    </HideOnDesktop>
+
+                                                    <HideOnMobile>
+                                                        <ListMenu
+                                                            root={
+                                                                categories?.[
+                                                                    CAT_MENU_DEFAULT_ROOT_CATEGORY
+                                                                ]
+                                                            }
+                                                            itemsKey="categories"
+                                                            itemsCountKey="onlineSubCategoriesCount"
+                                                            contentComponent={
+                                                                ListMenuContentWithData
+                                                            }
+                                                        />
+                                                    </HideOnMobile>
+                                                </Header>
+                                            </>
+                                        ) : (
+                                            <CheckoutHeader />
+                                        )}
+                                    </Box>
+                                </Island>
+                                {!isOnline && <OfflineBanner />}
                                 <BonusProductSelectionModalProvider>
                                     <SkipNavContent
                                         style={{
@@ -540,8 +556,8 @@ const StorefrontApp = (props) => {
                                     <AuthModal {...authModal} />
                                     <DntNotification {...dntNotification} />
                                 </BonusProductSelectionModalProvider>
-                            </AddToCartModalProvider>
-                        </Box>
+                            </Box>
+                        </AddToCartModalProvider>
                     </CurrencyProvider>
                 </IntlProvider>
             </StorefrontPreview>
