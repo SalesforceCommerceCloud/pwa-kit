@@ -23,6 +23,9 @@ module.exports = {
         commerceAgent: parseSettings(process.env.COMMERCE_AGENT_SETTINGS) || {
             enabled: 'false',
             askAgentOnSearch: 'false',
+            // When 'true', an "Ask AI" button is shown inside the header search bar. Clicking
+            // it opens the active shopper agent widget and, for MIAW, sends the typed query.
+            enableAgentFromSearchBar: 'true',
             embeddedServiceName: '',
             embeddedServiceEndpoint: '',
             scriptSourceUrl: '',

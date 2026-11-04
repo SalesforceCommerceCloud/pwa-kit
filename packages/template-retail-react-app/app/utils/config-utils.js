@@ -24,6 +24,7 @@ export const getCommerceAgentConfig = () => {
         enableAgentFromHeader: 'false',
         enableAgentFromFloatingButton: 'false',
         enableAgentFromSearchSuggestions: 'false',
+        enableAgentFromSearchBar: 'true',
         // Widget provider: 'miaw' (default) or 'commerce-client'. See config/default.js.
         provider: 'miaw',
         cc_cdnVersion: '',

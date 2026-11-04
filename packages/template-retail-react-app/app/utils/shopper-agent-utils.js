@@ -124,6 +124,41 @@ export function openCommerceClientWidget(show = true) {
 }
 
 /**
+ * Send a message to the Commerce Client conversation as the shopper.
+ *
+ * Uses `window.CimulateMessaging.eventHandlers.session.sendMessage()`, falling back to the
+ * top-level `window.CimulateMessaging.sendMessage()`. The widget queues the message and starts
+ * a session when none is connected yet, so this can be called right after opening the widget.
+ *
+ * @function sendCommerceClientMessage
+ * @param {string} text - Message text to send
+ * @returns {boolean} `true` when the message was dispatched, `false` when the text is empty
+ *   or the loaded widget bundle does not expose `sendMessage`
+ */
+export function sendCommerceClientMessage(text) {
+    if (!onClient) return false
+
+    const message = typeof text === 'string' ? text.trim() : ''
+    if (!message) return false
+
+    try {
+        const messaging = window.CimulateMessaging
+        const sendMessage = messaging?.eventHandlers?.session?.sendMessage || messaging?.sendMessage
+        if (typeof sendMessage !== 'function') {
+            console.warn('Shopper Agent: Commerce Client sendMessage is unavailable')
+            return false
+        }
+        Promise.resolve(sendMessage(message)).catch((error) => {
+            console.error('Shopper Agent: Error sending Commerce Client message', error)
+        })
+        return true
+    } catch (error) {
+        console.error('Shopper Agent: Error sending Commerce Client message', error)
+    }
+    return false
+}
+
+/**
  * End the current Commerce Client conversation.
  *
  * Prefers `window.CimulateMessaging.eventHandlers.session.endConversation()`

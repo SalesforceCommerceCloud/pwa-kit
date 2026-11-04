@@ -12,6 +12,7 @@ import {
     endCommerceClientConversation,
     openCommerceClientWidget,
     openShopperAgentWidget,
+    sendCommerceClientMessage,
     persistCommerceClientOpenState,
     getPersistedCommerceClientOpenState,
     resolveCommerceClientRoutingAttributes,
@@ -365,6 +366,60 @@ describe('shopper-agent-utils', () => {
                 'Shopper Agent: Error ending Commerce Client conversation',
                 expect.any(Error)
             )
+        })
+    })
+
+    describe('sendCommerceClientMessage', () => {
+        test('should send the trimmed text via eventHandlers.session.sendMessage', () => {
+            const mockSend = jest.fn().mockResolvedValue()
+            global.window = {
+                CimulateMessaging: {eventHandlers: {session: {sendMessage: mockSend}}}
+            }
+
+            expect(sendCommerceClientMessage('  tops ')).toBe(true)
+            expect(mockSend).toHaveBeenCalledWith('tops')
+        })
+
+        test('should fall back to the top-level sendMessage', () => {
+            const mockSend = jest.fn().mockResolvedValue()
+            global.window = {CimulateMessaging: {sendMessage: mockSend}}
+
+            expect(sendCommerceClientMessage('tops')).toBe(true)
+            expect(mockSend).toHaveBeenCalledWith('tops')
+        })
+
+        test('should not send empty or whitespace-only text', () => {
+            const mockSend = jest.fn()
+            global.window = {
+                CimulateMessaging: {eventHandlers: {session: {sendMessage: mockSend}}}
+            }
+
+            expect(sendCommerceClientMessage('   ')).toBe(false)
+            expect(sendCommerceClientMessage(undefined)).toBe(false)
+            expect(mockSend).not.toHaveBeenCalled()
+        })
+
+        test('should return false when sendMessage is unavailable', () => {
+            const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+            global.window = {CimulateMessaging: {eventHandlers: {session: {}}}}
+
+            expect(sendCommerceClientMessage('tops')).toBe(false)
+            expect(warnSpy).toHaveBeenCalled()
+            warnSpy.mockRestore()
+        })
+
+        test('should log when sendMessage rejects', async () => {
+            const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+            const mockSend = jest.fn().mockRejectedValue(new Error('not ready'))
+            global.window = {
+                CimulateMessaging: {eventHandlers: {session: {sendMessage: mockSend}}}
+            }
+
+            expect(sendCommerceClientMessage('tops')).toBe(true)
+            await Promise.resolve()
+            await Promise.resolve()
+            expect(errorSpy).toHaveBeenCalled()
+            errorSpy.mockRestore()
         })
     })
 
