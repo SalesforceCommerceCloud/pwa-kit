@@ -121,6 +121,35 @@ describe('App', () => {
         buildUrl
     }
 
+    test('starts downloading the commerce widget from the app shell', async () => {
+        useMultiSite.mockImplementation(() => resultUseMultiSite)
+        const previousConfig = mockConfig.app.commerceAgent
+        const src = 'https://cdn.search.cimulate.ai/copilot-widget/1.43.2/messaging.umd.js'
+        mockConfig.app.commerceAgent = {
+            enabled: 'true',
+            provider: 'commerce-client',
+            commerceClientScriptSourceUrl: src
+        }
+        try {
+            renderWithProviders(
+                <App
+                    targetLocale={DEFAULT_LOCALE}
+                    defaultLocale={DEFAULT_LOCALE}
+                    messages={messages}
+                >
+                    <p>Storefront content</p>
+                </App>
+            )
+            await waitFor(() =>
+                expect(document.querySelector(`script[src="${src}"]`)).not.toBeNull()
+            )
+            expect(document.querySelectorAll(`script[src="${src}"]`)).toHaveLength(1)
+        } finally {
+            mockConfig.app.commerceAgent = previousConfig
+            document.querySelector(`script[src="${src}"]`)?.remove()
+        }
+    })
+
     test('User can select DNT options when App component is rendered with DNT notification', async () => {
         useMultiSite.mockImplementation(() => resultUseMultiSite)
         const {user} = renderWithProviders(
