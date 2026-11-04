@@ -236,6 +236,53 @@ describe('Passwordless landing tests', function () {
         })
     })
 
+    test('shows an error instead of failing silently when magic link has no login_id', async () => {
+        const token = '55555555'
+        window.history.pushState(
+            {},
+            'Passwordless Login Landing',
+            createPathWithDefaults(`/passwordless-login-landing?token=${token}`)
+        )
+        const {findByText} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app
+            }
+        })
+
+        expect(await findByText(/Your email is missing for this verification/i)).toBeInTheDocument()
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
+        ).not.toHaveBeenCalled()
+    })
+
+    test('shows an error when passwordless login fails on the landing page', async () => {
+        const token = '66666666'
+        const loginId = 'shopper@example.com'
+        mockAuthHelperFunctions[
+            AuthHelpers.LoginPasswordlessUser
+        ].mutateAsync.mockRejectedValueOnce(
+            Object.assign(new Error('Too many requests'), {response: {status: 429}})
+        )
+        window.history.pushState(
+            {},
+            'Passwordless Login Landing',
+            createPathWithDefaults(
+                `/passwordless-login-landing?token=${token}&login_id=${encodeURIComponent(loginId)}`
+            )
+        )
+        const {findByText} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app
+            }
+        })
+
+        expect(await findByText(/You reached the limit for login attempts/i)).toBeInTheDocument()
+    })
+
     test('landing path changes based on config', async () => {
         const token = '44444444'
         const loginId = 'shopper@example.com'

@@ -188,7 +188,13 @@ const Login = () => {
                 setRedirectPath('')
             }
 
-            handleOtpVerification(token)
+            // Surface failures (e.g. a magic link without login_id from an older ssr.js)
+            // instead of leaving the shopper on a silent landing page.
+            handleOtpVerification(token).then((result) => {
+                if (!result?.success) {
+                    form.setError('global', {type: 'manual', message: result?.error})
+                }
+            })
         }
     }, [path, isSuccessCustomerBaskets])
 
