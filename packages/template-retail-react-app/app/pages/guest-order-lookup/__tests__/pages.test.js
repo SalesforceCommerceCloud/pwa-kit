@@ -145,10 +145,10 @@ describe('GuestOrderLookupRequest', () => {
 
     test('renders heading and form fields for guest users', () => {
         renderWithProviders(<GuestOrderLookupRequest />)
-        expect(screen.getByText('Look Up Your Order')).toBeInTheDocument()
-        expect(screen.getByLabelText('Order number')).toBeInTheDocument()
-        expect(screen.getByLabelText('Email address')).toBeInTheDocument()
-        expect(screen.getByRole('button', {name: /find my order/i})).toBeInTheDocument()
+        expect(screen.getByText('Order Lookup')).toBeInTheDocument()
+        expect(screen.getByLabelText('Order Number')).toBeInTheDocument()
+        expect(screen.getByLabelText('Email Address')).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /find order/i})).toBeInTheDocument()
     })
 
     test('redirects to /account/orders when user is registered', () => {
@@ -159,14 +159,14 @@ describe('GuestOrderLookupRequest', () => {
                 <Route path="/account/orders" render={() => <div>Account Orders</div>} />
             </MemoryRouter>
         )
-        expect(screen.queryByText('Look Up Your Order')).not.toBeInTheDocument()
+        expect(screen.queryByText('Order Lookup')).not.toBeInTheDocument()
         expect(screen.getByText('Account Orders')).toBeInTheDocument()
     })
 
     test('shows validation error when order number is empty', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        await user.click(screen.getByRole('button', {name: /find my order/i}))
+        await user.click(screen.getByRole('button', {name: /find order/i}))
         await waitFor(() => {
             expect(screen.getByText('Order number is required')).toBeInTheDocument()
         })
@@ -175,9 +175,9 @@ describe('GuestOrderLookupRequest', () => {
     test('shows validation error when email is empty', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        const orderInput = screen.getByLabelText('Order number')
+        const orderInput = screen.getByLabelText('Order Number')
         await user.type(orderInput, 'ABC123')
-        await user.click(screen.getByRole('button', {name: /find my order/i}))
+        await user.click(screen.getByRole('button', {name: /find order/i}))
         await waitFor(() => {
             expect(screen.getByText('Email address is required')).toBeInTheDocument()
         })
@@ -186,11 +186,11 @@ describe('GuestOrderLookupRequest', () => {
     test('shows validation error when order number does not match regex', async () => {
         const user = userEvent.setup()
         renderWithProviders(<GuestOrderLookupRequest />)
-        const orderInput = screen.getByLabelText('Order number')
+        const orderInput = screen.getByLabelText('Order Number')
         await user.type(orderInput, '!!!')
-        const emailInput = screen.getByLabelText('Email address')
+        const emailInput = screen.getByLabelText('Email Address')
         await user.type(emailInput, 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /find my order/i}))
+        await user.click(screen.getByRole('button', {name: /find order/i}))
         await waitFor(() => {
             expect(screen.getByText('Enter a valid order number')).toBeInTheDocument()
         })
@@ -203,9 +203,9 @@ describe('GuestOrderLookupRequest', () => {
                 <GuestOrderLookupRequest />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /find my order/i}))
+        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find order/i}))
         await waitFor(() => {
             expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {orderNo: 'ABC123'},
@@ -230,9 +230,9 @@ describe('GuestOrderLookupRequest', () => {
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /find my order/i}))
+        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
             expect(screen.getByTestId('verify-page').textContent).toContain('ABC123')
@@ -252,9 +252,9 @@ describe('GuestOrderLookupRequest', () => {
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /find my order/i}))
+        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
         })
@@ -272,9 +272,9 @@ describe('GuestOrderLookupRequest', () => {
                 />
             </MemoryRouter>
         )
-        await user.type(screen.getByLabelText('Order number'), 'ABC123')
-        await user.type(screen.getByLabelText('Email address'), 'test@example.com')
-        await user.click(screen.getByRole('button', {name: /find my order/i}))
+        await user.type(screen.getByLabelText('Order Number'), 'ABC123')
+        await user.type(screen.getByLabelText('Email Address'), 'test@example.com')
+        await user.click(screen.getByRole('button', {name: /find order/i}))
         await waitFor(() => {
             expect(screen.getByTestId('verify-page')).toBeInTheDocument()
         })

@@ -80,7 +80,7 @@ const navigateToStep2 = async (page, {orderNo = 'ORD-001234', email = 'test@exam
 
     await Promise.all([
         page.waitForURL('**/order-lookup/verify/**'),
-        page.getByRole('button', {name: /find my order/i}).click()
+        page.getByRole('button', {name: /find order/i}).click()
     ])
 
     await expect(page.getByRole('heading', {name: /verify your email/i})).toBeVisible()
@@ -233,7 +233,7 @@ test.describe('Guest Order Access — a11y critical violations check (S19)', () 
         await page.goto(FEATURE_ON_BASE_URL + '/order-lookup?expired=1')
         await answerConsentTrackingForm(page)
 
-        await expect(page.getByRole('heading', {name: /look up your order/i})).toBeVisible()
+        await expect(page.getByRole('heading', {name: /order lookup/i})).toBeVisible()
 
         const results = await new AxeBuilder({page})
             .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
