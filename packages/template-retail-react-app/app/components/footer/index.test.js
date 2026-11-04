@@ -43,6 +43,11 @@ test('renders SubscribeForm within Footer', () => {
     expect(signUpButtons.length).toBeGreaterThanOrEqual(1)
 })
 
+test('does not render the placeholder "Order Status" link', () => {
+    renderWithProviders(<Footer />)
+    expect(screen.queryByRole('link', {name: 'Order Status', hidden: true})).toBeNull()
+})
+
 describe('Guest Order Lookup footer link', () => {
     test('does not render "Order Lookup" link when flag is off', () => {
         getConfig.mockReturnValue({
