@@ -130,6 +130,41 @@ All `COMMERCE_AGENT_SETTINGS` fields for the Commerce Client provider — requir
 - `cc_pagePush: "true"` — shifts page content aside for the panel instead of overlaying it (desktop, full-height dialog only).
 - `cc_headerText`, `cc_logoUrl`, `cc_theme`, `cc_searchConfig` — branding and search-input customization.
 
+### First-visit welcome nudge
+
+With `provider: "commerce-client"` and `cc_showFab: "true"`, PWA Kit shows a
+welcome bubble beside its floating agent button:
+
+> Hi! Welcome to our store. Looking for holiday gift inspiration?
+
+Clicking the bubble opens the existing chat without sending a shopper message.
+The × dismisses it and returns keyboard focus to the launcher. It follows
+`cc_widgetPosition`, hides while chat is open, and is enabled by default when
+that floating button is enabled. It does not change the legacy MIAW provider.
+
+Configure it in the `commerceAgent` object / `COMMERCE_AGENT_SETTINGS`:
+
+```json
+{
+  "cc_showFab": "true",
+  "cc_welcomeMessageEnabled": "true",
+  "cc_welcomeMessage": "Hi! Welcome to Vineyard Vines. Looking for holiday gift inspiration?"
+}
+```
+
+Merge these fields into the existing agent configuration. Set
+`cc_welcomeMessageEnabled` to `"false"` to opt out; an empty message also hides
+it. The default text and dismiss label use React Intl; merchant-supplied text
+is displayed as provided.
+
+The nudge records that it was shown in localStorage under
+`pwa-kit:shopper-agent:welcome:<siteId>:v1`, so it stays hidden after navigation,
+reloads, and later visits in that browser on the same origin. This does not
+require sign-in and does not identify people across devices. If browser storage
+is unavailable, it stays hidden. For a demo reset, remove that one localStorage
+entry in the browser's developer tools and reload. The site ID comes from the Commerce SDK configuration, falling back to the agent
+configuration. Storefronts on different origins have separate browser storage.
+
 **Widget presentation & behavior settings** — these mirror configs the Commerce Client widget already supports. The storefront forwards each one **only when you set it and applies no storefront default** — omit a setting and the widget keeps its own default (shown below). Object-valued settings are passed as JSON objects in `COMMERCE_AGENT_SETTINGS`; boolean-valued ones are passed as the strings `"true"` / `"false"`.
 
 | Setting                     | Type / values                   | Widget default          | Forwarded to the widget as            |
@@ -219,3 +254,17 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 -   [Routing](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html)
 -   [Phased Headless Rollouts](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/phased-headless-rollouts.html)
 -   [Launch Your Storefront](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/launching-your-storefront.html)
+
+For demos, set `cc_welcomeMessageDemoMode` to `"true"` in `COMMERCE_AGENT_SETTINGS` to show the nudge again after each full page refresh. Dismissing it hides it for the rest of that page visit. Omit this setting for the normal once-per-storefront behavior.
+
+### Live-cart free-shipping nudge
+
+Set `cc_freeShippingNudge` in `COMMERCE_AGENT_SETTINGS` to
+`{"enabled":true,"threshold":35,"currency":"USD","maxGap":18,"priceBuffer":5}`.
+This is an explicit merchant/demo rule; it does not discover promotions or change checkout shipping prices.
+Uses the live basket's `productTotal` (not order total), currency, and product names.
+A $22 merchandise total with a $35 threshold searches for complementary items priced $13–$18.
+Only shows for a nonempty basket below the threshold and within an optional `maxGap` (defaults to the threshold); hides when a selected shipping method is already free.
+The shipping invitation takes priority over the welcome invitation. Click submits the search using the Commerce Client `sendMessage` API (widget 1.41.0+); nothing is sent automatically.
+The existing welcome demo mode also replays this invitation on full refresh. Otherwise each basket/total/threshold state is shown once.
+Verify the configured threshold, currency, and total basis against the merchant's real shipping policy before enabling outside a demo.

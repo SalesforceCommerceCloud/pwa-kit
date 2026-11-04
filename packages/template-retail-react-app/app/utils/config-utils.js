@@ -24,6 +24,7 @@ export const getCommerceAgentConfig = () => {
         enableAgentFromHeader: 'false',
         enableAgentFromFloatingButton: 'false',
         enableAgentFromSearchSuggestions: 'false',
+        enableAgentFromSearchBar: 'true',
         // Widget provider: 'miaw' (default) or 'commerce-client'. See config/default.js.
         provider: 'miaw',
         cc_cdnVersion: '',
@@ -36,6 +37,7 @@ export const getCommerceAgentConfig = () => {
         cc_dialogWidth: '420px',
         cc_widgetPosition: 'bottom-right',
         cc_showFab: 'false',
+        cc_welcomeMessageEnabled: 'true',
         cc_pagePush: 'false',
         cc_logoUrl: '',
         cc_isOpen: 'false',

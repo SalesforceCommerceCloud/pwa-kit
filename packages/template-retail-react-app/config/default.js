@@ -23,6 +23,9 @@ module.exports = {
         commerceAgent: parseSettings(process.env.COMMERCE_AGENT_SETTINGS) || {
             enabled: 'false',
             askAgentOnSearch: 'false',
+            // When 'true', an "Ask AI" button is shown inside the header search bar. Clicking
+            // it opens the active shopper agent widget and, for MIAW, sends the typed query.
+            enableAgentFromSearchBar: 'true',
             embeddedServiceName: '',
             embeddedServiceEndpoint: '',
             scriptSourceUrl: '',
@@ -64,6 +67,7 @@ module.exports = {
             // When 'true', a floating action button is rendered at cc_widgetPosition.
             // Clicking it opens the Commerce Client shopping agent. Defaults to 'false'.
             cc_showFab: 'false',
+            cc_welcomeMessageEnabled: 'true',
             // When 'true', storefront content shifts aside for the open side panel
             // instead of being overlaid by it. Handled template-side by
             // useCommerceClientPagePush; needs an enabled agent on a full-height

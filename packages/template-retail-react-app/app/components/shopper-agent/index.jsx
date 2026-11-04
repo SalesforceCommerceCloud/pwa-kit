@@ -1234,6 +1234,11 @@ const CommerceClientAgentWindow = ({
                 <CommerceClientFab
                     position={cc_widgetPosition}
                     isPanelOpenByDefault={initialIsOpen}
+                    siteId={configSiteId || commerceAgentConfiguration.siteId || 'default'}
+                    welcomeMessage={commerceAgentConfiguration.cc_welcomeMessage}
+                    welcomeMessageEnabled={commerceAgentConfiguration.cc_welcomeMessageEnabled}
+                    welcomeMessageDemoMode={commerceAgentConfiguration.cc_welcomeMessageDemoMode}
+                    freeShippingNudge={commerceAgentConfiguration.cc_freeShippingNudge}
                 />
             )}
         </>
