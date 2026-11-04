@@ -8,6 +8,7 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import styled from '@emotion/styled'
 import {keyframes} from '@emotion/react'
+import {SparkleIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 const welcomeEntrance = keyframes`
     0% { opacity: 0; transform: translateY(20px) scale(0.88); }
@@ -15,17 +16,17 @@ const welcomeEntrance = keyframes`
     100% { opacity: 1; transform: translateY(0) scale(1); }
 `
 const welcomePulse = keyframes`
-    0%, 100% { box-shadow: 0 8px 28px #0050c840; }
-    50% { box-shadow: 0 0 0 10px #0176d333, 0 12px 36px #0050c859; }
+    0%, 100% { box-shadow: 0 8px 28px #37307733; }
+    50% { box-shadow: 0 0 0 8px #7762d626, 0 14px 40px #245b9452; }
 `
 const WelcomeContainer = styled.div`
-    animation: ${welcomeEntrance} 250ms ease-out both, ${welcomePulse} 1600ms ease-in-out 300ms 2;
+    animation: ${welcomeEntrance} 250ms ease-out both, ${welcomePulse} 2400ms ease-in-out 300ms 4;
     &:hover,
     &:focus-within {
         animation-play-state: paused;
     }
     button:focus-visible {
-        outline: 3px solid #ffdf75;
+        outline: 3px solid #b9f5e4;
         outline-offset: 2px;
     }
     @media (prefers-reduced-motion: reduce) {
@@ -42,26 +43,30 @@ const styles = {
         zIndex: 'var(--chakra-zIndices-sticky, 1100)',
         display: 'flex',
         alignItems: 'flex-start',
-        width: '20rem',
+        width: '21.5rem',
         maxWidth: 'calc(100vw - 116px)',
-        border: '1px solid #0050c8',
-        borderRadius: '14px',
-        background: '#0050c8',
+        border: '1px solid rgba(255, 255, 255, 0.25)',
+        borderRadius: '20px',
+        background: 'linear-gradient(125deg, #4939a7 0%, #245b94 55%, #00666f 100%)',
         color: '#fff',
-        boxShadow: '0 8px 28px #0050c840'
+        boxShadow: '0 8px 28px #37307733'
     },
     message: {
         flex: 1,
         minWidth: 0,
         margin: 0,
-        padding: '14px 0 14px 16px',
+        padding: '18px 0 18px 18px',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '12px',
         border: 0,
-        borderRadius: '14px',
+        borderRadius: '20px',
         background: 'transparent',
         color: 'inherit',
         font: 'inherit',
         fontSize: '15px',
         lineHeight: 1.5,
+        fontWeight: 500,
         textAlign: 'left',
         whiteSpace: 'normal',
         overflowWrap: 'anywhere',
@@ -138,11 +143,21 @@ const ShopperAgentWelcomeMessage = ({
             >
                 <span
                     aria-hidden="true"
-                    style={{display: 'block', fontSize: '22px', marginBottom: '4px'}}
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flex: '0 0 36px',
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '12px',
+                        background: 'rgba(255, 255, 255, 0.14)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)'
+                    }}
                 >
-                    ✨
+                    <SparkleIcon boxSize={5} color="white" focusable="false" />
                 </span>
-                {message}
+                <span style={{minWidth: 0, paddingTop: '2px'}}>{message}</span>
             </button>
             <button
                 type="button"
