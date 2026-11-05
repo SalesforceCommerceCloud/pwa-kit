@@ -33,6 +33,56 @@ export const MISSING_PASSWORDLESS_LOGIN_ID_ERROR = defineMessage({
     id: 'global.error.missing_passwordless_login_id'
 })
 
+export const CONFIRM_PASSWORDLESS_EMAIL_MESSAGE = defineMessage({
+    defaultMessage: 'To finish signing in, enter the email address you used to request the link.',
+    id: 'login_page.info.confirm_passwordless_email'
+})
+
+const PASSWORDLESS_LOGIN_ID_STORAGE_KEY = 'pwdless_login_id'
+// Long enough to cover the SLAS passwordless token lifetime
+export const PASSWORDLESS_LOGIN_ID_TTL_MS = 15 * 60 * 1000
+
+/**
+ * Remembers the exact email sent to authorizePasswordless so a magic link opened in another
+ * tab of the same browser can send it as login_id. Kept out of the magic link URL so the
+ * shopper email doesn't end up in server logs, browser history, or Referer headers.
+ */
+export const rememberPasswordlessLoginId = (loginId) => {
+    if (typeof window === 'undefined' || !loginId) return
+    try {
+        window.localStorage.setItem(
+            PASSWORDLESS_LOGIN_ID_STORAGE_KEY,
+            JSON.stringify({loginId, expiresAt: Date.now() + PASSWORDLESS_LOGIN_ID_TTL_MS})
+        )
+    } catch {
+        // Storage unavailable (e.g. disabled); the landing page asks for the email instead
+    }
+}
+
+export const clearRememberedPasswordlessLoginId = () => {
+    if (typeof window === 'undefined') return
+    try {
+        window.localStorage.removeItem(PASSWORDLESS_LOGIN_ID_STORAGE_KEY)
+    } catch {
+        // Storage unavailable
+    }
+}
+
+/**
+ * Returns the email remembered by rememberPasswordlessLoginId, or null if none or expired.
+ */
+export const getRememberedPasswordlessLoginId = () => {
+    if (typeof window === 'undefined') return null
+    try {
+        const stored = JSON.parse(window.localStorage.getItem(PASSWORDLESS_LOGIN_ID_STORAGE_KEY))
+        if (stored?.loginId && stored.expiresAt > Date.now()) return stored.loginId
+        if (stored) clearRememberedPasswordlessLoginId()
+    } catch {
+        clearRememberedPasswordlessLoginId()
+    }
+    return null
+}
+
 // Shared error patterns for token-based auth features (passwordless login, password reset)
 const TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS = [
     /no callback_uri is registered/i,

@@ -349,13 +349,10 @@ export function extractLocaleFromUrl(urlString) {
 async function sendMagicLinkEmail(req, res, landingPath, notifyType, redirectUrl) {
     const {email_id, token} = req.body
 
+    // The shopper email is deliberately not put in the link (it would end up in server logs,
+    // browser history, and Referer headers). The landing page gets login_id from the browser
+    // that requested the link, or asks the shopper to confirm their email.
     let magicLinkPath = `${landingPath}?token=${encodeURIComponent(token)}`
-    if (
-        (notifyType === 'passwordless-login' || notifyType === 'passwordless-registration') &&
-        email_id
-    ) {
-        magicLinkPath += `&login_id=${encodeURIComponent(email_id)}`
-    }
     // redirect_url is only meaningful for returning users; new-user registration has no prior destination.
     if (notifyType === 'passwordless-login' && redirectUrl) {
         magicLinkPath += `&redirect_url=${encodeURIComponent(redirectUrl)}`

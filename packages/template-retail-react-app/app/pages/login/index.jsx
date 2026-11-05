@@ -8,7 +8,14 @@
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
-import {Box, Container, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Alert,
+    Box,
+    Container,
+    Heading,
+    Text
+} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     AuthHelpers,
     useAuthHelper,
@@ -30,11 +37,15 @@ import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
+    clearRememberedPasswordlessLoginId,
+    CONFIRM_PASSWORDLESS_EMAIL_MESSAGE,
     getAuthorizePasswordlessErrorMessage,
     getLoginPasswordlessErrorMessage,
     getPasswordlessCallbackUrl,
+    getRememberedPasswordlessLoginId,
     MISSING_PASSWORDLESS_LOGIN_ID_ERROR,
     readErrorResponseMessage,
+    rememberPasswordlessLoginId,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -80,6 +91,9 @@ const Login = () => {
     const [isOtpAuthOpen, setIsOtpAuthOpen] = useState(false)
     // Exact email sent to authorizePasswordless — SLAS compares login_id case-sensitively
     const lastEmailSentRef = useRef(null)
+    // Magic-link token waiting for the shopper to confirm their email (link opened in another
+    // browser or device, so the email isn't remembered locally)
+    const [pendingMagicLinkToken, setPendingMagicLinkToken] = useState(null)
 
     const handleMergeBasket = () => {
         const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
@@ -119,6 +133,7 @@ const Login = () => {
                 ...(passwordlessConfigCallback && {callbackURI: passwordlessConfigCallback})
             })
             lastEmailSentRef.current = authorizeEmail
+            rememberPasswordlessLoginId(authorizeEmail)
             setIsOtpAuthOpen(true)
         } catch (error) {
             const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))
@@ -126,14 +141,21 @@ const Login = () => {
         }
     }
 
-    const handleOtpVerification = async (pwdlessLoginToken) => {
+    const handleOtpVerification = async (pwdlessLoginToken, confirmedLoginId) => {
         try {
-            // Prefer authorize-time email; fall back to magic-link login_id query param.
+            // Prefer the email the shopper just confirmed, then the authorize-time email (this page
+            // or another tab of this browser), then a login_id a merchant put in an email-mode link.
             // Do not re-read the editable form — SLAS compares login_id case-sensitively.
-            const loginId = lastEmailSentRef.current || queryParams.get('login_id')
+            // URLSearchParams decodes an unencoded "+" as a space; emails never contain spaces.
+            const loginId =
+                confirmedLoginId ||
+                lastEmailSentRef.current ||
+                getRememberedPasswordlessLoginId() ||
+                queryParams.get('login_id')?.replace(/ /g, '+')
             if (!loginId) {
                 return {
                     success: false,
+                    missingLoginId: true,
                     error: formatMessage(MISSING_PASSWORDLESS_LOGIN_ID_ERROR)
                 }
             }
@@ -142,6 +164,7 @@ const Login = () => {
                 login_id: loginId,
                 channel_id: site.id
             })
+            clearRememberedPasswordlessLoginId()
             return {success: true}
         } catch (e) {
             if (e.response?.status === 429) {
@@ -158,6 +181,15 @@ const Login = () => {
 
     const submitForm = async (data) => {
         form.clearErrors()
+
+        // Finish a magic-link login with the email the shopper confirmed
+        if (pendingMagicLinkToken && !data.password) {
+            const result = await handleOtpVerification(pendingMagicLinkToken, data.email?.trim())
+            if (!result.success) {
+                form.setError('global', {type: 'manual', message: result.error})
+            }
+            return
+        }
 
         // If passwordless is enabled and the password is not provided, handle passwordless login
         if (isPasswordlessEnabled && !data.password) {
@@ -188,10 +220,13 @@ const Login = () => {
                 setRedirectPath('')
             }
 
-            // Surface failures (e.g. a magic link without login_id from an older ssr.js)
-            // instead of leaving the shopper on a silent landing page.
+            // No remembered email (link opened in another browser or device): keep the token and
+            // ask the shopper to confirm their email. Surface any other failure instead of leaving
+            // the shopper on a silent landing page.
             handleOtpVerification(token).then((result) => {
-                if (!result?.success) {
+                if (result?.missingLoginId) {
+                    setPendingMagicLinkToken(token)
+                } else if (!result?.success) {
                     form.setError('global', {type: 'manual', message: result?.error})
                 }
             })
@@ -229,13 +264,21 @@ const Login = () => {
                 marginBottom={8}
                 borderRadius="base"
             >
+                {pendingMagicLinkToken && (
+                    <Alert status="info" marginBottom={8} data-testid="confirm-passwordless-email">
+                        <AlertIcon boxSize={4} />
+                        <Text fontSize="sm" ml={3}>
+                            {formatMessage(CONFIRM_PASSWORDLESS_EMAIL_MESSAGE)}
+                        </Text>
+                    </Alert>
+                )}
                 <LoginForm
                     form={form}
                     submitForm={submitForm}
                     clickCreateAccount={() => navigate('/registration')}
                     handlePasswordlessLoginClick={noop}
                     handleForgotPasswordClick={() => navigate('/reset-password')}
-                    isPasswordlessEnabled={isPasswordlessEnabled}
+                    isPasswordlessEnabled={isPasswordlessEnabled || Boolean(pendingMagicLinkToken)}
                     isSocialEnabled={isSocialEnabled}
                     idps={idps}
                 />
