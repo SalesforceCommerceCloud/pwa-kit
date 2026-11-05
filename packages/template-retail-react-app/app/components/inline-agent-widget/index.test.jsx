@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {createRef as mockCreateRef} from 'react'
 import {screen, act} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import InlineAgentWidget from '@salesforce/retail-react-app/app/components/inline-agent-widget'
+import {handoffToShopperAgent as handoffMock} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-inline-agent-widget', () => {
-    const React = require('react')
     return {
         __esModule: true,
-        default: () => React.createRef(),
+        default: () => mockCreateRef(),
         isConfigured: (config) => {
             if (!config?.enabled) return false
             if (config?.mode === 'shopper-agent') return true
@@ -26,9 +26,6 @@ jest.mock('@salesforce/retail-react-app/app/utils/shopper-agent-handoff', () => 
     __esModule: true,
     handoffToShopperAgent: jest.fn()
 }))
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const {handoffToShopperAgent: handoffMock} = require('@salesforce/retail-react-app/app/utils/shopper-agent-handoff')
 
 const BASE_CONFIG = {
     enabled: true,
@@ -87,6 +84,63 @@ describe('InlineAgentWidget', () => {
         expect(payload.productContext.productName).toBe('Serum')
     })
 
+    test('hands off every embedded interaction with the current PDP context', () => {
+        renderWithProviders(
+            <InlineAgentWidget
+                config={{...BASE_CONFIG, mode: 'shopper-agent'}}
+                productId="500400"
+                productName="Serum"
+            />
+        )
+
+        const questions = [
+            'Is it waterproof?',
+            'What sizes are available?',
+            'Tell me about the fit'
+        ]
+        questions.forEach((question, index) => {
+            act(() => {
+                document.dispatchEvent(
+                    new CustomEvent('inline-agent-widget:handoff', {
+                        detail: {question, source: index === 2 ? 'input' : 'pill'}
+                    })
+                )
+            })
+        })
+
+        expect(handoffMock).toHaveBeenCalledTimes(3)
+        questions.forEach((question, index) => {
+            expect(handoffMock).toHaveBeenNthCalledWith(index + 1, {
+                question,
+                productContext: {
+                    productId: '500400',
+                    productName: 'Serum',
+                    pdpUrl: window.location.href
+                }
+            })
+        })
+    })
+
+    test('removes the handoff listener when the embedded widget unmounts', () => {
+        const {unmount} = renderWithProviders(
+            <InlineAgentWidget
+                config={{...BASE_CONFIG, mode: 'shopper-agent'}}
+                productId="500400"
+            />
+        )
+        unmount()
+
+        act(() => {
+            document.dispatchEvent(
+                new CustomEvent('inline-agent-widget:handoff', {
+                    detail: {question: 'Is it waterproof?'}
+                })
+            )
+        })
+
+        expect(handoffMock).not.toHaveBeenCalled()
+    })
+
     test('ignores handoff events with no question', () => {
         renderWithProviders(
             <InlineAgentWidget
@@ -96,18 +150,14 @@ describe('InlineAgentWidget', () => {
         )
 
         act(() => {
-            document.dispatchEvent(
-                new CustomEvent('inline-agent-widget:handoff', {detail: {}})
-            )
+            document.dispatchEvent(new CustomEvent('inline-agent-widget:handoff', {detail: {}}))
         })
 
         expect(handoffMock).not.toHaveBeenCalled()
     })
 
     test('does not attach a handoff listener in inline mode', () => {
-        renderWithProviders(
-            <InlineAgentWidget config={BASE_CONFIG} productId="500400" />
-        )
+        renderWithProviders(<InlineAgentWidget config={BASE_CONFIG} productId="500400" />)
 
         act(() => {
             document.dispatchEvent(

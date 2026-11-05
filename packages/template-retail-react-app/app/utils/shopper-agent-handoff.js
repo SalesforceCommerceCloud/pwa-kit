@@ -104,9 +104,7 @@ export const handoffToShopperAgent = ({question, productContext = {}} = {}) => {
     }
 
     try {
-        window.dispatchEvent(
-            new CustomEvent(SHOPPER_AGENT_SEED_EVENT, {detail: seed})
-        )
+        window.dispatchEvent(new CustomEvent(SHOPPER_AGENT_SEED_EVENT, {detail: seed}))
     } catch (err) {
         console.error('Shopper Agent handoff: dispatch failed', err)
     }

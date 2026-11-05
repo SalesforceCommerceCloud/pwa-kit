@@ -22,7 +22,9 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
     useEffect(() => {
         if (config.mode !== undefined && !VALID_MODES.includes(config.mode)) {
             console.warn(
-                `InlineAgentWidget: unknown mode "${config.mode}". Expected one of ${VALID_MODES.join(', ')}. Falling back to 'inline'.`
+                `InlineAgentWidget: unknown mode "${
+                    config.mode
+                }". Expected one of ${VALID_MODES.join(', ')}. Falling back to 'inline'.`
             )
         }
     }, [config.mode])

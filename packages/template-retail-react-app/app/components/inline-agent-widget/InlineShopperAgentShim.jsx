@@ -26,7 +26,11 @@ const InlineShopperAgentShim = ({pdpQuestions = [], productName, productId}) => 
     const intl = useIntl()
     const [value, setValue] = useState('')
 
-    const context = {productId, productName, pdpUrl: typeof window !== 'undefined' ? window.location.href : ''}
+    const context = {
+        productId,
+        productName,
+        pdpUrl: typeof window !== 'undefined' ? window.location.href : ''
+    }
 
     const handleSubmit = (question) => {
         const q = (question ?? value).trim()
