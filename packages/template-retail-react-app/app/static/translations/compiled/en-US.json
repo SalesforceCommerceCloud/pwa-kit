@@ -2447,12 +2447,6 @@
       "value": "Order Lookup"
     }
   ],
-  "footer.link.order_status": [
-    {
-      "type": 0,
-      "value": "Order Status"
-    }
-  ],
   "footer.link.privacy_policy": [
     {
       "type": 0,
@@ -2878,7 +2872,7 @@
   "guestOrderLookup.request.button.submit": [
     {
       "type": 0,
-      "value": "Find My Order"
+      "value": "Find Order"
     }
   ],
   "guestOrderLookup.request.error.emailInvalid": [
@@ -2908,19 +2902,19 @@
   "guestOrderLookup.request.heading": [
     {
       "type": 0,
-      "value": "Look Up Your Order"
+      "value": "Order Lookup"
     }
   ],
   "guestOrderLookup.request.label.email": [
     {
       "type": 0,
-      "value": "Email address"
+      "value": "Email Address"
     }
   ],
   "guestOrderLookup.request.label.orderNumber": [
     {
       "type": 0,
-      "value": "Order number"
+      "value": "Order Number"
     }
   ],
   "guestOrderLookup.request.sessionExpired": [
@@ -2932,7 +2926,7 @@
   "guestOrderLookup.request.subtext": [
     {
       "type": 0,
-      "value": "Enter your order details to track your order or view your receipt."
+      "value": "Enter your order number and the email address you used for the order. The email address can't be associated with a registered account."
     }
   ],
   "guestOrderLookup.verify.button.submit": [
@@ -2998,7 +2992,7 @@
   "guestOrderLookup.verify.subtext": [
     {
       "type": 0,
-      "value": "We've sent a verification code to "
+      "value": "Enter the verification code that we sent to "
     },
     {
       "type": 1,
@@ -3006,7 +3000,7 @@
     },
     {
       "type": 0,
-      "value": ". Please enter it below."
+      "value": "."
     }
   ],
   "header.button.assistive_msg.ask_shopping_agent": [
