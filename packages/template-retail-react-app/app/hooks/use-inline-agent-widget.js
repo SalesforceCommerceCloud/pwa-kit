@@ -79,7 +79,7 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
         if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
         if (config.persistSession !== false) el.setAttribute('persist-session', '')
         if (config.enableLogging) el.setAttribute('enable-logging', '')
-        if (config.preWarm && config.preWarm !== 'off') el.setAttribute('pre-warm', config.preWarm)
+        if (config.preWarm) el.setAttribute('pre-warm', 'viewport')
         // Seed pdp-questions at create time when we already have them, so the
         // pills paint in the same frame the widget mounts (no visible pop-in
         // from the attribute-sync effect below).

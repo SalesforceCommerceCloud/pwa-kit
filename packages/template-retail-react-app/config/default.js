@@ -251,7 +251,7 @@ module.exports = {
             placeholder: '',
             persistSession: true,
             enableLogging: false,
-            preWarm: 'off'
+            preWarm: true
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
