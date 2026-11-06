@@ -39,6 +39,7 @@ import {
     getPasswordResetErrorMessage,
     MISSING_PASSWORDLESS_LOGIN_ID_ERROR,
     readErrorResponseMessage,
+    rememberPasswordlessLoginId,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -117,6 +118,7 @@ export const AuthModal = ({
                 ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
             })
             lastEmailSentRef.current = authorizeEmail
+            rememberPasswordlessLoginId(authorizeEmail)
             return {success: true}
         } catch (error) {
             const message = formatMessage(getAuthorizePasswordlessErrorMessage(error.message))

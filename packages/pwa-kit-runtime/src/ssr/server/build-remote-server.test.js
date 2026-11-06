@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {isBinary, once, RemoteServerFactory} from './build-remote-server'
+import {isBinary, once, RemoteServerFactory, redactUrlForLogging} from './build-remote-server'
 import {
     X_ENCODED_HEADERS,
     X_SITE_ID,
@@ -2630,5 +2630,30 @@ describe('URL reconstruction for request processing', () => {
         const cleanPath = '/mobify/bundle'
         const newUrl = cleanPath + search
         expect(newUrl).toBe('/mobify/bundle?v=1&t=2')
+    })
+})
+
+describe('redactUrlForLogging', () => {
+    test.each([
+        ['/', '/'],
+        ['/category/mens', '/category/mens'],
+        ['/search?q=shoes&page=2', '/search?q=shoes&page=2'],
+        [
+            '/passwordless-login-landing?token=12345678&login_id=jane%2Bx%40example.com&redirect_url=%2Faccount',
+            '/passwordless-login-landing?token=[REDACTED]&login_id=[REDACTED]&redirect_url=%2Faccount'
+        ],
+        [
+            '/reset-password-landing?token=abc&email=jane%40example.com',
+            '/reset-password-landing?token=[REDACTED]&email=[REDACTED]'
+        ],
+        ['/login?email', '/login?email=[REDACTED]'],
+        ['/login?login%5Fid=jane%40example.com', '/login?login%5Fid=[REDACTED]'],
+        ['/login?tokenish=1', '/login?tokenish=1']
+    ])('%s -> %s', (url, expected) => {
+        expect(redactUrlForLogging(url)).toBe(expected)
+    })
+
+    test('returns falsy input unchanged', () => {
+        expect(redactUrlForLogging(undefined)).toBeUndefined()
     })
 })

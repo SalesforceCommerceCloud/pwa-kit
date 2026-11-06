@@ -17,7 +17,10 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 // Components
 import {Skeleton} from '{{template.source.name}}/app/components/shared/ui'
 import {configureRoutes} from '{{template.source.name}}/app/utils/routes-utils'
-import {routes as _routes} from '{{template.source.name}}/app/routes'
+import {
+    routes as _routes,
+    getDynamicRoutes
+} from '{{template.source.name}}/app/routes'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -54,35 +57,45 @@ const routes = [
     // remove routes from the base template that we want to go to SFRA
     ..._routes.filter((route) => {
         return !(route.path === '/cart' || route.path === '/checkout' || route.path === '*')
-    }),
-    {
-        path: '*',
-        component: withRouter((props) => {
-            const { location, history } = props
-            const urlParams = new URLSearchParams(location.search)
-
-            useEffect(() => {
-                const newURL = new URL(window.location)
-                if (!urlParams.has('redirected')) {
-                    newURL.searchParams.append('redirected', '1')
-                    window.location.href = newURL
-                }
-            }, [location.pathname])
-            if (urlParams.has('redirected')) {
-                return <PageNotFound {...props} />
-            }
-            return null
-        })
-    }
+    })
     {{else}}
     ..._routes
     {{/if}}
 ]
+{{#if answers.project.hybrid}}
+
+// Keep the catch-all last so it doesn't match before the dynamic routes
+const catchAllRoute = {
+    path: '*',
+    component: withRouter((props) => {
+        const { location, history } = props
+        const urlParams = new URLSearchParams(location.search)
+
+        useEffect(() => {
+            const newURL = new URL(window.location)
+            if (!urlParams.has('redirected')) {
+                newURL.searchParams.append('redirected', '1')
+                window.location.href = newURL
+            }
+        }, [location.pathname])
+        if (urlParams.has('redirected')) {
+            return <PageNotFound {...props} />
+        }
+        return null
+    })
+}
+{{/if}}
 
 {{!-- export default routes --}}
 export default () => {
     const config = getConfig()
-    return configureRoutes(routes, config, {
-        ignoredRoutes: ['/callback', '*']
-    })
+    // getDynamicRoutes adds the routes gated by config, such as the reset password and
+    // passwordless login landing pages that the emailed magic links open
+    return configureRoutes(
+        [...routes, ...getDynamicRoutes(config){{#if answers.project.hybrid}}, catchAllRoute{{/if}}],
+        config,
+        {
+            ignoredRoutes: ['/callback', '*']
+        }
+    )
 }

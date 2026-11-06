@@ -18,6 +18,10 @@ import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {
+    getRememberedPasswordlessLoginId,
+    rememberPasswordlessLoginId
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn(() => mockConfig)
@@ -79,6 +83,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
 // Set up and clean up
 beforeEach(() => {
     jest.clearAllMocks()
+    window.localStorage.clear()
     getConfig.mockReturnValue(mockConfig)
 
     // Reset useRouteMatch mock to return path based on window.location.pathname
@@ -234,6 +239,129 @@ describe('Passwordless landing tests', function () {
             login_id: loginId,
             channel_id: 'site-1'
         })
+    })
+
+    test('uses the email remembered at authorize time when the link has no login_id', async () => {
+        const token = '77777777'
+        const loginId = 'Shopper+Tag@example.com'
+        rememberPasswordlessLoginId(loginId)
+        window.history.pushState(
+            {},
+            'Passwordless Login Landing',
+            createPathWithDefaults(`/passwordless-login-landing?token=${token}`)
+        )
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app
+            }
+        })
+
+        await waitFor(() => {
+            expect(
+                mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
+            ).toHaveBeenCalledWith({
+                pwdlessLoginToken: token,
+                login_id: loginId,
+                channel_id: 'site-1'
+            })
+        })
+        await waitFor(() => {
+            expect(getRememberedPasswordlessLoginId()).toBeNull()
+        })
+    })
+
+    test('restores a "+" in a login_id query param that was not URL-encoded', async () => {
+        const token = '88888888'
+        window.history.pushState(
+            {},
+            'Passwordless Login Landing',
+            createPathWithDefaults(
+                `/passwordless-login-landing?token=${token}&login_id=shopper+tag@example.com`
+            )
+        )
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app
+            }
+        })
+
+        await waitFor(() => {
+            expect(
+                mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
+            ).toHaveBeenCalledWith({
+                pwdlessLoginToken: token,
+                login_id: 'shopper+tag@example.com',
+                channel_id: 'site-1'
+            })
+        })
+    })
+
+    test('asks the shopper to confirm their email when none is remembered, then logs in', async () => {
+        const token = '55555555'
+        const loginId = 'shopper@example.com'
+        window.history.pushState(
+            {},
+            'Passwordless Login Landing',
+            createPathWithDefaults(`/passwordless-login-landing?token=${token}`)
+        )
+        const {user, findByTestId, getByLabelText, getByRole} = renderWithProviders(
+            <MockedComponent />,
+            {
+                wrapperProps: {
+                    siteAlias: 'uk',
+                    locale: {id: 'en-GB'},
+                    appConfig: mockConfig.app
+                }
+            }
+        )
+
+        expect(await findByTestId('confirm-passwordless-email')).toBeInTheDocument()
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
+        ).not.toHaveBeenCalled()
+
+        await user.type(getByLabelText('Email'), ` ${loginId} `)
+        await user.click(getByRole('button', {name: /continue/i}))
+
+        await waitFor(() => {
+            expect(
+                mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
+            ).toHaveBeenCalledWith({
+                pwdlessLoginToken: token,
+                login_id: loginId,
+                channel_id: 'site-1'
+            })
+        })
+    })
+
+    test('shows an error when passwordless login fails on the landing page', async () => {
+        const token = '66666666'
+        const loginId = 'shopper@example.com'
+        mockAuthHelperFunctions[
+            AuthHelpers.LoginPasswordlessUser
+        ].mutateAsync.mockRejectedValueOnce(
+            Object.assign(new Error('Too many requests'), {response: {status: 429}})
+        )
+        window.history.pushState(
+            {},
+            'Passwordless Login Landing',
+            createPathWithDefaults(
+                `/passwordless-login-landing?token=${token}&login_id=${encodeURIComponent(loginId)}`
+            )
+        )
+        const {findByText} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app
+            }
+        })
+
+        expect(await findByText(/You reached the limit for login attempts/i)).toBeInTheDocument()
     })
 
     test('landing path changes based on config', async () => {
