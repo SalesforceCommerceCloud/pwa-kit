@@ -134,38 +134,12 @@ describe('Passwordless landing tests', function () {
 
     test('redirects to account page when redirect url is not passed', async () => {
         const token = '12345678'
-        window.history.pushState(
-            {},
-            'Passwordless Login Landing',
-            createPathWithDefaults(`/passwordless-login-landing?token=${token}`)
-        )
-        renderWithProviders(<MockedComponent />, {
-            wrapperProps: {
-                siteAlias: 'uk',
-                locale: {id: 'en-GB'},
-                appConfig: mockConfig.app
-            }
-        })
-
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
-        ).toHaveBeenCalledWith({
-            pwdlessLoginToken: token
-        })
-
-        await waitFor(() => {
-            expect(window.location.pathname).toBe('/uk/en-GB/account')
-        })
-    })
-
-    test('redirects to redirectUrl when passed as param', async () => {
-        const token = '12345678'
-        const redirectUrl = '/womens-tops'
+        const loginId = 'shopper@example.com'
         window.history.pushState(
             {},
             'Passwordless Login Landing',
             createPathWithDefaults(
-                `/passwordless-login-landing?token=${token}&redirect_url=${redirectUrl}`
+                `/passwordless-login-landing?token=${token}&login_id=${encodeURIComponent(loginId)}`
             )
         )
         renderWithProviders(<MockedComponent />, {
@@ -179,7 +153,43 @@ describe('Passwordless landing tests', function () {
         expect(
             mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
         ).toHaveBeenCalledWith({
-            pwdlessLoginToken: token
+            pwdlessLoginToken: token,
+            login_id: loginId,
+            channel_id: 'site-1'
+        })
+
+        await waitFor(() => {
+            expect(window.location.pathname).toBe('/uk/en-GB/account')
+        })
+    })
+
+    test('redirects to redirectUrl when passed as param', async () => {
+        const token = '12345678'
+        const loginId = 'shopper@example.com'
+        const redirectUrl = '/womens-tops'
+        window.history.pushState(
+            {},
+            'Passwordless Login Landing',
+            createPathWithDefaults(
+                `/passwordless-login-landing?token=${token}&login_id=${encodeURIComponent(
+                    loginId
+                )}&redirect_url=${redirectUrl}`
+            )
+        )
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app
+            }
+        })
+
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
+        ).toHaveBeenCalledWith({
+            pwdlessLoginToken: token,
+            login_id: loginId,
+            channel_id: 'site-1'
         })
 
         await waitFor(() => {
@@ -189,12 +199,15 @@ describe('Passwordless landing tests', function () {
 
     test('detects landing path when at the end of path', async () => {
         const token = '33333333'
+        const loginId = 'shopper@example.com'
         const loginPath = '/global/en-GB/passwordless-login-landing'
         // mockRouteMatch.mockReturnValue({path: loginPath})
         window.history.pushState(
             {},
             'Passwordless Login Landing',
-            createPathWithDefaults(`${loginPath}?token=${token}`)
+            createPathWithDefaults(
+                `${loginPath}?token=${token}&login_id=${encodeURIComponent(loginId)}`
+            )
         )
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
@@ -208,19 +221,24 @@ describe('Passwordless landing tests', function () {
             expect(
                 mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
             ).toHaveBeenCalledWith({
-                pwdlessLoginToken: token
+                pwdlessLoginToken: token,
+                login_id: loginId,
+                channel_id: 'site-1'
             })
         })
 
         expect(
             mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
         ).toHaveBeenCalledWith({
-            pwdlessLoginToken: token
+            pwdlessLoginToken: token,
+            login_id: loginId,
+            channel_id: 'site-1'
         })
     })
 
     test('landing path changes based on config', async () => {
         const token = '44444444'
+        const loginId = 'shopper@example.com'
         const customLandingPath = '/custom-passwordless-login-landing'
         const mockConfigWithCustomLandingPath = {
             ...mockConfig,
@@ -242,7 +260,9 @@ describe('Passwordless landing tests', function () {
         window.history.pushState(
             {},
             'Passwordless Login Landing',
-            createPathWithDefaults(`${customLandingPath}?token=${token}`)
+            createPathWithDefaults(
+                `${customLandingPath}?token=${token}&login_id=${encodeURIComponent(loginId)}`
+            )
         )
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
@@ -255,7 +275,9 @@ describe('Passwordless landing tests', function () {
         expect(
             mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync
         ).toHaveBeenCalledWith({
-            pwdlessLoginToken: token
+            pwdlessLoginToken: token,
+            login_id: loginId,
+            channel_id: 'site-1'
         })
     })
 })

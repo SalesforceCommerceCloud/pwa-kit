@@ -604,6 +604,26 @@ describe('passwordlessLoginCallback route handler', () => {
         const sentBody = JSON.parse(fetchSpy.mock.calls[0][1].body)
         expect(sentBody.type).toBe('passwordless-login')
     })
+
+    test.each([
+        [{}, 'passwordless-login'],
+        [{register: 'true'}, 'passwordless-registration']
+    ])('includes login_id in magic link for %j notify type', async (query, expectedType) => {
+        const email = 'shopper+tag@example.com'
+        jose.jwtVerify.mockResolvedValueOnce({
+            payload: {iss: 'prefix/prefix2/test_001/oauth2', email_id: email}
+        })
+        const req = makeReq({
+            body: {email_id: email, token: 'tok'},
+            headers: {'x-slas-callback-token': 'valid-token'},
+            query
+        })
+        await passwordlessLoginCallbackHandler(req, mockRes)
+        const sentBody = JSON.parse(fetchSpy.mock.calls[0][1].body)
+        expect(sentBody.type).toBe(expectedType)
+        expect(sentBody.data.magicLinkPath).toContain(`login_id=${encodeURIComponent(email)}`)
+        expect(sentBody.data.magicLinkPath).toContain('token=tok')
+    })
 })
 
 describe('extractLocaleFromUrl', () => {
