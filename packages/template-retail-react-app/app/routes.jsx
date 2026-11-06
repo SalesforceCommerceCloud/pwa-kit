@@ -148,19 +148,23 @@ export const routes = [
     }
 ]
 
-export default () => {
-    const config = getConfig()
+/**
+ * Routes that are only added when their feature is enabled in config (reset password and
+ * passwordless landing pages, social login redirect, guest order lookup, Shopper Agent).
+ * Exported so projects that extend this template can include them in their own routes.
+ */
+export const getDynamicRoutes = (config = getConfig()) => {
     const loginConfig = config?.app?.login
     const resetPasswordLandingPath = loginConfig?.resetPassword?.landingPath
     const socialLoginEnabled = loginConfig?.social?.enabled
     const socialRedirectURI = loginConfig?.social?.redirectURI
     const passwordlessLoginEnabled = loginConfig?.passwordless?.enabled
     const passwordlessLoginLandingPath = loginConfig?.passwordless?.landingPath
-    const guestOrderLookupEnabled = getConfig()?.app?.guestOrderLookup?.enabled
+    const guestOrderLookupEnabled = config?.app?.guestOrderLookup?.enabled
     const commerceAgentEnabled = getCommerceAgentConfig()?.enabled === 'true'
 
     // Add dynamic routes conditionally (only if features are enabled and paths are defined)
-    const dynamicRoutes = [
+    return [
         resetPasswordLandingPath && {
             path: resetPasswordLandingPath,
             component: ResetPassword,
@@ -211,8 +215,11 @@ export default () => {
             sensitive: true
         }
     ].filter(Boolean)
+}
 
-    const allRoutes = configureRoutes([...routes, ...dynamicRoutes], config, {
+export default () => {
+    const config = getConfig()
+    const allRoutes = configureRoutes([...routes, ...getDynamicRoutes(config)], config, {
         ignoredRoutes: ['/callback'],
         fuzzyPathMatching: true
     })
