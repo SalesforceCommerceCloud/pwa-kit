@@ -203,7 +203,7 @@ const GuestOrderLookupVerify = () => {
                                 {
                                     id: 'guestOrderLookup.verify.subtext',
                                     defaultMessage:
-                                        "We've sent a verification code to {email}. Please enter it below."
+                                        'Enter the verification code that we sent to {email}.'
                                 },
                                 {email}
                             )}

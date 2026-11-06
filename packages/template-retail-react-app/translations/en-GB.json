@@ -981,9 +981,6 @@
   "footer.link.order_lookup": {
     "defaultMessage": "Order Lookup"
   },
-  "footer.link.order_status": {
-    "defaultMessage": "Order Status"
-  },
   "footer.link.privacy_policy": {
     "defaultMessage": "Privacy Policy"
   },
@@ -1150,7 +1147,7 @@
     "defaultMessage": "Shipping Address"
   },
   "guestOrderLookup.request.button.submit": {
-    "defaultMessage": "Find My Order"
+    "defaultMessage": "Find Order"
   },
   "guestOrderLookup.request.error.emailInvalid": {
     "defaultMessage": "Enter a valid email address"
@@ -1165,19 +1162,19 @@
     "defaultMessage": "Order number is required"
   },
   "guestOrderLookup.request.heading": {
-    "defaultMessage": "Look Up Your Order"
+    "defaultMessage": "Order Lookup"
   },
   "guestOrderLookup.request.label.email": {
-    "defaultMessage": "Email address"
+    "defaultMessage": "Email Address"
   },
   "guestOrderLookup.request.label.orderNumber": {
-    "defaultMessage": "Order number"
+    "defaultMessage": "Order Number"
   },
   "guestOrderLookup.request.sessionExpired": {
     "defaultMessage": "Your session has expired. Please look up your order again."
   },
   "guestOrderLookup.request.subtext": {
-    "defaultMessage": "Enter your order details to track your order or view your receipt."
+    "defaultMessage": "Enter your order number and the email address you used for the order. The email address can't be associated with a registered account."
   },
   "guestOrderLookup.verify.button.submit": {
     "defaultMessage": "Verify Code"
@@ -1204,7 +1201,7 @@
     "defaultMessage": "Your email address"
   },
   "guestOrderLookup.verify.subtext": {
-    "defaultMessage": "We've sent a verification code to {email}. Please enter it below."
+    "defaultMessage": "Enter the verification code that we sent to {email}."
   },
   "header.button.assistive_msg.ask_shopping_agent": {
     "defaultMessage": "Ask Shopping Agent"
