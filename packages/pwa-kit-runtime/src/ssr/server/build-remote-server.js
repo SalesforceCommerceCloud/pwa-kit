@@ -263,8 +263,8 @@ const handleHttpOnlyCookiesOnProxyRes = (
 export const REDACTED_LOG_QUERY_PARAMS = Object.freeze(['token', 'login_id', 'email'])
 
 /**
- * Masks the values of sensitive query parameters in a request URL so they are
- * not written to request logs. Other parameters are left untouched.
+ * Masks the values of sensitive query parameters (matched case-insensitively) in a
+ * request URL so they are not written to request logs. Other parameters are left untouched.
  *
  * @private
  */
@@ -284,7 +284,9 @@ export const redactUrlForLogging = (url) => {
             } catch {
                 // Leave malformed keys as-is
             }
-            return REDACTED_LOG_QUERY_PARAMS.includes(key) ? `${rawKey}=[REDACTED]` : pair
+            return REDACTED_LOG_QUERY_PARAMS.includes(key.toLowerCase())
+                ? `${rawKey}=[REDACTED]`
+                : pair
         })
         .join('&')
     return `${url.slice(0, queryIndex)}?${query}`

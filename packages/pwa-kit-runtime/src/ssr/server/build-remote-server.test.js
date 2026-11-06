@@ -2648,6 +2648,7 @@ describe('redactUrlForLogging', () => {
         ],
         ['/login?email', '/login?email=[REDACTED]'],
         ['/login?login%5Fid=jane%40example.com', '/login?login%5Fid=[REDACTED]'],
+        ['/login?Token=abc&EMAIL=jane%40example.com', '/login?Token=[REDACTED]&EMAIL=[REDACTED]'],
         ['/login?tokenish=1', '/login?tokenish=1']
     ])('%s -> %s', (url, expected) => {
         expect(redactUrlForLogging(url)).toBe(expected)
