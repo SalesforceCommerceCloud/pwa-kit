@@ -22,6 +22,7 @@ import {
     rememberPasswordResetEmail,
     getRememberedPasswordResetEmail,
     clearRememberedPasswordResetEmail,
+    clearRememberedAuthEmails,
     PASSWORDLESS_LOGIN_ID_TTL_MS,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE,
     TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
@@ -261,5 +262,15 @@ describe('remembered password reset email', () => {
         rememberPasswordResetEmail('shopper@example.com')
         clearRememberedPasswordResetEmail()
         expect(getRememberedPasswordResetEmail()).toBeNull()
+    })
+})
+
+describe('clearRememberedAuthEmails', () => {
+    test('removes both remembered emails', () => {
+        rememberPasswordlessLoginId('shopper@example.com')
+        rememberPasswordResetEmail('shopper@example.com')
+        clearRememberedAuthEmails()
+        expect(window.localStorage.getItem('pwdless_login_id')).toBeNull()
+        expect(window.localStorage.getItem('pwd_reset_email')).toBeNull()
     })
 })

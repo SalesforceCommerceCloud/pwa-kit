@@ -51,6 +51,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {
+    clearRememberedAuthEmails,
     getAuthorizePasswordlessErrorMessage,
     getPasswordlessCallbackUrl,
     MISSING_PASSWORDLESS_LOGIN_ID_ERROR,
@@ -742,6 +743,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 isOpen={signOutConfirmDialogIsOpen}
                 onClose={() => setSignOutConfirmDialogIsOpen(false)}
                 onConfirm={async () => {
+                    clearRememberedAuthEmails()
                     await logout.mutateAsync()
                     setSignOutConfirmDialogIsOpen(false)
                     navigate('/')

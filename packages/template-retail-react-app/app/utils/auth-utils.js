@@ -109,6 +109,15 @@ export const clearRememberedPasswordResetEmail = () =>
 export const getRememberedPasswordResetEmail = () =>
     getRememberedEmail(PASSWORD_RESET_EMAIL_STORAGE_KEY)
 
+/**
+ * Clears both remembered emails. Call on logout so an email saved for an unused link
+ * doesn't stay in storage after the session ends (e.g. on a shared computer).
+ */
+export const clearRememberedAuthEmails = () => {
+    clearRememberedPasswordlessLoginId()
+    clearRememberedPasswordResetEmail()
+}
+
 // Shared error patterns for token-based auth features (passwordless login, password reset)
 const TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS = [
     /no callback_uri is registered/i,
