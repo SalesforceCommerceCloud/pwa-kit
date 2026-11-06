@@ -19,6 +19,9 @@ import {
     rememberPasswordlessLoginId,
     getRememberedPasswordlessLoginId,
     clearRememberedPasswordlessLoginId,
+    rememberPasswordResetEmail,
+    getRememberedPasswordResetEmail,
+    clearRememberedPasswordResetEmail,
     PASSWORDLESS_LOGIN_ID_TTL_MS,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE,
     TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
@@ -220,5 +223,43 @@ describe('remembered passwordless login ID', () => {
     test('does not store an empty email', () => {
         rememberPasswordlessLoginId('')
         expect(window.localStorage.getItem('pwdless_login_id')).toBeNull()
+    })
+})
+
+describe('remembered password reset email', () => {
+    beforeEach(() => {
+        window.localStorage.clear()
+    })
+
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
+    test('returns the exact email that was remembered', () => {
+        rememberPasswordResetEmail('Shopper+Tag@example.com')
+        expect(getRememberedPasswordResetEmail()).toBe('Shopper+Tag@example.com')
+    })
+
+    test('is stored separately from the passwordless email', () => {
+        rememberPasswordResetEmail('reset@example.com')
+        rememberPasswordlessLoginId('passwordless@example.com')
+        expect(getRememberedPasswordResetEmail()).toBe('reset@example.com')
+        clearRememberedPasswordlessLoginId()
+        expect(getRememberedPasswordResetEmail()).toBe('reset@example.com')
+    })
+
+    test('returns null and clears the entry once it expires', () => {
+        const now = Date.now()
+        jest.spyOn(Date, 'now').mockReturnValue(now)
+        rememberPasswordResetEmail('shopper@example.com')
+        Date.now.mockReturnValue(now + PASSWORDLESS_LOGIN_ID_TTL_MS + 1)
+        expect(getRememberedPasswordResetEmail()).toBeNull()
+        expect(window.localStorage.getItem('pwd_reset_email')).toBeNull()
+    })
+
+    test('clearRememberedPasswordResetEmail removes the entry', () => {
+        rememberPasswordResetEmail('shopper@example.com')
+        clearRememberedPasswordResetEmail()
+        expect(getRememberedPasswordResetEmail()).toBeNull()
     })
 })

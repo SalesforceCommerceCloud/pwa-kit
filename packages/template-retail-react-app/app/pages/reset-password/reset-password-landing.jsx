@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
@@ -24,6 +24,7 @@ import useUpdatePasswordFields from '@salesforce/retail-react-app/app/components
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
+    getRememberedPasswordResetEmail,
     getResetPasswordActionErrorMessage,
     readErrorResponseMessage,
     TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
@@ -40,6 +41,15 @@ const ResetPasswordLanding = () => {
     const fields = useUpdatePasswordFields({form})
     const password = form.watch('password')
     const {resetPassword} = usePasswordReset()
+
+    // Prefill the email this browser requested the link for. Read after mount because
+    // localStorage isn't available during server rendering.
+    useEffect(() => {
+        const rememberedEmail = getRememberedPasswordResetEmail()
+        if (rememberedEmail && !form.getValues('email')) {
+            form.setValue('email', rememberedEmail)
+        }
+    }, [])
 
     const submit = async (values) => {
         form.clearErrors()

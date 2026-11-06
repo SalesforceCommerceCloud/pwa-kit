@@ -39,19 +39,15 @@ export const CONFIRM_PASSWORDLESS_EMAIL_MESSAGE = defineMessage({
 })
 
 const PASSWORDLESS_LOGIN_ID_STORAGE_KEY = 'pwdless_login_id'
-// Long enough to cover the SLAS passwordless token lifetime
+const PASSWORD_RESET_EMAIL_STORAGE_KEY = 'pwd_reset_email'
+// Long enough to cover the SLAS passwordless and password reset token lifetimes
 export const PASSWORDLESS_LOGIN_ID_TTL_MS = 15 * 60 * 1000
 
-/**
- * Remembers the exact email sent to authorizePasswordless so a magic link opened in another
- * tab of the same browser can send it as login_id. Kept out of the magic link URL so the
- * shopper email doesn't end up in server logs, browser history, or Referer headers.
- */
-export const rememberPasswordlessLoginId = (loginId) => {
+const rememberEmail = (storageKey, loginId) => {
     if (typeof window === 'undefined' || !loginId) return
     try {
         window.localStorage.setItem(
-            PASSWORDLESS_LOGIN_ID_STORAGE_KEY,
+            storageKey,
             JSON.stringify({loginId, expiresAt: Date.now() + PASSWORDLESS_LOGIN_ID_TTL_MS})
         )
     } catch {
@@ -59,29 +55,59 @@ export const rememberPasswordlessLoginId = (loginId) => {
     }
 }
 
-export const clearRememberedPasswordlessLoginId = () => {
+const clearRememberedEmail = (storageKey) => {
     if (typeof window === 'undefined') return
     try {
-        window.localStorage.removeItem(PASSWORDLESS_LOGIN_ID_STORAGE_KEY)
+        window.localStorage.removeItem(storageKey)
     } catch {
         // Storage unavailable
     }
 }
 
-/**
- * Returns the email remembered by rememberPasswordlessLoginId, or null if none or expired.
- */
-export const getRememberedPasswordlessLoginId = () => {
+const getRememberedEmail = (storageKey) => {
     if (typeof window === 'undefined') return null
     try {
-        const stored = JSON.parse(window.localStorage.getItem(PASSWORDLESS_LOGIN_ID_STORAGE_KEY))
+        const stored = JSON.parse(window.localStorage.getItem(storageKey))
         if (stored?.loginId && stored.expiresAt > Date.now()) return stored.loginId
-        if (stored) clearRememberedPasswordlessLoginId()
+        if (stored) clearRememberedEmail(storageKey)
     } catch {
-        clearRememberedPasswordlessLoginId()
+        clearRememberedEmail(storageKey)
     }
     return null
 }
+
+/**
+ * Remembers the exact email sent to authorizePasswordless so a magic link opened in another
+ * tab of the same browser can send it as login_id. Kept out of the magic link URL so the
+ * shopper email doesn't end up in server logs, browser history, or Referer headers.
+ */
+export const rememberPasswordlessLoginId = (loginId) =>
+    rememberEmail(PASSWORDLESS_LOGIN_ID_STORAGE_KEY, loginId)
+
+export const clearRememberedPasswordlessLoginId = () =>
+    clearRememberedEmail(PASSWORDLESS_LOGIN_ID_STORAGE_KEY)
+
+/**
+ * Returns the email remembered by rememberPasswordlessLoginId, or null if none or expired.
+ */
+export const getRememberedPasswordlessLoginId = () =>
+    getRememberedEmail(PASSWORDLESS_LOGIN_ID_STORAGE_KEY)
+
+/**
+ * Remembers the email a password reset link was requested for, so the reset landing page
+ * opened in the same browser can prefill it. Stored separately from the passwordless email.
+ */
+export const rememberPasswordResetEmail = (email) =>
+    rememberEmail(PASSWORD_RESET_EMAIL_STORAGE_KEY, email)
+
+export const clearRememberedPasswordResetEmail = () =>
+    clearRememberedEmail(PASSWORD_RESET_EMAIL_STORAGE_KEY)
+
+/**
+ * Returns the email remembered by rememberPasswordResetEmail, or null if none or expired.
+ */
+export const getRememberedPasswordResetEmail = () =>
+    getRememberedEmail(PASSWORD_RESET_EMAIL_STORAGE_KEY)
 
 // Shared error patterns for token-based auth features (passwordless login, password reset)
 const TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS = [

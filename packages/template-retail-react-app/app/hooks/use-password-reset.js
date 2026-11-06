@@ -9,7 +9,11 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useIntl} from 'react-intl'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {
+    clearRememberedPasswordResetEmail,
+    getPasswordlessCallbackUrl,
+    rememberPasswordResetEmail
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 /**
  * This hook provides commerce-react-sdk hooks to simplify the reset password flow.
@@ -32,6 +36,8 @@ export const usePasswordReset = () => {
             locale: locale.id,
             ...(callbackURI && {callback_uri: callbackURI})
         })
+        // Lets the reset landing page prefill the email; the link doesn't carry it
+        rememberPasswordResetEmail(email)
     }
 
     const resetPassword = async ({email, token, newPassword}) => {
@@ -39,6 +45,7 @@ export const usePasswordReset = () => {
             {user_id: email, pwd_action_token: token, new_password: newPassword},
             {
                 onSuccess: () => {
+                    clearRememberedPasswordResetEmail()
                     showToast({
                         title: formatMessage({
                             defaultMessage: 'Password Reset Success',

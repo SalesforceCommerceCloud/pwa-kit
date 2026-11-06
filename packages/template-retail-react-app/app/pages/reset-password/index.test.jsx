@@ -13,6 +13,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/test-utils'
 import ResetPassword from '.'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {rememberPasswordResetEmail} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const mockUseRouteMatch = jest.fn(() => ({path: '/'}))
 
@@ -136,4 +137,36 @@ test.each([
     await waitFor(() => {
         expect(screen.getByText(/confirm new password/i)).toBeInTheDocument()
     })
+})
+
+test('prefills the email this browser requested the reset link for', async () => {
+    rememberPasswordResetEmail('Shopper+Tag@example.com')
+    window.history.pushState(
+        {},
+        'Reset Password',
+        createPathWithDefaults('/uk/en-GB/reset-password-landing?token=12345678')
+    )
+
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    await waitFor(() => {
+        expect(screen.getByLabelText('Email')).toHaveValue('Shopper+Tag@example.com')
+    })
+})
+
+test('leaves the email empty when this browser did not request the reset link', async () => {
+    window.history.pushState(
+        {},
+        'Reset Password',
+        createPathWithDefaults('/uk/en-GB/reset-password-landing?token=12345678')
+    )
+
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    expect(await screen.findByText(/confirm new password/i)).toBeInTheDocument()
+    expect(screen.getByLabelText('Email')).toHaveValue('')
 })
