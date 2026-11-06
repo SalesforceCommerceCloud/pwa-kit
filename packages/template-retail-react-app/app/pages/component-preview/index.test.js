@@ -24,7 +24,7 @@ jest.mock('@salesforce/commerce-sdk-react/page-designer', () => {
     const actual = jest.requireActual('@salesforce/commerce-sdk-react/page-designer')
     return {
         ...actual,
-
+        // eslint-disable-next-line react/prop-types
         Page: jest.fn((props) => actual.Page(props))
     }
 })
