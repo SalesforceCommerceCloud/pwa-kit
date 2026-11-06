@@ -1669,7 +1669,7 @@ class Auth {
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
      * Requires `login_id` and `channel_id`; forwards them to the helper as camelCase
-     * `loginId` / `channelId` (commerce-sdk-isomorphic@6.0.0 maps these to the wire body).
+     * `loginId` / `channelId` (commerce-sdk-isomorphic@5.8.0 maps these to the wire body).
      */
     async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
         const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
