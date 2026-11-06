@@ -250,7 +250,8 @@ module.exports = {
             esDeveloperName: '',
             placeholder: '',
             persistSession: true,
-            enableLogging: false
+            enableLogging: false,
+            preWarm: true
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
