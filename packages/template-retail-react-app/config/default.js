@@ -255,12 +255,7 @@ module.exports = {
             placeholder: '',
             persistSession: true,
             enableLogging: false,
-            // 'inline' (default) renders the UMD custom element with its own SCRT2 session.
-            // 'shopper-agent' renders a non-conversational shim that hands shopper
-            // questions off to the main Shopper Agent drawer. 'hybrid' is reserved —
-            // PDP-scoped questions stay inline, non-PDP routes to the main drawer;
-            // currently falls back to inline until the per-pill routing lands.
-            // Override via EMBEDDED_AGENT_COMMERCE_SETTINGS JSON on MRT.
+            preWarm: true,
             mode: 'inline',
             ...(parseSettings(process.env.EMBEDDED_AGENT_COMMERCE_SETTINGS) || {})
         },
