@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {handleInvalidToken} from './helpers'
+import {generateCustomEndpointOptions, handleInvalidToken} from './helpers'
 import Auth from '../auth'
 
 const mockLogger = {
@@ -146,5 +146,38 @@ describe('handleInvalidToken', () => {
         // Expiry is still cleared before the failed refresh attempt.
         expect(mockAuth.clearAccessTokenExpiry).toHaveBeenCalled()
         expect(mockAuth.logout).not.toHaveBeenCalled()
+    })
+})
+
+describe('generateCustomEndpointOptions', () => {
+    const generateBody = (body: unknown) =>
+        generateCustomEndpointOptions(
+            {
+                options: {
+                    method: 'POST',
+                    customApiPathParameters: {apiName: 'hello-world', endpointPath: 'test'}
+                }
+            },
+            {} as Parameters<typeof generateCustomEndpointOptions>[1],
+            'access_token',
+            {body}
+        ).options.body
+
+    test('serializes plain objects and arrays', () => {
+        expect(generateBody({a: 1})).toBe('{"a":1}')
+        expect(generateBody(Object.assign(Object.create(null), {a: 1}))).toBe('{"a":1}')
+        expect(generateBody([1, 2])).toBe('[1,2]')
+    })
+
+    test('leaves other body types untouched', () => {
+        const urlSearchParams = new URLSearchParams('a=1')
+        const formData = new FormData()
+        expect(generateBody('a=1')).toBe('a=1')
+        expect(generateBody(urlSearchParams)).toBe(urlSearchParams)
+        expect(generateBody(formData)).toBe(formData)
+    })
+
+    test('leaves the body undefined when there is none', () => {
+        expect(generateBody(undefined)).toBeUndefined()
     })
 })
