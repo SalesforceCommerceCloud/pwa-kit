@@ -318,7 +318,7 @@ The `mutation.mutate(args)` function is used to execute the mutation. It accepts
 
 - `headers` (Object): Optional headers to send with the request.
 - `parameters` (Object): Optional query parameters to append to the API URL.
-- `body` (Object): Optional the payload for POST, PUT, PATCH methods.
+- `body` (Object): Optional the payload for POST, PUT, PATCH methods. Plain objects and arrays are sent as JSON. Any other value that `fetch` accepts as a body, such as a string or `FormData`, is sent as is.
 
 ##### Usage
 
