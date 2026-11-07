@@ -35,13 +35,13 @@ const primeCimulatePageContext = (productContext) => {
     }
 }
 
-const trySendViaCimulate = (question) => {
+const trySendViaCimulate = async (question) => {
     const session = window.CimulateMessaging?.eventHandlers?.session
     const sendCandidates = ['sendMessage', 'sendUserMessage', 'sendUserText']
     for (const method of sendCandidates) {
         if (typeof session?.[method] === 'function') {
             try {
-                session[method](question)
+                await session[method](question)
                 return true
             } catch (err) {
                 console.error(`Shopper Agent handoff: ${method} threw`, err)
@@ -51,28 +51,38 @@ const trySendViaCimulate = (question) => {
     return false
 }
 
-/**
- * Hand off a shopper question from the PDP inline surface to the main
- * Shopper Agent drawer. Opens the drawer, seeds the question, and attaches
- * product context so the agent can answer in context.
- *
- * The seed is published three ways so downstream listeners can pick the
- * channel that fits them: a `SHOPPER_AGENT_SEED_EVENT` CustomEvent, a
- * `sessionStorage` key, and (if the Cimulate SDK ever exposes a programmatic
- * send) a direct call. The drawer itself is opened regardless.
- *
- * @param {Object} params
- * @param {string} params.question - The question the shopper tapped or typed
- * @param {Object} [params.productContext] - { productId, productName, pdpUrl }
- */
-export const handoffToShopperAgent = ({question, productContext = {}} = {}) => {
+const waitForProvider = (signal) =>
+    new Promise((resolve) => {
+        const deadline = Date.now() + 10000
+        let timer
+        const finish = (provider) => {
+            clearTimeout(timer)
+            signal?.removeEventListener('abort', abort)
+            resolve(provider)
+        }
+        const abort = () => finish('none')
+        const check = () => {
+            const provider = detectProvider()
+            if (signal?.aborted || provider !== 'none' || Date.now() >= deadline) {
+                finish(signal?.aborted ? 'none' : provider)
+                return
+            }
+            timer = setTimeout(check, 50)
+        }
+        signal?.addEventListener('abort', abort, {once: true})
+        check()
+    })
+
+export const handoffToShopperAgent = async ({question, productContext = {}, signal} = {}) => {
     if (!onClient) return {opened: false, seeded: false, provider: 'none'}
 
     const trimmed = typeof question === 'string' ? question.trim() : ''
     if (!trimmed) return {opened: false, seeded: false, provider: 'none'}
 
-    const provider = detectProvider()
-    if (provider === 'none') {
+    if (signal?.aborted) return {opened: false, seeded: false, provider: 'none'}
+    let provider = detectProvider()
+    if (provider === 'none') provider = await waitForProvider(signal)
+    if (provider === 'none' || signal?.aborted) {
         console.warn('Shopper Agent handoff: no provider detected on window')
         return {opened: false, seeded: false, provider}
     }
@@ -100,7 +110,7 @@ export const handoffToShopperAgent = ({question, productContext = {}} = {}) => {
     let seeded = false
     if (provider === 'commerce-client') {
         primeCimulatePageContext(productContext)
-        seeded = trySendViaCimulate(trimmed)
+        seeded = await trySendViaCimulate(trimmed)
     }
 
     try {

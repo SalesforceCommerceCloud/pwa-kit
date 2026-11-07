@@ -112,6 +112,7 @@ describe('InlineAgentWidget', () => {
         questions.forEach((question, index) => {
             expect(handoffMock).toHaveBeenNthCalledWith(index + 1, {
                 question,
+                signal: expect.any(AbortSignal),
                 productContext: {
                     productId: '500400',
                     productName: 'Serum',

@@ -29,19 +29,17 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
         }
     }, [config.mode])
 
-    // Shopper-agent: the UMD paints a non-conversational shim and emits a
-    // bubbling `inline-agent-widget:handoff` CustomEvent whenever the shopper
-    // clicks a pill or submits the input. The host owns the handoff — opens
-    // the main Shopper Agent drawer with the question seeded + PDP context.
     useEffect(() => {
         if (config.mode !== 'shopper-agent') return
         if (typeof window === 'undefined') return
 
+        const controller = new AbortController()
         const onHandoff = (ev) => {
             const question = ev.detail?.question
             if (!question) return
             handoffToShopperAgent({
                 question,
+                signal: controller.signal,
                 productContext: {
                     productId,
                     productName,
@@ -52,6 +50,7 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
 
         document.addEventListener(HANDOFF_EVENT, onHandoff)
         return () => {
+            controller.abort()
             document.removeEventListener(HANDOFF_EVENT, onHandoff)
         }
     }, [config.mode, productId, productName])
