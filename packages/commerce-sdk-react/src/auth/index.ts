@@ -972,7 +972,12 @@ class Auth {
         // falling through to guest login.
         if (refreshToken || (!refreshToken && this.hasHttpOnlyRefreshToken())) {
             try {
-                const isGuest = this.get('customer_type') !== 'registered'
+                // Derive the shopper type from the refresh token being used rather than from
+                // `customer_type`, which is stale when the login state changed outside of PWA Kit
+                // (e.g. a logout on SFRA replaces the registered refresh token with a guest one).
+                // With HttpOnly cookies neither token is readable here, but `handleTokenResponse`
+                // doesn't use this value in that mode: the proxy sets the cookies.
+                const isGuest = !refreshTokenRegistered
                 // Signal the proxy that this is a refresh token request so it can
                 // inject the HttpOnly refresh token cookie as the sfdc_refresh_token header.
                 if (this.enableHttpOnlySessionCookies) {
