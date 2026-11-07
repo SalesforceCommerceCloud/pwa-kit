@@ -5,15 +5,55 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Helmet} from 'react-helmet'
 import PropTypes from 'prop-types'
 import useInlineAgentWidget, {
     isConfigured
 } from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
+import {handoffToShopperAgent} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
 
-const InlineAgentWidget = ({config, pdpQuestions, productName}) => {
+const VALID_MODES = ['inline', 'shopper-agent', 'hybrid']
+const HANDOFF_EVENT = 'inline-agent-widget:handoff'
+
+const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
     const containerRef = useInlineAgentWidget(config, {pdpQuestions, productName})
+
+    useEffect(() => {
+        if (config.mode !== undefined && !VALID_MODES.includes(config.mode)) {
+            console.warn(
+                `InlineAgentWidget: unknown mode "${
+                    config.mode
+                }". Expected one of ${VALID_MODES.join(', ')}. Falling back to 'inline'.`
+            )
+        }
+    }, [config.mode])
+
+    useEffect(() => {
+        if (config.mode !== 'shopper-agent') return
+        if (typeof window === 'undefined') return
+
+        const controller = new AbortController()
+        const onHandoff = (ev) => {
+            const question = ev.detail?.question
+            if (!question) return
+            handoffToShopperAgent({
+                question,
+                signal: controller.signal,
+                productContext: {
+                    productId,
+                    productName,
+                    pdpUrl: window.location.href
+                }
+            })
+        }
+
+        document.addEventListener(HANDOFF_EVENT, onHandoff)
+        return () => {
+            controller.abort()
+            document.removeEventListener(HANDOFF_EVENT, onHandoff)
+        }
+    }, [config.mode, productId, productName])
 
     if (!isConfigured(config)) return null
 
@@ -33,7 +73,17 @@ InlineAgentWidget.propTypes = {
         scrt2Url: PropTypes.string,
         orgId: PropTypes.string,
         esDeveloperName: PropTypes.string,
-        placeholder: PropTypes.string
+        placeholder: PropTypes.string,
+        /**
+         * `'inline'` (default) runs the UMD custom element with its own SCRT2 session.
+         * `'shopper-agent'` renders a non-conversational shim (owned by the UMD)
+         * that dispatches an `inline-agent-widget:handoff` CustomEvent on pill
+         * click / submit; this component catches it and hands off to the main
+         * Shopper Agent drawer.
+         * `'hybrid'` is reserved for future per-pill routing (PDP questions inline,
+         * discovery/comparison to the main drawer); currently falls back to inline.
+         */
+        mode: PropTypes.oneOf(['inline', 'shopper-agent', 'hybrid'])
     }),
     /**
      * Opener questions for the current product — rendered as tappable pills
@@ -48,7 +98,13 @@ InlineAgentWidget.propTypes = {
      * `name` standard field. When absent, the widget falls back to the
      * generic "Ask me anything" string.
      */
-    productName: PropTypes.string
+    productName: PropTypes.string,
+    /**
+     * Current product id. Attached to `productContext.productId` in the
+     * handoff payload so the main drawer can prime its page context and
+     * agent routing attributes with the PDP the shopper is on.
+     */
+    productId: PropTypes.string
 }
 
 export default InlineAgentWidget

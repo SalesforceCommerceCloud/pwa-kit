@@ -1321,6 +1321,18 @@
   "icons.assistive_msg.lock": {
     "defaultMessage": "Secure"
   },
+  "inline_agent_widget.shopper_agent.input_placeholder": {
+    "defaultMessage": "Ask me anything"
+  },
+  "inline_agent_widget.shopper_agent.input_placeholder_with_product": {
+    "defaultMessage": "Ask me anything about {productName}"
+  },
+  "inline_agent_widget.shopper_agent.submit": {
+    "defaultMessage": "Ask"
+  },
+  "inline_agent_widget.shopper_agent.title": {
+    "defaultMessage": "Have a question?"
+  },
   "item_attributes.label.bonus_product": {
     "defaultMessage": "Bonus Product"
   },

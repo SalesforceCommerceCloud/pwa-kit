@@ -6767,6 +6767,66 @@
       "value": "]"
     }
   ],
+  "inline_agent_widget.shopper_agent.input_placeholder": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧşķ ḿḗḗ ȧȧƞẏŧħīƞɠ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "inline_agent_widget.shopper_agent.input_placeholder_with_product": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧşķ ḿḗḗ ȧȧƞẏŧħīƞɠ ȧȧƀǿǿŭŭŧ "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "inline_agent_widget.shopper_agent.submit": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧşķ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "inline_agent_widget.shopper_agent.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ħȧȧṽḗḗ ȧȧ ɋŭŭḗḗşŧīǿǿƞ?"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "item_attributes.label.bonus_product": [
     {
       "type": 0,
