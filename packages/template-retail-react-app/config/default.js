@@ -136,6 +136,10 @@ module.exports = {
             // Optional: pass `cc_promptsConfig` (object) via COMMERCE_AGENT_SETTINGS to configure the
             // prompts extension. Forwarded as `promptsConfig`; requires `isOpen`, `isInline`, and
             // `elementId` to mount, plus optional fields like `staticQuestions` and `promptsDisplay`.
+            // Optional: pass `cc_enablePageContext` ('true' | 'false') via COMMERCE_AGENT_SETTINGS,
+            // forwarded as the boolean `enablePageContext`. Enables window.CimulateMessaging.
+            // eventHandlers.pageContext.set — required for the shopper-agent handoff to prime
+            // product context before the drawer opens.
             // None of the above set a storefront default — the widget applies its own defaults when
             // a value is omitted.
         },
@@ -243,14 +247,17 @@ module.exports = {
             sdkUrl: '',
             metadataUrl: ''
         },
-        embeddedAgent: parseSettings(process.env.EMBEDDED_AGENT_COMMERCE_SETTINGS) || {
+        embeddedAgent: {
             enabled: false,
             scrt2Url: '',
             orgId: '',
             esDeveloperName: '',
             placeholder: '',
             persistSession: true,
-            enableLogging: false
+            enableLogging: false,
+            preWarm: true,
+            mode: 'inline',
+            ...(parseSettings(process.env.EMBEDDED_AGENT_COMMERCE_SETTINGS) || {})
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
