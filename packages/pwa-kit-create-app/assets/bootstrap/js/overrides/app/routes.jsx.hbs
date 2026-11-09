@@ -17,10 +17,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 // Components
 import {Skeleton} from '{{template.source.name}}/app/components/shared/ui'
 import {configureRoutes} from '{{template.source.name}}/app/utils/routes-utils'
-import {
-    routes as _routes,
-    getDynamicRoutes
-} from '{{template.source.name}}/app/routes'
+import {routes as _routes, getDynamicRoutes} from '{{template.source.name}}/app/routes'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -91,11 +88,7 @@ export default () => {
     const config = getConfig()
     // getDynamicRoutes adds the routes gated by config, such as the reset password and
     // passwordless login landing pages that the emailed magic links open
-    return configureRoutes(
-        [...routes, ...getDynamicRoutes(config){{#if answers.project.hybrid}}, catchAllRoute{{/if}}],
-        config,
-        {
-            ignoredRoutes: ['/callback', '*']
-        }
-    )
+    return configureRoutes([...routes, ...getDynamicRoutes(config){{#if answers.project.hybrid}}, catchAllRoute{{/if}}], config, {
+        ignoredRoutes: ['/callback', '*']
+    })
 }
