@@ -197,4 +197,93 @@ describe('CommerceClientFab', () => {
         renderWithProviders(<CommerceClientFab welcomeMessage="   " />)
         expect(screen.queryByTestId('shopper-agent-welcome')).not.toBeInTheDocument()
     })
+
+    describe('spotlight', () => {
+        beforeEach(() => jest.useFakeTimers())
+        afterEach(() => jest.useRealTimers())
+
+        test('shows "Browse Collection" and moves to the horizontal center on a category page for 8 seconds', () => {
+            window.history.pushState({}, '', '/category/womens')
+            renderWithProviders(<CommerceClientFab />)
+
+            expect(screen.getByTestId('commerce-client-fab-label')).toHaveTextContent(
+                'Browse Collection'
+            )
+            expect(getComputedStyle(screen.getByTestId('commerce-client-fab')).transform).not.toBe(
+                'none'
+            )
+
+            act(() => {
+                jest.advanceTimersByTime(8000)
+            })
+            expect(screen.queryByTestId('commerce-client-fab-label')).toBeNull()
+            expect(getComputedStyle(screen.getByTestId('commerce-client-fab')).transform).toBe(
+                'none'
+            )
+        })
+
+        test('shows "Explore this product" on a product page', () => {
+            window.history.pushState({}, '', '/product/25518704M')
+            renderWithProviders(<CommerceClientFab />)
+
+            expect(screen.getByTestId('commerce-client-fab-label')).toHaveTextContent(
+                'Explore this product'
+            )
+        })
+
+        test('does not spotlight on other pages', () => {
+            window.history.pushState({}, '', '/cart')
+            renderWithProviders(<CommerceClientFab />)
+
+            expect(screen.queryByTestId('commerce-client-fab-label')).toBeNull()
+        })
+
+        test('ends the spotlight when the FAB is clicked', () => {
+            window.history.pushState({}, '', '/search')
+            renderWithProviders(<CommerceClientFab />)
+
+            fireEvent.click(screen.getByTestId('commerce-client-fab'))
+            expect(screen.queryByTestId('commerce-client-fab-label')).toBeNull()
+        })
+
+        test('asks for the top products of the category when clicked on a category page', () => {
+            const sendMessage = jest.fn().mockResolvedValue({})
+            window.CimulateMessaging.eventHandlers.session = {sendMessage}
+            window.history.pushState({}, '', '/category/womens-clothing-tops')
+            renderWithProviders(<CommerceClientFab />)
+
+            fireEvent.click(screen.getByTestId('commerce-client-fab'))
+
+            expect(mockToggleWidgetOpen).toHaveBeenCalledWith(true)
+            expect(sendMessage).toHaveBeenCalledWith(
+                'Show me the top products in womens clothing tops'
+            )
+        })
+
+        test('asks for product details when clicked on a product page', () => {
+            const sendMessage = jest.fn().mockResolvedValue({})
+            window.CimulateMessaging.eventHandlers.session = {sendMessage}
+            window.history.pushState({}, '', '/product/25518704M')
+            renderWithProviders(<CommerceClientFab />)
+
+            fireEvent.click(screen.getByTestId('commerce-client-fab'))
+
+            expect(sendMessage).toHaveBeenCalledWith('Show details of product 25518704M')
+        })
+
+        test('only opens the agent when clicked after the spotlight ended', () => {
+            const sendMessage = jest.fn().mockResolvedValue({})
+            window.CimulateMessaging.eventHandlers.session = {sendMessage}
+            window.history.pushState({}, '', '/product/25518704M')
+            renderWithProviders(<CommerceClientFab />)
+
+            act(() => {
+                jest.advanceTimersByTime(8000)
+            })
+            fireEvent.click(screen.getByTestId('commerce-client-fab'))
+
+            expect(mockToggleWidgetOpen).toHaveBeenCalledWith(true)
+            expect(sendMessage).not.toHaveBeenCalled()
+        })
+    })
 })

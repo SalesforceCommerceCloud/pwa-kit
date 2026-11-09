@@ -35,7 +35,8 @@ import debounce from 'lodash/debounce'
 import {
     RECENT_SEARCH_KEY,
     RECENT_SEARCH_LIMIT,
-    RECENT_SEARCH_MIN_LENGTH
+    RECENT_SEARCH_MIN_LENGTH,
+    SHOPPER_AGENT_GRADIENT
 } from '@salesforce/retail-react-app/app/constants'
 import {
     productUrlBuilder,
@@ -461,14 +462,12 @@ const Search = (props) => {
                                                 size="sm"
                                                 borderRadius="full"
                                                 border="1px solid"
-                                                borderColor="blue.200"
-                                                bgGradient="linear(to-r, blue.50, purple.50)"
-                                                color="blue.700"
+                                                borderColor="whiteAlpha.400"
+                                                bg={SHOPPER_AGENT_GRADIENT}
+                                                color="white"
                                                 fontWeight="medium"
-                                                leftIcon={
-                                                    <SparkleIcon boxSize={4} color="blue.600" />
-                                                }
-                                                transition="border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease"
+                                                leftIcon={<SparkleIcon boxSize={4} color="white" />}
+                                                transition="filter 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease"
                                                 sx={{
                                                     '.chakra-button__icon': {
                                                         transition: 'transform 0.3s ease'
@@ -480,22 +479,19 @@ const Search = (props) => {
                                                     }
                                                 }}
                                                 _hover={{
-                                                    bgGradient:
-                                                        'linear(to-r, blue.100, purple.100)',
-                                                    borderColor: 'purple.300',
-                                                    boxShadow:
-                                                        '0 0 0 3px rgba(173, 123, 238, 0.15)',
+                                                    bg: SHOPPER_AGENT_GRADIENT,
+                                                    filter: 'brightness(1.1)',
+                                                    boxShadow: '0 0 0 3px rgba(119, 98, 214, 0.25)',
                                                     '.chakra-button__icon': {
                                                         transform: 'rotate(20deg) scale(1.1)'
                                                     }
                                                 }}
                                                 _active={{
-                                                    bgGradient:
-                                                        'linear(to-r, blue.100, purple.100)',
+                                                    bg: SHOPPER_AGENT_GRADIENT,
                                                     transform: 'scale(0.97)'
                                                 }}
                                                 _focusVisible={{
-                                                    boxShadow: '0 0 0 3px rgba(1, 118, 211, 0.4)'
+                                                    boxShadow: '0 0 0 3px rgba(185, 245, 228, 0.9)'
                                                 }}
                                                 onClick={onAskAIClick}
                                             >

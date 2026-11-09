@@ -21,15 +21,15 @@ module.exports = {
             enabled: false
         },
         commerceAgent: parseSettings(process.env.COMMERCE_AGENT_SETTINGS) || {
-            enabled: 'false',
+            enabled: 'true',
             askAgentOnSearch: 'false',
             // When 'true', an "Ask AI" button is shown inside the header search bar. Clicking
             // it opens the active shopper agent widget and, for MIAW, sends the typed query.
             enableAgentFromSearchBar: 'true',
-            embeddedServiceName: '',
+            embeddedServiceName: 'RefArch_CC_ES',
             embeddedServiceEndpoint: '',
             scriptSourceUrl: '',
-            scrt2Url: '',
+            scrt2Url: 'https://orgfarm-b320c2c19c.test1.my.pc-rnd.salesforce-scrt.com',
             salesforceOrgId: '',
             commerceOrgId: '',
             siteId: '',
@@ -254,6 +254,8 @@ module.exports = {
             esDeveloperName: '',
             placeholder: '',
             persistSession: true,
+            // Cart requires an explicit boolean opt-in in EMBEDDED_AGENT_COMMERCE_SETTINGS.
+            cartEnabled: true,
             enableLogging: false
         },
         googleCloudAPI: {

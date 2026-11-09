@@ -1,460 +1,479 @@
 ## v10.4.0-dev (Oct 20, 2026)
-- [Feature] Add Shopper Agent discovery entry points: Ask AI in header search, a configurable animated welcome nudge, and live-cart free-shipping suggestions that open a complementary-product search.
-- [Bugfix] Keep Commerce Client shopper-agent product links on the PWA Kit storefront. The agent backend sends product links as SFRA URLs on the backend origin (e.g. `/en_US/<slug>-<id>.html`), which the widget's `onNavigate` never sees, so clicking a product card left for the SFRA PDP. The storefront now reads the product id from those links in the widget's product slots (cards, product detail title, comparison columns), rewrites their `href` to the PWA product page, and routes plain clicks through the router. Links in agent message text are left alone. When the product id is not certain from the URL (the last path segment contains `-`, so it may be a name slug and id, or an id that contains `-`), it is resolved through Shopper SEO `getUrlMapping`; if that finds no product the link keeps its backend URL rather than pointing at a storefront 404. [#4076](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4076)
-- [Feature] Add a neutral Shopper Agent express-payment iframe framework with cart and product routes, a merchant provider lifecycle contract, validated iframe-to-host events, and automatic iframe sizing. [#4063](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4063)
-- [Changed] Rename `pwakit-notify` notification types to flow-based names: `passwordless-magic-link` → `passwordless-login`, `otp` → `password-registration`. Adds new `passwordless-registration` type for new-user magic-link delivery — intentionally skips the anti-enumeration account-existence check (correct for the new-user registration flow). The cartridge changes are aligned 1-to-1 with sf-next PR #2946. [Security] Cross-validate `email_id` from the SLAS callback JWT against the request body in the passwordless-login callback, preventing email relay via an arbitrary-recipient registration email when `register=true`.
-- [Security] Cross-validate `email_id` and `token` claims in the SLAS callback JWT against the request body in the registration-verification callback (`/registration-verification-callback`), preventing email-relay attacks where a caller with a valid tenant-signed guest token could trigger OTP delivery to an arbitrary address. [#4067](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4067)
-- [Bugfix] Gate the GLO magic-link auto-submit on `emailFromContext` (email present in router state) rather than the derived `email` variable, so arriving directly via magic link no longer attempts an auto-submit before the user enters their email address. [#4067](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4067)
-- [Enhancement] Update inline agent widget UMD bundle: add follow-up suggestion pills from agent responses, and send `commerce_agent_context` as a TextValue JSON string. Bump the embedded agent `capabilitiesVersion` to `66` (new `DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION` constant, separate from the Commerce Client's `65`) for context-variable support. Built from [inline-agent-widget#17](https://github.com/SalesforceCommerceCloud/inline-agent-widget/pull/17) and [inline-agent-widget#18](https://github.com/SalesforceCommerceCloud/inline-agent-widget/pull/18). [#4061](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4061)
-- [Bugfix] Temporarily pin transitive Vitest to 4.1.11 to avoid an npm 10 dependency resolver crash during fresh installs while the Vitest browser packages require 4.1.11.
-- [Bugfix] Fix `useScript` remount when the script tag is already in the DOM. ShopperAgent (and other consumers) stayed at `loaded: false` after a remount because the existing tag never fired `load` again, so the Commerce Client widget did not re-inject. The hook now stamps `data-script-status` on load/error and only reports `loaded: true` when that status is `ready`; an in-flight tag stays unloaded until it finishes. [#4062](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4062) (W-24380725)
-- [Bugfix] Route Commerce Client widget product/checkout/markdown clicks through the storefront `useNavigation` router via the widget's `onNavigate` callback, so same-tab same-origin links stay in the SPA instead of triggering a full page load. Requires Commerce Client widget `1.48.0+`. `cc_openLinksInNewTab: "true"` is unchanged and still opens a new tab. Also fixes `buildUrl` (`createUrlTemplate`) when site/locale are configured as `query_param`: paths that already have a query string or hash now get site/locale merged into the existing query instead of a second `?` appended (which previously corrupted params like `q`/`pid` and swallowed the hash).
-- [Enhancement] Update inline agent widget UMD bundle: replace the text-prefix product-context hack with the proper SCRT2 v2 session-context API. Product context is now sent as a `commerce_agent_context` StructuredValue in the SessionContextSet envelope, leaving the shopper's message text unchanged. Default `capabilitiesVersion` bumped to `"65"`. Built from [inline-agent-widget#3](https://github.com/SalesforceCommerceCloud/inline-agent-widget/pull/3). [#4054](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4054)
-- [Feature] Add `app_pwakit_base` B2C cartridge for transactional email delivery via ISML templates and `dw/net/Mail`. GLO access-code emails use the `sfcc.app.order.sendOrderAccessCode` hook; passwordless login, OTP verification, and password reset use the `pwakit-notify` Custom REST API (`POST .../organizations/{orgId}/notify?siteId={siteId}`, guarded by the `c_pwakit_notify` SLAS scope). Deploy with `npm run deploy:cartridge` from `packages/template-retail-react-app` (uses `b2c-cli` with `--reload` to upload the cartridge and re-register the SCAPI endpoint in one step), then import `OrganizationPreferences.xml` to enable the `pwakitNotifyEnabled` and `pwakitStorefrontHost` site preferences. **Required: create a dedicated private SLAS client** (`notifyClientId`) scoped only to `c_pwakit_notify`, set `PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET` to its secret, and add `notifyClientId` to `commerceAPI.parameters` in your config. **Do not add `c_pwakit_notify` to the shopper/public client** — doing so makes browser-minted guest tokens capable of calling the notification API directly, reopening the email-relay risk this design is intended to close. See `cartridges/app_pwakit_base/README.md` for full setup steps. [#4012](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4012)
-- [Breaking change] `config/default.js` now sets `mode: 'callback'` for both `passwordless` and `resetPassword` flows (previously `'email'`). This routes password-reset confirmation through the SSR `/reset-password-callback` route and the new `pwakit-notify` cartridge. **Projects that adopt this config without deploying the cartridge will have broken password resets** — there is no `resetPassword.enabled` guard (unlike `passwordless.enabled`). Either deploy the cartridge before adopting the config change, or explicitly override `resetPassword.mode` back to `'email'`. [#4012](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4012)
-- [Bugfix] Fix GLO `/api/guestOrderLookup/verify` and related server endpoints returning 401 when `enablePWAKitPrivateClient` is enabled. The `cc-nx-g_` cookie stores the SLAS refresh token, not the access token — the access token is never stored in any cookie. All GLO server endpoints now read the SLAS JWT from the `Authorization` header sent by the client (via `useAccessToken().getTokenWhenReady()`), which works correctly in both public and private client modes. [#4012](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4012)
-- [Enhancement] End the Commerce Client shopper-agent conversation when a registered shopper logs out, instead of re-linking it to the guest. Uses the widget's `eventHandlers.session.endConversation()` (`cc_cdnVersion` >= `1.39.0`), falls back to `resetConversation()` on `1.36.0`–`1.38.x`, and to re-linking before `1.36.0`. Also keeps the widget mounted through the login/logout basket reload so the bundle is not injected twice. [#4051](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4051) (W-24207318)
+
+-   [Feature] Add Shopper Agent discovery entry points: Ask AI in header search, a configurable animated welcome nudge, and live-cart free-shipping suggestions that open a complementary-product search.
+-   [Feature] Add read-only inline cart assistance with localized copy and same-page loader retry. Opt in with boolean `cartEnabled: true` in `EMBEDDED_AGENT_COMMERCE_SETTINGS` alongside the existing embedded-agent configuration; checkout remains independent. Requires the matching cart-mode/`ui-text` artifact built locally from the upstream `SalesforceCommerceCloud/inline-agent-widget` source; cart assistance does not enable cart mutations.
+-   [Bugfix] Keep Commerce Client shopper-agent product links on the PWA Kit storefront. The agent backend sends product links as SFRA URLs on the backend origin (e.g. `/en_US/<slug>-<id>.html`), which the widget's `onNavigate` never sees, so clicking a product card left for the SFRA PDP. The storefront now reads the product id from those links in the widget's product slots (cards, product detail title, comparison columns), rewrites their `href` to the PWA product page, and routes plain clicks through the router. Links in agent message text are left alone. When the product id is not certain from the URL (the last path segment contains `-`, so it may be a name slug and id, or an id that contains `-`), it is resolved through Shopper SEO `getUrlMapping`; if that finds no product the link keeps its backend URL rather than pointing at a storefront 404. [#4076](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4076)
+-   [Feature] Add a neutral Shopper Agent express-payment iframe framework with cart and product routes, a merchant provider lifecycle contract, validated iframe-to-host events, and automatic iframe sizing. [#4063](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4063)
+-   [Changed] Rename `pwakit-notify` notification types to flow-based names: `passwordless-magic-link` → `passwordless-login`, `otp` → `password-registration`. Adds new `passwordless-registration` type for new-user magic-link delivery — intentionally skips the anti-enumeration account-existence check (correct for the new-user registration flow). The cartridge changes are aligned 1-to-1 with sf-next PR #2946. [Security] Cross-validate `email_id` from the SLAS callback JWT against the request body in the passwordless-login callback, preventing email relay via an arbitrary-recipient registration email when `register=true`.
+-   [Security] Cross-validate `email_id` and `token` claims in the SLAS callback JWT against the request body in the registration-verification callback (`/registration-verification-callback`), preventing email-relay attacks where a caller with a valid tenant-signed guest token could trigger OTP delivery to an arbitrary address. [#4067](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4067)
+-   [Bugfix] Gate the GLO magic-link auto-submit on `emailFromContext` (email present in router state) rather than the derived `email` variable, so arriving directly via magic link no longer attempts an auto-submit before the user enters their email address. [#4067](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4067)
+-   [Enhancement] Update inline agent widget UMD bundle: add follow-up suggestion pills from agent responses, and send `commerce_agent_context` as a TextValue JSON string. Bump the embedded agent `capabilitiesVersion` to `66` (new `DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION` constant, separate from the Commerce Client's `65`) for context-variable support. Built from [inline-agent-widget#17](https://github.com/SalesforceCommerceCloud/inline-agent-widget/pull/17) and [inline-agent-widget#18](https://github.com/SalesforceCommerceCloud/inline-agent-widget/pull/18). [#4061](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4061)
+-   [Bugfix] Temporarily pin transitive Vitest to 4.1.11 to avoid an npm 10 dependency resolver crash during fresh installs while the Vitest browser packages require 4.1.11.
+-   [Bugfix] Fix `useScript` remount when the script tag is already in the DOM. ShopperAgent (and other consumers) stayed at `loaded: false` after a remount because the existing tag never fired `load` again, so the Commerce Client widget did not re-inject. The hook now stamps `data-script-status` on load/error and only reports `loaded: true` when that status is `ready`; an in-flight tag stays unloaded until it finishes. [#4062](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4062) (W-24380725)
+-   [Bugfix] Route Commerce Client widget product/checkout/markdown clicks through the storefront `useNavigation` router via the widget's `onNavigate` callback, so same-tab same-origin links stay in the SPA instead of triggering a full page load. Requires Commerce Client widget `1.48.0+`. `cc_openLinksInNewTab: "true"` is unchanged and still opens a new tab. Also fixes `buildUrl` (`createUrlTemplate`) when site/locale are configured as `query_param`: paths that already have a query string or hash now get site/locale merged into the existing query instead of a second `?` appended (which previously corrupted params like `q`/`pid` and swallowed the hash).
+-   [Enhancement] Update inline agent widget UMD bundle: replace the text-prefix product-context hack with the proper SCRT2 v2 session-context API. Product context is now sent as a `commerce_agent_context` StructuredValue in the SessionContextSet envelope, leaving the shopper's message text unchanged. Default `capabilitiesVersion` bumped to `"65"`. Built from [inline-agent-widget#3](https://github.com/SalesforceCommerceCloud/inline-agent-widget/pull/3). [#4054](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4054)
+-   [Feature] Add `app_pwakit_base` B2C cartridge for transactional email delivery via ISML templates and `dw/net/Mail`. GLO access-code emails use the `sfcc.app.order.sendOrderAccessCode` hook; passwordless login, OTP verification, and password reset use the `pwakit-notify` Custom REST API (`POST .../organizations/{orgId}/notify?siteId={siteId}`, guarded by the `c_pwakit_notify` SLAS scope). Deploy with `npm run deploy:cartridge` from `packages/template-retail-react-app` (uses `b2c-cli` with `--reload` to upload the cartridge and re-register the SCAPI endpoint in one step), then import `OrganizationPreferences.xml` to enable the `pwakitNotifyEnabled` and `pwakitStorefrontHost` site preferences. **Required: create a dedicated private SLAS client** (`notifyClientId`) scoped only to `c_pwakit_notify`, set `PWA_KIT_NOTIFY_SLAS_CLIENT_SECRET` to its secret, and add `notifyClientId` to `commerceAPI.parameters` in your config. **Do not add `c_pwakit_notify` to the shopper/public client** — doing so makes browser-minted guest tokens capable of calling the notification API directly, reopening the email-relay risk this design is intended to close. See `cartridges/app_pwakit_base/README.md` for full setup steps. [#4012](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4012)
+-   [Breaking change] `config/default.js` now sets `mode: 'callback'` for both `passwordless` and `resetPassword` flows (previously `'email'`). This routes password-reset confirmation through the SSR `/reset-password-callback` route and the new `pwakit-notify` cartridge. **Projects that adopt this config without deploying the cartridge will have broken password resets** — there is no `resetPassword.enabled` guard (unlike `passwordless.enabled`). Either deploy the cartridge before adopting the config change, or explicitly override `resetPassword.mode` back to `'email'`. [#4012](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4012)
+-   [Bugfix] Fix GLO `/api/guestOrderLookup/verify` and related server endpoints returning 401 when `enablePWAKitPrivateClient` is enabled. The `cc-nx-g_` cookie stores the SLAS refresh token, not the access token — the access token is never stored in any cookie. All GLO server endpoints now read the SLAS JWT from the `Authorization` header sent by the client (via `useAccessToken().getTokenWhenReady()`), which works correctly in both public and private client modes. [#4012](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4012)
+-   [Enhancement] End the Commerce Client shopper-agent conversation when a registered shopper logs out, instead of re-linking it to the guest. Uses the widget's `eventHandlers.session.endConversation()` (`cc_cdnVersion` >= `1.39.0`), falls back to `resetConversation()` on `1.36.0`–`1.38.x`, and to re-linking before `1.36.0`. Also keeps the widget mounted through the login/logout basket reload so the bundle is not injected twice. [#4051](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4051) (W-24207318)
 
 ## v10.3.0 (Oct 08, 2026)
-- [Enhancement] Commerce Client shopper identity linking now retrieves the auth link key via the widget's `window.CimulateMessaging.getAuthLinkKey()` when the bundle exposes it, instead of calling SCRT2's `/iamessage/api/v2/authorization/authlink` endpoint directly with the Commerce Client JWT. Older bundles without the function fall back to the direct SCRT2 call (feature-detected, not version-checked). A `getAuthLinkKey()` rejection is surfaced as a linking failure rather than retried via the fallback, since both paths hit the same endpoint. [#4050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4050) (W-24076703)
-- [Feature] Add embedded Page Designer content-block support to the retail template, including an Announcement Banner content component, a preview-only Header layout, and a chrome-free `/preview/component` route for standalone component previews. [#4042](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4042)
-- [Enhancement] Rename `INLINE_AGENT_WIDGET_COMMERCE_SETTINGS` environment variable to `EMBEDDED_AGENT_COMMERCE_SETTINGS` and config key `inlineAgentWidget` to `embeddedAgent` to align with updated product terminology. [#4041](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4041)
-- [Feature] Add a configurable `cc_enableImageUpload` toggle for the Commerce Client (Embedded Messaging) shopper-agent widget, defaulting to `'false'` and forwarded to the bundle as `messagingConfig.enableImageUpload`. Set it to `'true'` via `COMMERCE_AGENT_SETTINGS` to let shoppers upload images in the chat; requires a Commerce Client bundle that supports image upload (`cc_cdnVersion` >= `1.44.0`) plus the backend file-upload prerequisites. Also adds `blob:` and `data:` to the `img-src` CSP directive in `app/ssr.js` so the widget can render the pre-send preview (a `blob:` URL) and the sent-image thumbnail (a `data:` URL); the widget renders images locally only, so no image host is added. [#4030](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4030)
-- [Feature] Add the `dw_attribution` first-touch marketing-attribution cookie (W-23493129). The app writes a sanitized, allowlist-only campaign cookie client-side on load so Salesforce CIP can attribute placed orders back to the campaign that drove a headless-storefront visit. Writing in the browser (not on SSR) means it also fires on a CDN document-cache hit — where the SSR handler never runs — and lets the app clear the cookie the instant a shopper opts out; campaign landing pages stay fully cacheable. The Secure + `SameSite=Lax` cookie has a 30-minute write-once TTL and stores percent-encoded `key=value` pairs (`utm_source`/`utm_medium`/`utm_campaign`/`utm_term`/`utm_content`, `gclid`, `fbclid`, `msclkid`, and a sanitized external `ref` — origin, path, and its own allowlisted params only); no free-text query params are captured. It is write-once (first touch wins) and honors Do Not Track (`dw_dnt=1`): while opted out it captures nothing and expires any existing cookie.
-- [Feature] Add a full-PDP delivery-estimate calculator. Shoppers can enter a country code and postal code to retrieve the slowest eligible shipping option without modifying their basket; valid destinations are saved per site after a successful response. The calculator selects the latest delivery window and does not expose provider non-delivery reasons. Increase the `main.js` bundle-size budget from 105 kB to 109 kB for the calculator. [#4013](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4013)
-- Update the direct `commerce-sdk-isomorphic` dependency for the new Shopper Delivery Estimates API support in `commerce-sdk-react`, and increase the `vendor.js` bundle budget to 403 kB for the upgraded SDK and Page Designer preview runtime.
-- [Feature] Add inline agent widget on the Product Detail Page: renders a self-hosted `<inline-agent-widget>` web component below the Add to Cart actions so shoppers can ask product questions without opening the floating panel. The widget is gated on config (`enabled` + SCRT2 credentials present), loads client-side only, and passes product context (product id from the URL) to the agent on each message. [#3988](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3988)
-- [Enhancement] Update inline agent widget with beautified UI and move it into the right-side product details column (below Add to Wishlist) via a new `actionFooter` prop on `ProductView`. Add default `inlineAgentWidget` config block with "Ask me anything" placeholder. [#3995](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3995)
-- [Enhancement] Add `persistSession` (default `true`) and `enableLogging` (default `false`) config options to the inline agent widget. Session persistence keeps the conversation across page navigations; logging enables console output for debugging. [#3997](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3997)
-- [Enhancement] Support `INLINE_AGENT_WIDGET_COMMERCE_SETTINGS` environment variable for inline agent widget configuration, matching the `COMMERCE_AGENT_SETTINGS` pattern used by the shopper agent. Credentials are read from the env var at runtime instead of being hardcoded in config. [#3999](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3999)
-- [Enhancement] Pass `capabilities-version` attribute to the inline agent widget using the shared `DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION` constant, matching the shopper agent pattern. Update the UMD bundle to support configurable capabilities version, disable the send button until the session connects, and add an SFRA DOM fallback for the product ID. [#4007](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4007)
-- [Bugfix] Update inline agent widget UMD bundle: wrap product context prefix in parentheses so the BYON regex can extract the product ID correctly. [#4010](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4010)
-- [Enhancement] Update inline agent widget UMD bundle: auto-restart session on expiry instead of showing an error. The widget silently resets to idle and the next message starts a fresh session transparently. [#4015](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4015)
-- [Enhancement] Update inline agent widget UMD bundle: show user question bubble, add 4,000-character message limit, improve error handling with generic user-facing messages, fix 403 stale-conversation reset, and hide restored session Q&A on page reload. [#4032](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4032)
-- [Enhancement] Update inline agent widget UMD bundle: suppress agent welcome message on conversation start, and clear stale question/answer when navigating between product pages via SPA routing.
-- [Feature] Add opener question pills to the inline agent widget on the PDP (@W-24333476). The Product Detail page parses SCAPI `c_pdpQuestions` (a JSON-encoded array of strings published by Commerce Content Studio) and forwards it to the widget via the new `pdp-questions` attribute. The widget renders up to 5 tappable pills above the input; tapping a pill sends it through the same message path as typed input, and pills auto-hide once the shopper engages. On SPA navigation between PDPs the pills re-appear for the new product's list. Malformed or absent `c_pdpQuestions` renders no pills.
-- [Feature] Add Guest Order Lookup (GLO): unauthenticated shoppers can look up an order by order number and email, verify ownership via a time-limited 6-digit access code (valid for 15 minutes, reusable within the window), and view a filtered order detail page (shipment tracking, items, payment summary, shipping address). Server-side endpoints (`/api/guestOrderLookup/{verify,order,oms-meta,cancel,return}`) receive the SLAS access token via the `Authorization` header (sent by the client using `useAccessToken().getTokenWhenReady()`), call SCAPI with the shopper's bearer token, and filter the response to safe fields. The verify endpoint writes a `cc-goa_` HttpOnly cookie binding the order number to the verified access code; all subsequent order endpoints validate this cookie before proxying. [#3982](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3982)
-- [Feature] Forward two backend-gating signals on the Commerce Client shopper-agent widget's `routingAttributes`: `clientVersion` (sourced from `cc_cdnVersion`, so the runtime can gate rich components on the client's capability version; omitted when unset) and `isCartMgmtSupported` (string `'true'`/`'false'`, default `'false'`, read from `cc_routingAttributes`). Brings the PWA commerce-client path to parity with the SFRA cartridge.
-- [Feature] Enable shopper identity (customer context) for the Commerce Client (Cimulate) shopper-agent provider. Unlike MIAW, Commerce Client widgets do not expose `getAuthLinkKey`, so the browser extracts the Commerce Client JWT from the deployment-scoped `cim_af_ct_<orgId>_<embeddedServiceName>` key (`sessionStorage` is authoritative; `localStorage` is a compatibility fallback) and calls SCRT2's `/iamessage/api/v2/authorization/authlink` endpoint directly (`auth-link-client.js`) with an `Authorization: Bearer <jwt>` header to obtain an `auth_link_key`. The SCRT2 origin comes from `scrt2Url` in `COMMERCE_AGENT_SETTINGS` (a different host from Core's My Domain) and is strictly validated before the token is sent (HTTPS only; no credentials, port, path, query, or fragment) against the Salesforce SCRT2 domain allowlist, with the request hardened (`credentials: 'omit'`, `redirect: 'error'`, `referrerPolicy: 'no-referrer'`, `cache: 'no-store'`) and bounded by a 10s abort timeout. The `auth_link_key` is then forwarded to the existing Token Bridge to bind the conversation to the shopper's SLAS session. Linking is idempotent — deduped by `conversationId` + SLAS identity — and re-runs both on a new conversation (`onCimulateWidgetReady`) and on a SLAS identity transition (guest ↔ registered / account switch), gated on `my_domain` resolution. [#3943](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3943) [#3981](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3981)
-- [Bugfix] Restore Commerce Client shopper identity linking with widget 1.34.0+: read persisted conversation IDs from `localStorage` with a legacy `sessionStorage` fallback, and continue checking the other store when one contains the previously linked JWT so a stale session token cannot hide a newer local token. [#4033](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4033) (W-24293344)
-- [Bugfix] Fix the Shopper Agent Token Bridge proxy (`/api/agent/identity/bridge`) failing to reach Core in two cases: (1) same-origin POSTs were rejected with 403 `FORBIDDEN_ORIGIN` because the CSRF Origin check compared `URL.hostname` (no port) against `req.headers.host` (with port), so a non-standard dev port like `localhost:3000` never matched — now compares `URL.host`; (2) a scheme-less My Domain value (e.g. `orgfarm-1234.my.salesforce.com`) was rejected as 400 `UNTRUSTED_MYDOMAIN` because `new URL()` threw on it — the value is now normalized to an absolute `https://` origin before validation and fetch. The `AGENT_MYDOMAIN` environment variable configures the My Domain.
-- [Feature] Expose eight optional Commerce Client shopper-agent widget presentation/behavior configs through `COMMERCE_AGENT_SETTINGS`: `cc_headerConfig`, `cc_suggestionButtonConfig`, `cc_messageAlignment`, `cc_autoScroll`, `cc_openLinksInNewTab`, `cc_showProductDescription`, `cc_showProductCaptions`, and `cc_promptsConfig`. Each is forwarded to the widget only when set — `cc_showProductCaptions` is nested under `messagingConfig.showProductCaptions`, the rest are top-level widget options — and the storefront applies no default of its own, so an omitted setting keeps the widget's built-in default. String booleans (`'true'`/`'false'`) are converted to real booleans before forwarding; `cc_promptsConfig` requires `isOpen`/`isInline`/`elementId` to mount its extension.
+
+-   [Enhancement] Commerce Client shopper identity linking now retrieves the auth link key via the widget's `window.CimulateMessaging.getAuthLinkKey()` when the bundle exposes it, instead of calling SCRT2's `/iamessage/api/v2/authorization/authlink` endpoint directly with the Commerce Client JWT. Older bundles without the function fall back to the direct SCRT2 call (feature-detected, not version-checked). A `getAuthLinkKey()` rejection is surfaced as a linking failure rather than retried via the fallback, since both paths hit the same endpoint. [#4050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4050) (W-24076703)
+-   [Feature] Add embedded Page Designer content-block support to the retail template, including an Announcement Banner content component, a preview-only Header layout, and a chrome-free `/preview/component` route for standalone component previews. [#4042](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4042)
+-   [Enhancement] Rename `INLINE_AGENT_WIDGET_COMMERCE_SETTINGS` environment variable to `EMBEDDED_AGENT_COMMERCE_SETTINGS` and config key `inlineAgentWidget` to `embeddedAgent` to align with updated product terminology. [#4041](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4041)
+-   [Feature] Add a configurable `cc_enableImageUpload` toggle for the Commerce Client (Embedded Messaging) shopper-agent widget, defaulting to `'false'` and forwarded to the bundle as `messagingConfig.enableImageUpload`. Set it to `'true'` via `COMMERCE_AGENT_SETTINGS` to let shoppers upload images in the chat; requires a Commerce Client bundle that supports image upload (`cc_cdnVersion` >= `1.44.0`) plus the backend file-upload prerequisites. Also adds `blob:` and `data:` to the `img-src` CSP directive in `app/ssr.js` so the widget can render the pre-send preview (a `blob:` URL) and the sent-image thumbnail (a `data:` URL); the widget renders images locally only, so no image host is added. [#4030](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4030)
+-   [Feature] Add the `dw_attribution` first-touch marketing-attribution cookie (W-23493129). The app writes a sanitized, allowlist-only campaign cookie client-side on load so Salesforce CIP can attribute placed orders back to the campaign that drove a headless-storefront visit. Writing in the browser (not on SSR) means it also fires on a CDN document-cache hit — where the SSR handler never runs — and lets the app clear the cookie the instant a shopper opts out; campaign landing pages stay fully cacheable. The Secure + `SameSite=Lax` cookie has a 30-minute write-once TTL and stores percent-encoded `key=value` pairs (`utm_source`/`utm_medium`/`utm_campaign`/`utm_term`/`utm_content`, `gclid`, `fbclid`, `msclkid`, and a sanitized external `ref` — origin, path, and its own allowlisted params only); no free-text query params are captured. It is write-once (first touch wins) and honors Do Not Track (`dw_dnt=1`): while opted out it captures nothing and expires any existing cookie.
+-   [Feature] Add a full-PDP delivery-estimate calculator. Shoppers can enter a country code and postal code to retrieve the slowest eligible shipping option without modifying their basket; valid destinations are saved per site after a successful response. The calculator selects the latest delivery window and does not expose provider non-delivery reasons. Increase the `main.js` bundle-size budget from 105 kB to 109 kB for the calculator. [#4013](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4013)
+-   Update the direct `commerce-sdk-isomorphic` dependency for the new Shopper Delivery Estimates API support in `commerce-sdk-react`, and increase the `vendor.js` bundle budget to 403 kB for the upgraded SDK and Page Designer preview runtime.
+-   [Feature] Add inline agent widget on the Product Detail Page: renders a self-hosted `<inline-agent-widget>` web component below the Add to Cart actions so shoppers can ask product questions without opening the floating panel. The widget is gated on config (`enabled` + SCRT2 credentials present), loads client-side only, and passes product context (product id from the URL) to the agent on each message. [#3988](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3988)
+-   [Enhancement] Update inline agent widget with beautified UI and move it into the right-side product details column (below Add to Wishlist) via a new `actionFooter` prop on `ProductView`. Add default `inlineAgentWidget` config block with "Ask me anything" placeholder. [#3995](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3995)
+-   [Enhancement] Add `persistSession` (default `true`) and `enableLogging` (default `false`) config options to the inline agent widget. Session persistence keeps the conversation across page navigations; logging enables console output for debugging. [#3997](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3997)
+-   [Enhancement] Support `INLINE_AGENT_WIDGET_COMMERCE_SETTINGS` environment variable for inline agent widget configuration, matching the `COMMERCE_AGENT_SETTINGS` pattern used by the shopper agent. Credentials are read from the env var at runtime instead of being hardcoded in config. [#3999](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3999)
+-   [Enhancement] Pass `capabilities-version` attribute to the inline agent widget using the shared `DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION` constant, matching the shopper agent pattern. Update the UMD bundle to support configurable capabilities version, disable the send button until the session connects, and add an SFRA DOM fallback for the product ID. [#4007](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4007)
+-   [Bugfix] Update inline agent widget UMD bundle: wrap product context prefix in parentheses so the BYON regex can extract the product ID correctly. [#4010](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4010)
+-   [Enhancement] Update inline agent widget UMD bundle: auto-restart session on expiry instead of showing an error. The widget silently resets to idle and the next message starts a fresh session transparently. [#4015](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4015)
+-   [Enhancement] Update inline agent widget UMD bundle: show user question bubble, add 4,000-character message limit, improve error handling with generic user-facing messages, fix 403 stale-conversation reset, and hide restored session Q&A on page reload. [#4032](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4032)
+-   [Enhancement] Update inline agent widget UMD bundle: suppress agent welcome message on conversation start, and clear stale question/answer when navigating between product pages via SPA routing.
+-   [Feature] Add opener question pills to the inline agent widget on the PDP (@W-24333476). The Product Detail page parses SCAPI `c_pdpQuestions` (a JSON-encoded array of strings published by Commerce Content Studio) and forwards it to the widget via the new `pdp-questions` attribute. The widget renders up to 5 tappable pills above the input; tapping a pill sends it through the same message path as typed input, and pills auto-hide once the shopper engages. On SPA navigation between PDPs the pills re-appear for the new product's list. Malformed or absent `c_pdpQuestions` renders no pills.
+-   [Feature] Add Guest Order Lookup (GLO): unauthenticated shoppers can look up an order by order number and email, verify ownership via a time-limited 6-digit access code (valid for 15 minutes, reusable within the window), and view a filtered order detail page (shipment tracking, items, payment summary, shipping address). Server-side endpoints (`/api/guestOrderLookup/{verify,order,oms-meta,cancel,return}`) receive the SLAS access token via the `Authorization` header (sent by the client using `useAccessToken().getTokenWhenReady()`), call SCAPI with the shopper's bearer token, and filter the response to safe fields. The verify endpoint writes a `cc-goa_` HttpOnly cookie binding the order number to the verified access code; all subsequent order endpoints validate this cookie before proxying. [#3982](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3982)
+-   [Feature] Forward two backend-gating signals on the Commerce Client shopper-agent widget's `routingAttributes`: `clientVersion` (sourced from `cc_cdnVersion`, so the runtime can gate rich components on the client's capability version; omitted when unset) and `isCartMgmtSupported` (string `'true'`/`'false'`, default `'false'`, read from `cc_routingAttributes`). Brings the PWA commerce-client path to parity with the SFRA cartridge.
+-   [Feature] Enable shopper identity (customer context) for the Commerce Client (Cimulate) shopper-agent provider. Unlike MIAW, Commerce Client widgets do not expose `getAuthLinkKey`, so the browser extracts the Commerce Client JWT from the deployment-scoped `cim_af_ct_<orgId>_<embeddedServiceName>` key (`sessionStorage` is authoritative; `localStorage` is a compatibility fallback) and calls SCRT2's `/iamessage/api/v2/authorization/authlink` endpoint directly (`auth-link-client.js`) with an `Authorization: Bearer <jwt>` header to obtain an `auth_link_key`. The SCRT2 origin comes from `scrt2Url` in `COMMERCE_AGENT_SETTINGS` (a different host from Core's My Domain) and is strictly validated before the token is sent (HTTPS only; no credentials, port, path, query, or fragment) against the Salesforce SCRT2 domain allowlist, with the request hardened (`credentials: 'omit'`, `redirect: 'error'`, `referrerPolicy: 'no-referrer'`, `cache: 'no-store'`) and bounded by a 10s abort timeout. The `auth_link_key` is then forwarded to the existing Token Bridge to bind the conversation to the shopper's SLAS session. Linking is idempotent — deduped by `conversationId` + SLAS identity — and re-runs both on a new conversation (`onCimulateWidgetReady`) and on a SLAS identity transition (guest ↔ registered / account switch), gated on `my_domain` resolution. [#3943](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3943) [#3981](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3981)
+-   [Bugfix] Restore Commerce Client shopper identity linking with widget 1.34.0+: read persisted conversation IDs from `localStorage` with a legacy `sessionStorage` fallback, and continue checking the other store when one contains the previously linked JWT so a stale session token cannot hide a newer local token. [#4033](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4033) (W-24293344)
+-   [Bugfix] Fix the Shopper Agent Token Bridge proxy (`/api/agent/identity/bridge`) failing to reach Core in two cases: (1) same-origin POSTs were rejected with 403 `FORBIDDEN_ORIGIN` because the CSRF Origin check compared `URL.hostname` (no port) against `req.headers.host` (with port), so a non-standard dev port like `localhost:3000` never matched — now compares `URL.host`; (2) a scheme-less My Domain value (e.g. `orgfarm-1234.my.salesforce.com`) was rejected as 400 `UNTRUSTED_MYDOMAIN` because `new URL()` threw on it — the value is now normalized to an absolute `https://` origin before validation and fetch. The `AGENT_MYDOMAIN` environment variable configures the My Domain.
+-   [Feature] Expose eight optional Commerce Client shopper-agent widget presentation/behavior configs through `COMMERCE_AGENT_SETTINGS`: `cc_headerConfig`, `cc_suggestionButtonConfig`, `cc_messageAlignment`, `cc_autoScroll`, `cc_openLinksInNewTab`, `cc_showProductDescription`, `cc_showProductCaptions`, and `cc_promptsConfig`. Each is forwarded to the widget only when set — `cc_showProductCaptions` is nested under `messagingConfig.showProductCaptions`, the rest are top-level widget options — and the storefront applies no default of its own, so an omitted setting keeps the widget's built-in default. String booleans (`'true'`/`'false'`) are converted to real booleans before forwarding; `cc_promptsConfig` requires `isOpen`/`isInline`/`elementId` to mount its extension.
 
 ## v10.2.1 (Sep 22, 2026)
-- [Bugfix] Keep the Page Designer preview URL bar synchronized with client-side navigation. The storefront now parses the exact `mode` query parameter, and the Page Designer initializer emits `notifyClientRouteChanged(url)` after the preview channel is connected whenever the SPA route changes. Bumps `@salesforce/storefront-next-runtime` to `1.3.1`. [#4021](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4021)
+
+-   [Bugfix] Keep the Page Designer preview URL bar synchronized with client-side navigation. The storefront now parses the exact `mode` query parameter, and the Page Designer initializer emits `notifyClientRouteChanged(url)` after the preview channel is connected whenever the SPA route changes. Bumps `@salesforce/storefront-next-runtime` to `1.3.1`. [#4021](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4021)
 
 ## v10.2.0 (Aug 12, 2026)
-- [Bugfix] Fix the Data Cloud recommender catalog event field name: `personalizationContextId` → `personalizationContentId`. The official `@salesforce/cc-datacloud-typescript` SDK type and Salesforce docs both define `personalizationContentId` (Content); the `Context` spelling did not match, so the recommender UUID (`__recoUUID`) was sent under a key Data Cloud does not recognize and is expected to be dropped on ingest.
-- [Feature] Add `cc_showFab` for the Commerce Client shopper-agent widget: when `'true'`, renders a floating action button at `cc_widgetPosition` that opens the agent panel and hides while it is open. Defaults to `'false'`.
-- [Bugfix] Honor `cc_dialogFullHeight: 'false'`, which was previously dropped from the widget options so the bundle's full-height default always won.
-- [Bugfix] Remove the `cc_pagePush` content shift while the panel is expanded into a modal, instead of leaving the storefront pushed aside under the centered overlay.
-- [Feature] Add component overrides for the Commerce Client shopper-agent widget, so the default product tiles, carousels, and custom action payloads can be replaced with your own Web Components. Set `cc_overridesUrl` in `COMMERCE_AGENT_SETTINGS` to an HTTPS URL of a hosted override script (any domain, e.g. your own CDN), or `cc_overrides` to an inline map of override keys to already-registered custom element tag names (e.g. `{"ProductTile": "my-product-tile"}`), forwarded to the bundle as `overridesUrl` / `overrides`. The two are mutually exclusive: when both are set, `cc_overrides` wins and the URL is ignored with a console warning. A non-HTTPS or malformed `cc_overridesUrl` warns and is dropped rather than forwarded to the widget, leaving it on its default components. When a valid `cc_overridesUrl` is configured, its origin is added to the `script-src` CSP directive in `app/ssr.js` so the merchant-hosted script is not blocked by the browser; serving that script from a different host than the configured one requires adding the hostname to `script-src` yourself. [#3963](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3963)
-- [Bugfix] Deliver the Trusted Agent (Order on Behalf) result from the `/callback` page back to the opener. Two things previously stopped the callback page from rendering. The request processor stripped `code` from every `/callback` request for CDN caching, and the server `/callback` handler returned an empty cached response for every request. The request processor now keeps `code` when `state` is also present (the Trusted Agent redirect) and the handler falls through to the renderer with `Cache-Control: no-store` for that variant, while any other request still has `code` stripped and gets the cached empty response. When the popup lands on the same origin callback page, the page posts `code` and `state` to the opener via `postMessage` (scoped to its own origin) with a `BroadcastChannel` fallback, so login completes even when a `Cross-Origin-Opener-Policy: same-origin` header severs the popup. The standard SLAS login redirect carries no `state`, so it stays CDN cacheable and is unaffected.
-- [Feature] Persist the Commerce Client shopper-agent panel's open-state to `sessionStorage` so it stays open across page navigations (e.g. clicking an in-panel product result to a PDP) until the shopper closes it, instead of re-injecting closed on every page.
-- [Feature] Add configurable `cc_enableEscalationToAgent` and `cc_enableDownloadTranscript` toggles for the Commerce Client (Embedded Messaging) shopper-agent widget, both defaulting to `'true'` and forwarded to the bundle as `messagingConfig.enableEscalationToAgent` / `messagingConfig.enableDownloadTranscript`. Set either to `'false'` via `COMMERCE_AGENT_SETTINGS` to hide the human-agent escalation control or the transcript-download control respectively.
-- [Feature] Add `cc_pagePush` for the Commerce Client shopper-agent widget: when enabled, storefront content shifts aside (via layout padding on the shared `_app` container, desktop `lg`+ only) to make room for the open full-height side panel instead of being overlaid. Driven by the widget's `cimulate:ui-state-update` event so the layout stays in sync however the panel closes, and follows the panel to the other side when the shopper uses the widget's Move left/right control.
-- [Feature] Resolve the Commerce Client messaging bundle URL from a `cc_cdnVersion` (e.g. `1.20.0`) interpolated into the Cimulate CDN, with `commerceClientScriptSourceUrl` as an explicit override for local dev / self-hosting.
-- Namespace all Commerce Client shopper-agent config-input properties under a `cc_` prefix (e.g. `cc_esDeveloperName`, `cc_dialogFullHeight`, `cc_widgetPosition`, `cc_isOpen`) to disambiguate them from the shared/MIAW fields in `COMMERCE_AGENT_SETTINGS`.
-- [Bugfix] Render in-progress return states (Return Initiated / Partial Return Initiated) in the order status badge with the info/blue color scheme, matching the Storefront-Next order-management badge mapping. Terminal returns (Return Complete / Partial Return Complete) remain neutral gray.
-- Bump `vendor.js` bundle-size budget from 398 kB to 400 kB to accommodate the graceful invalid-JWT handling added in `commerce-sdk-react`.
-- [Feature] Add a configurable `capabilitiesVersion` for the Commerce Client (Embedded Messaging) shopper-agent widget, forwarded to the bundle as `messagingConfig.capabilitiesVersion` and defaulting to `'65'`. Enables Embedded Messaging action progress indicators; override per environment via the `capabilitiesVersion` field in `COMMERCE_AGENT_SETTINGS`.
-- [Bugfix] Only treat coupons SCAPI actually applied (`statusCode` `applied`/`adhoc`) as applied promotions. A valid-but-ineligible code (e.g. `no_applicable_promotion`) is parked on the basket with HTTP 200, so it no longer shows a false "Promotion applied" toast or appears under "Promotions applied" with no discount. The shared helper `app/utils/coupon-utils.js` (`isCouponApplied`) is the single source of truth — any override or downstream surface that renders `basket.couponItems` directly should filter through it to avoid displaying parked coupons as applied.
+
+-   [Bugfix] Fix the Data Cloud recommender catalog event field name: `personalizationContextId` → `personalizationContentId`. The official `@salesforce/cc-datacloud-typescript` SDK type and Salesforce docs both define `personalizationContentId` (Content); the `Context` spelling did not match, so the recommender UUID (`__recoUUID`) was sent under a key Data Cloud does not recognize and is expected to be dropped on ingest.
+-   [Feature] Add `cc_showFab` for the Commerce Client shopper-agent widget: when `'true'`, renders a floating action button at `cc_widgetPosition` that opens the agent panel and hides while it is open. Defaults to `'false'`.
+-   [Bugfix] Honor `cc_dialogFullHeight: 'false'`, which was previously dropped from the widget options so the bundle's full-height default always won.
+-   [Bugfix] Remove the `cc_pagePush` content shift while the panel is expanded into a modal, instead of leaving the storefront pushed aside under the centered overlay.
+-   [Feature] Add component overrides for the Commerce Client shopper-agent widget, so the default product tiles, carousels, and custom action payloads can be replaced with your own Web Components. Set `cc_overridesUrl` in `COMMERCE_AGENT_SETTINGS` to an HTTPS URL of a hosted override script (any domain, e.g. your own CDN), or `cc_overrides` to an inline map of override keys to already-registered custom element tag names (e.g. `{"ProductTile": "my-product-tile"}`), forwarded to the bundle as `overridesUrl` / `overrides`. The two are mutually exclusive: when both are set, `cc_overrides` wins and the URL is ignored with a console warning. A non-HTTPS or malformed `cc_overridesUrl` warns and is dropped rather than forwarded to the widget, leaving it on its default components. When a valid `cc_overridesUrl` is configured, its origin is added to the `script-src` CSP directive in `app/ssr.js` so the merchant-hosted script is not blocked by the browser; serving that script from a different host than the configured one requires adding the hostname to `script-src` yourself. [#3963](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3963)
+-   [Bugfix] Deliver the Trusted Agent (Order on Behalf) result from the `/callback` page back to the opener. Two things previously stopped the callback page from rendering. The request processor stripped `code` from every `/callback` request for CDN caching, and the server `/callback` handler returned an empty cached response for every request. The request processor now keeps `code` when `state` is also present (the Trusted Agent redirect) and the handler falls through to the renderer with `Cache-Control: no-store` for that variant, while any other request still has `code` stripped and gets the cached empty response. When the popup lands on the same origin callback page, the page posts `code` and `state` to the opener via `postMessage` (scoped to its own origin) with a `BroadcastChannel` fallback, so login completes even when a `Cross-Origin-Opener-Policy: same-origin` header severs the popup. The standard SLAS login redirect carries no `state`, so it stays CDN cacheable and is unaffected.
+-   [Feature] Persist the Commerce Client shopper-agent panel's open-state to `sessionStorage` so it stays open across page navigations (e.g. clicking an in-panel product result to a PDP) until the shopper closes it, instead of re-injecting closed on every page.
+-   [Feature] Add configurable `cc_enableEscalationToAgent` and `cc_enableDownloadTranscript` toggles for the Commerce Client (Embedded Messaging) shopper-agent widget, both defaulting to `'true'` and forwarded to the bundle as `messagingConfig.enableEscalationToAgent` / `messagingConfig.enableDownloadTranscript`. Set either to `'false'` via `COMMERCE_AGENT_SETTINGS` to hide the human-agent escalation control or the transcript-download control respectively.
+-   [Feature] Add `cc_pagePush` for the Commerce Client shopper-agent widget: when enabled, storefront content shifts aside (via layout padding on the shared `_app` container, desktop `lg`+ only) to make room for the open full-height side panel instead of being overlaid. Driven by the widget's `cimulate:ui-state-update` event so the layout stays in sync however the panel closes, and follows the panel to the other side when the shopper uses the widget's Move left/right control.
+-   [Feature] Resolve the Commerce Client messaging bundle URL from a `cc_cdnVersion` (e.g. `1.20.0`) interpolated into the Cimulate CDN, with `commerceClientScriptSourceUrl` as an explicit override for local dev / self-hosting.
+-   Namespace all Commerce Client shopper-agent config-input properties under a `cc_` prefix (e.g. `cc_esDeveloperName`, `cc_dialogFullHeight`, `cc_widgetPosition`, `cc_isOpen`) to disambiguate them from the shared/MIAW fields in `COMMERCE_AGENT_SETTINGS`.
+-   [Bugfix] Render in-progress return states (Return Initiated / Partial Return Initiated) in the order status badge with the info/blue color scheme, matching the Storefront-Next order-management badge mapping. Terminal returns (Return Complete / Partial Return Complete) remain neutral gray.
+-   Bump `vendor.js` bundle-size budget from 398 kB to 400 kB to accommodate the graceful invalid-JWT handling added in `commerce-sdk-react`.
+-   [Feature] Add a configurable `capabilitiesVersion` for the Commerce Client (Embedded Messaging) shopper-agent widget, forwarded to the bundle as `messagingConfig.capabilitiesVersion` and defaulting to `'65'`. Enables Embedded Messaging action progress indicators; override per environment via the `capabilitiesVersion` field in `COMMERCE_AGENT_SETTINGS`.
+-   [Bugfix] Only treat coupons SCAPI actually applied (`statusCode` `applied`/`adhoc`) as applied promotions. A valid-but-ineligible code (e.g. `no_applicable_promotion`) is parked on the basket with HTTP 200, so it no longer shows a false "Promotion applied" toast or appears under "Promotions applied" with no discount. The shared helper `app/utils/coupon-utils.js` (`isCouponApplied`) is the single source of truth — any override or downstream surface that renders `basket.couponItems` directly should filter through it to avoid displaying parked coupons as applied.
 
 ## v10.1.0 (Jul 13, 2026)
-- [Feature] Enable customer context for Shopper Agent: on conversation start, call Core's Token Bridge via a same-origin PWA Kit proxy that forwards the shopper's SLAS session (access token in the body for non-HttpOnly mode; both tokens read server-side from `cc-at_*` / `cc-nx_*` cookies in HttpOnly mode) and reset the embedded messaging session on guest ↔ registered transitions so the agent never picks up a stale shopper identity.
-- [Bugfix] Add explicit `rel="noopener noreferrer"` to external carrier tracking links so the order page URL doesn't leak as the `Referer` (Chakra `isExternal` alone only emits `noopener`).
-- Bump `vendor.js` bundle-size budget from 397 kB to 398 kB to accommodate the `commerce-sdk-isomorphic` 5.4.0 upgrade.
-- [Feature] Add item-level order returns on the order detail page. Registered shoppers who own an OMS-managed order can return eligible items (OMS-driven via `quantityAvailableToReturn`) through a modal with per-item quantity and reason selection, inline success/error feedback, and a status badge that reflects return progress (including partially-returned multi-unit lines). [#3904](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3904)
-- [Feature] Add `getOrderDisplayStatus` util that aggregates item-level OMS `omsData.status` values into a single order-level display status, following the Shopper Agent Order Level Status Matrix. Returns `null` when no item-level status is present so callers fall back to the raw order status. [#3900](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3900)
-- [Feature] Add the Commerce Client widget as an optional shopper-agent provider. A new `commerceAgent.provider` config switch selects between `miaw` (default, Salesforce Embedded Messaging) and `commerce-client`; when set to `commerce-client`, the Commerce Client messaging UMD bundle (allowlisted to `*.cimulate.ai`) is loaded and rendered in a configurable display mode (`panel`/`dialog`/`modal`). Existing MIAW storefronts are unaffected.
-- [Feature] Forward the distributed-tracing `traceparent` (a plain string set on `res.locals.traceparent` by the SDK during SSR) on the `CommerceApiProvider` `headers` prop, so outbound SCAPI/SLAS calls made during SSR carry the current trace context. No-op when tracing is disabled. [#3889](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3889)
-- [Bugfix] Fix PayPal/Venmo express checkout: resolve buyer-approved address from the upstream PayPal Order via `getBasket?expand=payment_references` (the SDK does not provide it client-side), and PATCH the basket payment instrument on shipping address change so the PayPal review screen reflects the new amount and shipping options. [#3868](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3868)
-- Bump `main.js` bundle-size budget from 102 kB to 103 kB to accommodate the PayPal/Venmo express address-resolution and shipping-PATCH paths. [#3868](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3868)
-- [Bugfix] Sync `amount` on the basket payment instrument before placing the order so the persisted `PaymentTransaction` matches `orderTotal`.
-- [Feature] Add cancel order modal on order detail page. Registered users with OMS enabled can cancel orders that are not yet shipped. Modal includes reason code selection and inline success/error feedback. Shown for OMS-managed orders the shopper owns (gated on `order.omsData`). [#3861](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3861)
-- [Bugfix] Render the search refinements panels open during server-side rendering. ChakraUI v2's Accordion forces every item closed in SSR (its open state depends on a post-mount layout effect that never runs on the server), so the panels opened only after hydration — a late relayout that could become the PLP largest-contentful-paint element. Replaced the Accordion with a controlled disclosure that honors its open state server-side.
-- [Bugfix] Memoize the search refinements panel so it stops re-rendering on every parent render when the filter set is unchanged, improving PLP render stability. [#3855](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3855)
-- Bump `vendor.js` bundle-size budget from 395 kB to 397 kB to accommodate the new `MrtDataStoreProvider` context and `useCustomSitePreferences` / `useCustomGlobalPreferences` hooks shipped in `@salesforce/pwa-kit-react-sdk`. [#3834](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3834)
-- [Feature] Add maintenance mode page: when the Commerce API returns an `sfdc_maintenance` response header, a 503 error is detected and a dedicated maintenance page is displayed instead of the generic error page. The maintenance page can render a shared page fetched from a configurable CDN URL (default) or fall back to a built-in message. Configure via `app.pages.maintenancePage` in `config/default.js`. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
+
+-   [Feature] Enable customer context for Shopper Agent: on conversation start, call Core's Token Bridge via a same-origin PWA Kit proxy that forwards the shopper's SLAS session (access token in the body for non-HttpOnly mode; both tokens read server-side from `cc-at_*` / `cc-nx_*` cookies in HttpOnly mode) and reset the embedded messaging session on guest ↔ registered transitions so the agent never picks up a stale shopper identity.
+-   [Bugfix] Add explicit `rel="noopener noreferrer"` to external carrier tracking links so the order page URL doesn't leak as the `Referer` (Chakra `isExternal` alone only emits `noopener`).
+-   Bump `vendor.js` bundle-size budget from 397 kB to 398 kB to accommodate the `commerce-sdk-isomorphic` 5.4.0 upgrade.
+-   [Feature] Add item-level order returns on the order detail page. Registered shoppers who own an OMS-managed order can return eligible items (OMS-driven via `quantityAvailableToReturn`) through a modal with per-item quantity and reason selection, inline success/error feedback, and a status badge that reflects return progress (including partially-returned multi-unit lines). [#3904](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3904)
+-   [Feature] Add `getOrderDisplayStatus` util that aggregates item-level OMS `omsData.status` values into a single order-level display status, following the Shopper Agent Order Level Status Matrix. Returns `null` when no item-level status is present so callers fall back to the raw order status. [#3900](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3900)
+-   [Feature] Add the Commerce Client widget as an optional shopper-agent provider. A new `commerceAgent.provider` config switch selects between `miaw` (default, Salesforce Embedded Messaging) and `commerce-client`; when set to `commerce-client`, the Commerce Client messaging UMD bundle (allowlisted to `*.cimulate.ai`) is loaded and rendered in a configurable display mode (`panel`/`dialog`/`modal`). Existing MIAW storefronts are unaffected.
+-   [Feature] Forward the distributed-tracing `traceparent` (a plain string set on `res.locals.traceparent` by the SDK during SSR) on the `CommerceApiProvider` `headers` prop, so outbound SCAPI/SLAS calls made during SSR carry the current trace context. No-op when tracing is disabled. [#3889](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3889)
+-   [Bugfix] Fix PayPal/Venmo express checkout: resolve buyer-approved address from the upstream PayPal Order via `getBasket?expand=payment_references` (the SDK does not provide it client-side), and PATCH the basket payment instrument on shipping address change so the PayPal review screen reflects the new amount and shipping options. [#3868](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3868)
+-   Bump `main.js` bundle-size budget from 102 kB to 103 kB to accommodate the PayPal/Venmo express address-resolution and shipping-PATCH paths. [#3868](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3868)
+-   [Bugfix] Sync `amount` on the basket payment instrument before placing the order so the persisted `PaymentTransaction` matches `orderTotal`.
+-   [Feature] Add cancel order modal on order detail page. Registered users with OMS enabled can cancel orders that are not yet shipped. Modal includes reason code selection and inline success/error feedback. Shown for OMS-managed orders the shopper owns (gated on `order.omsData`). [#3861](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3861)
+-   [Bugfix] Render the search refinements panels open during server-side rendering. ChakraUI v2's Accordion forces every item closed in SSR (its open state depends on a post-mount layout effect that never runs on the server), so the panels opened only after hydration — a late relayout that could become the PLP largest-contentful-paint element. Replaced the Accordion with a controlled disclosure that honors its open state server-side.
+-   [Bugfix] Memoize the search refinements panel so it stops re-rendering on every parent render when the filter set is unchanged, improving PLP render stability. [#3855](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3855)
+-   Bump `vendor.js` bundle-size budget from 395 kB to 397 kB to accommodate the new `MrtDataStoreProvider` context and `useCustomSitePreferences` / `useCustomGlobalPreferences` hooks shipped in `@salesforce/pwa-kit-react-sdk`. [#3834](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3834)
+-   [Feature] Add maintenance mode page: when the Commerce API returns an `sfdc_maintenance` response header, a 503 error is detected and a dedicated maintenance page is displayed instead of the generic error page. The maintenance page can render a shared page fetched from a configurable CDN URL (default) or fall back to a built-in message. Configure via `app.pages.maintenancePage` in `config/default.js`. [#3827](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3827)
 
 ## v10.0.1 (May 21, 2026)
-- Upgrade @salesforce/storefront-next-runtime to 0.4.2 [#3839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3839)
-- [Bugfix] Pin `@formatjs/cli` to 6.9.0 to fix pseudo-locale compilation in generated projects [#3842](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3842)
+
+-   Upgrade @salesforce/storefront-next-runtime to 0.4.2 [#3839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3839)
+-   [Bugfix] Pin `@formatjs/cli` to 6.9.0 to fix pseudo-locale compilation in generated projects [#3842](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3842)
 
 ## v10.0.0 (May 07, 2026)
-- Update MRT Data Store configuration comments and README to use the unprefixed environment variable names actually consumed by `@salesforce/mrt-utilities` (`MRT_DATA_STORE_DEFAULTS`, `MRT_DATA_STORE_WARN_ON_MISSING`). [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811) [#3823](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3823)
-- Add opt-in `app.mrtDataStore.enabled` to `config/default.js` (default `false`). Set to `true` or use `PWAKIT_MRT_DATA_STORE_ENABLED=true` to resolve MRT Data Store custom preferences during SSR. Local defaults without DynamoDB: `MRT_DATA_STORE_DEFAULTS` (see `config/default.js` comments). [#3787](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3787)
-- Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)
-- [Bugfix] Fix per-page express checkout toggles using `expressOnCheckoutPagesEnabled` from Shopper Configurations API. Express payment buttons on PDP, minicart, cart, and checkout can now be individually controlled via Business Manager. [#3775](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3775)
-- [Bugfix] Fix alert description text styling on subscribe form to not override default alert styles [#3780](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3780)
-- [Bugfix] Add `return_url` for express checkout payment confirmation, required by redirect-based payment methods like Amazon Pay [#3803](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3803)
-- Update `app/ssr.js` guidance for the SLAS private-client proxy: replace the deprecated `applySLASPrivateClientToEndpoints` example with a pointer to `slasPrivateClientAllowList` [#3802](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3802)
-- WIP: Add support for HttpOnly session cookies [#3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
+
+-   Update MRT Data Store configuration comments and README to use the unprefixed environment variable names actually consumed by `@salesforce/mrt-utilities` (`MRT_DATA_STORE_DEFAULTS`, `MRT_DATA_STORE_WARN_ON_MISSING`). [#3811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3811) [#3823](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3823)
+-   Add opt-in `app.mrtDataStore.enabled` to `config/default.js` (default `false`). Set to `true` or use `PWAKIT_MRT_DATA_STORE_ENABLED=true` to resolve MRT Data Store custom preferences during SSR. Local defaults without DynamoDB: `MRT_DATA_STORE_DEFAULTS` (see `config/default.js` comments). [#3787](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3787)
+-   Allow auth related cookies domain to be set via config [#3782](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3782)
+-   [Bugfix] Fix per-page express checkout toggles using `expressOnCheckoutPagesEnabled` from Shopper Configurations API. Express payment buttons on PDP, minicart, cart, and checkout can now be individually controlled via Business Manager. [#3775](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3775)
+-   [Bugfix] Fix alert description text styling on subscribe form to not override default alert styles [#3780](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3780)
+-   [Bugfix] Add `return_url` for express checkout payment confirmation, required by redirect-based payment methods like Amazon Pay [#3803](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3803)
+-   Update `app/ssr.js` guidance for the SLAS private-client proxy: replace the deprecated `applySLASPrivateClientToEndpoints` example with a pointer to `slasPrivateClientAllowList` [#3802](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3802)
+-   WIP: Add support for HttpOnly session cookies [#3804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3804)
 
 ## v9.1.1 (Mar 20, 2026)
-- Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
+
+-   Add base path prefix to support multiple MRT environments under 1 domain [#3614](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3614)
 
 ## v9.1.0 (Mar 12, 2026)
-- Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
-- [Feature] Add Salesforce Payments support in checkout [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
-- One Click Checkout removed from Developer Preview. When shoppers use passwordless OTP login with one-click checkout, the system saves their shipping and payment information for faster checkout in the future. Security safeguards required: (1) Captcha - Protects the passwordless login from bots. (2) OTP for Email Changes - Verifies identity before an email update, prevents accidental account lockouts from typos, and prevents unauthorized access to saved payment methods.
-- Update jest-fetch-mock and Jest 29 dependencies [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)
-- Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
-- [Bugfix] Fix error toast for no applicable shipping methods in one-click checkout [#3673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3673)
-- [Feature] Subscribe to marketing communications. Email capture component updated in footer section to use Shopper Consents API. [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
-- [Bugfix] Fix for custom billing address as returning shoppers in 1CC [#3693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3693)
-- [Feature] Add translations for text in 1CC [#3703](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3703)
-- [Bugfix] Fix lost custom billing address after OTP registration [#3741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3741)
-- [Bugfix] Fix edirect payment methods status value to pascal [#3734](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3734)
-- [Bugfix] Fix in checkout and cart page: LoadingSpinner to have full screen overlay [#3730](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3730)
-- [Bugfix] Fix adding to cart from a master product in the wishlist [#3732](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3732)
+
+-   Add Page Designer Support [#3727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3727)
+-   [Feature] Add Salesforce Payments support in checkout [#3725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3725)
+-   One Click Checkout removed from Developer Preview. When shoppers use passwordless OTP login with one-click checkout, the system saves their shipping and payment information for faster checkout in the future. Security safeguards required: (1) Captcha - Protects the passwordless login from bots. (2) OTP for Email Changes - Verifies identity before an email update, prevents accidental account lockouts from typos, and prevents unauthorized access to saved payment methods.
+-   Update jest-fetch-mock and Jest 29 dependencies [#3663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3663)
+-   Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
+-   [Bugfix] Fix error toast for no applicable shipping methods in one-click checkout [#3673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3673)
+-   [Feature] Subscribe to marketing communications. Email capture component updated in footer section to use Shopper Consents API. [#3674](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3674)
+-   [Bugfix] Fix for custom billing address as returning shoppers in 1CC [#3693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3693)
+-   [Feature] Add translations for text in 1CC [#3703](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3703)
+-   [Bugfix] Fix lost custom billing address after OTP registration [#3741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3741)
+-   [Bugfix] Fix edirect payment methods status value to pascal [#3734](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3734)
+-   [Bugfix] Fix in checkout and cart page: LoadingSpinner to have full screen overlay [#3730](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3730)
+-   [Bugfix] Fix adding to cart from a master product in the wishlist [#3732](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3732)
 
 ## v9.0.0 (Feb 12, 2026)
-- [Feature] One Click Checkout (in Developer Preview) [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
-- [Feature] Add `fuzzyPathMatching` to reduce computational overhead of route generation at time of application load [#3530](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3530)
-- [Bugfix] Fix Passwordless Login landingPath, Reset Password landingPath, and Social Login redirectUri value in config not being used [#3560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3560)
-- [Feature] PWA Integration with OMS
-  - Integrate Order Details page to display orders data from OMS [#3573](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3573)
-  - Integrate Order History page to display data from OMS [#3581](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3581)
-  - Add shipping display support for OMS [#3588](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3588)
-  - BOPIS multishipment with OMS [#3613](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3613)
-  - Default to ECOM shipments in case OMS has no shipments [#3639](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3639)
-- [Feature] Update passwordless login and password reset to use email mode by default. The mode can now be configured across the login page, auth modal, and checkout page [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
-- Update "Continue Securely" button text to "Continue" for passwordless login [#3556](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3556)
-- Util function for passwordless callback URI [#3630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3630)
-- [BREAKING] Remove unused absoluteUrl util from retail react app [#3633](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3633)
-- Allow shopper to manually input OTP during passwordless login [#3554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3554)
+
+-   [Feature] One Click Checkout (in Developer Preview) [#3552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3552)
+-   [Feature] Add `fuzzyPathMatching` to reduce computational overhead of route generation at time of application load [#3530](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3530)
+-   [Bugfix] Fix Passwordless Login landingPath, Reset Password landingPath, and Social Login redirectUri value in config not being used [#3560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3560)
+-   [Feature] PWA Integration with OMS
+    -   Integrate Order Details page to display orders data from OMS [#3573](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3573)
+    -   Integrate Order History page to display data from OMS [#3581](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3581)
+    -   Add shipping display support for OMS [#3588](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3588)
+    -   BOPIS multishipment with OMS [#3613](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3613)
+    -   Default to ECOM shipments in case OMS has no shipments [#3639](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3639)
+-   [Feature] Update passwordless login and password reset to use email mode by default. The mode can now be configured across the login page, auth modal, and checkout page [#3525](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3525)
+-   Update "Continue Securely" button text to "Continue" for passwordless login [#3556](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3556)
+-   Util function for passwordless callback URI [#3630](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3630)
+-   [BREAKING] Remove unused absoluteUrl util from retail react app [#3633](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3633)
+-   Allow shopper to manually input OTP during passwordless login [#3554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3554)
 
 ## v8.3.0 (Dec 17, 2025)
-- [Bugfix] Fix Forgot Password link not working from Account Profile password update form [#3493](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3493)
-- Introduce Address Autocompletion feature in the checkout flow, powered by Google Maps Platform [#3071](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3071)
+
+-   [Bugfix] Fix Forgot Password link not working from Account Profile password update form [#3493](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3493)
+-   Introduce Address Autocompletion feature in the checkout flow, powered by Google Maps Platform [#3071](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3071)
 
 ## v8.2.0 (Nov 04, 2025)
-- Add support for Rule Based Promotions for Choice of Bonus Products. We are currently supporting only one product level rule based promotion per product [#3418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3418)
-- Add support for Rule Based Promotions for Choice of Bonus Products. We are currently supporting only one product level rule based promotion per product [#3418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3418)
-- Added Einstein suggestions support for popular and recent searches in search functionality. Users can now see personalized search suggestions based on Einstein AI recommendations. [#3422](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3422)
-- [Bugfix] Fix footer heading semantic consistency and alignment. Fix accessibility compliance by adding proper h1 headings to checkout pages to resolve the page-has-heading-one accessibility rule violation. [#3398](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3398)
-- [Bugfix] Use `serverSafeEncode` util for address mutations. [#3380](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3380)
-- Added Hybrid Proxy support for local and ODS hybrid development [#3409] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3409)
-- My Account Order Details page correctly shows orders with BOPIS and with Multiple shipments [#3414](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3414)
-- Fix bug where pick up items were displaying delivery stock levels instead of in store stock levels [#3401](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3401) 
-- When registering a guest user on the confirmation page only save the delivery addresses to the new account
-[#3412](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3412)
-- Improve mobile layout for StoreDisplay component [3420](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3420)
+
+-   Add support for Rule Based Promotions for Choice of Bonus Products. We are currently supporting only one product level rule based promotion per product [#3418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3418)
+-   Add support for Rule Based Promotions for Choice of Bonus Products. We are currently supporting only one product level rule based promotion per product [#3418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3418)
+-   Added Einstein suggestions support for popular and recent searches in search functionality. Users can now see personalized search suggestions based on Einstein AI recommendations. [#3422](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3422)
+-   [Bugfix] Fix footer heading semantic consistency and alignment. Fix accessibility compliance by adding proper h1 headings to checkout pages to resolve the page-has-heading-one accessibility rule violation. [#3398](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3398)
+-   [Bugfix] Use `serverSafeEncode` util for address mutations. [#3380](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3380)
+-   Added Hybrid Proxy support for local and ODS hybrid development [#3409] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3409)
+-   My Account Order Details page correctly shows orders with BOPIS and with Multiple shipments [#3414](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3414)
+-   Fix bug where pick up items were displaying delivery stock levels instead of in store stock levels [#3401](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3401)
+-   When registering a guest user on the confirmation page only save the delivery addresses to the new account
+    [#3412](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3412)
+-   Improve mobile layout for StoreDisplay component [3420](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3420)
 
 ## v8.1.0 (Sep 25, 2025)
-- Updated search UX - prices, images, suggestions new layout [#3271](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3271)
-- Updated the UI for StoreDisplay component which displays pickup in-store information on different pages. [#3248](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3248)
-- Added warning modal for guest users when toggling between multi ship and ship to one address. [#3280](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3280) [#3302](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3302)
-- Fix the invalid address error that could occur when consolidating a pickup shipment into the default shipment `me` on checkout. [#3333](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3333)
-- Enhanced the shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications, adding comprehensive context support, localization capabilities, and improved user experience features. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
-- Removed domainUrl, locale, basetId properties as part off the ShopperAgent during initialization. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
-- Only show option to deliver to multiple addresses if there are multiple items in the basket. [#3336](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3336)
-- Added support for Choice of Bonus Products feature. Users can now select from available bonus products when they qualify for the associated promotion. The bonus product selection flow can be entered from either the "Item Added to Cart" modal (when adding the qualifying product to the cart) or from the cart page. [#3292] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3292)
-- Add @h4ad/serverless-adapter to jest config [#3325](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3325)
+
+-   Updated search UX - prices, images, suggestions new layout [#3271](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3271)
+-   Updated the UI for StoreDisplay component which displays pickup in-store information on different pages. [#3248](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3248)
+-   Added warning modal for guest users when toggling between multi ship and ship to one address. [#3280](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3280) [#3302](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3302)
+-   Fix the invalid address error that could occur when consolidating a pickup shipment into the default shipment `me` on checkout. [#3333](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3333)
+-   Enhanced the shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications, adding comprehensive context support, localization capabilities, and improved user experience features. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
+-   Removed domainUrl, locale, basetId properties as part off the ShopperAgent during initialization. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
+-   Only show option to deliver to multiple addresses if there are multiple items in the basket. [#3336](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3336)
+-   Added support for Choice of Bonus Products feature. Users can now select from available bonus products when they qualify for the associated promotion. The bonus product selection flow can be entered from either the "Item Added to Cart" modal (when adding the qualifying product to the cart) or from the cart page. [#3292] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3292)
+-   Add @h4ad/serverless-adapter to jest config [#3325](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3325)
 
 ## v8.0.0 (Sep 04, 2025)
-- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
-- Remove deprecated properties from useDNT in commerce-sdk-react [#3177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3177)
-- This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
-- [Breaking] Added support for Multi-Ship [#3056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3056) [#3199](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3199) [#3203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3203) [#3211] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3211) [#3217](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3217) [#3216] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3216) [#3231] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3231) [#3240] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3240)
-- The feature toggle for partial hydration is now found in the config file (`config.app.partialHydrationEnabled`) [#3058](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3058)
-- Mask user not found messages to prevent user enumeration from passwordless login [#3113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3113)
-- [Bugfix] Pin `@chakra-ui/react` version to 2.7.0 to avoid breaking changes from 2.10.9 [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
-- Introduce optional prop `hybridAuthEnabled` to control Hybrid Auth specific behaviors in commerce-sdk-react [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
-- Inject sfdc_user_agent request header into all SCAPI requests for debugging and metrics prupose [#3183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3183)
-- Fix config parsing to gracefully handle missing properties [#3230](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3230)
-- [Bugfix] Fix unit test failures in generated projects [3204](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3204)
+
+-   Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
+-   Remove deprecated properties from useDNT in commerce-sdk-react [#3177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3177)
+-   This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+-   [Breaking] Added support for Multi-Ship [#3056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3056) [#3199](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3199) [#3203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3203) [#3211] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3211) [#3217](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3217) [#3216] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3216) [#3231] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3231) [#3240] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3240)
+-   The feature toggle for partial hydration is now found in the config file (`config.app.partialHydrationEnabled`) [#3058](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3058)
+-   Mask user not found messages to prevent user enumeration from passwordless login [#3113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3113)
+-   [Bugfix] Pin `@chakra-ui/react` version to 2.7.0 to avoid breaking changes from 2.10.9 [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+-   Introduce optional prop `hybridAuthEnabled` to control Hybrid Auth specific behaviors in commerce-sdk-react [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
+-   Inject sfdc_user_agent request header into all SCAPI requests for debugging and metrics prupose [#3183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3183)
+-   Fix config parsing to gracefully handle missing properties [#3230](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3230)
+-   [Bugfix] Fix unit test failures in generated projects [3204](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3204)
 
 ## v7.0.0 (July 22, 2025)
 
-- Improved the layout of product tiles in product scroll and product list [#2446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2446)
-- Update the configuration of datacloud [#2467](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2467)
-- [a11y] Ensure voiceover announces contents of the email confirmation modal [#2540](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2540)
-- Updated 6 new languages [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
-- Fix Einstein event tracking for `addToCart` event [#2558](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2558)
-- Password Reset and Passwordless Integration Test [#2669](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2669)
-- Update latest translations for all languages [#2616](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2616)
-- Added support for Buy Online Pick up In Store (BOPIS) [#2646](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2646) [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716) [#2726](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2726) [#2629](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2629) [#2823](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2823)
-- Load active data scripts on demand only [#2623](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2623)
-- Provide base image for convenient perf optimizations [#2642](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2642)
-- Support saving billing phone number on user registration from order confirmation [#2653](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2653)
-- Support saving default shipping address on user registration from order confirmation [#2706](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2706)
-- Minor updates to support BOPIS E2E tests [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716)
-- Provide conditional support for partial hydration (feature flag `PARTIAL_HYDRATION_ENABLED`) [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696) [#2846](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2846)
-- Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704) [#2760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2760) [#2815](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2815)
-- [Breaking] Support Standard Products [2697](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2697)
-- Introduce store locator [#2542](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2542)
-- Fix passwordless race conditions in form submission [#2758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2758)
-- Use `<picture>` element for responsive images [#2724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2724)
-- Add Data Cloud partyIdentification events and improve error handling [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
-- Introduce the cursor rules to assist project developers [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
+-   Improved the layout of product tiles in product scroll and product list [#2446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2446)
+-   Update the configuration of datacloud [#2467](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2467)
+-   [a11y] Ensure voiceover announces contents of the email confirmation modal [#2540](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2540)
+-   Updated 6 new languages [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
+-   Fix Einstein event tracking for `addToCart` event [#2558](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2558)
+-   Password Reset and Passwordless Integration Test [#2669](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2669)
+-   Update latest translations for all languages [#2616](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2616)
+-   Added support for Buy Online Pick up In Store (BOPIS) [#2646](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2646) [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716) [#2726](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2726) [#2629](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2629) [#2823](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2823)
+-   Load active data scripts on demand only [#2623](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2623)
+-   Provide base image for convenient perf optimizations [#2642](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2642)
+-   Support saving billing phone number on user registration from order confirmation [#2653](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2653)
+-   Support saving default shipping address on user registration from order confirmation [#2706](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2706)
+-   Minor updates to support BOPIS E2E tests [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716)
+-   Provide conditional support for partial hydration (feature flag `PARTIAL_HYDRATION_ENABLED`) [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696) [#2846](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2846)
+-   Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704) [#2760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2760) [#2815](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2815)
+-   [Breaking] Support Standard Products [2697](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2697)
+-   Introduce store locator [#2542](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2542)
+-   Fix passwordless race conditions in form submission [#2758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2758)
+-   Use `<picture>` element for responsive images [#2724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2724)
+-   Add Data Cloud partyIdentification events and improve error handling [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
+-   Introduce the cursor rules to assist project developers [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
 
 ## v6.1.0 (May 22, 2025)
 
-- Fix hreflang alternate links [#2269](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2269)
-- PDP / PLP: Add page meta data tags that have been defined in BM [#2232](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2232)
-- Send PWA Kit events to Data Cloud [#2318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2318)
-- Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
-- Fix accessibility issues [#2375](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2375)
-- Update cc-datacloud-typescript package to use a fixed lock version [#2392](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2392)
-- Add Confirm New Password input field to Reset & Change Password flows [#2395](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2395)
-- Update the configuration of datacloud [#2467](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2467)
+-   Fix hreflang alternate links [#2269](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2269)
+-   PDP / PLP: Add page meta data tags that have been defined in BM [#2232](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2232)
+-   Send PWA Kit events to Data Cloud [#2318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2318)
+-   Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
+-   Fix accessibility issues [#2375](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2375)
+-   Update cc-datacloud-typescript package to use a fixed lock version [#2392](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2392)
+-   Add Confirm New Password input field to Reset & Change Password flows [#2395](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2395)
+-   Update the configuration of datacloud [#2467](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2467)
 
 ## v6.0.1 (Mar 05, 2025)
-- Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)
+
+-   Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)
 
 ## v6.0.0 (Feb 18, 2025)
 
-- DNT Consent Banner: [#2203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2203)
-- Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
-- Implemented opt-in Social & Passwordless Login features and fixed the Reset Password flow which now leverages SLAS APIs [#2079] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2079)
-- Allow store to be selectable in StoreLocator [#2187](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2187)
-- Replace transfer basket call with merge basket on checkout [#2138](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2138)
+-   DNT Consent Banner: [#2203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2203)
+-   Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
+-   Implemented opt-in Social & Passwordless Login features and fixed the Reset Password flow which now leverages SLAS APIs [#2079] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2079)
+-   Allow store to be selectable in StoreLocator [#2187](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2187)
+-   Replace transfer basket call with merge basket on checkout [#2138](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2138)
 
 ### Bug Fixes
-- [BUG] Fixed GET /shopper-context API calls being made without the usid [#2206](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2206)
-- Update test data references to 2024, and unify to 01/2040 [#2196](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2197)
-- Fixed failing checkout tests [#2195](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2195)
-- [BUG] Fixed "getCheckboxProps is not a function" when rendering checkout page in generated app.[#2140](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2140)
-- [BUG] Fix images being fetced multiple times on Safari [#2223](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2223)
+
+-   [BUG] Fixed GET /shopper-context API calls being made without the usid [#2206](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2206)
+-   Update test data references to 2024, and unify to 01/2040 [#2196](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2197)
+-   Fixed failing checkout tests [#2195](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2195)
+-   [BUG] Fixed "getCheckboxProps is not a function" when rendering checkout page in generated app.[#2140](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2140)
+-   [BUG] Fix images being fetced multiple times on Safari [#2223](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2223)
 
 ### Accessibility Improvements
-- [a11y] Fix LinkList component to follow a11y practise [#2098])(https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2098)
 
+-   [a11y] Fix LinkList component to follow a11y practise [#2098])(https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2098)
 
 ## v5.0.0 (Oct 28, 2024)
 
 ### New Features
-- Implement ability to set Shopper Context via search parameters in the Retail React App [#1986](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1986)
-- Display a promo banner from Page Designer in the PLP page of the Retail React App [#2016](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2016)
-- Clear auth state if session has been invalidated by a password change [#2092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2092)
+
+-   Implement ability to set Shopper Context via search parameters in the Retail React App [#1986](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1986)
+-   Display a promo banner from Page Designer in the PLP page of the Retail React App [#2016](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2016)
+-   Clear auth state if session has been invalidated by a password change [#2092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2092)
 
 ### Performance Improvements
 
-- PLP: When products are being refetched, only the pricing and promotions sections will display a skeleton in the ProductTile [#2064](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2064)
-- Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
+-   PLP: When products are being refetched, only the pricing and promotions sections will display a skeleton in the ProductTile [#2064](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2064)
+-   Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
 
 ### Other Changes
 
-- [Server Affinity] - Attach dwsid to SCAPI request headers & remove OCAPI proxy [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)
-- Announce wishlist change in total for screen readers (a11y) [#2033](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2033)
-- Fixed a bug that incorrectly imports uninstalled package `@chakra-ui/layout` [#2047](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2047)
-- Replace getAppOrigin with useOrigin to have a better support for an app origin building. [#2050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2050)
-- PWA Kit projects have Active Data tracking set to "true" by default [#1983](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1983).
+-   [Server Affinity] - Attach dwsid to SCAPI request headers & remove OCAPI proxy [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)
+-   Announce wishlist change in total for screen readers (a11y) [#2033](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2033)
+-   Fixed a bug that incorrectly imports uninstalled package `@chakra-ui/layout` [#2047](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2047)
+-   Replace getAppOrigin with useOrigin to have a better support for an app origin building. [#2050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2050)
+-   PWA Kit projects have Active Data tracking set to "true" by default [#1983](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1983).
 
 ### Bug Fixes
-- The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
-- Remove save/edit billing action in checkout page for the registered user [#1976](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1976)
-- Product scroller: don't skip tiles if window is too large [#2003](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2003)
-- PDP / PLP: Render non HTTP 404 erros [#2003](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2003)
-- Error page: Render home page when clicking nav icon [#2003](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2003)
-- Encode non ASCII HTTP headers when `encodeNonAsciiHttpHeaders` flag is set to true in `ssr.js` [#2009](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2009)
-- Updated @salesforce/commerce-sdk-react to 3.0.1 to fix an issue with the expires attribute of cookies, ensuring it uses seconds instead of days [#1994](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1994)
 
+-   The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
+-   Remove save/edit billing action in checkout page for the registered user [#1976](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1976)
+-   Product scroller: don't skip tiles if window is too large [#2003](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2003)
+-   PDP / PLP: Render non HTTP 404 erros [#2003](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2003)
+-   Error page: Render home page when clicking nav icon [#2003](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2003)
+-   Encode non ASCII HTTP headers when `encodeNonAsciiHttpHeaders` flag is set to true in `ssr.js` [#2009](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2009)
+-   Updated @salesforce/commerce-sdk-react to 3.0.1 to fix an issue with the expires attribute of cookies, ensuring it uses seconds instead of days [#1994](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1994)
 
 ### Accessibility Improvements
-- [a11y] Hide svg from screenreader as they are decorative on homepage [#1980](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1980)
-- [a11y] Hide log out svg from screenreader as they are decorative [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
-- [a11y] Ensure heading level matches the heading's visual importance/level [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
-- [a11y] Provide a descriptive dialog title for Mobile Navigation Header [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
-- Hide breadcrumb chevrons from screen readers [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
-- Add descriptive text for screen readers on product edit modal in cart page [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
-- A11y: Fix search bar header element focus order [#1969](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1969)
-- A11y: Order Details - hide decorative image and convert some p tags as proper headings [#2026](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2026)
-- Add aria-labels for buttons in product item wishlist component to ensure they are unique and descriptive. [#2023](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2023)
-- Focus onto the `ToggleCard` title whenever the component is opened to be editted [#2029](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2029)
-- Add descriptive acccessibility label for edit/remove buttons on account addresses and checkout pages [#2037](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2037)
-- [a11y] Mobile view account menu a11y adjustments [#2059](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2059)
-- [a11y] PLP - Use header tags for filter options [#2065](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2065)
 
+-   [a11y] Hide svg from screenreader as they are decorative on homepage [#1980](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1980)
+-   [a11y] Hide log out svg from screenreader as they are decorative [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
+-   [a11y] Ensure heading level matches the heading's visual importance/level [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
+-   [a11y] Provide a descriptive dialog title for Mobile Navigation Header [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
+-   Hide breadcrumb chevrons from screen readers [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
+-   Add descriptive text for screen readers on product edit modal in cart page [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
+-   A11y: Fix search bar header element focus order [#1969](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1969)
+-   A11y: Order Details - hide decorative image and convert some p tags as proper headings [#2026](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2026)
+-   Add aria-labels for buttons in product item wishlist component to ensure they are unique and descriptive. [#2023](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2023)
+-   Focus onto the `ToggleCard` title whenever the component is opened to be editted [#2029](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2029)
+-   Add descriptive acccessibility label for edit/remove buttons on account addresses and checkout pages [#2037](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2037)
+-   [a11y] Mobile view account menu a11y adjustments [#2059](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2059)
+-   [a11y] PLP - Use header tags for filter options [#2065](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2065)
 
 ## v4.0.0 (Aug 7, 2024)
 
 ### New Features
 
-- Support product bundles [#1916](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1916/)
-- Add Store Locator [#1922](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1922)
+-   Support product bundles [#1916](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1916/)
+-   Add Store Locator [#1922](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1922)
 
 ### Bug Fixes
 
-- Update serialized query data via `beforeHydrate` to prevent data re-fetching on load [#1912](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912)
-- Out of stock and low stock items are removed from cart and checkout as unavailable products [#1881](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1881)
-- Fix infinity sign price on product tile [#1903](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1903)
-- Remove unecessary params from product search [#1873](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1873)
+-   Update serialized query data via `beforeHydrate` to prevent data re-fetching on load [#1912](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912)
+-   Out of stock and low stock items are removed from cart and checkout as unavailable products [#1881](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1881)
+-   Fix infinity sign price on product tile [#1903](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1903)
+-   Remove unecessary params from product search [#1873](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1873)
 
 ### Accessibility Improvements
 
-- Improve accessibility readout for strikethrough price on shipping options in checkout page [#1892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1892)
-- Ensure credit card informational tooltip on checkout page persists after the user is no longer hovering over it [#1890](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1890)
-- A11y: Add aria-label to the address form based on the address type [#1904](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1904)
-- A11y: Account Nav fixes [#1884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1884)
-- A11y: Replace `<p>` tags with header tag in home page Features section [#1902](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1902)
-- Add aria-label for Checkout's action buttons [#1906](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1906)
-- Avoid forced focus changes that are not user-initiated [#1940](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1940)
-
+-   Improve accessibility readout for strikethrough price on shipping options in checkout page [#1892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1892)
+-   Ensure credit card informational tooltip on checkout page persists after the user is no longer hovering over it [#1890](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1890)
+-   A11y: Add aria-label to the address form based on the address type [#1904](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1904)
+-   A11y: Account Nav fixes [#1884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1884)
+-   A11y: Replace `<p>` tags with header tag in home page Features section [#1902](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1902)
+-   Add aria-label for Checkout's action buttons [#1906](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1906)
+-   Avoid forced focus changes that are not user-initiated [#1940](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1940)
 
 ## v3.0.2 (Jul 11, 2024)
 
 ### Bug Fixes
 
-- Fix StorefrontPreview component add siteId query parameter to shopper context calls [#1891](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1891)
+-   Fix StorefrontPreview component add siteId query parameter to shopper context calls [#1891](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1891)
 
 ### Accessibility improvements
 
-- Ensure that the email field on the checkout page receives focus after content updates [#1894](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1894)
+-   Ensure that the email field on the checkout page receives focus after content updates [#1894](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1894)
 
 ## v3.0.1 (Jul 9, 2024)
 
 ### Bug Fixes
 
-- Fix basket transfer during checkout login [#1887](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887)
+-   Fix basket transfer during checkout login [#1887](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887)
 
 ## v3.0.0 (Jun 25, 2024)
 
 ### Improvements
 
-- Product Tile Revamp
-  - Display different pricing for various products on Product tiles and PDP [#1760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1760)
-  - Display pricing for cart, checkout and wishlist page [#1796](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1796)
-  - Shows promotional callout message on Product List and Product Detail pages [#1786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1786) [#1804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1804)
-  - Display selectable swatch groups for attributes like color [#1773](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1773)
-  - Show badges [#1791](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1791)
+-   Product Tile Revamp
 
-- Lazy basket creation [#1677](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1677)
-- Use `stale-while-revalidate` cache control directive [#1744](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1744)
+    -   Display different pricing for various products on Product tiles and PDP [#1760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1760)
+    -   Display pricing for cart, checkout and wishlist page [#1796](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1796)
+    -   Shows promotional callout message on Product List and Product Detail pages [#1786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1786) [#1804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1804)
+    -   Display selectable swatch groups for attributes like color [#1773](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1773)
+    -   Show badges [#1791](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1791)
+
+-   Lazy basket creation [#1677](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1677)
+-   Use `stale-while-revalidate` cache control directive [#1744](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1744)
 
 ### Accessibility Improvements
 
-- Added live region support to components [#1825](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1825)
-- Replace p tag with heading tags in cart page [#1818](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1818)
-- Fix product tile img alt text [#1769](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1769)
-- Add aria-hidden to search icon [#1809](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1809)
-- Add explicit headers to cart modal [#1811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1811)
-- Add autocomplete to text input fields [#1840](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1840)
-- Add error icon to error messages [#1839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1839)
+-   Added live region support to components [#1825](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1825)
+-   Replace p tag with heading tags in cart page [#1818](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1818)
+-   Fix product tile img alt text [#1769](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1769)
+-   Add aria-hidden to search icon [#1809](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1809)
+-   Add explicit headers to cart modal [#1811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1811)
+-   Add autocomplete to text input fields [#1840](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1840)
+-   Add error icon to error messages [#1839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1839)
 
 ### Performance Improvements
 
-- Make navigation components lazy load their categories [#1656](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1656) [#1673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1673)
+-   Make navigation components lazy load their categories [#1656](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1656) [#1673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1673)
 
 ### Bug Fixes
 
-- Fix seo component not settings keywords meta tag [#1762](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1762)
-- Fix RecommendedProducts' toggling of the favourite icon [#1861](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1861)
-
+-   Fix seo component not settings keywords meta tag [#1762](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1762)
+-   Fix RecommendedProducts' toggling of the favourite icon [#1861](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1861)
 
 ## v2.4.1 (Apr 17, 2024)
-- Update dependency commerce-sdk-react to 1.4.1 to have access to all params keys for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
+
+-   Update dependency commerce-sdk-react to 1.4.1 to have access to all params keys for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
 
 ## v2.4.0 (Apr 15, 2024)
 
 ### New Feature
 
-- Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
+-   Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
 
 ### Bug Fixes
 
-- Fix promo codes not being properly applied in cart [#1692](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1692)
-- Fix checkout shipping method fetching [#1693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1693)
-- Fix invalid query params warnings [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
-- Fix internal server error on account pages [#1675](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1675)
-- Fix `product-item` component imports to ensure that it is overridable. [#1672](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1672)
-- Fix locale selector navigating back to default locale [#1670](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1670)
-- Fix handling of offline products on Cart, Checkout, Order History, and Wishlist pages [#1691](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1691)
-- Fix tracking of `viewSearch` event for Einstein analytics, in the case of no-search-results [#1702](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1702)
-- Remove invalid header `_sfdc_customer_id` due to recent MRT HTTP3 upgrade [#1731](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1731)
+-   Fix promo codes not being properly applied in cart [#1692](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1692)
+-   Fix checkout shipping method fetching [#1693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1693)
+-   Fix invalid query params warnings [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
+-   Fix internal server error on account pages [#1675](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1675)
+-   Fix `product-item` component imports to ensure that it is overridable. [#1672](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1672)
+-   Fix locale selector navigating back to default locale [#1670](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1670)
+-   Fix handling of offline products on Cart, Checkout, Order History, and Wishlist pages [#1691](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1691)
+-   Fix tracking of `viewSearch` event for Einstein analytics, in the case of no-search-results [#1702](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1702)
+-   Remove invalid header `_sfdc_customer_id` due to recent MRT HTTP3 upgrade [#1731](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1731)
 
 ## v2.3.1 (Jan 23, 2024)
 
 ### Bug Fixes
 
-- Fix `extract-default-translations` script [#1647](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1647)
+-   Fix `extract-default-translations` script [#1647](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1647)
 
 ## v2.3.0 (Jan 19, 2024)
 
 ### Accessibility improvements
 
-- Add correct keyboard interaction behavior for variation attribute radio buttons [#1587](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1587)
-- Change radio refinements (for example, filtering by Price) from radio inputs to styled buttons [#1605](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1605)
-- Update search refinements ARIA labels to include "add/remove filter" [#1607](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1607)
-- Improve focus behavior on my account pages, address forms, and promo codes [#1625](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1625)
+-   Add correct keyboard interaction behavior for variation attribute radio buttons [#1587](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1587)
+-   Change radio refinements (for example, filtering by Price) from radio inputs to styled buttons [#1605](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1605)
+-   Update search refinements ARIA labels to include "add/remove filter" [#1607](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1607)
+-   Improve focus behavior on my account pages, address forms, and promo codes [#1625](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1625)
 
 ### Other features
 
-- Add local development support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
-  - Support for node 20 is not yet available on Managed Runtime
-- Display selected refinements on PLP, even if the selected refinement has no hits [#1622](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1622)
+-   Add local development support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
+    -   Support for node 20 is not yet available on Managed Runtime
+-   Display selected refinements on PLP, even if the selected refinement has no hits [#1622](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1622)
 
 ## v2.2.0 (Nov 8, 2023)
 
 ### Accessibility Improvements
 
 <!-- Order by Pull Request ID! -->
-- Ensure the ListMenuTrigger component applies ARIA attributes to the correct element for the trigger icon [#1600](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1600)
-- Ensure form fields and icons have accessible labels [#1526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1526)
-- Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
-- Fix outline on keyboard focus [#1536](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1536/files)
-- Fix improper nesting of elements in product tile [#1541](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1541)
-- Ensure all interactive functionality is operable with the keyboard [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
-- Make security code tooltip receive keyboard focus [#1551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1551)
-- Improve accessibility of quantity picker [#1552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1552)
-- Improve keyboard accessibility of product scroller [#1559](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1559)
-- Fix focus indicator for hero features links on homepage [#1561](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1561)
-- Ensure color is not the sole means of communicating information [#1570](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1570)
-- Improve keyboard accessibility of account menu and nav bar [#1572](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1572)
+
+-   Ensure the ListMenuTrigger component applies ARIA attributes to the correct element for the trigger icon [#1600](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1600)
+-   Ensure form fields and icons have accessible labels [#1526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1526)
+-   Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
+-   Fix outline on keyboard focus [#1536](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1536/files)
+-   Fix improper nesting of elements in product tile [#1541](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1541)
+-   Ensure all interactive functionality is operable with the keyboard [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
+-   Make security code tooltip receive keyboard focus [#1551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1551)
+-   Improve accessibility of quantity picker [#1552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1552)
+-   Improve keyboard accessibility of product scroller [#1559](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1559)
+-   Fix focus indicator for hero features links on homepage [#1561](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1561)
+-   Ensure color is not the sole means of communicating information [#1570](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1570)
+-   Improve keyboard accessibility of account menu and nav bar [#1572](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1572)
 
 ### Other Features
 
-- Add [Active Data](https://help.salesforce.com/s/articleView?id=cc.b2c_active_data_attributes.htm&type=5) files, update pages (app index.jsx, product list and product details pages) to trigger events on product category and product detail views [#1555](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1555)
-- Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
-- Implement gift option for basket [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
-- Added option to specify `isLoginPage` function to the `withRegistration` component. The default behavior is "all pages ending in `/login`". [#1572](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1572)
-- Update `extract-default-messages` script to support multiple locales [#1574](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1574)
-- Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
-- Add support for localization in icon component [#1609](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1609)
+-   Add [Active Data](https://help.salesforce.com/s/articleView?id=cc.b2c_active_data_attributes.htm&type=5) files, update pages (app index.jsx, product list and product details pages) to trigger events on product category and product detail views [#1555](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1555)
+-   Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
+-   Implement gift option for basket [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
+-   Added option to specify `isLoginPage` function to the `withRegistration` component. The default behavior is "all pages ending in `/login`". [#1572](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1572)
+-   Update `extract-default-messages` script to support multiple locales [#1574](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1574)
+-   Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
+-   Add support for localization in icon component [#1609](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1609)
 
 ### Bug Fixes
 
-- Fix checkout allowing you to proceed to review with invalid billing address [#1632](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1632)
-- Fix password change functionality [#1634](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1634)
-- Remove internal linter rule that is missing in generated projects [#1554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1554)
-- Fix bug where you can add duplicates of the same item to the wishlist. Also fixes bug where skeleton appears when removing last item from the wishlist. [#1560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1560)
-- Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
-- Fix PLP filters for mobile [#1565](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1565)
+-   Fix checkout allowing you to proceed to review with invalid billing address [#1632](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1632)
+-   Fix password change functionality [#1634](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1634)
+-   Remove internal linter rule that is missing in generated projects [#1554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1554)
+-   Fix bug where you can add duplicates of the same item to the wishlist. Also fixes bug where skeleton appears when removing last item from the wishlist. [#1560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1560)
+-   Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
+-   Fix PLP filters for mobile [#1565](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1565)
 
 ## v2.1.1 (Nov 7, 2023)
 
-- Use the new opt-in mechanism for enforcing the default security headers required by PWA Kit projects. [#1528](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1528)
+-   Use the new opt-in mechanism for enforcing the default security headers required by PWA Kit projects. [#1528](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1528)
 
 ## v2.1.0 (Nov 3, 2023)
 
-- Support Storefront Preview
-  - [#1413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1413)
-  - [#1440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1440)
-- Show discounted and strikethrough prices when there is a promotion on product detail page [1455](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1455)
-- Move Content-Security-Policy logic to pwa-kit-runtime [1457](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1457)
+-   Support Storefront Preview
+    -   [#1413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1413)
+    -   [#1440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1440)
+-   Show discounted and strikethrough prices when there is a promotion on product detail page [1455](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1455)
+-   Move Content-Security-Policy logic to pwa-kit-runtime [1457](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1457)
 
 ## v2.0.0 (Sep 21, 2023)
 
-- V3 Fix checkout card number [#1424](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1424)
-- Cleanup wrong import path for page-designer component [#1441](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1441) @clavery
-- Modularize country code source for targeting via extensibility [#1445](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1445) @bfeister
-- Export icon helper function for target via overrides [#1420](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1420) @cbrother-csu
-- Migrate Page Designer core types to commerce-sdk-react [#1441](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1441) @clavery
+-   V3 Fix checkout card number [#1424](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1424)
+-   Cleanup wrong import path for page-designer component [#1441](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1441) @clavery
+-   Modularize country code source for targeting via extensibility [#1445](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1445) @bfeister
+-   Export icon helper function for target via overrides [#1420](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1420) @cbrother-csu
+-   Migrate Page Designer core types to commerce-sdk-react [#1441](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1441) @clavery
 
 ## v1.0.1 (Jul 26, 2023)
 
-- Fix price display when a discounted price is zero [#1361](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1361)
-- Fix price adjustments of a line item when more than one is present [#1362](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1362)
-- Registered user checkout should set order with an email [#1363](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1363)
+-   Fix price display when a discounted price is zero [#1361](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1361)
+-   Fix price adjustments of a line item when more than one is present [#1362](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1362)
+-   Registered user checkout should set order with an email [#1363](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1363)
 
 ## v1.0.0 (June 15, 2023)
 
-- First public release of package on npm under `@salesforce/retail-react-app`
-- Upgrade React v18, React DOM v18, React-hook-form v7, and Chakra 2 libraries [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
-- Add app `above-header` and product-list `above-page-header` convenience components [#1183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1183)
-- Migration to "hooks" / `@salesforce/commerce-sdk-react` integration follow the [upgrade guide](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-to-v3.html) and [view the diff](https://github.com/SalesforceCommerceCloud/pwa-kit/compare/release-2.7.x...release-3.0.x?diff=unified#files_bucket)
+-   First public release of package on npm under `@salesforce/retail-react-app`
+-   Upgrade React v18, React DOM v18, React-hook-form v7, and Chakra 2 libraries [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
+-   Add app `above-header` and product-list `above-page-header` convenience components [#1183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1183)
+-   Migration to "hooks" / `@salesforce/commerce-sdk-react` integration follow the [upgrade guide](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-to-v3.html) and [view the diff](https://github.com/SalesforceCommerceCloud/pwa-kit/compare/release-2.7.x...release-3.0.x?diff=unified#files_bucket)
 
 ## Older Versions Without Namespace
 
@@ -462,168 +481,168 @@ The versions published below were not published on npm, and the versioning match
 
 ### v2.7.1 (May 11, 2023)
 
-- Replace invalid row value with nowrap [#1179](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1179)
-- Add a redirect to login page after user signs out from checkout page [#1172](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1172)
-- PWA Kit should have a mechanism for replacing the access token when a SFRA login state is changed [#1171](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1171)
-- Added session bridge call to login for phased launch [#1159](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1159)
-- Fix Page Designer ImageWithText Link component [#1092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1092)
-- Remove site alias and locale from location.state.directedFrom path [#1065)](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1065)
-- Product list refinements [#957](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/957)
-- Prevent modal to open when it fails to add an item to cart [#1053](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1053)
-- Make `mergeBasket` conditional more robust [#1048](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1048)
-- Fix addresses not having preferred address first. [#1051](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1051)
-- Changed type of the phone number field to bring up numberic keyboard on mobile devices - W-9871940 [#1016)](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1016)
+-   Replace invalid row value with nowrap [#1179](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1179)
+-   Add a redirect to login page after user signs out from checkout page [#1172](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1172)
+-   PWA Kit should have a mechanism for replacing the access token when a SFRA login state is changed [#1171](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1171)
+-   Added session bridge call to login for phased launch [#1159](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1159)
+-   Fix Page Designer ImageWithText Link component [#1092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1092)
+-   Remove site alias and locale from location.state.directedFrom path [#1065)](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1065)
+-   Product list refinements [#957](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/957)
+-   Prevent modal to open when it fails to add an item to cart [#1053](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1053)
+-   Make `mergeBasket` conditional more robust [#1048](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1048)
+-   Fix addresses not having preferred address first. [#1051](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1051)
+-   Changed type of the phone number field to bring up numberic keyboard on mobile devices - W-9871940 [#1016)](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1016)
 
 ### v2.7.0 (Mar 03, 2023)
 
-- Add Page Designer ImageTile component [#967](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/967)
-- Add Page Designer ImageWithText component [#991](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/991)
-- Add Page Designer carousel component [#977](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/977)
-- Add Page Designer layout components [#993](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/993)
-- Support the product-set type [#1019](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1019)
+-   Add Page Designer ImageTile component [#967](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/967)
+-   Add Page Designer ImageWithText component [#991](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/991)
+-   Add Page Designer carousel component [#977](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/977)
+-   Add Page Designer layout components [#993](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/993)
+-   Support the product-set type [#1019](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1019)
 
 ### v2.6.0 (Jan 25, 2023)
 
-- Mega menu fixes [#875](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/875) and [#910](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/910)
-- Cache SLAS callback using request processor [#884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/884)
-- Fix padding of footer drawer component [#899](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/899)
-- Update createOrder to send SLAS USID [#920](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/920)
-- Fix PropTypes [#924](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/924)
-- Remove unnecessary map statement [#929](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/929)
+-   Mega menu fixes [#875](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/875) and [#910](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/910)
+-   Cache SLAS callback using request processor [#884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/884)
+-   Fix padding of footer drawer component [#899](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/899)
+-   Update createOrder to send SLAS USID [#920](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/920)
+-   Fix PropTypes [#924](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/924)
+-   Remove unnecessary map statement [#929](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/929)
 
 ### v2.5.0 (Jan 5, 2023)
 
-- Add instanceType to Einstein activity body [#858](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/858)
-- Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)
-- Einstein handle variants [#867](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/867)
-- Fix cc exp year [#874](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/874)
+-   Add instanceType to Einstein activity body [#858](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/858)
+-   Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)
+-   Einstein handle variants [#867](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/867)
+-   Fix cc exp year [#874](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/874)
 
 ### v2.4.0 (Dec 1, 2022)
 
-- Dynamic footer Copyright date [#741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/741)
-- Footer copyright: remove the remaining hardcoded year [#760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/760)
-- ImageGallery uses image.link when DIS is not set [#786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/786)
-- Use default locale as target if none is specified [#788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/788)
-- Password change bug fix [#803](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/803)
-- pwa-kit-dev command for tailing logs [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
-- Update usages of zzrf-001 ODS instance to the new short URL format [#816](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/816)
+-   Dynamic footer Copyright date [#741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/741)
+-   Footer copyright: remove the remaining hardcoded year [#760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/760)
+-   ImageGallery uses image.link when DIS is not set [#786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/786)
+-   Use default locale as target if none is specified [#788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/788)
+-   Password change bug fix [#803](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/803)
+-   pwa-kit-dev command for tailing logs [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
+-   Update usages of zzrf-001 ODS instance to the new short URL format [#816](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/816)
 
 ### v2.3.0 (Oct 27, 2022)
 
-- Fix locale `alias` by including `locale` object inside the MultiSite Context. [#716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/716)
-- Updated translations. [#725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/725)
-- Add new Einstein API activities. [#714](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/714)
-- Fix search field to recognize `“&”` character. [#736](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/736)
-- Fix filters on search results page. [#742](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/742)
-- Dynamic footer copyright date. [#741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/741)
-- Bugfix: image gallery thumbnails not working without DIS [#786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/786)
-- Ensure that a valid target locale is use if none is provided [#788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/788)
+-   Fix locale `alias` by including `locale` object inside the MultiSite Context. [#716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/716)
+-   Updated translations. [#725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/725)
+-   Add new Einstein API activities. [#714](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/714)
+-   Fix search field to recognize `“&”` character. [#736](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/736)
+-   Fix filters on search results page. [#742](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/742)
+-   Dynamic footer copyright date. [#741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/741)
+-   Bugfix: image gallery thumbnails not working without DIS [#786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/786)
+-   Ensure that a valid target locale is use if none is provided [#788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/788)
 
 ### v2.2.0 (Aug 25, 2022)
 
-- Update zzrf-001 url [#694](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/694)
-- Optimize Server-side performance [#667](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/667)
-- Remove references to session bridging [#684](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/684)
+-   Update zzrf-001 url [#694](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/694)
+-   Optimize Server-side performance [#667](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/667)
+-   Remove references to session bridging [#684](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/684)
 
 ### v2.1.0 (Jul 05, 2022)
 
-- Update translations [#643](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/643)
-- Update translations [#653](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/653)
-- Add bundlesize test back into CI [#652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/652)
-- Fix UI bug on notifications badge [#620](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/620)
+-   Update translations [#643](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/643)
+-   Update translations [#653](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/653)
+-   Add bundlesize test back into CI [#652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/652)
+-   Fix UI bug on notifications badge [#620](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/620)
 
 ### v2.0.0 (May 16, 2022)
 
-- Update translation docs [#570](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/570)
-- Fixed loading correct amount of skeletons [#576] (<https://github.com/SalesforceCommerceCloud/pwa-kit/pull/576>)
-- Remove manifest path [#582](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/582)
-- Fix Verbose ShellJS Command [#588](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/588)
-- Drop node 12 support for [#589](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/589)
-- Multi-site, Fix the case when no site aliases is set [#551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/551)
-- Fix invalid refresh token [#528](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/528)
-- Add valid token check before using refresh token on login [#533](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/533)
-- Fix localization scripts to output to the correct default locale [#539](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/539)
-- Merge guest cart and registered cart [#540](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/540)
-- Move retail react app jest setup out from pwa-kit-dev [#545](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/545)
-- Remove legacy remote proxy, which allowed remote environments to use proxy configs in package.json [#425](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/425)
-- Rename 'pwa' directory into 'template-retail-react-app' [#485](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/485)
-- Optimize visibility-off.svg [#512](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/512)
-- Support Multi-site implementation using dynamic config [#469](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/469)
-- Service worker loading for dev server [#464](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/464)
-- Environment Specific Configuration Support [#477](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
+-   Update translation docs [#570](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/570)
+-   Fixed loading correct amount of skeletons [#576] (<https://github.com/SalesforceCommerceCloud/pwa-kit/pull/576>)
+-   Remove manifest path [#582](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/582)
+-   Fix Verbose ShellJS Command [#588](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/588)
+-   Drop node 12 support for [#589](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/589)
+-   Multi-site, Fix the case when no site aliases is set [#551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/551)
+-   Fix invalid refresh token [#528](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/528)
+-   Add valid token check before using refresh token on login [#533](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/533)
+-   Fix localization scripts to output to the correct default locale [#539](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/539)
+-   Merge guest cart and registered cart [#540](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/540)
+-   Move retail react app jest setup out from pwa-kit-dev [#545](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/545)
+-   Remove legacy remote proxy, which allowed remote environments to use proxy configs in package.json [#425](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/425)
+-   Rename 'pwa' directory into 'template-retail-react-app' [#485](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/485)
+-   Optimize visibility-off.svg [#512](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/512)
+-   Support Multi-site implementation using dynamic config [#469](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/469)
+-   Service worker loading for dev server [#464](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/464)
+-   Environment Specific Configuration Support [#477](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
 
 ### v1.5.0 (Mar 17, 2022)
 
-- Support storing authentication tokens in cookie [#429](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/429)
-- Make sure the forgot-password modal also shows up in the checkout flow [#373](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/373)
-- On Windows, the locale selector dropdown in the footer now showing all of the options properly [#381](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/381)
-- Import cross-fetch to make OCAPI client isomorphic [#382](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/382)
-- Multi-site implementation for Retail React App [#391](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/391)
+-   Support storing authentication tokens in cookie [#429](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/429)
+-   Make sure the forgot-password modal also shows up in the checkout flow [#373](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/373)
+-   On Windows, the locale selector dropdown in the footer now showing all of the options properly [#381](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/381)
+-   Import cross-fetch to make OCAPI client isomorphic [#382](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/382)
+-   Multi-site implementation for Retail React App [#391](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/391)
 
 ### v1.4.0 (Jan 27, 2022)
 
-- Do not send HSTS header during local development [#288](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/288)
-- Add constants for `<meta>` tags `theme-color` and `apple-mobile-web-app-title` [#287](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/287)
-- Upgrade to React 17 [#278](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/278)
-- Import preliminary translations [#324](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/324)
-- Remove old dependencies that are no longer used [#317](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/317)
+-   Do not send HSTS header during local development [#288](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/288)
+-   Add constants for `<meta>` tags `theme-color` and `apple-mobile-web-app-title` [#287](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/287)
+-   Upgrade to React 17 [#278](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/278)
+-   Import preliminary translations [#324](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/324)
+-   Remove old dependencies that are no longer used [#317](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/317)
 
 ### v1.3.0 (Jan 06, 2022)
 
-- Remove Einstein from home page [#208](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/208)
-- Add git2gus config to allow git2gus integration [210](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/210)
-- Set common HTTP security headers [#263](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/263)
-- Add message ids to all the translated text, so they provide context for the translators [#239](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/239) [#207](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/207) [#195](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/195)
-- Minor translation fixes [260](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/260) [#252](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/252)
-- Provide Url Customization for the Retail React App [#228](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/228/files)
-- Add an image component to allow for easier-implementation of responsive images [#186](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/186)
-- Add shop Products section with products from the Catalog [#216](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/216)
-- Remove `upgrade-insecure-requests` for local development [#270](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/270)
-- Fix the missing out-of-stock message on mobile screens [#231](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/231)
-- Fix order summary prices on the check out page misaligned on mobile [#233](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/233)
-- Skip irrelevant jobs on CI on forked PR [#237](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/237) [#240](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/240)
-- Add webpack plugin [#255](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/255)
-- Combine config files [#256](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/256)
-- Improve unsupported locale error message [#225](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/225)
-- Add github template [#226](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/226)
-- Fix shipping method description overflows the price section [#232](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/232)
-- Fix show applied promotion codes case sensitive issue [#224](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/224)
-- Fix section subtitle incorrect prop warning [#282](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/282)
+-   Remove Einstein from home page [#208](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/208)
+-   Add git2gus config to allow git2gus integration [210](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/210)
+-   Set common HTTP security headers [#263](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/263)
+-   Add message ids to all the translated text, so they provide context for the translators [#239](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/239) [#207](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/207) [#195](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/195)
+-   Minor translation fixes [260](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/260) [#252](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/252)
+-   Provide Url Customization for the Retail React App [#228](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/228/files)
+-   Add an image component to allow for easier-implementation of responsive images [#186](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/186)
+-   Add shop Products section with products from the Catalog [#216](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/216)
+-   Remove `upgrade-insecure-requests` for local development [#270](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/270)
+-   Fix the missing out-of-stock message on mobile screens [#231](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/231)
+-   Fix order summary prices on the check out page misaligned on mobile [#233](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/233)
+-   Skip irrelevant jobs on CI on forked PR [#237](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/237) [#240](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/240)
+-   Add webpack plugin [#255](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/255)
+-   Combine config files [#256](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/256)
+-   Improve unsupported locale error message [#225](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/225)
+-   Add github template [#226](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/226)
+-   Fix shipping method description overflows the price section [#232](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/232)
+-   Fix show applied promotion codes case sensitive issue [#224](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/224)
+-   Fix section subtitle incorrect prop warning [#282](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/282)
 
 ### v1.2.0 (Nov 18, 2021)
 
-- Simplify homepage for Retail React App [#201](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/201)
-- Ensure `cookieId` value is sent always for Einstein recommendations [#179](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/179)
-- Remove `x-powered-by` HTTP response header [#165](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/165)
-- For search engine crawlers, add `hreflang` links to the current page's html [#137](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/137)
-- Use the preferred currency when switching locales. [#105](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/105)
-- Integrate wishlist with einstein recommended products. [#131](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/131)
-- When adding a new locale, minimize configuring the locale selector UI by having a list of commonly-used locales [#175](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/175)
-- Enable adding wishlist item to the cart. [#158](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/158)
-- Rename CartItemVariant to ItemVariantProvider [#155](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/155)
-- Enabling pseudo locale now affects only the loading of the translation messages. The rest of the app still knows about English and the other locales. [#177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/177)
-- Allow individual Commerce API calls to pass in a different locale/currency and override the global value. [#177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/177)
-- Fix regression with loading the correct translation file [#193](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/193)
-- Upgrade `chakra-ui/react` to `^1.7.1` version. [#204](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/204)
-- Rename the `extract-messages` and `compile-messages` commands to `extract-default-translations` and `compile-translations` [#160](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/160)
-- Enable favourite icons on product tiles for guest users [#173](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/173)
-- Fix Missing Locale Param for Commerce API Calls [#174](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/174)
-- Add cache control header to product details page [#172](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/172)
-- Clear SLAS tokens when OID is changed [#178](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/178)
+-   Simplify homepage for Retail React App [#201](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/201)
+-   Ensure `cookieId` value is sent always for Einstein recommendations [#179](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/179)
+-   Remove `x-powered-by` HTTP response header [#165](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/165)
+-   For search engine crawlers, add `hreflang` links to the current page's html [#137](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/137)
+-   Use the preferred currency when switching locales. [#105](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/105)
+-   Integrate wishlist with einstein recommended products. [#131](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/131)
+-   When adding a new locale, minimize configuring the locale selector UI by having a list of commonly-used locales [#175](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/175)
+-   Enable adding wishlist item to the cart. [#158](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/158)
+-   Rename CartItemVariant to ItemVariantProvider [#155](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/155)
+-   Enabling pseudo locale now affects only the loading of the translation messages. The rest of the app still knows about English and the other locales. [#177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/177)
+-   Allow individual Commerce API calls to pass in a different locale/currency and override the global value. [#177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/177)
+-   Fix regression with loading the correct translation file [#193](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/193)
+-   Upgrade `chakra-ui/react` to `^1.7.1` version. [#204](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/204)
+-   Rename the `extract-messages` and `compile-messages` commands to `extract-default-translations` and `compile-translations` [#160](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/160)
+-   Enable favourite icons on product tiles for guest users [#173](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/173)
+-   Fix Missing Locale Param for Commerce API Calls [#174](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/174)
+-   Add cache control header to product details page [#172](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/172)
+-   Clear SLAS tokens when OID is changed [#178](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/178)
 
 ### v1.1.0 (Sep 27, 2021)
 
-- Fix wishlist bugs and provide better hooks for wishlist features. [#64](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/64)
-- Lazy load Popover component. [#134](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/134)
-- Fix pseudo local command to use `en-XB`. [#101](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/101)
-- Ensure generated projects ship with a working .gitignore file. [#95](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/95)
-- Remove eslint rule which check for Salesforce copyright. [#104](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/104)
-- Improve error page design. [#74](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/74)
-- Localize cart and checkout messages. [#106](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/106)
-- Add default cache control header to home page. [#103](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/103)
-- Security - `inquirer` package upgrade. [#121](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/121)
-- New quantity picker. [#102](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/102)
+-   Fix wishlist bugs and provide better hooks for wishlist features. [#64](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/64)
+-   Lazy load Popover component. [#134](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/134)
+-   Fix pseudo local command to use `en-XB`. [#101](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/101)
+-   Ensure generated projects ship with a working .gitignore file. [#95](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/95)
+-   Remove eslint rule which check for Salesforce copyright. [#104](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/104)
+-   Improve error page design. [#74](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/74)
+-   Localize cart and checkout messages. [#106](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/106)
+-   Add default cache control header to home page. [#103](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/103)
+-   Security - `inquirer` package upgrade. [#121](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/121)
+-   New quantity picker. [#102](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/102)
 
 ### v1.0.0 (Sep 08, 2021)
 
-- PWA Kit General Availability and open source. 🎉
+-   PWA Kit General Availability and open source. 🎉

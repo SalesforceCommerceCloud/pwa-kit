@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2026, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React from 'react'
 import {IntlProvider} from 'react-intl'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
-import CartNudge from './cart-nudge'
+import CartNudge from '@salesforce/retail-react-app/app/components/shopper-agent/cart-nudge'
 
 let mockBasket
 let mockLoading

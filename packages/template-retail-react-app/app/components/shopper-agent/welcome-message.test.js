@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
-import ShopperAgentWelcomeMessage from './welcome-message'
+import ShopperAgentWelcomeMessage from '@salesforce/retail-react-app/app/components/shopper-agent/welcome-message'
 
 const message = 'Hi! Welcome to our store. Looking for holiday gift inspiration?'
 const props = {

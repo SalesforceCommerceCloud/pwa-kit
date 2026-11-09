@@ -2,6 +2,7 @@
  * Copyright (c) 2026, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
@@ -12,7 +13,7 @@ import {
     getFreeShippingNudge,
     openFreeShippingSearch
 } from '@salesforce/retail-react-app/app/utils/free-shipping-nudge'
-import ShopperAgentWelcomeMessage from './welcome-message'
+import ShopperAgentWelcomeMessage from '@salesforce/retail-react-app/app/components/shopper-agent/welcome-message'
 
 export default function CartNudge({config, siteId, position, demoMode, onDismiss, fallback}) {
     const {data: basket, isLoading} = useCurrentBasket()

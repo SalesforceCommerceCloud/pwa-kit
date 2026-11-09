@@ -1137,6 +1137,96 @@
       "value": "Shopping Cart"
     }
   ],
+  "cart_agent.chip.compare_items": [
+    {
+      "type": 0,
+      "value": "Compare items"
+    }
+  ],
+  "cart_agent.chip.delivery_date": [
+    {
+      "type": 0,
+      "value": "Delivery date"
+    }
+  ],
+  "cart_agent.chip.return_policy": [
+    {
+      "type": 0,
+      "value": "Return policy"
+    }
+  ],
+  "cart_agent.connection_error": [
+    {
+      "type": 0,
+      "value": "Unable to reach the server. Please try again."
+    }
+  ],
+  "cart_agent.description": [
+    {
+      "type": 0,
+      "value": "Ask about sizing, delivery, returns, or items in your cart."
+    }
+  ],
+  "cart_agent.generic_error": [
+    {
+      "type": 0,
+      "value": "Something went wrong. Please try again."
+    }
+  ],
+  "cart_agent.input_label": [
+    {
+      "type": 0,
+      "value": "Ask a question about your cart"
+    }
+  ],
+  "cart_agent.loader_error": [
+    {
+      "type": 0,
+      "value": "Cart assistance is unavailable. You can still check out."
+    }
+  ],
+  "cart_agent.placeholder": [
+    {
+      "type": 0,
+      "value": "Ask about your cart"
+    }
+  ],
+  "cart_agent.question_too_long_error": [
+    {
+      "type": 0,
+      "value": "Use 1,500 characters or fewer for your question."
+    }
+  ],
+  "cart_agent.retry_label": [
+    {
+      "type": 0,
+      "value": "Retry"
+    }
+  ],
+  "cart_agent.send_label": [
+    {
+      "type": 0,
+      "value": "Send question"
+    }
+  ],
+  "cart_agent.suggestions_label": [
+    {
+      "type": 0,
+      "value": "Suggested questions"
+    }
+  ],
+  "cart_agent.thinking_label": [
+    {
+      "type": 0,
+      "value": "Thinking"
+    }
+  ],
+  "cart_agent.title": [
+    {
+      "type": 0,
+      "value": "Need help before checkout?"
+    }
+  ],
   "cart_cta.link.checkout": [
     {
       "type": 0,
@@ -1735,6 +1825,18 @@
     {
       "type": 0,
       "value": ")"
+    }
+  ],
+  "commerce_client_fab.label.browse_collection": [
+    {
+      "type": 0,
+      "value": "Browse Collection"
+    }
+  ],
+  "commerce_client_fab.label.explore_product": [
+    {
+      "type": 0,
+      "value": "Explore this product"
     }
   ],
   "confirmation_modal.default.action.no": [
@@ -3259,6 +3361,18 @@
     {
       "type": 0,
       "value": "Secure"
+    }
+  ],
+  "inline_agent_widget.loader_error": [
+    {
+      "type": 0,
+      "value": "Assistant is unavailable. Please try again."
+    }
+  ],
+  "inline_agent_widget.retry_label": [
+    {
+      "type": 0,
+      "value": "Retry"
     }
   ],
   "item_attributes.label.bonus_product": [
@@ -5633,6 +5747,52 @@
     {
       "type": 0,
       "value": "Something went wrong. Try again."
+    }
+  ],
+  "shopper_agent.shipping.dismiss": [
+    {
+      "type": 0,
+      "value": "Dismiss free-shipping suggestion"
+    }
+  ],
+  "shopper_agent.shipping.error": [
+    {
+      "type": 0,
+      "value": "Could not start the product search. Please ask the shopping agent for complementary items to reach free shipping."
+    }
+  ],
+  "shopper_agent.shipping.nudge": [
+    {
+      "type": 0,
+      "value": "You're "
+    },
+    {
+      "type": 1,
+      "value": "gap"
+    },
+    {
+      "type": 0,
+      "value": " away from free shipping. Want help finding something to go with "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "?"
+    }
+  ],
+  "shopper_agent.welcome.dismiss": [
+    {
+      "type": 0,
+      "value": "Dismiss welcome message"
+    }
+  ],
+  "shopper_agent.welcome.message": [
+    {
+      "type": 0,
+      "value": "Hi! Welcome to our store. Looking for holiday gift inspiration?"
     }
   ],
   "signout_confirmation_dialog.button.cancel": [

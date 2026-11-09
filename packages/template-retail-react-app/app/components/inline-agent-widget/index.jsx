@@ -6,23 +6,55 @@
  */
 
 import React from 'react'
-import {Helmet} from 'react-helmet'
 import PropTypes from 'prop-types'
+import {useIntl} from 'react-intl'
+import {Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useInlineAgentWidget, {
     isConfigured
 } from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 
-const InlineAgentWidget = ({config, pdpQuestions, productName}) => {
-    const containerRef = useInlineAgentWidget(config, {pdpQuestions, productName})
+const InlineAgentWidget = ({
+    config,
+    pdpQuestions,
+    productName,
+    cartContext,
+    title,
+    description,
+    uiText
+}) => {
+    const {formatMessage} = useIntl()
+    const {containerRef, loadError, retry} = useInlineAgentWidget(config, {
+        pdpQuestions,
+        productName,
+        cartContext,
+        title,
+        description,
+        uiText
+    })
 
     if (!isConfigured(config)) return null
 
     return (
         <>
-            <Helmet>
-                <script src="/static/inline-agent-widget.umd.js" async></script>
-            </Helmet>
             <div ref={containerRef} />
+            {loadError && (
+                <div>
+                    <p role="alert">
+                        {uiText?.loaderError ||
+                            formatMessage({
+                                id: 'inline_agent_widget.loader_error',
+                                defaultMessage: 'Assistant is unavailable. Please try again.'
+                            })}
+                    </p>
+                    <Button type="button" onClick={retry}>
+                        {uiText?.retryLabel ||
+                            formatMessage({
+                                id: 'inline_agent_widget.retry_label',
+                                defaultMessage: 'Retry'
+                            })}
+                    </Button>
+                </div>
+            )}
         </>
     )
 }
@@ -48,7 +80,28 @@ InlineAgentWidget.propTypes = {
      * `name` standard field. When absent, the widget falls back to the
      * generic "Ask me anything" string.
      */
-    productName: PropTypes.string
+    productName: PropTypes.string,
+    cartContext: PropTypes.shape({
+        currency: PropTypes.string,
+        items: PropTypes.arrayOf(
+            PropTypes.shape({
+                productId: PropTypes.string,
+                name: PropTypes.string,
+                quantity: PropTypes.number,
+                variationAttributes: PropTypes.arrayOf(
+                    PropTypes.shape({
+                        id: PropTypes.string,
+                        name: PropTypes.string,
+                        value: PropTypes.string,
+                        valueName: PropTypes.string
+                    })
+                )
+            })
+        )
+    }),
+    title: PropTypes.string,
+    description: PropTypes.string,
+    uiText: PropTypes.objectOf(PropTypes.string)
 }
 
 export default InlineAgentWidget

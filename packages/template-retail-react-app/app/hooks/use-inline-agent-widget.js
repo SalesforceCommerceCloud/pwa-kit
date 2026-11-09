@@ -20,21 +20,53 @@ const ensureWidget = () => {
         return readyPromise
     }
 
-    // Ensure the script tag exists in <head> (Helmet adds it on SSR, but on
-    // client-only navigation we may need to inject it manually).
-    if (!document.querySelector(`script[src="${SCRIPT_SRC}"]`)) {
-        const script = document.createElement('script')
-        script.src = SCRIPT_SRC
-        script.async = true
-        document.head.appendChild(script)
-    }
-
-    // Wait for the custom element to be registered — works regardless of
-    // whether the script was included in SSR HTML or injected dynamically.
-    readyPromise = customElements.whenDefined('inline-agent-widget').then(() => {
-        if (!customElements.get('inline-agent-widget') && window.InlineAgentWidget?.defineElement) {
-            window.InlineAgentWidget.defineElement()
+    readyPromise = new Promise((resolve, reject) => {
+        let script = document.querySelector(`script[src="${SCRIPT_SRC}"]`)
+        const injected = !script
+        if (injected) {
+            script = document.createElement('script')
+            script.src = SCRIPT_SRC
+            script.async = true
         }
+        let settled = false
+        const finish = (error) => {
+            if (settled) return
+            settled = true
+            clearTimeout(timeout)
+            script.removeEventListener('load', onLoad)
+            script.removeEventListener('error', onError)
+            if (error) {
+                script.remove()
+                reject(error)
+            } else {
+                resolve()
+            }
+        }
+        const onLoad = () => {
+            try {
+                if (
+                    !customElements.get('inline-agent-widget') &&
+                    window.InlineAgentWidget?.defineElement
+                ) {
+                    window.InlineAgentWidget.defineElement()
+                }
+                if (customElements.get('inline-agent-widget')) finish()
+            } catch (error) {
+                finish(error)
+            }
+        }
+        const onError = () => finish(new Error('Inline agent widget script failed to load'))
+        const timeout = setTimeout(
+            () => finish(new Error('Inline agent widget registration timed out')),
+            15000
+        )
+        script.addEventListener('load', onLoad)
+        script.addEventListener('error', onError)
+        customElements.whenDefined('inline-agent-widget').then(() => finish())
+        if (injected) document.head.appendChild(script)
+    }).catch((error) => {
+        readyPromise = null
+        throw error
     })
     return readyPromise
 }
@@ -48,23 +80,36 @@ const isConfigured = (config) =>
 const pdpQuestionsKey = (pdpQuestions) =>
     Array.isArray(pdpQuestions) && pdpQuestions.length > 0 ? JSON.stringify(pdpQuestions) : ''
 
-const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
+const useInlineAgentWidget = (
+    config,
+    {pdpQuestions, productName, cartContext, title, description, uiText} = {}
+) => {
     const [ready, setReady] = useState(false)
+    const [loadError, setLoadError] = useState(false)
+    const [attempt, setAttempt] = useState(0)
     const containerRef = useRef(null)
     const configured = isConfigured(config)
     const questionsKey = pdpQuestionsKey(pdpQuestions)
+    const cartContextKey = cartContext ? JSON.stringify(cartContext) : ''
+    const uiTextKey = uiText ? JSON.stringify(uiText) : ''
 
     useEffect(() => {
         if (typeof window === 'undefined') return
+        setReady(false)
+        setLoadError(false)
         if (!configured) return
         let cancelled = false
-        ensureWidget().then(() => {
-            if (!cancelled) setReady(true)
-        })
+        ensureWidget()
+            .then(() => {
+                if (!cancelled) setReady(true)
+            })
+            .catch(() => {
+                if (!cancelled) setLoadError(true)
+            })
         return () => {
             cancelled = true
         }
-    }, [configured])
+    }, [configured, attempt])
 
     useEffect(() => {
         if (!configured || !ready) return
@@ -77,7 +122,8 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
         el.setAttribute('es-developer-name', config.esDeveloperName)
         el.setAttribute('capabilities-version', DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION)
         if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
-        if (config.persistSession !== false) el.setAttribute('persist-session', '')
+        if (!cartContextKey && config.persistSession !== false)
+            el.setAttribute('persist-session', '')
         if (config.enableLogging) el.setAttribute('enable-logging', '')
         // Seed pdp-questions at create time when we already have them, so the
         // pills paint in the same frame the widget mounts (no visible pop-in
@@ -88,6 +134,13 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
         // effect below handles variant switches / SPA PDP navigation without
         // tearing down the widget.
         if (productName) el.setAttribute('product-name', productName)
+        if (cartContextKey) {
+            el.setAttribute('cart-mode', '')
+            el.setAttribute('cart-context', cartContextKey)
+        }
+        if (title) el.setAttribute('title', title)
+        if (description) el.setAttribute('description', description)
+        if (uiTextKey) el.setAttribute('ui-text', uiTextKey)
 
         containerRef.current.appendChild(el)
 
@@ -128,7 +181,37 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
         }
     }, [configured, ready, productName])
 
-    return containerRef
+    useEffect(() => {
+        if (!configured || !ready) return
+        const el = containerRef.current?.querySelector('inline-agent-widget')
+        if (!el) return
+        if (cartContextKey) {
+            el.setAttribute('cart-mode', '')
+            el.setAttribute('cart-context', cartContextKey)
+            el.removeAttribute('persist-session')
+        } else {
+            el.removeAttribute('cart-mode')
+            el.removeAttribute('cart-context')
+        }
+        for (const [name, value] of [
+            ['title', title],
+            ['description', description]
+        ]) {
+            if (value) el.setAttribute(name, value)
+            else el.removeAttribute(name)
+        }
+    }, [configured, ready, cartContextKey, title, description])
+
+    useEffect(() => {
+        if (!configured || !ready) return
+        const el = containerRef.current?.querySelector('inline-agent-widget')
+        if (!el) return
+        if (uiTextKey) el.setAttribute('ui-text', uiTextKey)
+        else el.removeAttribute('ui-text')
+    }, [configured, ready, uiTextKey])
+
+    const retry = () => setAttempt((value) => value + 1)
+    return {containerRef, loadError, retry}
 }
 
 export {isConfigured}

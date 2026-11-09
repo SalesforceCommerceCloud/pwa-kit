@@ -30,6 +30,19 @@ import {
     products as mockProducts
 } from '@salesforce/retail-react-app/app/pages/cart/cart.mock'
 import userEvent from '@testing-library/user-event'
+import cartMessages from '@salesforce/retail-react-app/translations/en-GB.json'
+import fallbackMessages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
+
+const cartAgentMessages = Object.fromEntries(
+    Object.entries(cartMessages)
+        .filter(([id]) => id.startsWith('cart_agent.'))
+        .map(([id, message]) => [id, message.defaultMessage])
+)
+
+jest.mock('@salesforce/retail-react-app/app/components/inline-agent-widget', () => ({
+    __esModule: true,
+    default: () => <div data-testid="cart-agent-widget" />
+}))
 
 // Mock useMultiSite hook
 const mockUseMultiSite = jest.fn()
@@ -315,10 +328,38 @@ describe('Empty cart tests', function () {
     test('Renders empty cart when there are no items', async () => {
         renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
+        expect(screen.queryByTestId('cart-agent-widget')).not.toBeInTheDocument()
     })
 })
 
 describe('Rendering tests', function () {
+    test('mounts one cart panel after all shipment groups in the left column', async () => {
+        const {getConfig} = jest.requireMock('@salesforce/pwa-kit-runtime/utils/ssr-config')
+        const original = getConfig.getMockImplementation()
+        getConfig.mockImplementation(() => {
+            const config = original()
+            return {
+                ...config,
+                app: {
+                    ...config.app,
+                    embeddedAgent: {
+                        enabled: true,
+                        cartEnabled: true,
+                        scrt2Url: 'https://example.com',
+                        orgId: 'org',
+                        esDeveloperName: 'agent'
+                    }
+                }
+            }
+        })
+        renderWithProviders(<Cart />, {messages: {...fallbackMessages, ...cartAgentMessages}})
+        const widget = await screen.findByTestId('cart-agent-widget')
+        expect(screen.getAllByTestId('cart-agent-widget')).toHaveLength(1)
+        const groupStack = widget.parentElement.previousElementSibling
+        expect(groupStack.textContent).toContain('Belted Cardigan')
+        expect(groupStack.children.length).toBeGreaterThan(0)
+        getConfig.mockImplementation(original)
+    })
     test('Renders skeleton initially', async () => {
         renderWithProviders(<Cart />)
 

@@ -22,6 +22,7 @@ import {
 // Project Components
 import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-cta'
+import CartAgent from '@salesforce/retail-react-app/app/pages/cart/partials/cart-agent'
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
 import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart-title'
@@ -1396,6 +1397,11 @@ const Cart = () => {
                                         </Box>
                                     ))}
                                 </Stack>
+                                <CartAgent
+                                    basket={basket}
+                                    productsByItemId={productsByItemId}
+                                    customerId={customerId}
+                                />
                                 <Box>
                                     {isOpen && !selectedItem.bundledProductItems && (
                                         <ProductViewModal

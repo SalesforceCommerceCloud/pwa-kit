@@ -354,3 +354,7 @@ export const DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG = {
         dialogPosition: 'bottom-right'
     }
 }
+
+// Purple-to-teal gradient shared by the shopper agent call-to-action surfaces.
+export const SHOPPER_AGENT_GRADIENT =
+    'linear-gradient(125deg, #4939a7 0%, #245b94 55%, #00666f 100%)'
