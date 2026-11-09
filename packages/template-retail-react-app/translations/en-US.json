@@ -1321,17 +1321,14 @@
   "icons.assistive_msg.lock": {
     "defaultMessage": "Secure"
   },
-  "inline_agent_widget.shopper_agent.input_placeholder": {
-    "defaultMessage": "Ask me anything"
+  "inline_agent_widget.button.retry": {
+    "defaultMessage": "Try again"
   },
-  "inline_agent_widget.shopper_agent.input_placeholder_with_product": {
-    "defaultMessage": "Ask me anything about {productName}"
+  "inline_agent_widget.message.handoff_failed": {
+    "defaultMessage": "We couldn't send your question to the assistant. Please try again."
   },
-  "inline_agent_widget.shopper_agent.submit": {
-    "defaultMessage": "Ask"
-  },
-  "inline_agent_widget.shopper_agent.title": {
-    "defaultMessage": "Have a question?"
+  "inline_agent_widget.message.manual_handoff": {
+    "defaultMessage": "This chat cannot receive questions automatically. Copy your question below and send it in the chat."
   },
   "item_attributes.label.bonus_product": {
     "defaultMessage": "Bonus Product"

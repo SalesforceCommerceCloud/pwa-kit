@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {createRef as mockCreateRef} from 'react'
-import {screen, act} from '@testing-library/react'
+import React, {useState, createRef as mockCreateRef} from 'react'
+import {screen, act, fireEvent, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import InlineAgentWidget from '@salesforce/retail-react-app/app/components/inline-agent-widget'
 import {handoffToShopperAgent as handoffMock} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
@@ -36,7 +36,102 @@ const BASE_CONFIG = {
 
 describe('InlineAgentWidget', () => {
     beforeEach(() => {
-        handoffMock.mockReset()
+        handoffMock.mockReset().mockResolvedValue({seeded: true, provider: 'commerce-client'})
+    })
+
+    test.each([undefined, null])(
+        'renders nothing and ignores handoffs with config %s',
+        (config) => {
+            const {container} = renderWithProviders(<InlineAgentWidget config={config} />)
+            act(() => {
+                document.dispatchEvent(
+                    new CustomEvent('inline-agent-widget:handoff', {
+                        detail: {question: 'Hello?'}
+                    })
+                )
+            })
+            expect(container.querySelector('div')).toBeNull()
+            expect(handoffMock).not.toHaveBeenCalled()
+        }
+    )
+
+    test.each(['none', 'commerce-client', 'rejection'])(
+        'preserves a failed question for %s',
+        async (provider) => {
+            if (provider === 'rejection') {
+                handoffMock.mockRejectedValueOnce(new Error('unavailable'))
+            } else {
+                handoffMock.mockResolvedValueOnce({seeded: false, provider})
+            }
+            const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+            renderWithProviders(
+                <InlineAgentWidget
+                    config={{...BASE_CONFIG, mode: 'shopper-agent'}}
+                    productId="500400"
+                />
+            )
+            await act(async () => {
+                document.dispatchEvent(
+                    new CustomEvent('inline-agent-widget:handoff', {
+                        detail: {question: 'What colors are available?', source: 'input'}
+                    })
+                )
+            })
+            expect(screen.getByRole('alert')).toHaveTextContent('What colors are available?')
+            fireEvent.click(screen.getByRole('button', {name: 'Try again'}))
+            await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument())
+            expect(handoffMock).toHaveBeenCalledTimes(2)
+            expect(handoffMock.mock.calls[1][0]).toMatchObject({
+                question: 'What colors are available?',
+                productContext: {productId: '500400'}
+            })
+            errorSpy.mockRestore()
+        }
+    )
+
+    test('keeps MIAW questions available to copy into the chat', async () => {
+        handoffMock.mockResolvedValueOnce({seeded: false, provider: 'miaw'})
+        renderWithProviders(<InlineAgentWidget config={{...BASE_CONFIG, mode: 'shopper-agent'}} />)
+        await act(async () => {
+            document.dispatchEvent(
+                new CustomEvent('inline-agent-widget:handoff', {
+                    detail: {question: 'What colors are available?', source: 'input'}
+                })
+            )
+        })
+        expect(screen.getByRole('alert')).toHaveTextContent('What colors are available?')
+        expect(screen.getByRole('alert')).toHaveTextContent('Copy your question below')
+        expect(screen.queryByRole('button', {name: 'Try again'})).not.toBeInTheDocument()
+    })
+
+    test('ignores a failed handoff after switching products', async () => {
+        let finish
+        handoffMock.mockReturnValueOnce(
+            new Promise((resolve) => {
+                finish = resolve
+            })
+        )
+        const ProductSwitch = () => {
+            const [productId, setProductId] = useState('old')
+            return (
+                <>
+                    <button onClick={() => setProductId('new')}>Switch product</button>
+                    <InlineAgentWidget
+                        config={{...BASE_CONFIG, mode: 'shopper-agent'}}
+                        productId={productId}
+                    />
+                </>
+            )
+        }
+        renderWithProviders(<ProductSwitch />)
+        act(() =>
+            document.dispatchEvent(
+                new CustomEvent('inline-agent-widget:handoff', {detail: {question: 'Old product?'}})
+            )
+        )
+        fireEvent.click(screen.getByRole('button', {name: 'Switch product'}))
+        await act(async () => finish({seeded: false, provider: 'none'}))
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })
 
     test('renders nothing meaningful when config is not configured', () => {
@@ -46,10 +141,7 @@ describe('InlineAgentWidget', () => {
 
     test('renders the UMD mount container in inline mode (default)', () => {
         const {container} = renderWithProviders(<InlineAgentWidget config={BASE_CONFIG} />)
-        // The local React shim (removed in favor of the UMD shim) should NOT render.
         expect(screen.queryByTestId('inline-shopper-agent-shim')).not.toBeInTheDocument()
-        // The hook mount container is a plain div (ref target); the UMD custom
-        // element is mounted into it imperatively — not visible in enzyme.
         expect(container.querySelector('div')).toBeInTheDocument()
     })
 
@@ -63,11 +155,8 @@ describe('InlineAgentWidget', () => {
             />
         )
 
-        // The local React shim is gone — the UMD paints the pills now.
         expect(screen.queryByTestId('inline-shopper-agent-shim')).not.toBeInTheDocument()
 
-        // Simulate the UMD firing its handoff event; the host should call
-        // handoffToShopperAgent with productId/productName context.
         act(() => {
             document.dispatchEvent(
                 new CustomEvent('inline-agent-widget:handoff', {

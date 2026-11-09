@@ -5,18 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {
-    handoffToShopperAgent,
-    consumePersistedSeed,
-    SHOPPER_AGENT_SEED_EVENT,
-    SHOPPER_AGENT_SEED_STORAGE_KEY
-} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
+import {handoffToShopperAgent} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
 
 const originalCimulate = window.CimulateMessaging
 const originalBootstrap = window.embeddedservice_bootstrap
 
 beforeEach(() => {
-    window.sessionStorage.clear()
     delete window.CimulateMessaging
     delete window.embeddedservice_bootstrap
     jest.spyOn(console, 'warn').mockImplementation(() => {})
@@ -106,9 +100,6 @@ describe('handoffToShopperAgent', () => {
         const sendMessage = jest.fn()
         const {toggleWidgetOpen} = installCommerceClient({sendMessage})
 
-        const listener = jest.fn()
-        window.addEventListener(SHOPPER_AGENT_SEED_EVENT, listener)
-
         const result = await handoffToShopperAgent({
             question: 'does this work with sensitive skin?',
             productContext: {productId: '500400', productName: 'Serum'}
@@ -117,25 +108,6 @@ describe('handoffToShopperAgent', () => {
         expect(toggleWidgetOpen).toHaveBeenCalledWith(true)
         expect(sendMessage).toHaveBeenCalledWith('does this work with sensitive skin?')
         expect(result).toEqual({opened: true, seeded: true, provider: 'commerce-client'})
-
-        expect(listener).toHaveBeenCalledTimes(1)
-        const dispatched = listener.mock.calls[0][0].detail
-        expect(dispatched.question).toBe('does this work with sensitive skin?')
-        expect(dispatched.productContext).toEqual({productId: '500400', productName: 'Serum'})
-
-        window.removeEventListener(SHOPPER_AGENT_SEED_EVENT, listener)
-    })
-
-    it('persists the seed to sessionStorage for cross-nav pickup', async () => {
-        installCommerceClient()
-        await handoffToShopperAgent({
-            question: 'ask about fit',
-            productContext: {productId: 'abc'}
-        })
-
-        const stored = JSON.parse(window.sessionStorage.getItem(SHOPPER_AGENT_SEED_STORAGE_KEY))
-        expect(stored.question).toBe('ask about fit')
-        expect(stored.productContext).toEqual({productId: 'abc'})
     })
 
     it('falls through to seeded=false when Commerce Client exposes no send method', async () => {
@@ -176,20 +148,31 @@ describe('handoffToShopperAgent', () => {
         expect(console.error).toHaveBeenCalled()
     })
 
+    it.each(['sync', 'async'])(
+        'does not try another method after a %s send failure',
+        async (failure) => {
+            const sendMessage = jest.fn(() => {
+                if (failure === 'sync') throw new Error('delivery uncertain')
+                return Promise.reject(new Error('delivery uncertain'))
+            })
+            const sendUserMessage = jest.fn()
+            const sendUserText = jest.fn()
+            installCommerceClient({sendMessage, sendUserMessage, sendUserText})
+            const result = await handoffToShopperAgent({question: 'send once'})
+            expect(result.seeded).toBe(false)
+            expect(sendMessage).toHaveBeenCalledTimes(1)
+            expect(sendUserMessage).not.toHaveBeenCalled()
+            expect(sendUserText).not.toHaveBeenCalled()
+        }
+    )
+
     it('opens MIAW with a warning but does not attempt to seed', async () => {
         const {launchChat} = installMiaw()
-        const listener = jest.fn()
-        window.addEventListener(SHOPPER_AGENT_SEED_EVENT, listener)
-
         const result = await handoffToShopperAgent({question: 'miaw path'})
 
         expect(launchChat).toHaveBeenCalledTimes(1)
         expect(result).toEqual({opened: true, seeded: false, provider: 'miaw'})
         expect(console.warn).toHaveBeenCalled()
-        // Event still fires so bespoke host integrations can react
-        expect(listener).toHaveBeenCalledTimes(1)
-
-        window.removeEventListener(SHOPPER_AGENT_SEED_EVENT, listener)
     })
 
     it('trims leading/trailing whitespace from the question', async () => {
@@ -220,26 +203,5 @@ describe('handoffToShopperAgent', () => {
         await handoffToShopperAgent({question: 'no product id'})
         expect(pageContextSet).not.toHaveBeenCalled()
         expect(sendMessage).toHaveBeenCalledWith('no product id')
-    })
-})
-
-describe('consumePersistedSeed', () => {
-    it('returns null when there is no seed', () => {
-        expect(consumePersistedSeed()).toBeNull()
-    })
-
-    it('returns the seed and clears sessionStorage on consume', () => {
-        window.sessionStorage.setItem(
-            SHOPPER_AGENT_SEED_STORAGE_KEY,
-            JSON.stringify({question: 'x', productContext: {}, timestamp: 1})
-        )
-        const seed = consumePersistedSeed()
-        expect(seed).toEqual({question: 'x', productContext: {}, timestamp: 1})
-        expect(window.sessionStorage.getItem(SHOPPER_AGENT_SEED_STORAGE_KEY)).toBeNull()
-    })
-
-    it('returns null and clears on malformed JSON', () => {
-        window.sessionStorage.setItem(SHOPPER_AGENT_SEED_STORAGE_KEY, '{not-json')
-        expect(consumePersistedSeed()).toBeNull()
     })
 })

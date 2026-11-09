@@ -7,9 +7,6 @@
 
 import {openShopperAgentWidget} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
-export const SHOPPER_AGENT_SEED_EVENT = 'shopper-agent:seed-question'
-export const SHOPPER_AGENT_SEED_STORAGE_KEY = 'shopper-agent-seed-question'
-
 const onClient = typeof window !== 'undefined'
 
 const detectProvider = () => {
@@ -38,17 +35,15 @@ const primeCimulatePageContext = (productContext) => {
 const trySendViaCimulate = async (question) => {
     const session = window.CimulateMessaging?.eventHandlers?.session
     const sendCandidates = ['sendMessage', 'sendUserMessage', 'sendUserText']
-    for (const method of sendCandidates) {
-        if (typeof session?.[method] === 'function') {
-            try {
-                await session[method](question)
-                return true
-            } catch (err) {
-                console.error(`Shopper Agent handoff: ${method} threw`, err)
-            }
-        }
+    const method = sendCandidates.find((candidate) => typeof session?.[candidate] === 'function')
+    if (!method) return false
+    try {
+        await session[method](question)
+        return true
+    } catch (err) {
+        console.error(`Shopper Agent handoff: ${method} threw`, err)
+        return false
     }
-    return false
 }
 
 const waitForProvider = (signal) =>
@@ -93,18 +88,6 @@ export const handoffToShopperAgent = async ({question, productContext = {}, sign
         )
     }
 
-    const seed = {
-        question: trimmed,
-        productContext,
-        timestamp: Date.now()
-    }
-
-    try {
-        window.sessionStorage.setItem(SHOPPER_AGENT_SEED_STORAGE_KEY, JSON.stringify(seed))
-    } catch (err) {
-        console.error('Shopper Agent handoff: sessionStorage write failed', err)
-    }
-
     openShopperAgentWidget()
 
     let seeded = false
@@ -113,33 +96,7 @@ export const handoffToShopperAgent = async ({question, productContext = {}, sign
         seeded = await trySendViaCimulate(trimmed)
     }
 
-    try {
-        window.dispatchEvent(new CustomEvent(SHOPPER_AGENT_SEED_EVENT, {detail: seed}))
-    } catch (err) {
-        console.error('Shopper Agent handoff: dispatch failed', err)
-    }
-
     return {opened: true, seeded, provider}
-}
-
-/**
- * Read and clear the one-shot seed stashed in `sessionStorage`. The drawer
- * host calls this on mount so the question survives a storefront navigation
- * from the PDP into the drawer-aware route tree.
- *
- * @returns {{question: string, productContext: Object, timestamp: number}|null}
- */
-export const consumePersistedSeed = () => {
-    if (!onClient) return null
-    try {
-        const raw = window.sessionStorage.getItem(SHOPPER_AGENT_SEED_STORAGE_KEY)
-        if (!raw) return null
-        window.sessionStorage.removeItem(SHOPPER_AGENT_SEED_STORAGE_KEY)
-        return JSON.parse(raw)
-    } catch (err) {
-        console.error('Shopper Agent handoff: consume seed failed', err)
-        return null
-    }
 }
 
 export default handoffToShopperAgent
