@@ -30,6 +30,7 @@ import {
     getPasswordlessCallbackUrl,
     MISSING_PASSWORDLESS_LOGIN_ID_ERROR,
     readErrorResponseMessage,
+    rememberPasswordlessLoginId,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -109,6 +110,7 @@ export default function UserRegistration({
                     email: authorizeEmail
                 })
                 lastEmailSentRef.current = authorizeEmail
+                rememberPasswordlessLoginId(authorizeEmail)
                 otpSentRef.current = true
                 onOtpOpen()
             } catch (_e) {
@@ -363,6 +365,7 @@ export default function UserRegistration({
                         email
                     })
                     lastEmailSentRef.current = email
+                    rememberPasswordlessLoginId(email)
                 }}
                 handleOtpVerification={handleOtpVerification}
             />

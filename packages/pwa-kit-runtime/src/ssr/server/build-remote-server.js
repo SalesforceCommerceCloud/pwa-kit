@@ -255,6 +255,44 @@ const handleHttpOnlyCookiesOnProxyRes = (
 }
 
 /**
+ * Query parameters whose values are masked in request logs. Passwordless and
+ * password reset links carry the shopper's email and a one-time token.
+ *
+ * @private
+ */
+export const REDACTED_LOG_QUERY_PARAMS = Object.freeze(['token', 'login_id', 'email'])
+
+/**
+ * Masks the values of sensitive query parameters (matched case-insensitively) in a
+ * request URL so they are not written to request logs. Other parameters are left untouched.
+ *
+ * @private
+ */
+export const redactUrlForLogging = (url) => {
+    if (!url) return url
+    const queryIndex = url.indexOf('?')
+    if (queryIndex === -1) return url
+    const query = url
+        .slice(queryIndex + 1)
+        .split('&')
+        .map((pair) => {
+            const separatorIndex = pair.indexOf('=')
+            const rawKey = separatorIndex === -1 ? pair : pair.slice(0, separatorIndex)
+            let key = rawKey
+            try {
+                key = decodeURIComponent(rawKey)
+            } catch {
+                // Leave malformed keys as-is
+            }
+            return REDACTED_LOG_QUERY_PARAMS.includes(key.toLowerCase())
+                ? `${rawKey}=[REDACTED]`
+                : pair
+        })
+        .join('&')
+    return `${url.slice(0, queryIndex)}?${query}`
+}
+
+/**
  * Environment variables that must be set for the Express app to run remotely.
  *
  * @private
@@ -572,7 +610,7 @@ export const RemoteServerFactory = {
             return [
                 `(${res.locals.requestId})`,
                 tokens.method(req, res),
-                tokens.url(req, res),
+                redactUrlForLogging(tokens.url(req, res)),
                 tokens.status(req, res),
                 tokens['response-time'](req, res),
                 'ms',

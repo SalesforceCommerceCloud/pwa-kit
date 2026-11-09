@@ -1557,6 +1557,9 @@
   "login_page.error.incorrect_username_or_password": {
     "defaultMessage": "Incorrect username or password, please try again."
   },
+  "login_page.info.confirm_passwordless_email": {
+    "defaultMessage": "To finish signing in, enter the email address you used to request the link."
+  },
   "multi_ship_warning_modal.action.cancel": {
     "defaultMessage": "Cancel"
   },

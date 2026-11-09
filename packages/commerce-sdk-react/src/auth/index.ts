@@ -1745,9 +1745,12 @@ class Auth {
 
     /**
      * A wrapper method for the SLAS endpoint: resetPassword.
-     *
+     * Requires `user_id`: SLAS checks it against the user the reset token was issued for.
      */
     async resetPassword(parameters: ShopperLoginTypes.resetPasswordBodyType) {
+        if (!parameters.user_id) {
+            throw new Error('Required argument user_id is not provided')
+        }
         const slasClient = this.client
         const options = {
             headers: {
