@@ -1754,7 +1754,7 @@ class Auth {
                 Authorization: ''
             },
             body: {
-                ...(parameters.user_id && {user_id: parameters.user_id}),
+                user_id: parameters.user_id,
                 pwd_action_token: parameters.pwd_action_token,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
