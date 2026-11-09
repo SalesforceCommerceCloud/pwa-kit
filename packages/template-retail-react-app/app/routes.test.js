@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import routes from '@salesforce/retail-react-app/app/routes'
+import routes, {getDynamicRoutes} from '@salesforce/retail-react-app/app/routes'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Mock getConfig to return test values
@@ -379,6 +379,38 @@ describe('Routes', () => {
                 expect(socialRoute).toBeDefined()
                 expect(socialRoute.exact).toBe(true)
             })
+        })
+    })
+
+    describe('getDynamicRoutes', () => {
+        test('returns the landing routes from the given config for extending projects', () => {
+            const paths = getDynamicRoutes({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    login: {
+                        resetPassword: {landingPath: '/reset-password-landing'},
+                        passwordless: {enabled: true, landingPath: '/passwordless-login-landing'}
+                    }
+                }
+            }).map((route) => route.path)
+
+            expect(paths).toEqual(
+                expect.arrayContaining(['/reset-password-landing', '/passwordless-login-landing'])
+            )
+            expect(paths).not.toContain('*')
+        })
+
+        test('falls back to getConfig when no config is passed', () => {
+            getConfig.mockReturnValue({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    login: {resetPassword: {landingPath: '/custom-reset-landing'}}
+                }
+            })
+
+            expect(getDynamicRoutes().map((route) => route.path)).toContain('/custom-reset-landing')
         })
     })
 })

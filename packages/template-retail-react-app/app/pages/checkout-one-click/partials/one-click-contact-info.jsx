@@ -51,9 +51,11 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {
+    clearRememberedAuthEmails,
     getAuthorizePasswordlessErrorMessage,
     getPasswordlessCallbackUrl,
-    MISSING_PASSWORDLESS_LOGIN_ID_ERROR
+    MISSING_PASSWORDLESS_LOGIN_ID_ERROR,
+    rememberPasswordlessLoginId
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
@@ -258,6 +260,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 otpFromContactRef.current = true
                 // Store the exact email sent to authorize — required for login_id on verify
                 lastEmailSentRef.current = authorizeEmail
+                rememberPasswordlessLoginId(authorizeEmail)
                 return {isRegistered: true}
             } catch (error) {
                 // 404 = email not registered (guest); treat as guest and continue
@@ -740,6 +743,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 isOpen={signOutConfirmDialogIsOpen}
                 onClose={() => setSignOutConfirmDialogIsOpen(false)}
                 onConfirm={async () => {
+                    clearRememberedAuthEmails()
                     await logout.mutateAsync()
                     setSignOutConfirmDialogIsOpen(false)
                     navigate('/')

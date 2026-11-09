@@ -48,6 +48,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
+    clearRememberedAuthEmails,
     getPasswordlessCallbackUrl,
     getAuthorizePasswordlessErrorMessage
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
@@ -264,6 +265,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                     isOpen={signOutConfirmDialogIsOpen}
                     onClose={() => setSignOutConfirmDialogIsOpen(false)}
                     onConfirm={async () => {
+                        clearRememberedAuthEmails()
                         await logout.mutateAsync()
                         navigate('/login')
                         setSignOutConfirmDialogIsOpen(false)

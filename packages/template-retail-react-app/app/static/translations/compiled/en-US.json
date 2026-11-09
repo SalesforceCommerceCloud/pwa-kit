@@ -3765,6 +3765,12 @@
       "value": "Incorrect username or password, please try again."
     }
   ],
+  "login_page.info.confirm_passwordless_email": [
+    {
+      "type": 0,
+      "value": "To finish signing in, enter the email address you used to request the link."
+    }
+  ],
   "multi_ship_warning_modal.action.cancel": [
     {
       "type": 0,

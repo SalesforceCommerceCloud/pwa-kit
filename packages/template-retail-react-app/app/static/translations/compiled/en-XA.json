@@ -7925,6 +7925,20 @@
       "value": "]"
     }
   ],
+  "login_page.info.confirm_passwordless_email": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧǿǿ ƒīƞīşħ şīɠƞīƞɠ īƞ, ḗḗƞŧḗḗř ŧħḗḗ ḗḗḿȧȧīŀ ȧȧḓḓřḗḗşş ẏǿǿŭŭ ŭŭşḗḗḓ ŧǿǿ řḗḗɋŭŭḗḗşŧ ŧħḗḗ ŀīƞķ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "multi_ship_warning_modal.action.cancel": [
     {
       "type": 0,

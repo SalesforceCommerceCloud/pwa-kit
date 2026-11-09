@@ -1289,6 +1289,7 @@ describe('Auth', () => {
         const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
 
         await auth.resetPassword({
+            user_id: 'user@example.com',
             pwd_action_token: '12345678',
             new_password: 'newPassword123'
         } as ShopperLoginTypes.resetPasswordBodyType)
@@ -1298,6 +1299,20 @@ describe('Auth', () => {
                 headers: expect.objectContaining({Authorization: expect.stringContaining('Basic ')})
             })
         )
+    })
+
+    test('resetPassword throws without user_id and does not call SLAS', async () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private property
+        const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
+
+        await expect(
+            auth.resetPassword({
+                pwd_action_token: '12345678',
+                new_password: 'newPassword123'
+            } as ShopperLoginTypes.resetPasswordBodyType)
+        ).rejects.toThrow('Required argument user_id is not provided')
+        expect(resetPasswordSpy).not.toHaveBeenCalled()
     })
 
     test('logout as registered user calls isomorphic logout', async () => {
