@@ -116,6 +116,13 @@ type AuthorizePasswordlessParams = {
 
 type GetPasswordLessAccessTokenParams = {
     pwdlessLoginToken: string
+    /**
+     * Shopper login ID (typically email) used when the passwordless token was requested.
+     * Must exactly match the ID used during passwordless login.
+     */
+    login_id: string
+    /** Channel / site ID for the passwordless token exchange. */
+    channel_id: string
     /** When true, SLAS will register the customer if not already registered */
     register_customer?: boolean | string
 }
@@ -1661,6 +1668,8 @@ class Auth {
 
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
+     * Requires `login_id` and `channel_id`; forwards them to the helper as camelCase
+     * `loginId` / `channelId` (commerce-sdk-isomorphic@5.8.0 maps these to the wire body).
      */
     async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
         const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
@@ -1673,10 +1682,12 @@ class Auth {
             },
             parameters: {
                 pwdlessLoginToken,
+                loginId: parameters.login_id,
+                channelId: parameters.channel_id,
                 dnt: dntPref !== undefined ? String(dntPref) : undefined,
                 ...(usid && {usid}),
                 ...(parameters.register_customer !== undefined && {
-                    register_customer:
+                    registerCustomer:
                         typeof parameters.register_customer === 'boolean'
                             ? String(parameters.register_customer)
                             : parameters.register_customer
@@ -1743,11 +1754,7 @@ class Auth {
                 Authorization: ''
             },
             body: {
-                // TODO: remove the eslint disabled after updating OAS
-                // user_id is a valid param for resetPassword
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                ...(parameters.user_id && {user_id: parameters.user_id}),
+                user_id: parameters.user_id,
                 pwd_action_token: parameters.pwd_action_token,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,

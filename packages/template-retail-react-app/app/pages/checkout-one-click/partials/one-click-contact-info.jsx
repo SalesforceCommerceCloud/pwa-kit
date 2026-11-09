@@ -50,14 +50,17 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {getAuthorizePasswordlessErrorMessage} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {
+    getAuthorizePasswordlessErrorMessage,
+    getPasswordlessCallbackUrl,
+    MISSING_PASSWORDLESS_LOGIN_ID_ERROR
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
 import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useLocation} from 'react-router-dom'
-import {getPasswordlessCallbackUrl} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
@@ -76,7 +79,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const updateBillingAddressForBasket = useShopperBasketsMutation('updateBillingAddressForBasket')
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
-    const {locale} = useMultiSite()
+    const {site, locale} = useMultiSite()
     const passwordlessConfig = getConfig().app.login?.passwordless
     const callbackURL = getPasswordlessCallbackUrl(passwordlessConfig?.callbackURI)
     const redirectPath = location.pathname + location.search
@@ -219,11 +222,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     // Handle sending OTP email
     const handleSendEmailOtp = async (email, isResend = false) => {
-        // Normalize email for comparison (trim and lowercase)
-        const normalizedEmail = email?.trim().toLowerCase() || ''
+        // Preserve exact casing for SLAS (login_id is case-sensitive); normalize only for dedupe.
+        const authorizeEmail = email?.trim() || ''
+        const normalizedEmail = authorizeEmail.toLowerCase()
+        const lastNormalized = lastEmailSentRef.current?.trim().toLowerCase() || ''
 
         // Skip if email hasn't changed from the last one we sent (unless user requested)
-        if (!isResend && lastEmailSentRef.current === normalizedEmail) {
+        if (!isResend && lastNormalized && lastNormalized === normalizedEmail) {
             // Return cached result if we have one
             if (otpSendPromiseRef.current) {
                 return otpSendPromiseRef.current
@@ -243,7 +248,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         otpSendPromiseRef.current = (async () => {
             try {
                 await authorizePasswordlessLogin.mutateAsync({
-                    userid: email,
+                    userid: authorizeEmail,
                     mode: passwordlessConfig?.mode,
                     locale: locale?.id,
                     ...(callbackURL && {callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`})
@@ -251,8 +256,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 // Only open modal if API call succeeds
                 onOtpModalOpen()
                 otpFromContactRef.current = true
-                // Update the last email sent ref after successful call
-                lastEmailSentRef.current = normalizedEmail
+                // Store the exact email sent to authorize — required for login_id on verify
+                lastEmailSentRef.current = authorizeEmail
                 return {isRegistered: true}
             } catch (error) {
                 // 404 = email not registered (guest); treat as guest and continue
@@ -270,7 +275,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                     }
                 }
                 // Update the last email sent ref even on error to prevent retrying immediately
-                lastEmailSentRef.current = normalizedEmail
+                lastEmailSentRef.current = authorizeEmail
                 return {isRegistered: false}
             } finally {
                 setIsCheckingEmail(false)
@@ -304,7 +309,20 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         try {
             // Prevent post-auth recovery effect from also attempting merge in this flow
             hasAttemptedRecoveryRef.current = true
-            await loginPasswordless.mutateAsync({pwdlessLoginToken: otpCode})
+            // Prefer the email sent to authorizePasswordless — SLAS compares login_id
+            // case-sensitively, and the form field may have been edited since then.
+            const loginId = lastEmailSentRef.current
+            if (!loginId) {
+                return {
+                    success: false,
+                    error: formatMessage(MISSING_PASSWORDLESS_LOGIN_ID_ERROR)
+                }
+            }
+            await loginPasswordless.mutateAsync({
+                pwdlessLoginToken: otpCode,
+                login_id: loginId,
+                channel_id: site.id
+            })
 
             // Successful OTP verification - user is now logged in
             const hasBasketItem = basket.productItems?.length > 0
@@ -325,9 +343,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 basketId = refreshed?.data?.basketId || basketId
             }
 
-            // Update basket with email after successful OTP verification
-            const email =
-                form.getValues('email') || (emailRef.current && emailRef.current.value) || ''
+            // Update basket with the authorize-time email after successful OTP verification
+            const email = lastEmailSentRef.current || form.getValues('email') || ''
             if (basketId && email) {
                 try {
                     await updateCustomerForBasket.mutateAsync({
