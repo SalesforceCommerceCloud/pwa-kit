@@ -1053,6 +1053,9 @@
   "global.error.invalid_token": {
     "defaultMessage": "Invalid token, please try again."
   },
+  "global.error.missing_passwordless_login_id": {
+    "defaultMessage": "Your email is missing for this verification. Click Resend Code and try again."
+  },
   "global.error.something_went_wrong": {
     "defaultMessage": "Something went wrong. Try again!"
   },
@@ -1321,6 +1324,15 @@
   "icons.assistive_msg.lock": {
     "defaultMessage": "Secure"
   },
+  "inline_agent_widget.button.retry": {
+    "defaultMessage": "Try again"
+  },
+  "inline_agent_widget.message.handoff_failed": {
+    "defaultMessage": "We couldn't send your question to the assistant. Please try again."
+  },
+  "inline_agent_widget.message.manual_handoff": {
+    "defaultMessage": "This chat cannot receive questions automatically. Copy your question below and send it in the chat."
+  },
   "item_attributes.label.bonus_product": {
     "defaultMessage": "Bonus Product"
   },
@@ -1553,6 +1565,9 @@
   },
   "login_page.error.incorrect_username_or_password": {
     "defaultMessage": "Incorrect username or password, please try again."
+  },
+  "login_page.info.confirm_passwordless_email": {
+    "defaultMessage": "To finish signing in, enter the email address you used to request the link."
   },
   "multi_ship_warning_modal.action.cancel": {
     "defaultMessage": "Cancel"

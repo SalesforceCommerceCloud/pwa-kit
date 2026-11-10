@@ -12,6 +12,7 @@ describe('Shopper Experience hooks', () => {
     test('all endpoints have hooks', () => {
         const unimplemtented = getUnimplementedEndpoints(ShopperExperience, queries)
         expect(unimplemtented).toEqual([
+            'applyPreviewContext',
             'getContent', //TODO: implement later
             'getContentFolder', //TODO: implement later
             'getContentFolders', //TODO: implement later
