@@ -481,6 +481,48 @@ describe('Auth', () => {
         const funcArg = (helpers.refreshAccessToken as jest.Mock).mock.calls[0][0]
         expect(funcArg).toMatchObject({credentials: {clientSecret: SLAS_SECRET_PLACEHOLDER}})
     })
+    test('ready - SFRA logout downgrades a stale registered session to guest', async () => {
+        const auth = new Auth(config)
+        // State left by a PWA Kit login...
+        // @ts-expect-error private method
+        auth.set('customer_type', 'registered')
+        // ...after SFRA logged the shopper out: the registered refresh token was replaced with a
+        // guest one, and the `cc-at` handoff cookie asks PWA Kit to refresh.
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest', 'refresh_token_from_sfra')
+        // @ts-expect-error private method
+        auth.set('access_token_sfra', 'refresh')
+        ;(helpers.refreshAccessToken as jest.Mock).mockResolvedValueOnce({
+            access_token: JWTNotExpired,
+            refresh_token: 'refresh_token_rotated'
+        })
+
+        await auth.ready()
+
+        expect(helpers.refreshAccessToken).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({refreshToken: 'refresh_token_from_sfra'})
+            })
+        )
+        expect(auth.get('customer_type')).toBe('guest')
+        expect(auth.get('refresh_token_guest')).toBe('refresh_token_rotated')
+        expect(auth.get('refresh_token_registered')).toBe('')
+    })
+    test('ready - a registered refresh token keeps the shopper registered when customer_type is missing', async () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('refresh_token_registered', 'refresh_token_registered_value')
+        ;(helpers.refreshAccessToken as jest.Mock).mockResolvedValueOnce({
+            access_token: JWTNotExpired,
+            refresh_token: 'refresh_token_rotated'
+        })
+
+        await auth.ready()
+
+        expect(auth.get('customer_type')).toBe('registered')
+        expect(auth.get('refresh_token_registered')).toBe('refresh_token_rotated')
+        expect(auth.get('refresh_token_guest')).toBe('')
+    })
     test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
 

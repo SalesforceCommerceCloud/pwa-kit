@@ -3,6 +3,7 @@
 - [Breaking] `resetPassword` / `ResetPassword` now requires `user_id` and throws before calling SLAS when it is missing. SLAS checks it against the user the reset token was issued for. [#4092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4092)
 
 ## v5.6.0-dev (Oct 09, 2026)
+- [Bugfix] Fix `useCustomerType` reporting a shopper as registered after logging out on SFRA in a hybrid storefront. The token refresh trusted the stale `customer_type` value in local storage, so the new guest session was saved as registered. It now derives the shopper type from the refresh token being used, as it did before the HttpOnly session cookies change. [#4096](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4096)
 - [Feature] When a SLAS private client secret is set directly via `clientSecret` (not PWA Kit private client mode), `loginRegisteredUserB2C` now sends the `x-slas-client-auth` header so the login works with SLAS strict client auth.
 ## v5.5.0 (Oct 08, 2026)
 - [Feature] Add a `useDeliveryEstimates` query hook and `ShopperDeliveryEstimates` client registration for the Shopper Delivery Estimates API. This requires `commerce-sdk-isomorphic` `5.7.0`, which includes the generated client. The TypeDoc entry is grouped with the Shopper Delivery Estimates API and links to the endpoint, SDK, and TanStack Query references. [#4013](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4013)
