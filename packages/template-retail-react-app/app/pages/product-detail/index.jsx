@@ -64,6 +64,7 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {isPickupMethod} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {useProductInventory} from '@salesforce/retail-react-app/app/hooks/use-product-inventory'
+import {useCommerceClientPdpContext} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -105,15 +106,17 @@ const ProductDetail = () => {
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
+    const requestedProductId = urlParams.get('pid') || productId
     const {
         data: productResponse,
         isLoading: isProductLoading,
+        isPreviousData: isPreviousProductData,
         isError: isProductError,
         error: productError
     } = useProduct(
         {
             parameters: {
-                id: urlParams.get('pid') || productId,
+                id: requestedProductId,
                 perPricebook: true,
                 expand: [
                     'availability',
@@ -191,6 +194,20 @@ const ProductDetail = () => {
         isProductABundle
     )
 
+    // keepPreviousData is for rendering only: it must not become the new route's
+    // product context or cause a stale variant to rewrite that route's pid.
+    const variant = useVariant(
+        !isPreviousProductData && product?.id === requestedProductId ? product : undefined
+    )
+    useCommerceClientPdpContext({
+        product,
+        requestedProductId,
+        variant,
+        isLoading: isProductLoading,
+        isPreviousData: isPreviousProductData,
+        isError: isProductError
+    })
+
     /**************** Error Handling ****************/
 
     if (isProductError) {
@@ -213,7 +230,6 @@ const ProductDetail = () => {
     }
 
     const [primaryCategory, setPrimaryCategory] = useState(category)
-    const variant = useVariant(product)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
     // attributes are selected (to get the correct inventory values), the category information

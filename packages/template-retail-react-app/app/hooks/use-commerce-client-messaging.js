@@ -6,6 +6,11 @@
  */
 
 import {useEffect, useRef} from 'react'
+import {useQueryClient} from '@tanstack/react-query'
+import {
+    COMMERCE_CLIENT_PAGE_CONTEXT_KEY,
+    getCommerceClientPageContext
+} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
 import {
     DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
@@ -33,6 +38,8 @@ const onClient = typeof window !== 'undefined'
  * @param {boolean} [options.enableEscalationToAgent=true] - Whether shoppers can escalate to a human agent
  * @param {boolean} [options.enableDownloadTranscript=true] - Whether shoppers can download the chat transcript
  * @param {boolean} [options.enableImageUpload=false] - Whether shoppers can upload images in the chat
+ * @param {boolean} [options.enablePageContext] - Opt in to widget-owned page-context snapshots and transport
+ * @param {Object} [options.initialPageContext] - Resolved PDP context seeded through the public API before widget mount
  * @param {Object} [options.routingAttributes] - Optional Agentforce routing attributes
  * @param {string} [options.logoUrl] - URL of the logo shown in the widget
  * @param {string} [options.headerText] - Header text shown at the top of the widget
@@ -68,6 +75,7 @@ const injectCommerceClientWidget = ({
     enableEscalationToAgent = true,
     enableDownloadTranscript = true,
     enableImageUpload = false,
+    initialPageContext,
     routingAttributes,
     logoUrl,
     headerText,
@@ -118,6 +126,27 @@ const injectCommerceClientWidget = ({
         }
         if (typeof enablePageContext === 'boolean') {
             messagingConfig.enablePageContext = enablePageContext
+        }
+        if (enablePageContext === true) {
+            const pageContext = commerceClient.eventHandlers?.pageContext
+            if (
+                typeof pageContext?.set !== 'function' ||
+                typeof pageContext?.clear !== 'function'
+            ) {
+                console.error(
+                    'Commerce Client PDP context requires a messaging bundle with the public pageContext.set/clear API (use >= 1.52.0).'
+                )
+                return false
+            }
+            if (initialPageContext) {
+                // Seed synchronously. Passing messagingConfig.initialPageContext
+                // would let the widget's asynchronous React mount replay an old
+                // snapshot after a subsequent storefront navigation/set/clear.
+                pageContext.set(initialPageContext)
+            } else {
+                // The bundle may retain proxy state from an earlier mount.
+                pageContext.clear()
+            }
         }
 
         commerceClient.injectMessagingWidget({
@@ -171,21 +200,51 @@ const injectCommerceClientWidget = ({
  */
 const useCommerceClientMessaging = (scriptLoadStatus, options = {}) => {
     const hasInjectedRef = useRef(false)
+    const queryClient = useQueryClient()
+    const lastContextRef = useRef()
 
     useEffect(() => {
         if (!scriptLoadStatus?.loaded || scriptLoadStatus?.error) {
             return
         }
 
-        if (hasInjectedRef.current) {
-            return
+        const syncPageContext = () => {
+            if (!hasInjectedRef.current || options.enablePageContext !== true) return
+            const context = getCommerceClientPageContext(queryClient)
+            const contextKey = JSON.stringify(context)
+            if (lastContextRef.current === contextKey) return
+            const api = window.CimulateMessaging?.eventHandlers?.pageContext
+            if (context) {
+                api.set(context)
+            } else {
+                api.clear()
+            }
+            lastContextRef.current = contextKey
         }
 
-        const didInject = injectCommerceClientWidget(options)
-        if (didInject) {
-            hasInjectedRef.current = true
+        if (!hasInjectedRef.current) {
+            // Read the cache at injection time: PDP layout effects can publish after
+            // this sibling rendered, before its passive effect gets to mount the widget.
+            const context = getCommerceClientPageContext(queryClient)
+            const didInject = injectCommerceClientWidget({...options, initialPageContext: context})
+            if (didInject) {
+                hasInjectedRef.current = true
+                lastContextRef.current = JSON.stringify(context)
+            }
         }
-    }, [scriptLoadStatus, options])
+        syncPageContext()
+
+        // Cache notifications are synchronous, so navigation clears/updates the
+        // widget before another shopper turn can read it. No widget remount needed.
+        return queryClient.getQueryCache().subscribe((event) => {
+            if (
+                event.type === 'updated' &&
+                event.query.queryKey[0] === COMMERCE_CLIENT_PAGE_CONTEXT_KEY[0]
+            ) {
+                syncPageContext()
+            }
+        })
+    }, [scriptLoadStatus, options, queryClient])
 }
 
 export default useCommerceClientMessaging
