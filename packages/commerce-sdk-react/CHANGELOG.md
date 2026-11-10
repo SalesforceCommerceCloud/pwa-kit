@@ -3,6 +3,7 @@
 - [Breaking] `resetPassword` / `ResetPassword` now requires `user_id` and throws before calling SLAS when it is missing. SLAS checks it against the user the reset token was issued for. [#4092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4092)
 
 ## v5.6.0-dev (Oct 09, 2026)
+- [Bugfix] Forward the `body` and `parameters` passed to the `useCustomMutation` `mutate` function to the custom endpoint. Only `headers` were being applied, so these values were silently dropped. Mutate args take priority over the hook options. Plain object and array bodies are now JSON-serialized, since `callCustomEndpoint` passes the body to `fetch` as is and would otherwise send `[object Object]`. [#4095](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4095)
 - [Feature] When a SLAS private client secret is set directly via `clientSecret` (not PWA Kit private client mode), `loginRegisteredUserB2C` now sends the `x-slas-client-auth` header so the login works with SLAS strict client auth.
 ## v5.5.0 (Oct 08, 2026)
 - [Feature] Add a `useDeliveryEstimates` query hook and `ShopperDeliveryEstimates` client registration for the Shopper Delivery Estimates API. This requires `commerce-sdk-isomorphic` `5.7.0`, which includes the generated client. The TypeDoc entry is grouped with the Shopper Delivery Estimates API and links to the endpoint, SDK, and TanStack Query references. [#4013](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4013)
