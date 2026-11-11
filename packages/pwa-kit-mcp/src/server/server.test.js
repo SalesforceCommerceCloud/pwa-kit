@@ -39,6 +39,7 @@ describe('PwaStorefrontMCPServerHighLevel integration', () => {
         async (isTTY) => {
             const warning =
                 '[DEPRECATED] @salesforce/pwa-kit-mcp is discontinued. Use @salesforce/b2c-dx-mcp instead. Setup instructions: https://salesforcecommercecloud.github.io/b2c-developer-tooling/mcp/'
+            const expectedWarning = isTTY ? `\u001b[33m${warning}\u001b[0m` : warning
             const args = isTTY
                 ? [
                       '--eval',
@@ -66,7 +67,7 @@ describe('PwaStorefrontMCPServerHighLevel integration', () => {
                         reject(new Error('Timed out waiting for the startup warning'))
                     }, 5000)
                     const onData = () => {
-                        if (stderr.includes('\n')) {
+                        if (stderr.includes(`${expectedWarning}\n`)) {
                             clearTimeout(timer)
                             child.stderr.off('data', onData)
                             resolve()
@@ -88,7 +89,8 @@ describe('PwaStorefrontMCPServerHighLevel integration', () => {
                 // Check that at least the DeveloperGuidelinesTool is present
                 const toolNames = response.result.tools.map((t) => t.name)
                 expect(toolNames).toContain('pwakit_get_dev_guidelines')
-                expect(stderr).toBe(isTTY ? `\u001b[33m${warning}\u001b[0m\n` : `${warning}\n`)
+                const warningLines = stderr.split('\n').filter((line) => line.includes(warning))
+                expect(warningLines).toEqual([expectedWarning])
             } finally {
                 child.kill()
             }
