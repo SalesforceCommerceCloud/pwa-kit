@@ -12,6 +12,7 @@ import {
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
+import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
 import ProductDetail from '.'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
@@ -212,6 +213,55 @@ test('should render product details page', async () => {
         expect(screen.getAllByTestId('product-view')).toHaveLength(1)
         expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
     })
+})
+
+test('publishes the resolved PDP product and selected variant to the Commerce Client', async () => {
+    const setContext = jest.fn()
+    window.CimulateMessaging = {
+        injectMessagingWidget: jest.fn(),
+        eventHandlers: {pageContext: {set: setContext, clear: jest.fn()}}
+    }
+    const Messaging = () => {
+        useCommerceClientMessaging(
+            {loaded: true, error: false},
+            {enablePageContext: true, scrt2Url: 'scrt', orgId: 'org', esDeveloperName: 'agent'}
+        )
+        return null
+    }
+    const variant = masterProduct.variants.find(
+        ({variationValues}) => variationValues.color === 'JJ169XX' && variationValues.size === '9LG'
+    )
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            const id = req.params.productId
+            return res(
+                ctx.json(
+                    id === masterProduct.id ? masterProduct : {...masterProduct, id, variants: []}
+                )
+            )
+        })
+    )
+
+    try {
+        renderWithProviders(
+            <>
+                <Messaging />
+                <MockedComponent />
+            </>
+        )
+        await waitFor(() =>
+            expect(setContext).toHaveBeenCalledWith(expect.objectContaining({id: masterProduct.id}))
+        )
+        fireEvent.click(await screen.findByRole('radio', {name: /^black$/i}))
+        fireEvent.click(await screen.findByRole('radio', {name: /^l$/i}))
+        await waitFor(() =>
+            expect(setContext).toHaveBeenLastCalledWith(
+                expect.objectContaining({id: variant.productId})
+            )
+        )
+    } finally {
+        delete window.CimulateMessaging
+    }
 })
 
 test('should add to wishlist', async () => {

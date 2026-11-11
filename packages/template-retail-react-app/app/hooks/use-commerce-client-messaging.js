@@ -213,11 +213,11 @@ const useCommerceClientMessaging = (scriptLoadStatus, options = {}) => {
             const context = getCommerceClientPageContext(queryClient)
             const contextKey = JSON.stringify(context)
             if (lastContextRef.current === contextKey) return
-            const api = window.CimulateMessaging?.eventHandlers?.pageContext
+            const pageContext = window.CimulateMessaging?.eventHandlers?.pageContext
             if (context) {
-                api.set(context)
+                pageContext.set(context)
             } else {
-                api.clear()
+                pageContext.clear()
             }
             lastContextRef.current = contextKey
         }
