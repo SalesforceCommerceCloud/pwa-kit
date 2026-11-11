@@ -1,3 +1,6 @@
+## v6.0.0-nightly-20261111080300 (Nov 11, 2026)
+## v6.0.0-dev (Nov 11, 2026)
+## v3.22.0-nightly-20261111080300 (Nov 11, 2026)
 ## v6.0.0-dev
 - [Breaking] Upgrade to `commerce-sdk-isomorphic@5.8.0`. Require `login_id` and `channel_id` on `getPasswordLessAccessToken` / `LoginPasswordlessUser` and forward them to the helper as camelCase `loginId` / `channelId` (mapped to snake_case on the wire by isomorphic). Also remove the stale `@ts-ignore` on `resetPassword` `user_id` (present in SDK types since 5.2.0); `user_id` and `channel_id` continue to be sent on password reset.
 - [Breaking] `resetPassword` / `ResetPassword` now requires `user_id` and throws before calling SLAS when it is missing. SLAS checks it against the user the reset token was issued for. [#4092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4092)
