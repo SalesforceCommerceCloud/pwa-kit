@@ -39,6 +39,20 @@ describe('InlineAgentWidget', () => {
         handoffMock.mockReset().mockResolvedValue({seeded: true, provider: 'commerce-client'})
     })
 
+    test('uses the configured CDN source in the page script', async () => {
+        const source =
+            'https://cdn.search.cimulate.ai/inline-agent-widget/0.1.1/inline-agent-widget.umd.js'
+        renderWithProviders(
+            <InlineAgentWidget config={{...BASE_CONFIG, embeddedWidgetSourceUrl: source}} />
+        )
+        await waitFor(() =>
+            expect(document.head.querySelector(`script[src="${source}"]`)).not.toBeNull()
+        )
+        expect(
+            document.head.querySelector('script[src="/static/inline-agent-widget.umd.js"]')
+        ).toBeNull()
+    })
+
     test.each([undefined, null])(
         'renders nothing and ignores handoffs with config %s',
         (config) => {

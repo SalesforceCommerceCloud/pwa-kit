@@ -72,3 +72,29 @@ export const parsePdpQuestions = (raw, maxCount = MAX_PDP_QUESTIONS) => {
     }
     return out
 }
+
+export const DEFAULT_EMBEDDED_WIDGET_SOURCE_URL =
+    'https://cdn.search.cimulate.ai/inline-agent-widget/0.1.0/inline-agent-widget.umd.js'
+
+export const resolveEmbeddedWidgetSourceUrl = (config) => {
+    const source = config?.embeddedWidgetSourceUrl
+    if (!source) return DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+    try {
+        const url = new URL(source)
+        if (
+            url.protocol === 'https:' &&
+            url.hostname === 'cdn.search.cimulate.ai' &&
+            !url.port &&
+            !url.username &&
+            !url.password &&
+            /^\/inline-agent-widget\/[^/]+\/inline-agent-widget\.umd\.js$/.test(url.pathname) &&
+            !url.search &&
+            !url.hash
+        ) {
+            return url.href
+        }
+    } catch {
+        // Invalid configuration falls back to the pinned release.
+    }
+    return DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+}

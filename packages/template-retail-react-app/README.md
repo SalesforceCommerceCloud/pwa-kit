@@ -219,3 +219,16 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 -   [Routing](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html)
 -   [Phased Headless Rollouts](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/phased-headless-rollouts.html)
 -   [Launch Your Storefront](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/launching-your-storefront.html)
+
+### Inline PDP widget CDN
+
+The inline widget loads the pinned release `https://cdn.search.cimulate.ai/inline-agent-widget/0.1.0/inline-agent-widget.umd.js` by default. No inline UMD
+is copied into the storefront bundle. Set `app.embeddedAgent.embeddedWidgetSourceUrl`
+in configuration, or the same field inside `EMBEDDED_AGENT_COMMERCE_SETTINGS`
+on MRT, to select another published version. Only HTTPS inline-widget bundle URLs
+on `cdn.search.cimulate.ai` are accepted; invalid values use the default release.
+
+The server-rendered script and client navigation loader use the same resolver.
+The existing CSP allows this CDN. This setting is independent of the floating
+Cimulate Widget's `commerceClientScriptSourceUrl`. Changing the pinned version
+requires an MRT configuration redeploy, but does not require uploading a UMD.

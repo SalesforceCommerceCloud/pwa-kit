@@ -7,12 +7,11 @@
 
 import {useEffect, useRef, useState} from 'react'
 import {DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION} from '@salesforce/retail-react-app/app/constants'
-
-const SCRIPT_SRC = '/static/inline-agent-widget.umd.js'
+import {resolveEmbeddedWidgetSourceUrl} from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
 
 let readyPromise = null
 
-const ensureWidget = () => {
+const ensureWidget = (scriptSourceUrl) => {
     if (readyPromise) return readyPromise
 
     if (customElements.get('inline-agent-widget')) {
@@ -22,9 +21,9 @@ const ensureWidget = () => {
 
     // Ensure the script tag exists in <head> (Helmet adds it on SSR, but on
     // client-only navigation we may need to inject it manually).
-    if (!document.querySelector(`script[src="${SCRIPT_SRC}"]`)) {
+    if (!document.querySelector(`script[src="${scriptSourceUrl}"]`)) {
         const script = document.createElement('script')
-        script.src = SCRIPT_SRC
+        script.src = scriptSourceUrl
         script.async = true
         document.head.appendChild(script)
     }
@@ -58,18 +57,19 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
     const configured = isConfigured(config)
     const questionsKey = pdpQuestionsKey(pdpQuestions)
     const mode = config?.mode
+    const scriptSourceUrl = resolveEmbeddedWidgetSourceUrl(config)
 
     useEffect(() => {
         if (typeof window === 'undefined') return
         if (!configured) return
         let cancelled = false
-        ensureWidget().then(() => {
+        ensureWidget(scriptSourceUrl).then(() => {
             if (!cancelled) setReady(true)
         })
         return () => {
             cancelled = true
         }
-    }, [configured])
+    }, [configured, scriptSourceUrl])
 
     useEffect(() => {
         if (!configured || !ready) return

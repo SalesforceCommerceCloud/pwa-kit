@@ -8,6 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {render, waitFor, cleanup} from '@testing-library/react'
+import {DEFAULT_EMBEDDED_WIDGET_SOURCE_URL} from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
 import useInlineAgentWidget from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 
 const baseConfig = {
@@ -35,6 +36,32 @@ describe('embedded widget pre-warm configuration', () => {
     })
 
     afterEach(cleanup)
+
+    test.each([undefined, null])('does not load a script without configuration %s', (config) => {
+        const {container} = render(<Mount config={config} />)
+        expect(container.querySelector('inline-agent-widget')).toBeNull()
+        expect(
+            document.querySelector(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
+        ).toBeNull()
+    })
+
+    test('loads the pinned CDN script on client-only navigation', async () => {
+        const getSpy = jest.spyOn(customElements, 'get').mockReturnValueOnce(undefined)
+        try {
+            const {container} = render(<Mount config={baseConfig} />)
+            await waitFor(() =>
+                expect(container.querySelector('inline-agent-widget')).not.toBeNull()
+            )
+            const script = document.querySelector(
+                `script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`
+            )
+            expect(script).not.toBeNull()
+            expect(script.async).toBe(true)
+        } finally {
+            getSpy.mockRestore()
+            document.querySelector(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)?.remove()
+        }
+    })
 
     test.each([
         ['inline', undefined, true],

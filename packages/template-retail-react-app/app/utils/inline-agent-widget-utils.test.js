@@ -6,6 +6,8 @@
  */
 
 import {
+    DEFAULT_EMBEDDED_WIDGET_SOURCE_URL,
+    resolveEmbeddedWidgetSourceUrl,
     MAX_PDP_QUESTIONS,
     parsePdpQuestions
 } from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
@@ -83,5 +85,33 @@ describe('parsePdpQuestions', () => {
 
     test('respects an explicit maxCount override', () => {
         expect(parsePdpQuestions('["A","B","C","D"]', 2)).toEqual(['A', 'B'])
+    })
+})
+
+describe('resolveEmbeddedWidgetSourceUrl', () => {
+    test.each([undefined, null, {}, {embeddedWidgetSourceUrl: ''}])(
+        'uses the pinned release for %s',
+        (config) => {
+            expect(resolveEmbeddedWidgetSourceUrl(config)).toBe(DEFAULT_EMBEDDED_WIDGET_SOURCE_URL)
+        }
+    )
+
+    test('accepts a different version from the trusted CDN', () => {
+        const source = DEFAULT_EMBEDDED_WIDGET_SOURCE_URL.replace('/0.1.0/', '/0.1.1/')
+        expect(resolveEmbeddedWidgetSourceUrl({embeddedWidgetSourceUrl: source})).toBe(source)
+    })
+
+    test.each([
+        'http://cdn.search.cimulate.ai/inline-agent-widget/0.1.0/inline-agent-widget.umd.js',
+        'https://cdn.search.cimulate.ai.evil.test/inline-agent-widget/0.1.0/inline-agent-widget.umd.js',
+        'https://evil.test/inline-agent-widget.umd.js',
+        'https://cdn.search.cimulate.ai/copilot-widget/1.55.1/messaging.umd.js',
+        'javascript:alert(1)',
+        'https://user:pass@cdn.search.cimulate.ai/inline-agent-widget/0.1.0/inline-agent-widget.umd.js',
+        42
+    ])('rejects an unsafe or incorrect widget source %s', (source) => {
+        expect(resolveEmbeddedWidgetSourceUrl({embeddedWidgetSourceUrl: source})).toBe(
+            DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+        )
     })
 })
