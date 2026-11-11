@@ -249,8 +249,8 @@ module.exports = {
         },
         embeddedAgent: {
             enabled: false,
-            embeddedWidgetSourceUrl:
-                'https://cdn.search.cimulate.ai/inline-agent-widget/0.1.0/inline-agent-widget.umd.js',
+            cc_embeddedWidgetCdnVersion: '0.1.0',
+            embeddedWidgetSourceUrl: '',
             scrt2Url: '',
             orgId: '',
             esDeveloperName: '',

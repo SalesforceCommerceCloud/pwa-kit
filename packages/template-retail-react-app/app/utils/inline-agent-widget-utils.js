@@ -73,14 +73,23 @@ export const parsePdpQuestions = (raw, maxCount = MAX_PDP_QUESTIONS) => {
     return out
 }
 
-export const DEFAULT_EMBEDDED_WIDGET_SOURCE_URL =
-    'https://cdn.search.cimulate.ai/inline-agent-widget/0.1.0/inline-agent-widget.umd.js'
+export const DEFAULT_EMBEDDED_WIDGET_CDN_VERSION = '0.1.0'
+export const DEFAULT_EMBEDDED_WIDGET_SOURCE_URL = `https://cdn.search.cimulate.ai/inline-agent-widget/${DEFAULT_EMBEDDED_WIDGET_CDN_VERSION}/inline-agent-widget.umd.js`
 
 export const resolveEmbeddedWidgetSourceUrl = (config) => {
+    const configuredVersion = config?.cc_embeddedWidgetCdnVersion
+    const version =
+        typeof configuredVersion === 'string' &&
+        /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/.test(
+            configuredVersion.trim()
+        )
+            ? configuredVersion.trim()
+            : DEFAULT_EMBEDDED_WIDGET_CDN_VERSION
+    const versionUrl = `https://cdn.search.cimulate.ai/inline-agent-widget/${version}/inline-agent-widget.umd.js`
     const source = config?.embeddedWidgetSourceUrl
-    if (!source) return DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+    if (typeof source !== 'string' || !source.trim()) return versionUrl
     try {
-        const url = new URL(source)
+        const url = new URL(source.trim())
         if (
             url.protocol === 'https:' &&
             url.hostname === 'cdn.search.cimulate.ai' &&
@@ -94,7 +103,7 @@ export const resolveEmbeddedWidgetSourceUrl = (config) => {
             return url.href
         }
     } catch {
-        // Invalid configuration falls back to the pinned release.
+        // Invalid overrides use the selected CDN version.
     }
-    return DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+    return versionUrl
 }

@@ -124,6 +124,7 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
 InlineAgentWidget.propTypes = {
     config: PropTypes.shape({
         enabled: PropTypes.bool,
+        cc_embeddedWidgetCdnVersion: PropTypes.string,
         embeddedWidgetSourceUrl: PropTypes.string,
         scrt2Url: PropTypes.string,
         orgId: PropTypes.string,

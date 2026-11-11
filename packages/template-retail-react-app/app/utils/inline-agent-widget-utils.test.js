@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import storefrontDefaults from '@salesforce/retail-react-app/config/default'
 import {
     DEFAULT_EMBEDDED_WIDGET_SOURCE_URL,
     resolveEmbeddedWidgetSourceUrl,
@@ -106,12 +107,66 @@ describe('resolveEmbeddedWidgetSourceUrl', () => {
         'https://cdn.search.cimulate.ai.evil.test/inline-agent-widget/0.1.0/inline-agent-widget.umd.js',
         'https://evil.test/inline-agent-widget.umd.js',
         'https://cdn.search.cimulate.ai/copilot-widget/1.55.1/messaging.umd.js',
-        'javascript:alert(1)',
+        'data:text/javascript,alert(1)',
         'https://user:pass@cdn.search.cimulate.ai/inline-agent-widget/0.1.0/inline-agent-widget.umd.js',
         42
     ])('rejects an unsafe or incorrect widget source %s', (source) => {
         expect(resolveEmbeddedWidgetSourceUrl({embeddedWidgetSourceUrl: source})).toBe(
             DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+        )
+    })
+})
+
+describe('embedded widget CDN version selection', () => {
+    test('the actual storefront defaults do not mask a version override', () => {
+        const defaults = storefrontDefaults.app.embeddedAgent
+        expect(
+            resolveEmbeddedWidgetSourceUrl({...defaults, cc_embeddedWidgetCdnVersion: '0.1.1'})
+        ).toBe(
+            'https://cdn.search.cimulate.ai/inline-agent-widget/0.1.1/inline-agent-widget.umd.js'
+        )
+    })
+
+    test.each(['0.1.1', '1.0.0-rc.1', '1.2.3+build.2'])(
+        'resolves selected version %s',
+        (version) => {
+            expect(resolveEmbeddedWidgetSourceUrl({cc_embeddedWidgetCdnVersion: version})).toBe(
+                `https://cdn.search.cimulate.ai/inline-agent-widget/${version}/inline-agent-widget.umd.js`
+            )
+        }
+    )
+    test.each(['latest', 'v0.1.0', '0.01.0', '../0.1.0', '', null, 42])(
+        'defaults an invalid version %s',
+        (version) => {
+            expect(resolveEmbeddedWidgetSourceUrl({cc_embeddedWidgetCdnVersion: version})).toBe(
+                DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+            )
+        }
+    )
+    test.each(['', '   ', 'https://evil.example/widget.js'])(
+        'uses the selected version when override is empty or rejected: %s',
+        (source) => {
+            expect(
+                resolveEmbeddedWidgetSourceUrl({
+                    cc_embeddedWidgetCdnVersion: '0.1.1',
+                    embeddedWidgetSourceUrl: source
+                })
+            ).toBe(
+                'https://cdn.search.cimulate.ai/inline-agent-widget/0.1.1/inline-agent-widget.umd.js'
+            )
+        }
+    )
+    test('the explicit URL wins over the version', () => {
+        expect(
+            resolveEmbeddedWidgetSourceUrl({
+                cc_embeddedWidgetCdnVersion: '0.1.1',
+                embeddedWidgetSourceUrl: DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+            })
+        ).toBe(DEFAULT_EMBEDDED_WIDGET_SOURCE_URL)
+    })
+    test('trims the selected version', () => {
+        expect(resolveEmbeddedWidgetSourceUrl({cc_embeddedWidgetCdnVersion: ' 0.1.1 '})).toBe(
+            'https://cdn.search.cimulate.ai/inline-agent-widget/0.1.1/inline-agent-widget.umd.js'
         )
     })
 })

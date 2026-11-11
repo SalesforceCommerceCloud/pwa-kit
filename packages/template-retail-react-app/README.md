@@ -222,13 +222,24 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 
 ### Inline PDP widget CDN
 
-The inline widget loads the pinned release `https://cdn.search.cimulate.ai/inline-agent-widget/0.1.0/inline-agent-widget.umd.js` by default. No inline UMD
-is copied into the storefront bundle. Set `app.embeddedAgent.embeddedWidgetSourceUrl`
-in configuration, or the same field inside `EMBEDDED_AGENT_COMMERCE_SETTINGS`
-on MRT, to select another published version. Only HTTPS inline-widget bundle URLs
-on `cdn.search.cimulate.ai` are accepted; invalid values use the default release.
+The inline widget loads the pinned Cimulate CDN release; no inline UMD is copied into the storefront bundle.
+Put the following fields in `app.embeddedAgent`, or inside `EMBEDDED_AGENT_COMMERCE_SETTINGS` on MRT:
 
-The server-rendered script and client navigation loader use the same resolver.
-The existing CSP allows this CDN. This setting is independent of the floating
-Cimulate Widget's `commerceClientScriptSourceUrl`. Changing the pinned version
-requires an MRT configuration redeploy, but does not require uploading a UMD.
+```json
+{"cc_embeddedWidgetCdnVersion":"0.1.0","embeddedWidgetSourceUrl":""}
+```
+
+Use `cc_embeddedWidgetCdnVersion` for normal release selection (default `"0.1.0"`).
+The storefront constructs `https://cdn.search.cimulate.ai/inline-agent-widget/<version>/inline-agent-widget.umd.js`.
+Leave `embeddedWidgetSourceUrl` empty unless an explicit trusted URL override is required.
+A valid nonempty override wins over the version; clear the override when switching back to version selection.
+Invalid URLs use the selected version. Missing or invalid version values use `0.1.0`.
+Only versioned releases are supported, not a mutable `latest` alias. A well-formed version must already be published;
+a missing CDN file does not silently switch the shopper to another release.
+
+These fields configure the inline widget only. The floating Cimulate Widget's `cc_cdnVersion` and messaging SDK
+are independent, as is the embedded widget's `capabilitiesVersion`.
+
+Only HTTPS inline-widget URLs on `cdn.search.cimulate.ai` are accepted as overrides. SSR and client navigation
+use the same resolver; the existing CSP permits this CDN. Updating the MRT configuration triggers a redeploy,
+but no widget UMD upload is needed. The URL override defaults to empty so it does not mask version selection.
