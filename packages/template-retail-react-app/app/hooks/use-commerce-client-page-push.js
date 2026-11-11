@@ -35,27 +35,38 @@ const DEFAULT_PANEL_WIDTH = '420px'
  * @param {string} [commerceAgentConfiguration.cc_isOpen] - 'true' when the panel opens on load (seeds the initial state)
  * @returns {Object} Chakra style props to spread onto the content container. Empty when page-push is not active.
  */
-export const useCommerceClientPagePush = (commerceAgentConfiguration = {}) => {
+/**
+ * Whether the page-push layout is configured (agent enabled, commerce-client
+ * provider, full-height dialog, cc_pagePush on). Use this to gate layout
+ * restructuring and panel-position hooks without duplicating the check.
+ */
+export const isPagePushEnabled = (commerceAgentConfiguration = {}) => {
     const {
         enabled = 'false',
         provider = 'miaw',
         cc_pagePush = 'false',
         cc_displayType = 'dialog',
-        cc_dialogFullHeight = 'true',
-        cc_widgetPosition = 'bottom-right',
-        cc_dialogWidth = DEFAULT_PANEL_WIDTH,
-        cc_isOpen = 'false'
+        cc_dialogFullHeight = 'true'
     } = commerceAgentConfiguration
 
-    // Page-push only applies to a rendered, full-height Commerce Client side panel:
-    // modal and inline chat widgets never occupy the edge of the viewport, and a
-    // disabled agent has no panel to make room for.
-    const isPagePushConfigured =
+    return (
         enabled === 'true' &&
         provider === 'commerce-client' &&
         cc_pagePush === 'true' &&
         cc_displayType === 'dialog' &&
         cc_dialogFullHeight === 'true'
+    )
+}
+
+export const useCommerceClientPagePush = (commerceAgentConfiguration = {}) => {
+    const {
+        cc_displayType = 'dialog',
+        cc_widgetPosition = 'bottom-right',
+        cc_dialogWidth = DEFAULT_PANEL_WIDTH,
+        cc_isOpen = 'false'
+    } = commerceAgentConfiguration
+
+    const isPagePushConfigured = isPagePushEnabled(commerceAgentConfiguration)
 
     // Seed from cc_isOpen for SSR/hydration consistency; the persisted open-state is
     // reconciled client-side in the mount effect below (sessionStorage is SSR-unsafe).
