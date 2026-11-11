@@ -331,8 +331,8 @@ export const DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION = '66'
  * These map internally to the `--cim-widget-*` CSS custom properties.
  */
 export const DEFAULT_COMMERCE_CLIENT_THEME = {
-    primaryColor: '#0176d3',
-    secondaryColor: '#014486',
+    primaryColor: '#1c1d22',
+    secondaryColor: '#2c2d32',
     fontColor: '#1a202c',
     fontFamily: 'inherit',
     backgroundColor: '#ffffff',
