@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {render, waitFor, cleanup} from '@testing-library/react'
+import {render, waitFor, cleanup, fireEvent} from '@testing-library/react'
 import {DEFAULT_EMBEDDED_WIDGET_SOURCE_URL} from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
 import useInlineAgentWidget from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 
@@ -45,20 +45,48 @@ describe('embedded widget pre-warm configuration', () => {
         ).toBeNull()
     })
 
-    test('loads the pinned CDN script on client-only navigation', async () => {
-        const getSpy = jest.spyOn(customElements, 'get').mockReturnValueOnce(undefined)
+    test('retries a failed CDN load on a later mount', async () => {
+        const getSpy = jest.spyOn(customElements, 'get').mockReturnValue(undefined)
+        const definedSpy = jest
+            .spyOn(customElements, 'whenDefined')
+            .mockReturnValue(new Promise(() => {}))
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         try {
-            const {container} = render(<Mount config={baseConfig} />)
-            await waitFor(() =>
-                expect(container.querySelector('inline-agent-widget')).not.toBeNull()
-            )
-            const script = document.querySelector(
+            const ssrScript = document.createElement('script')
+            ssrScript.src = DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+            document.head.appendChild(ssrScript)
+            const first = render(<Mount config={baseConfig} />)
+            const concurrent = render(<Mount config={baseConfig} />)
+            expect(
+                document.querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
+            ).toHaveLength(1)
+            const failedScript = document.querySelector(
                 `script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`
             )
-            expect(script).not.toBeNull()
-            expect(script.async).toBe(true)
+            fireEvent.error(failedScript)
+            await waitFor(() =>
+                expect(errorSpy).toHaveBeenCalledWith(
+                    'Inline agent widget CDN script failed to load'
+                )
+            )
+            expect(first.container.querySelector('inline-agent-widget')).toBeNull()
+            expect(failedScript.isConnected).toBe(false)
+            first.unmount()
+            concurrent.unmount()
+            definedSpy.mockResolvedValue(undefined)
+            const second = render(<Mount config={baseConfig} />)
+            await waitFor(() =>
+                expect(second.container.querySelector('inline-agent-widget')).not.toBeNull()
+            )
+            const retryScript = document.querySelector(
+                `script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`
+            )
+            expect(retryScript).not.toBe(failedScript)
+            expect(retryScript.async).toBe(true)
         } finally {
             getSpy.mockRestore()
+            definedSpy.mockRestore()
+            errorSpy.mockRestore()
             document.querySelector(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)?.remove()
         }
     })

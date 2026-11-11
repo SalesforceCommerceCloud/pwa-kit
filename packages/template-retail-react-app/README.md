@@ -243,3 +243,5 @@ are independent, as is the embedded widget's `capabilitiesVersion`.
 Only HTTPS inline-widget URLs on `cdn.search.cimulate.ai` are accepted as overrides. SSR and client navigation
 use the same resolver; the existing CSP permits this CDN. Updating the MRT configuration triggers a redeploy,
 but no widget UMD upload is needed. The URL override defaults to empty so it does not mask version selection.
+
+After changing the release, reload any already-open storefront tabs. Custom-element registration persists for the life of the page.

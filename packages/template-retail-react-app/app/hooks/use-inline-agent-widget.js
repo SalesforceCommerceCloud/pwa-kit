@@ -19,22 +19,26 @@ const ensureWidget = (scriptSourceUrl) => {
         return readyPromise
     }
 
-    // Ensure the script tag exists in <head> (Helmet adds it on SSR, but on
-    // client-only navigation we may need to inject it manually).
-    if (!document.querySelector(`script[src="${scriptSourceUrl}"]`)) {
-        const script = document.createElement('script')
+    const existing = document.querySelector(`script[src="${scriptSourceUrl}"]`)
+    const script = existing || document.createElement('script')
+    readyPromise = new Promise((resolve, reject) => {
+        const onError = () => {
+            script.remove()
+            readyPromise = null
+            reject(new Error('Inline agent widget CDN script failed to load'))
+        }
+        script.addEventListener('error', onError, {once: true})
+        customElements.whenDefined('inline-agent-widget').then(() => {
+            script.removeEventListener('error', onError)
+            resolve()
+        })
+    })
+    if (!existing) {
         script.src = scriptSourceUrl
         script.async = true
         document.head.appendChild(script)
     }
 
-    // Wait for the custom element to be registered — works regardless of
-    // whether the script was included in SSR HTML or injected dynamically.
-    readyPromise = customElements.whenDefined('inline-agent-widget').then(() => {
-        if (!customElements.get('inline-agent-widget') && window.InlineAgentWidget?.defineElement) {
-            window.InlineAgentWidget.defineElement()
-        }
-    })
     return readyPromise
 }
 
@@ -63,9 +67,13 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
         if (typeof window === 'undefined') return
         if (!configured) return
         let cancelled = false
-        ensureWidget(scriptSourceUrl).then(() => {
-            if (!cancelled) setReady(true)
-        })
+        ensureWidget(scriptSourceUrl)
+            .then(() => {
+                if (!cancelled) setReady(true)
+            })
+            .catch((error) => {
+                if (!cancelled) console.error(error.message)
+            })
         return () => {
             cancelled = true
         }
