@@ -91,7 +91,6 @@ const useFabAnimation = (isVisible, prefersReducedMotion) => {
             setIsExpanded(false)
             add(() => setIsExpanded(true), 5200)
             add(() => setShowSheen(true), 6000)
-            // eslint-disable-next-line no-use-before-define
             add(() => startLoop(), 7100)
         }
 
@@ -262,9 +261,7 @@ const CommerceClientFab = ({
                     alignItems="center"
                     justifyContent="center"
                     flex="0 0 auto"
-                    transition={
-                        noTransition || `transform 0.6s ${EASE_OUT_EXPO}`
-                    }
+                    transition={noTransition || `transform 0.6s ${EASE_OUT_EXPO}`}
                     transform={isExpanded ? 'translateX(3px)' : 'translateX(0)'}
                 >
                     <SparkleFilledIcon boxSize={5} />

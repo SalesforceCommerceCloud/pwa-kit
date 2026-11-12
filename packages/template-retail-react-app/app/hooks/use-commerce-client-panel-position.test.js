@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
 import {renderHook} from '@testing-library/react'
 import {
     CC_HEADER_ID,
@@ -18,7 +17,7 @@ let mutationObserverInstance
 class MockResizeObserver {
     constructor(callback) {
         this._callback = callback
-        resizeObserverInstance = this
+        resizeObserverInstance = this // eslint-disable-line @typescript-eslint/no-this-alias
     }
     observe = jest.fn()
     disconnect = jest.fn()
@@ -27,7 +26,7 @@ class MockResizeObserver {
 class MockMutationObserver {
     constructor(callback) {
         this._callback = callback
-        mutationObserverInstance = this
+        mutationObserverInstance = this // eslint-disable-line @typescript-eslint/no-this-alias
     }
     observe = jest.fn()
     disconnect = jest.fn()
