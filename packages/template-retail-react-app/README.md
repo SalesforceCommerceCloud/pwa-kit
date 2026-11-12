@@ -222,23 +222,23 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 
 ### Inline PDP widget CDN
 
-The inline widget loads the pinned Cimulate CDN release; no inline UMD is copied into the storefront bundle.
+The inline widget loads a versioned release from the trusted Cimulate CDN instead of a UMD copied into the storefront bundle.
 Put the following fields in `app.embeddedAgent`, or inside `EMBEDDED_AGENT_COMMERCE_SETTINGS` on MRT:
 
 ```json
 {"cc_embeddedWidgetCdnVersion":"0.1.0","embeddedWidgetSourceUrl":""}
 ```
 
-Use `cc_embeddedWidgetCdnVersion` for normal release selection (default `"0.1.0"`).
+Use `cc_embeddedWidgetCdnVersion` to select a published release. It defaults to `"0.1.0"`; set this field to another published version to switch releases.
 The storefront constructs `https://cdn.search.cimulate.ai/inline-agent-widget/<version>/inline-agent-widget.umd.js`.
 Leave `embeddedWidgetSourceUrl` empty unless an explicit trusted URL override is required.
 A valid nonempty override wins over the version; clear the override when switching back to version selection.
 Invalid URLs use the selected version. Missing or invalid version values use `0.1.0`.
-Only versioned releases are supported, not a mutable `latest` alias. A well-formed version must already be published;
+The version field accepts semantic versions, not `latest`. The selected release must already be published;
 a missing CDN file does not silently switch the shopper to another release.
 
-These fields configure the inline widget only. The floating Cimulate Widget's `cc_cdnVersion` and messaging SDK
-are independent, as is the embedded widget's `capabilitiesVersion`.
+These fields select the embedded widget release. The floating Cimulate Widget's `cc_cdnVersion` and the
+SCRT2 capabilities version are configured separately.
 
 Only HTTPS inline-widget URLs on `cdn.search.cimulate.ai` are accepted as overrides. SSR and client navigation
 use the same resolver; the existing CSP permits this CDN. Updating the MRT configuration triggers a redeploy,
