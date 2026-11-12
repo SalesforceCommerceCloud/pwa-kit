@@ -106,6 +106,43 @@ describe('CommerceClientFab', () => {
         expect(screen.getByTestId('commerce-client-fab')).toBeInTheDocument()
     })
 
+    test('resumes animation cycle after panel close even if hover was interrupted', () => {
+        renderWithProviders(<CommerceClientFab />)
+
+        const fab = screen.getByTestId('commerce-client-fab')
+
+        // Hover the FAB (sets interactingRef = true)
+        act(() => {
+            fireEvent.mouseEnter(fab)
+        })
+
+        // Panel opens — FAB disappears without mouseLeave firing
+        act(() => {
+            window.dispatchEvent(
+                new CustomEvent(COMMERCE_CLIENT_UI_STATE_EVENT, {
+                    detail: {property: 'isOpen', value: true}
+                })
+            )
+        })
+        expect(screen.queryByTestId('commerce-client-fab')).toBeNull()
+
+        // Panel closes — FAB reappears
+        act(() => {
+            window.dispatchEvent(
+                new CustomEvent(COMMERCE_CLIENT_UI_STATE_EVENT, {
+                    detail: {property: 'isOpen', value: false}
+                })
+            )
+        })
+
+        const reappeared = screen.getByTestId('commerce-client-fab')
+        expect(reappeared).toHaveStyle({maxWidth: '320px'})
+
+        // Should still collapse after 1s (interactingRef was reset)
+        act(() => jest.advanceTimersByTime(1000))
+        expect(reappeared).toHaveStyle({maxWidth: '56px'})
+    })
+
     test('stays hidden after navigating with the panel left open', () => {
         window.sessionStorage.setItem(COMMERCE_CLIENT_OPEN_STATE_KEY, 'true')
 

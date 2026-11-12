@@ -43,16 +43,12 @@ const usePrefersReducedMotion = () => {
     return prefersReducedMotion
 }
 
-/**
- * Manages the FAB expand → collapse → sheen → repeat animation cycle.
- *
- * Timing matches the SFRA plugin_commerce_client reference:
- *   0s      expanded (label visible)
- *   1s      collapse to icon-only
- *   6.2s    re-expand
- *   7s      sheen sweep
- *   8.1s    loop restarts
- */
+// Animation timing (ms) — matches the SFRA plugin_commerce_client reference.
+const COLLAPSE_DELAY = 1000
+const EXPAND_DELAY = 5200
+const SHEEN_DELAY = 6000
+const LOOP_DELAY = 7100
+
 const useFabAnimation = (isVisible, prefersReducedMotion) => {
     const [isExpanded, setIsExpanded] = useState(true)
     const [showSheen, setShowSheen] = useState(false)
@@ -67,56 +63,58 @@ const useFabAnimation = (isVisible, prefersReducedMotion) => {
             return undefined
         }
 
-        const clear = () => {
+        interactingRef.current = false
+
+        const cancelTimers = () => {
             timersRef.current.forEach(clearTimeout)
             timersRef.current = []
         }
-        const add = (cb, delay) => {
+        const scheduleTimer = (cb, delay) => {
             timersRef.current.push(setTimeout(cb, delay))
         }
 
-        const holdOpen = () => {
-            clear()
+        const holdExpanded = () => {
+            cancelTimers()
             setShowSheen(false)
             setIsExpanded(true)
         }
 
-        const startClosedCycle = () => {
-            clear()
+        const startCollapsedPhase = () => {
+            cancelTimers()
             setShowSheen(false)
             if (prefersReducedMotion) {
                 setIsExpanded(true)
                 return
             }
             setIsExpanded(false)
-            add(() => setIsExpanded(true), 5200)
-            add(() => setShowSheen(true), 6000)
-            add(() => startLoop(), 7100)
+            scheduleTimer(() => setIsExpanded(true), EXPAND_DELAY)
+            scheduleTimer(() => setShowSheen(true), SHEEN_DELAY)
+            scheduleTimer(() => startExpandedPhase(), LOOP_DELAY)
         }
 
-        const startLoop = () => {
-            holdOpen()
+        const startExpandedPhase = () => {
+            holdExpanded()
             if (!prefersReducedMotion) {
-                add(() => {
-                    if (!interactingRef.current) startClosedCycle()
-                }, 1000)
+                scheduleTimer(() => {
+                    if (!interactingRef.current) startCollapsedPhase()
+                }, COLLAPSE_DELAY)
             }
         }
 
-        cycleRef.current = {holdOpen, startClosedCycle}
-        startLoop()
+        cycleRef.current = {holdExpanded, startCollapsedPhase}
+        startExpandedPhase()
 
-        return clear
+        return cancelTimers
     }, [isVisible, prefersReducedMotion])
 
     const onInteractionStart = useCallback(() => {
         interactingRef.current = true
-        cycleRef.current.holdOpen?.()
+        cycleRef.current.holdExpanded?.()
     }, [])
 
     const onInteractionEnd = useCallback(() => {
         interactingRef.current = false
-        cycleRef.current.startClosedCycle?.()
+        cycleRef.current.startCollapsedPhase?.()
     }, [])
 
     return {isExpanded, showSheen, onInteractionStart, onInteractionEnd}
