@@ -156,6 +156,26 @@ describe('embedded widget CDN version selection', () => {
             )
         }
     )
+    test.each(['latest', 'v0.2.0', '0.01.0', 'release-candidate', '0.2'])(
+        'rejects a non-semver URL segment %s and preserves the selected release',
+        (segment) => {
+            expect(
+                resolveEmbeddedWidgetSourceUrl({
+                    cc_embeddedWidgetCdnVersion: '0.2.0',
+                    embeddedWidgetSourceUrl: `https://cdn.search.cimulate.ai/inline-agent-widget/${segment}/inline-agent-widget.umd.js`
+                })
+            ).toBe(
+                'https://cdn.search.cimulate.ai/inline-agent-widget/0.2.0/inline-agent-widget.umd.js'
+            )
+        }
+    )
+    test.each(['0.2.0', '1.0.0-rc.1', '1.2.3+build.2'])(
+        'accepts an explicit release URL for %s',
+        (version) => {
+            const source = `https://cdn.search.cimulate.ai/inline-agent-widget/${version}/inline-agent-widget.umd.js`
+            expect(resolveEmbeddedWidgetSourceUrl({embeddedWidgetSourceUrl: source})).toBe(source)
+        }
+    )
     test('the explicit URL wins over the version', () => {
         expect(
             resolveEmbeddedWidgetSourceUrl({

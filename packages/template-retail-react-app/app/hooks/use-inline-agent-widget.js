@@ -20,7 +20,9 @@ const ensureWidget = (scriptSourceUrl) => {
     }
 
     const existing = document.querySelector(`script[src="${scriptSourceUrl}"]`)
-    const script = existing || document.createElement('script')
+    // An SSR script may have failed before hydration attached an error listener.
+    existing?.remove()
+    const script = document.createElement('script')
     readyPromise = new Promise((resolve, reject) => {
         const onError = () => {
             script.remove()
@@ -33,11 +35,12 @@ const ensureWidget = (scriptSourceUrl) => {
             resolve()
         })
     })
-    if (!existing) {
-        script.src = scriptSourceUrl
-        script.async = true
-        document.head.appendChild(script)
-    }
+    script.src = scriptSourceUrl
+    script.async = true
+    // Match Helmet's attributes so it retains the listener-bound script.
+    script.setAttribute('async', 'true')
+    script.setAttribute('data-react-helmet', 'true')
+    document.head.appendChild(script)
 
     return readyPromise
 }

@@ -7,8 +7,12 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {render, waitFor, cleanup, fireEvent} from '@testing-library/react'
-import {DEFAULT_EMBEDDED_WIDGET_SOURCE_URL} from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
+import {Helmet} from 'react-helmet'
+import {render, waitFor, cleanup, fireEvent, act} from '@testing-library/react'
+import {
+    DEFAULT_EMBEDDED_WIDGET_SOURCE_URL,
+    resolveEmbeddedWidgetSourceUrl
+} from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
 import useInlineAgentWidget from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 
 const baseConfig = {
@@ -23,7 +27,16 @@ const Mount = ({config}) => {
         productName: 'TrailFit',
         pdpQuestions: ['How does it fit?']
     })
-    return <div ref={ref} />
+    return (
+        <>
+            {config?.enabled && (
+                <Helmet>
+                    <script src={resolveEmbeddedWidgetSourceUrl(config)} async />
+                </Helmet>
+            )}
+            <div ref={ref} />
+        </>
+    )
 }
 
 Mount.propTypes = {config: PropTypes.object}
@@ -45,7 +58,7 @@ describe('embedded widget pre-warm configuration', () => {
         ).toBeNull()
     })
 
-    test('retries a failed CDN load on a later mount', async () => {
+    test('replaces an SSR script that failed before hydration and retries a later load failure', async () => {
         const getSpy = jest.spyOn(customElements, 'get').mockReturnValue(undefined)
         const definedSpy = jest
             .spyOn(customElements, 'whenDefined')
@@ -55,14 +68,24 @@ describe('embedded widget pre-warm configuration', () => {
             const ssrScript = document.createElement('script')
             ssrScript.src = DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
             document.head.appendChild(ssrScript)
+            fireEvent.error(ssrScript)
             const first = render(<Mount config={baseConfig} />)
             const concurrent = render(<Mount config={baseConfig} />)
+            expect(ssrScript.isConnected).toBe(false)
             expect(
                 document.querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
             ).toHaveLength(1)
             const failedScript = document.querySelector(
                 `script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`
             )
+            expect(failedScript).not.toBe(ssrScript)
+            await act(async () => new Promise((resolve) => requestAnimationFrame(resolve)))
+            expect(
+                document.querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
+            ).toHaveLength(1)
+            expect(
+                document.querySelector(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
+            ).toBe(failedScript)
             fireEvent.error(failedScript)
             await waitFor(() =>
                 expect(errorSpy).toHaveBeenCalledWith(
