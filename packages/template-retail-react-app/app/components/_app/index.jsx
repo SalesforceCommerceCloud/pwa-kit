@@ -433,7 +433,9 @@ const StorefrontApp = (props) => {
                                     @media (min-width: 992px) {
                                         .cim-widget-dialog.full-height.commerce-client-shopper-agent {
                                             top: var(--cc-panel-top, 0) !important;
-                                            height: calc(100dvh - var(--cc-panel-top, 0px)) !important;
+                                            height: calc(
+                                                100dvh - var(--cc-panel-top, 0px)
+                                            ) !important;
                                         }
                                     }
                                 `}
