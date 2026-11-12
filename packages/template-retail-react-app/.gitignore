@@ -26,6 +26,8 @@ tmp/
 node_modules
 
 # Generated files
+dw.json
+cartridges/dw.json
 app/cache-hash-manifest.json
 app/loader-cache-hash-manifest.json
 

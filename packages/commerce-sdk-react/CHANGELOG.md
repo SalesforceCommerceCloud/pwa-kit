@@ -1,7 +1,13 @@
-## v5.5.0-dev (Aug 12, 2026)
-- [Feature] Add a `useDeliveryEstimates` query hook and `ShopperDeliveryEstimates` client registration for the Shopper Delivery Estimates API. This requires a `commerce-sdk-isomorphic` release that includes the generated client. The TypeDoc entry is grouped with the Shopper Delivery Estimates API and links to the endpoint, SDK, and TanStack Query references. [#4013](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4013)
+## v6.0.0-dev
+- [Breaking] Upgrade to `commerce-sdk-isomorphic@5.8.0`. Require `login_id` and `channel_id` on `getPasswordLessAccessToken` / `LoginPasswordlessUser` and forward them to the helper as camelCase `loginId` / `channelId` (mapped to snake_case on the wire by isomorphic). Also remove the stale `@ts-ignore` on `resetPassword` `user_id` (present in SDK types since 5.2.0); `user_id` and `channel_id` continue to be sent on password reset.
+- [Breaking] `resetPassword` / `ResetPassword` now requires `user_id` and throws before calling SLAS when it is missing. SLAS checks it against the user the reset token was issued for. [#4092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4092)
+
+## v5.6.0-dev (Oct 09, 2026)
+- [Feature] When a SLAS private client secret is set directly via `clientSecret` (not PWA Kit private client mode), `loginRegisteredUserB2C` now sends the `x-slas-client-auth` header so the login works with SLAS strict client auth.
+## v5.5.0 (Oct 08, 2026)
+- [Feature] Add a `useDeliveryEstimates` query hook and `ShopperDeliveryEstimates` client registration for the Shopper Delivery Estimates API. This requires `commerce-sdk-isomorphic` `5.7.0`, which includes the generated client. The TypeDoc entry is grouped with the Shopper Delivery Estimates API and links to the endpoint, SDK, and TanStack Query references. [#4013](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4013)
 - [Feature] Add Shopper Experience `useComponent` query hook for fetching a single Page Designer component by component ID, with Page Designer edit/preview mode support (raw response preserved when a `mode` or `pdToken` is present). Page Designer mode uses `rawResponse`, which bypasses the SDK's `throwOnBadResponse` check, so `usePage`, `usePages`, and `useComponent` now explicitly throw a `ResponseError` on a non-ok response in that mode instead of parsing the error body as successful data.
-- [Feature] Add `requestOrderAccessCode` to `ShopperOrdersMutations` and bump `commerce-sdk-isomorphic` to `5.5.0`, which ships the method. `useShopperOrdersMutation('requestOrderAccessCode')` is now fully typed and functional. [#3982](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3982)
+- [Feature] Add `requestOrderAccessCode` to `ShopperOrdersMutations`. Requires `commerce-sdk-isomorphic` `5.5.0` or later (this release ships with `5.7.0`). `useShopperOrdersMutation('requestOrderAccessCode')` is now fully typed and functional. [#3982](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3982)
 
 ## v5.4.1 (Sep 22, 2026)
 - [Feature] Re-export `usePreviewContext` through `ShopperExperienceV2` so storefront code can read the Page Designer preview channel’s `isConnected` state and call `notifyClientRouteChanged`. Bumps `@salesforce/storefront-next-runtime` to `1.3.1`. [#4021](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4021)

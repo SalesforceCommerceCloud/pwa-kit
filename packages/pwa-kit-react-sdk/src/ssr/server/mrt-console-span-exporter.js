@@ -12,7 +12,8 @@
  * exporter's only job is to print the JSON shape MRT expects. No OTLP endpoint
  * is involved.
  *
- * @env OTEL_TRACING_ENABLED — resolved via getOTELConfig().enabled
+ * @env OTEL_TRACING_ENABLED / MRT_DISTRIBUTED_TRACING_ENABLED — resolved via
+ *      getOTELConfig().enabled
  */
 import {ConsoleSpanExporter} from '@opentelemetry/sdk-trace-base'
 import {ExportResultCode, hrTimeToTimeStamp} from '@opentelemetry/core'

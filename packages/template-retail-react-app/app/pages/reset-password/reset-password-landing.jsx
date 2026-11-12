@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
@@ -24,10 +24,11 @@ import useUpdatePasswordFields from '@salesforce/retail-react-app/app/components
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
-    API_ERROR_MESSAGE,
-    INVALID_TOKEN_ERROR,
-    INVALID_TOKEN_ERROR_MESSAGE
-} from '@salesforce/retail-react-app/app/constants'
+    getRememberedPasswordResetEmail,
+    getResetPasswordActionErrorMessage,
+    readErrorResponseMessage,
+    TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const ResetPasswordLanding = () => {
     const form = useForm()
@@ -35,23 +36,34 @@ const ResetPasswordLanding = () => {
     const {search} = useLocation()
     const navigate = useNavigation()
     const queryParams = new URLSearchParams(search)
-    const email = decodeURIComponent(queryParams.get('email'))
     const token = decodeURIComponent(queryParams.get('token'))
+    const {control} = form
     const fields = useUpdatePasswordFields({form})
     const password = form.watch('password')
     const {resetPassword} = usePasswordReset()
 
+    // Prefill the email this browser requested the link for. Read after mount because
+    // localStorage isn't available during server rendering.
+    useEffect(() => {
+        const rememberedEmail = getRememberedPasswordResetEmail()
+        if (rememberedEmail && !form.getValues('email')) {
+            form.setValue('email', rememberedEmail)
+        }
+    }, [])
+
     const submit = async (values) => {
         form.clearErrors()
         try {
-            await resetPassword({email, token, newPassword: values.password})
+            await resetPassword({email: values.email, token, newPassword: values.password})
             navigate('/login')
         } catch (error) {
-            const errorData = await error.response?.json()
-            const message = INVALID_TOKEN_ERROR.test(errorData.message)
-                ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
-            form.setError('global', {type: 'manual', message})
+            // /password/action 429 responses have an empty body — check status, not message.
+            // Do not show "request a new link" (INVALID_TOKEN); that would hit the limit again.
+            const messageDescriptor =
+                error.response?.status === 429
+                    ? TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
+                    : getResetPasswordActionErrorMessage(await readErrorResponseMessage(error))
+            form.setError('global', {type: 'manual', message: formatMessage(messageDescriptor)})
         }
     }
 
@@ -78,6 +90,23 @@ const ResetPasswordLanding = () => {
                             </Alert>
                         )}
                         <Stack spacing={3} pb={2}>
+                            <Field
+                                name="email"
+                                label={formatMessage({
+                                    defaultMessage: 'Email',
+                                    id: 'reset_password_form.label.email'
+                                })}
+                                type="email"
+                                control={control}
+                                defaultValue=""
+                                rules={{
+                                    required: formatMessage({
+                                        defaultMessage: 'Please enter your email address.',
+                                        id: 'reset_password_form.error.required_email'
+                                    })
+                                }}
+                                autoComplete="email"
+                            />
                             <Field {...fields.password} />
                             <Field {...fields.confirmPassword} />
                             <PasswordRequirements value={password} />

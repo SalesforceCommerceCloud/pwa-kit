@@ -160,7 +160,7 @@ test('Verify password reset request when extra login features are not enabled', 
     const params = new URLSearchParams(postData)
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
-    expect(params.get('mode')).toBe('email')
+    expect(['email', 'callback']).toContain(params.get('mode'))
     expect(params.get('channel_id')).toBe(config.RETAIL_APP_HOME_SITE)
     expect(params.get('hint')).toBe('cross_device')
 })

@@ -1055,12 +1055,72 @@ describe('Auth', () => {
 
     test('getPasswordLessAccessToken calls isomorphic getPasswordLessAccessToken', async () => {
         const auth = new Auth(config)
-        await auth.getPasswordLessAccessToken({pwdlessLoginToken: '12345678'})
+        await auth.getPasswordLessAccessToken({
+            pwdlessLoginToken: '12345678',
+            login_id: 'shopper@example.com',
+            channel_id: config.siteId
+        })
         expect(helpers.getPasswordLessAccessToken).toHaveBeenCalled()
         const functionArg = (helpers.getPasswordLessAccessToken as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
-            parameters: {pwdlessLoginToken: '12345678'}
+            parameters: {
+                pwdlessLoginToken: '12345678',
+                loginId: 'shopper@example.com',
+                channelId: config.siteId
+            }
         })
+    })
+
+    test('getPasswordLessAccessToken forwards loginId, channelId, usid, and registerCustomer', async () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('usid', 'test-usid')
+        await auth.getPasswordLessAccessToken({
+            pwdlessLoginToken: '12345678',
+            login_id: 'shopper@example.com',
+            channel_id: 'customChannelId',
+            register_customer: true
+        })
+        expect(helpers.getPasswordLessAccessToken).toHaveBeenCalled()
+        const functionArg = (helpers.getPasswordLessAccessToken as jest.Mock).mock.calls[0][0]
+        expect(functionArg).toMatchObject({
+            parameters: {
+                pwdlessLoginToken: '12345678',
+                loginId: 'shopper@example.com',
+                channelId: 'customChannelId',
+                usid: 'test-usid',
+                registerCustomer: 'true'
+            }
+        })
+    })
+
+    test('getPasswordLessAccessToken maps loginId/channelId onto the SLAS request body', async () => {
+        // Drive the real isomorphic helper so we assert the wire body, not only our wrapper args.
+        const {helpers: actualHelpers} = jest.requireActual('commerce-sdk-isomorphic')
+        const getPasswordLessAccessTokenSpy = jest.fn().mockResolvedValue(TOKEN_RESPONSE)
+
+        const auth = new Auth(configSLASPrivate)
+        // @ts-expect-error private property
+        auth.client.getPasswordLessAccessToken = getPasswordLessAccessTokenSpy
+        ;(helpers.getPasswordLessAccessToken as jest.Mock).mockImplementationOnce((options) =>
+            actualHelpers.getPasswordLessAccessToken(options)
+        )
+
+        await auth.getPasswordLessAccessToken({
+            pwdlessLoginToken: '12345678',
+            login_id: 'shopper@example.com',
+            channel_id: 'customChannelId'
+        })
+
+        expect(getPasswordLessAccessTokenSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                body: expect.objectContaining({
+                    pwdless_login_token: '12345678',
+                    login_id: 'shopper@example.com',
+                    channel_id: 'customChannelId'
+                })
+            })
+        )
     })
 
     test.each([
@@ -1169,6 +1229,7 @@ describe('Auth', () => {
         [
             'with all parameters specified',
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123',
                 channel_id: 'customChannelId',
@@ -1177,6 +1238,7 @@ describe('Auth', () => {
                 code_verifier: 'test-code-verifier'
             },
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123',
                 channel_id: 'customChannelId',
@@ -1188,10 +1250,12 @@ describe('Auth', () => {
         [
             'defaults all parameters when only required parameters are specified',
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123'
             },
             {
+                user_id: 'user@example.com',
                 pwd_action_token: '12345678',
                 new_password: 'newPassword123',
                 channel_id: config.siteId,
@@ -1225,6 +1289,7 @@ describe('Auth', () => {
         const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
 
         await auth.resetPassword({
+            user_id: 'user@example.com',
             pwd_action_token: '12345678',
             new_password: 'newPassword123'
         } as ShopperLoginTypes.resetPasswordBodyType)
@@ -1234,6 +1299,20 @@ describe('Auth', () => {
                 headers: expect.objectContaining({Authorization: expect.stringContaining('Basic ')})
             })
         )
+    })
+
+    test('resetPassword throws without user_id and does not call SLAS', async () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private property
+        const resetPasswordSpy = jest.spyOn(auth.client, 'resetPassword')
+
+        await expect(
+            auth.resetPassword({
+                pwd_action_token: '12345678',
+                new_password: 'newPassword123'
+            } as ShopperLoginTypes.resetPasswordBodyType)
+        ).rejects.toThrow('Required argument user_id is not provided')
+        expect(resetPasswordSpy).not.toHaveBeenCalled()
     })
 
     test('logout as registered user calls isomorphic logout', async () => {
@@ -1335,6 +1414,27 @@ describe('Auth', () => {
         expect(funcArg).toMatchObject({
             credentials: {clientSecret: 'someSecret'}
         })
+    })
+    test('loginRegisteredUserB2C sends x-slas-client-auth when a client secret is set directly', async () => {
+        const auth = new Auth({...config, clientSecret: 'someSecret'})
+        await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
+        const funcArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][0]
+        // Raw base64 of clientId:clientSecret, no `Basic ` prefix
+        expect(funcArg.slasClient.clientConfig.headers['x-slas-client-auth']).toBe(
+            Buffer.from('clientId:someSecret').toString('base64')
+        )
+    })
+    test('loginRegisteredUserB2C does not send x-slas-client-auth in PWA Kit private client mode', async () => {
+        const auth = new Auth(configSLASPrivate)
+        await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
+        const funcArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][0]
+        expect(funcArg.slasClient.clientConfig.headers['x-slas-client-auth']).toBeUndefined()
+    })
+    test('loginRegisteredUserB2C does not send x-slas-client-auth for a public client', async () => {
+        const auth = new Auth(config)
+        await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
+        const funcArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][0]
+        expect(funcArg.slasClient.clientConfig.headers['x-slas-client-auth']).toBeUndefined()
     })
 
     test('running on the server uses a shared context memory store', () => {

@@ -19,6 +19,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -51,6 +52,7 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
 const PaymentProcessing = loadable(() => import('./pages/checkout/payment-processing'), {fallback})
+const ShopperAgentExpressPaymentPage = loadable(() => import('./pages/express'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 const GuestOrderLookupRequest = loadable(() => import('./pages/guest-order-lookup/request'), {
     fallback
@@ -64,6 +66,8 @@ const GuestOrderLookupOrder = loadable(() => import('./pages/guest-order-lookup/
 const GuestOrderLookupResults = loadable(() => import('./pages/guest-order-lookup/results'), {
     fallback
 })
+
+const ComponentPreview = loadable(() => import('./pages/component-preview'), {fallback})
 
 export const routes = [
     {
@@ -137,21 +141,30 @@ export const routes = [
     {
         path: '/store-locator',
         component: StoreLocator
+    },
+    {
+        path: '/preview/component',
+        component: ComponentPreview
     }
 ]
 
-export default () => {
-    const config = getConfig()
+/**
+ * Routes that are only added when their feature is enabled in config (reset password and
+ * passwordless landing pages, social login redirect, guest order lookup, Shopper Agent).
+ * Exported so projects that extend this template can include them in their own routes.
+ */
+export const getDynamicRoutes = (config = getConfig()) => {
     const loginConfig = config?.app?.login
     const resetPasswordLandingPath = loginConfig?.resetPassword?.landingPath
     const socialLoginEnabled = loginConfig?.social?.enabled
     const socialRedirectURI = loginConfig?.social?.redirectURI
     const passwordlessLoginEnabled = loginConfig?.passwordless?.enabled
     const passwordlessLoginLandingPath = loginConfig?.passwordless?.landingPath
-    const guestOrderLookupEnabled = getConfig()?.app?.guestOrderLookup?.enabled
+    const guestOrderLookupEnabled = config?.app?.guestOrderLookup?.enabled
+    const commerceAgentEnabled = getCommerceAgentConfig()?.enabled === 'true'
 
     // Add dynamic routes conditionally (only if features are enabled and paths are defined)
-    const dynamicRoutes = [
+    return [
         resetPasswordLandingPath && {
             path: resetPasswordLandingPath,
             component: ResetPassword,
@@ -188,10 +201,25 @@ export default () => {
             path: '/order-lookup/results/:orderNo',
             component: GuestOrderLookupResults,
             exact: true
+        },
+        commerceAgentEnabled && {
+            path: '/Payments-Express',
+            component: ShopperAgentExpressPaymentPage,
+            exact: true,
+            sensitive: true
+        },
+        commerceAgentEnabled && {
+            path: '/Payments-ExpressProduct',
+            component: ShopperAgentExpressPaymentPage,
+            exact: true,
+            sensitive: true
         }
     ].filter(Boolean)
+}
 
-    const allRoutes = configureRoutes([...routes, ...dynamicRoutes], config, {
+export default () => {
+    const config = getConfig()
+    const allRoutes = configureRoutes([...routes, ...getDynamicRoutes(config)], config, {
         ignoredRoutes: ['/callback'],
         fuzzyPathMatching: true
     })

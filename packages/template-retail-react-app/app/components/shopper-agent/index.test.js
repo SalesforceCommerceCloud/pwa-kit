@@ -115,8 +115,10 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-miaw', () => ({
 
 // Mock commerce-sdk-react hooks. useAccessToken returns a stable object so the
 // component can read getTokenWhenReady() during the conversation-started flow.
+const mockGetUrlMapping = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useAccessToken: jest.fn(),
+    useCommerceApi: () => ({getUrlMapping: mockGetUrlMapping}),
     useUsid: jest.fn(),
     useConfig: jest.fn(),
     useCustomerType: jest.fn(),
@@ -127,6 +129,17 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     __esModule: true,
     default: jest.fn()
+}))
+
+const mockNavigate = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
+    __esModule: true,
+    default: () => mockNavigate
+}))
+
+const mockStopProductLinkRouting = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/utils/shopper-agent-product-links', () => ({
+    attachAgentProductLinkRouting: jest.fn(() => mockStopProductLinkRouting)
 }))
 
 // Mock the useTheme hook
@@ -147,6 +160,7 @@ import {
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import {attachAgentProductLinkRouting} from '@salesforce/retail-react-app/app/utils/shopper-agent-product-links'
 
 // Get mocked functions
 const mockedUseScript = useScript
@@ -2060,6 +2074,85 @@ describe('ShopperAgent Component', () => {
             )
         })
 
+        test('always forwards onNavigate so same-tab widget links stay in the SPA', () => {
+            renderCommerceClient()
+
+            const calls = mockedUseCommerceClientMessaging.mock.calls
+            const widgetOptions = calls[calls.length - 1][1]
+            expect(typeof widgetOptions.onNavigate).toBe('function')
+        })
+
+        test('points agent product links at the storefront product page and stops on unmount', () => {
+            const buildUrl = jest.fn((path) => `/us/en-US${path}`)
+            mockedUseMultiSite.mockReturnValue({
+                locale: {id: 'en-US', preferredCurrency: 'USD'},
+                buildUrl
+            })
+
+            const {unmount} = renderCommerceClient()
+
+            const calls = attachAgentProductLinkRouting.mock.calls
+            const {navigateToProduct, getProductHref} = calls[calls.length - 1][0]
+            expect(getProductHref('DH-387')).toBe('/us/en-US/product/DH-387')
+            navigateToProduct('2040793A5H')
+            expect(mockNavigate).toHaveBeenCalledWith('/product/2040793A5H')
+
+            unmount()
+            expect(mockStopProductLinkRouting).toHaveBeenCalled()
+        })
+
+        test('escapes the product id as one path segment', () => {
+            mockedUseMultiSite.mockReturnValue({
+                locale: {id: 'en-US', preferredCurrency: 'USD'},
+                buildUrl: (path) => `/us/en-US${path}`
+            })
+            renderCommerceClient()
+
+            const calls = attachAgentProductLinkRouting.mock.calls
+            const {navigateToProduct, getProductHref} = calls[calls.length - 1][0]
+            expect(getProductHref('../account')).toBe('/us/en-US/product/..%2Faccount')
+            expect(getProductHref('a?b#c')).toBe('/us/en-US/product/a%3Fb%23c')
+            navigateToProduct('red shoe')
+            expect(mockNavigate).toHaveBeenCalledWith('/product/red%20shoe')
+        })
+
+        test('looks agent product links up through Shopper SEO', async () => {
+            renderCommerceClient()
+            const calls = attachAgentProductLinkRouting.mock.calls
+            const {lookupProductId} = calls[calls.length - 1][0]
+
+            mockGetUrlMapping.mockResolvedValueOnce({resourceType: 'PRODUCT', resourceId: 'DH-387'})
+            await expect(lookupProductId('chairs/DH-387.html')).resolves.toBe('DH-387')
+            expect(mockGetUrlMapping).toHaveBeenLastCalledWith({
+                parameters: {urlSegment: 'chairs/DH-387.html'},
+                headers: {Authorization: 'Bearer test-slas-access-token'}
+            })
+
+            mockGetUrlMapping.mockResolvedValueOnce({
+                resourceType: 'CATEGORY',
+                resourceId: 'chairs'
+            })
+            await expect(lookupProductId('chairs.html')).resolves.toBeUndefined()
+        })
+
+        test('treats a Shopper SEO 404 as no product, and lets any other failure reject', async () => {
+            renderCommerceClient()
+            const calls = attachAgentProductLinkRouting.mock.calls
+            const {lookupProductId} = calls[calls.length - 1][0]
+
+            const notFound = Object.assign(new Error('Not Found'), {response: {status: 404}})
+            mockGetUrlMapping.mockRejectedValueOnce(notFound)
+            await expect(lookupProductId('unknown.html')).resolves.toBeUndefined()
+
+            const serverError = Object.assign(new Error('Bad Gateway'), {response: {status: 502}})
+            mockGetUrlMapping.mockRejectedValueOnce(serverError)
+            await expect(lookupProductId('chairs/DH-387.html')).rejects.toBe(serverError)
+
+            const offline = new TypeError('Failed to fetch')
+            mockGetUrlMapping.mockRejectedValueOnce(offline)
+            await expect(lookupProductId('chairs/DH-387.html')).rejects.toBe(offline)
+        })
+
         test('leaves the new optional widget fields undefined when not configured so the widget default wins', () => {
             renderCommerceClient()
 
@@ -2073,6 +2166,7 @@ describe('ShopperAgent Component', () => {
             expect(widgetOptions.messageAlignment).toBeUndefined()
             expect(widgetOptions.autoScroll).toBeUndefined()
             expect(widgetOptions.openLinksInNewTab).toBeUndefined()
+            expect(typeof widgetOptions.onNavigate).toBe('function')
             expect(widgetOptions.showProductDescription).toBeUndefined()
             expect(widgetOptions.showProductCaptions).toBeUndefined()
             expect(widgetOptions.promptsConfig).toBeUndefined()
@@ -2193,7 +2287,227 @@ describe('ShopperAgent Component', () => {
                 expect(mockEmbeddedService.userVerificationAPI.clearSession).not.toHaveBeenCalled()
             })
 
-            test('uses an existing bundle global after a basket-loading remount', async () => {
+            describe('logout and login transitions', () => {
+                const mockEndConversation = jest.fn()
+
+                const setRegistered = () => {
+                    mockedUseCustomerType.mockReturnValue({
+                        customerType: 'registered',
+                        isGuest: false,
+                        isRegistered: true,
+                        isExternal: false
+                    })
+                    mockedUseUsid.mockReturnValue({usid: 'registered-usid'})
+                }
+
+                const setGuest = () => {
+                    mockedUseCustomerType.mockReturnValue({
+                        customerType: 'guest',
+                        isGuest: true,
+                        isRegistered: false,
+                        isExternal: false
+                    })
+                    mockedUseUsid.mockReturnValue({usid: 'guest-usid'})
+                }
+
+                // Logout clears auth storage before the guest login completes.
+                const setUnresolved = () => {
+                    mockedUseCustomerType.mockReturnValue({
+                        customerType: null,
+                        isGuest: false,
+                        isRegistered: false,
+                        isExternal: false
+                    })
+                    mockedUseUsid.mockReturnValue({usid: null})
+                }
+
+                const rerenderShopperAgent = (rerender) =>
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={true}
+                        />
+                    )
+
+                beforeEach(() => {
+                    mockEndConversation.mockReset()
+                    window.CimulateMessaging = {
+                        injectMessagingWidget: jest.fn(),
+                        eventHandlers: {session: {endConversation: mockEndConversation}}
+                    }
+                })
+
+                test('ends the conversation on logout instead of re-linking it to the guest', async () => {
+                    setRegistered()
+                    seedAuthLinkStorage({jwt: 'registered.jwt'})
+                    const {rerender} = renderCommerceClientWithBasket()
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    setGuest()
+                    rerenderShopperAgent(rerender)
+
+                    await waitFor(() => expect(mockEndConversation).toHaveBeenCalledTimes(1))
+                    // The registered shopper's conversation must not be linked to the guest.
+                    expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                })
+
+                test('ends the conversation once on logout while the guest basket reloads', async () => {
+                    setRegistered()
+                    seedAuthLinkStorage({jwt: 'registered.jwt'})
+                    const {rerender} = renderCommerceClientWithBasket()
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                    const widget = screen.getByTestId('shopper-agent')
+
+                    // Logout swaps the customer's basket query; the agent must
+                    // stay mounted so the bundle is not injected a second time.
+                    setGuest()
+                    rerender(
+                        <ShopperAgent
+                            commerceAgentConfiguration={commerceClientSettings}
+                            basketDoneLoading={false}
+                        />
+                    )
+                    expect(screen.getByTestId('shopper-agent')).toBe(widget)
+                    rerenderShopperAgent(rerender)
+
+                    await waitFor(() => expect(mockEndConversation).toHaveBeenCalledTimes(1))
+                    expect(screen.getByTestId('shopper-agent')).toBe(widget)
+                    expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                })
+
+                test('ends the conversation once when logout passes through an unresolved customer type', async () => {
+                    setRegistered()
+                    seedAuthLinkStorage({jwt: 'registered.jwt'})
+                    const {rerender} = renderCommerceClientWithBasket()
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    setUnresolved()
+                    rerenderShopperAgent(rerender)
+                    await waitFor(() => expect(mockEndConversation).toHaveBeenCalledTimes(1))
+
+                    setGuest()
+                    rerenderShopperAgent(rerender)
+
+                    // Guest login settling afterwards must not end or re-link again.
+                    await act(async () => {})
+                    expect(mockEndConversation).toHaveBeenCalledTimes(1)
+                    expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                })
+
+                test('ends the conversation on logout even if the guest login never completes', async () => {
+                    setRegistered()
+                    seedAuthLinkStorage({jwt: 'registered.jwt'})
+                    const {rerender} = renderCommerceClientWithBasket()
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    setUnresolved()
+                    rerenderShopperAgent(rerender)
+
+                    await waitFor(() => expect(mockEndConversation).toHaveBeenCalledTimes(1))
+                    expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                })
+
+                test('links the fresh guest conversation once the widget creates it after logout', async () => {
+                    setRegistered()
+                    seedAuthLinkStorage({jwt: 'registered.jwt'})
+                    const {rerender} = renderCommerceClientWithBasket()
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    setGuest()
+                    rerenderShopperAgent(rerender)
+                    await waitFor(() => expect(mockEndConversation).toHaveBeenCalledTimes(1))
+
+                    // The widget mints a new JWT for the next conversation.
+                    seedAuthLinkStorage({jwt: 'guest.jwt', conversationId: 'guest-conv'})
+                    await act(async () => {
+                        window.dispatchEvent(new Event('onCimulateWidgetReady'))
+                    })
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+                    expect(mockCallAuthLink).toHaveBeenLastCalledWith({
+                        commerceClientJWT: 'guest.jwt',
+                        scrt2Url: 'https://test.salesforce-scrt.com'
+                    })
+                })
+
+                test('resets the conversation on logout when the widget lacks endConversation', async () => {
+                    const mockResetConversation = jest.fn()
+                    window.CimulateMessaging.eventHandlers = {
+                        session: {resetConversation: mockResetConversation}
+                    }
+                    setRegistered()
+                    seedAuthLinkStorage({jwt: 'registered.jwt'})
+                    const {rerender} = renderCommerceClientWithBasket()
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    setGuest()
+                    rerenderShopperAgent(rerender)
+
+                    await waitFor(() => expect(mockResetConversation).toHaveBeenCalledTimes(1))
+                    // The registered shopper's conversation must not be linked to the guest.
+                    expect(mockCallAuthLink).toHaveBeenCalledTimes(1)
+                    expect(mockCallTokenBridge).toHaveBeenCalledTimes(1)
+                })
+
+                test('falls back to re-linking on logout when the widget can neither end nor reset', async () => {
+                    delete window.CimulateMessaging.eventHandlers
+                    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+                    setRegistered()
+                    seedAuthLinkStorage()
+                    const {rerender} = renderCommerceClientWithBasket()
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    setGuest()
+                    rerenderShopperAgent(rerender)
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+                    expect(warnSpy).toHaveBeenCalledWith(
+                        expect.stringContaining(
+                            'endConversation and resetConversation are unavailable'
+                        )
+                    )
+                    warnSpy.mockRestore()
+                })
+
+                test('keeps the conversation and re-links it on login', async () => {
+                    seedAuthLinkStorage()
+                    const {rerender} = renderCommerceClientWithBasket()
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+
+                    setRegistered()
+                    rerenderShopperAgent(rerender)
+
+                    await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(2))
+                    expect(mockEndConversation).not.toHaveBeenCalled()
+                })
+            })
+
+            test('stays mounted through a basket reload so the widget is injected once', async () => {
+                seedAuthLinkStorage()
+                const {rerender} = renderCommerceClientWithBasket()
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                const widget = screen.getByTestId('shopper-agent')
+                const injectHookCalls = mockedUseCommerceClientMessaging.mock.calls.length
+
+                rerender(
+                    <ShopperAgent
+                        commerceAgentConfiguration={commerceClientSettings}
+                        basketDoneLoading={false}
+                    />
+                )
+
+                expect(screen.getByTestId('shopper-agent')).toBe(widget)
+                // The inject hook kept rendering in the same component instance.
+                expect(mockedUseCommerceClientMessaging.mock.calls.length).toBeGreaterThan(
+                    injectHookCalls
+                )
+            })
+
+            test('uses an existing bundle global across a basket reload', async () => {
                 seedAuthLinkStorage()
                 window.CimulateMessaging = {injectMessagingWidget: jest.fn()}
                 mockedUseScript.mockReturnValue({loaded: false, error: false})
@@ -2467,6 +2781,65 @@ describe('ShopperAgent Component', () => {
                     slasAccessToken: 'registered-slas-access-token',
                     siteId: 'RefArchGlobal'
                 })
+            })
+
+            test('uses the widget getAuthLinkKey when the bundle exposes it', async () => {
+                seedAuthLinkStorage()
+                const getAuthLinkKey = jest.fn().mockResolvedValue('widget-auth-link-key')
+                window.CimulateMessaging = {injectMessagingWidget: jest.fn(), getAuthLinkKey}
+
+                renderCommerceClient()
+
+                await waitFor(() => expect(mockCallTokenBridge).toHaveBeenCalledTimes(1))
+                expect(getAuthLinkKey).toHaveBeenCalledTimes(1)
+                expect(mockCallAuthLink).not.toHaveBeenCalled()
+                expect(mockCallTokenBridge).toHaveBeenCalledWith({
+                    authLinkKey: 'widget-auth-link-key',
+                    slasAccessToken: 'test-slas-access-token',
+                    siteId: 'RefArchGlobal'
+                })
+            })
+
+            test('falls back to the direct SCRT2 call when getAuthLinkKey is not a function', async () => {
+                seedAuthLinkStorage()
+                window.CimulateMessaging = {
+                    injectMessagingWidget: jest.fn(),
+                    getAuthLinkKey: 'not-a-function'
+                }
+
+                renderCommerceClient()
+
+                await waitFor(() =>
+                    expect(mockCallAuthLink).toHaveBeenCalledWith({
+                        commerceClientJWT: 'commerce.jwt',
+                        scrt2Url: 'https://test.salesforce-scrt.com'
+                    })
+                )
+                await waitFor(() =>
+                    expect(mockCallTokenBridge).toHaveBeenCalledWith(
+                        expect.objectContaining({authLinkKey: 'commerce-auth-link-key'})
+                    )
+                )
+            })
+
+            test('does not fall back or bridge when the widget getAuthLinkKey rejects', async () => {
+                const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+                seedAuthLinkStorage()
+                const rejection = new Error('not ready')
+                const getAuthLinkKey = jest.fn().mockRejectedValue(rejection)
+                window.CimulateMessaging = {injectMessagingWidget: jest.fn(), getAuthLinkKey}
+
+                renderCommerceClient()
+
+                await waitFor(() =>
+                    expect(errorSpy).toHaveBeenCalledWith(
+                        '[Commerce Client] performAuthLink(resumed-conversation) threw',
+                        rejection
+                    )
+                )
+                expect(mockCallAuthLink).not.toHaveBeenCalled()
+                expect(mockCallTokenBridge).not.toHaveBeenCalled()
+                errorSpy.mockRestore()
             })
 
             test('does not auth-link without my_domain', async () => {

@@ -123,7 +123,8 @@ export const createChildSpan = (name, attributes = {}) => {
                     span_name: name,
                     otel_enabled: otelConfig.enabled,
                     otel_service_name: otelConfig.serviceName,
-                    suggestion: 'Set OTEL_TRACING_ENABLED=true to enable proper timing'
+                    suggestion:
+                        'Set OTEL_TRACING_ENABLED=true or MRT_DISTRIBUTED_TRACING_ENABLED=true to enable proper timing'
                 }
             })
         }

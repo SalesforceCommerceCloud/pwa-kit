@@ -1,4 +1,9 @@
-## v3.21.0-dev (Aug 12, 2026)
+## v3.22.0-dev (Oct 09, 2026)
+- The SLAS private client proxy now sends the `x-slas-client-auth` header (raw base64 private client credentials) on `/oauth2/login` and `/oauth2/authorize`, so private clients work with SLAS strict client auth. `/oauth2/authorize` (GET) is added to the default `SLAS_PRIVATE_PROXY_ALLOWLIST`, and `SlasProxyAuthType.SLAS_CLIENT_AUTH` is added for custom allow-lists. `/oauth2/trusted-agent/token` continues to use `_sfdc_client_auth`.
+- Request logs now mask the `token`, `login_id`, and `email` query parameter values, matched case-insensitively (for example in passwordless and reset password links) so shopper emails and one-time tokens are not written to logs. [#4092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4092)
+## v3.21.0 (Oct 08, 2026)
+- Version alignment release; no functional changes to `pwa-kit-runtime` since v3.20.0.
+
 ## v3.20.0 (Aug 12, 2026)
 - Remove the custom per-request CloudWatch metrics emitted by the SSR remote server (`GCTime`, `RequestTime`, `RequestSuccess`, `RequestFailed404`/`RequestFailed400`/`RequestFailed500`, `LambdaCreated`, `LambdaReused`, `RenderTime`, `RenderErrors`) to eliminate the `PutMetricData` cost incurred on every request. This is not a breaking change: `app.sendMetric()` and the `MetricsSender` (`send()`/`flush()`) are retained with their original signatures as no-ops for backwards compatibility.
 - **Bug Fix**: `getCustomGlobalPreferences` and `getCustomSitePreferences` now correctly unwrap the SCAPI `getSiteCustomPreferenceList` response envelope `{ data: [...], total: N }`. Previously, the raw envelope was stored as the preferences value, so attribute access (e.g. `preferences.c_myFlag`) silently returned `undefined`. The envelope is now flattened into a single flat map via shallow merge; non-object elements in `data` are skipped; later groups win on key collision. Port of [commerce-emu/storefront-next#2559](https://github.com/commerce-emu/storefront-next/pull/2559). [#3974](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3974)

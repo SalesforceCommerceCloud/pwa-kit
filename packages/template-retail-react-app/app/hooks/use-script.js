@@ -8,6 +8,32 @@
 import {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 
+const SCRIPT_STATUS_ATTR = 'data-script-status'
+
+const applyStatusFromEvent = (script, eventType) => {
+    const status = eventType === 'load' ? 'ready' : 'error'
+    script.setAttribute(SCRIPT_STATUS_ATTR, status)
+    return status
+}
+
+const subscribeToScript = (script, setScriptLoadStatus) => {
+    const onScriptLoad = (event) => {
+        const status = applyStatusFromEvent(script, event.type)
+        setScriptLoadStatus({
+            loaded: status === 'ready',
+            error: status === 'error'
+        })
+    }
+
+    script.addEventListener('load', onScriptLoad)
+    script.addEventListener('error', onScriptLoad)
+
+    return () => {
+        script.removeEventListener('load', onScriptLoad)
+        script.removeEventListener('error', onScriptLoad)
+    }
+}
+
 /**
  * Custom hook to handle script loading
  * @param {string} src - The source URL for the script
@@ -21,26 +47,28 @@ const useScript = (src) => {
             return
         }
 
-        // Check if script already exists
         const scriptAlreadyOnPage = document.querySelector(`script[src="${src}"]`)
 
-        if (!scriptAlreadyOnPage) {
-            const script = document.createElement('script')
-            script.src = src
-            script.defer = true
-            document.body.appendChild(script)
-
-            const onScriptLoad = (event) => {
-                const loadStatus = event.type === 'load' ? 'ready' : 'error'
-                setScriptLoadStatus({
-                    loaded: loadStatus === 'ready',
-                    error: loadStatus === 'error'
-                })
+        if (scriptAlreadyOnPage) {
+            const existingStatus = scriptAlreadyOnPage.getAttribute(SCRIPT_STATUS_ATTR)
+            if (existingStatus === 'ready') {
+                setScriptLoadStatus({loaded: true, error: false})
+                return
             }
-
-            script.addEventListener('load', onScriptLoad)
-            script.addEventListener('error', onScriptLoad)
+            if (existingStatus === 'error') {
+                setScriptLoadStatus({loaded: false, error: true})
+                return
+            }
+            // Tag is in the DOM but still downloading — wait for load/error.
+            return subscribeToScript(scriptAlreadyOnPage, setScriptLoadStatus)
         }
+
+        const script = document.createElement('script')
+        script.src = src
+        script.defer = true
+        document.body.appendChild(script)
+
+        return subscribeToScript(script, setScriptLoadStatus)
     }, [src])
 
     return scriptLoadStatus

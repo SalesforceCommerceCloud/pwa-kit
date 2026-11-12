@@ -10,6 +10,7 @@ import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {
     useAccessToken,
+    useCommerceApi,
     useConfig,
     useConfigurations,
     useCustomerType,
@@ -19,15 +20,19 @@ import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
     DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
     COMMERCE_CLIENT_UI_STATE_EVENT
 } from '@salesforce/retail-react-app/app/constants'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {toStorefrontNavigatePath} from '@salesforce/retail-react-app/app/utils/url'
+import {attachAgentProductLinkRouting} from '@salesforce/retail-react-app/app/utils/shopper-agent-product-links'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
+    endCommerceClientConversation,
     getPersistedCommerceClientOpenState,
     persistCommerceClientOpenState,
     resetEmbeddedMessagingForCommerceSessionChange,
@@ -622,6 +627,7 @@ const toOptionalWidgetBoolean = (value) => {
  * @param {Object} props.authLinkGenerationRef - Monotonic auth-link attempt generation
  * @param {Object} props.authLinkQueueRef - Serialized auth-link operation queue
  * @param {Object} props.lastAttemptedCommerceClientJWTRef - JWT used by the latest auth-link attempt
+ * @param {Object} props.prevSlasIdentityRef - Last observed SLAS identity, kept across remounts
  * @param {string} props.commerceAgentConfiguration.scrt2Url - SCRT2 URL (passed to `messagingConfig.scrt2Url`)
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID (passed to `messagingConfig.orgId`)
  * @param {string} [props.commerceAgentConfiguration.cc_esDeveloperName] - Embedded Service developer name
@@ -652,7 +658,7 @@ const toOptionalWidgetBoolean = (value) => {
  * @param {Object} [props.commerceAgentConfiguration.cc_suggestionButtonConfig] - Optional suggestion-button config forwarded as `suggestionButtonConfig` (`icon`: 'sparkle' | 'plus' | 'paper-plane', `iconPosition`: 'left' | 'right')
  * @param {string} [props.commerceAgentConfiguration.cc_messageAlignment] - Optional message-list alignment forwarded as `messageAlignment` ('start' | 'end')
  * @param {string} [props.commerceAgentConfiguration.cc_autoScroll] - When set ('true'/'false'), forwarded as the boolean `autoScroll`; auto-scrolls to the newest message. Omitted when unset so the widget's own default applies
- * @param {string} [props.commerceAgentConfiguration.cc_openLinksInNewTab] - When set ('true'/'false'), forwarded as the boolean `openLinksInNewTab`; opens widget links in a new tab. Omitted when unset so the widget's own default applies
+ * @param {string} [props.commerceAgentConfiguration.cc_openLinksInNewTab] - When set ('true'/'false'), forwarded as the boolean `openLinksInNewTab`; opens widget links in a new tab. Omitted when unset so the widget's own default applies. When omitted (same-tab), product/checkout/markdown clicks are routed through `onNavigate` so the storefront stays an SPA
  * @param {string} [props.commerceAgentConfiguration.cc_showProductDescription] - When set ('true'/'false'), forwarded as the boolean `showProductDescription`; shows the product description on tiles. Omitted when unset so the widget's own default applies
  * @param {string} [props.commerceAgentConfiguration.cc_showProductCaptions] - When set ('true'/'false'), forwarded as the boolean `messagingConfig.showProductCaptions`; shows product captions in the recommendation carousel. Omitted when unset so the widget's own default applies
  * @param {Object} [props.commerceAgentConfiguration.cc_promptsConfig] - Optional prompts-extension config forwarded as `promptsConfig`. Needs `isOpen`/`isInline`/`elementId` to mount; other fields (e.g. `staticQuestions`, `promptsDisplay`) are optional
@@ -664,7 +670,8 @@ const CommerceClientAgentWindow = ({
     lastCommerceClientJWTRef,
     authLinkGenerationRef,
     authLinkQueueRef,
-    lastAttemptedCommerceClientJWTRef
+    lastAttemptedCommerceClientJWTRef,
+    prevSlasIdentityRef
 }) => {
     const {
         scrt2Url,
@@ -701,8 +708,54 @@ const CommerceClientAgentWindow = ({
         cc_showProductDescription,
         cc_showProductCaptions,
         cc_promptsConfig,
+        cc_enablePageContext,
         cc_layoutPreset
     } = commerceAgentConfiguration
+
+    const navigate = useNavigation()
+    const onNavigate = useMemo(
+        () => (url, event) => {
+            const path = toStorefrontNavigatePath(url)
+            if (!path) return
+            event.preventDefault()
+            navigate(path)
+        },
+        [navigate]
+    )
+
+    // The backend sends product links as SFRA `.html` URLs on the backend origin, which `onNavigate`
+    // never sees. Point the widget's product links at the PWA product page instead. When the id is
+    // not certain from the URL, Shopper SEO resolves it with the site's own URL rules.
+    const {buildUrl} = useMultiSite()
+    const shopperSeo = useCommerceApi('shopperSeo')
+    const {getTokenWhenReady} = useAccessToken()
+    const getTokenWhenReadyRef = useRef(getTokenWhenReady)
+    getTokenWhenReadyRef.current = getTokenWhenReady
+    useEffect(() => {
+        // The id comes from the backend URL, so it is encoded as one path segment. `productUrlBuilder`
+        // uses `encodeURI`, which leaves `/`, `?` and `#` in place (`../account` would leave the PDP),
+        // and would encode an already encoded id twice.
+        const toProductPath = (productId) => `/product/${encodeURIComponent(productId)}`
+        return attachAgentProductLinkRouting({
+            navigateToProduct: (productId) => navigate(toProductPath(productId)),
+            getProductHref: (productId) => buildUrl(toProductPath(productId)),
+            lookupProductId: async (urlSegment) => {
+                const token = await getTokenWhenReadyRef.current()
+                let mapping
+                try {
+                    mapping = await shopperSeo.getUrlMapping({
+                        parameters: {urlSegment},
+                        headers: {Authorization: `Bearer ${token}`}
+                    })
+                } catch (error) {
+                    // 404 means the segment maps to nothing; anything else is a failed lookup
+                    if (error?.response?.status === 404) return undefined
+                    throw error
+                }
+                return mapping?.resourceType === 'PRODUCT' ? mapping.resourceId : undefined
+            }
+        })
+    }, [navigate, buildUrl, shopperSeo])
 
     // Loads the Commerce Client messaging UMD bundle, which exposes window.CimulateMessaging.
     const scriptLoadStatus = useScript(resolveCommerceClientScriptUrl(commerceAgentConfiguration))
@@ -711,11 +764,7 @@ const CommerceClientAgentWindow = ({
     const toastRef = useRef(toast)
     toastRef.current = toast
 
-    // Customer details and auth tokens for Commerce Client session init
-    const {getTokenWhenReady} = useAccessToken()
-    const getTokenWhenReadyRef = useRef(getTokenWhenReady)
-    getTokenWhenReadyRef.current = getTokenWhenReady
-
+    // Customer details for Commerce Client session init
     const {organizationId, siteId: configSiteId} = useConfig()
 
     // Fetch my_domain from the Shopper Configurations API. Auth-linking calls
@@ -918,13 +967,20 @@ const CommerceClientAgentWindow = ({
                     : await getTokenWhenReadyRef.current()
                 if (generation !== authLinkGenerationRef.current) return
 
-                // Step 1: auth link key from SCRT. Called directly from the
-                // browser against the configured SCRT2 origin — the authlink
-                // endpoint authenticates with the Commerce Client JWT (Bearer)
-                // alone, needing neither the siteId nor the conversationId.
-                const authLinkResponse = await callAuthLink({commerceClientJWT, scrt2Url})
+                // Step 1: auth link key from SCRT. Use the widget's getAuthLinkKey()
+                // when present; older bundles lack it, so fall back to calling SCRT2
+                // directly. No fallback on rejection: both hit the same endpoint.
+                let authLinkResponse
+                if (typeof window.CimulateMessaging?.getAuthLinkKey === 'function') {
+                    authLinkResponse = await window.CimulateMessaging.getAuthLinkKey()
+                } else {
+                    authLinkResponse = await callAuthLink({commerceClientJWT, scrt2Url})
+                }
                 if (generation !== authLinkGenerationRef.current) return
-                const authLinkKey = authLinkResponse?.auth_link_key || authLinkResponse?.authLinkKey
+                const authLinkKey =
+                    typeof authLinkResponse === 'string'
+                        ? authLinkResponse
+                        : authLinkResponse?.auth_link_key || authLinkResponse?.authLinkKey
                 if (!authLinkKey || typeof authLinkKey !== 'string') {
                     console.error(
                         `[Commerce Client] performAuthLink(${reason}): no auth link key`,
@@ -1012,8 +1068,16 @@ const CommerceClientAgentWindow = ({
      * unchanged but is now linked to the wrong (or anonymous) shopper, so we
      * re-link. Skips the initial mount; the composite dedup key in
      * performAuthLink prevents a redundant link if nothing effectively changed.
+     *
+     * Logout (registered -> guest) is the exception: the conversation belongs
+     * to the shopper who just signed out, so it is ended (clearing its visible
+     * history) rather than re-linked to the guest. The widget starts a fresh
+     * conversation on next open, which the widget-ready trigger links. Widgets
+     * without endConversation (1.36.0–1.38.x) reset the conversation instead,
+     * which starts the replacement immediately; it is linked the same way.
+     * An expired registered session (SLAS falls back to a guest login) takes
+     * the same path, which is intended.
      */
-    const prevSlasIdentityRef = useRef(undefined)
     useEffect(() => {
         if (!isCommerceClientReady) {
             return
@@ -1030,9 +1094,22 @@ const CommerceClientAgentWindow = ({
             }
             return
         }
-        if (prev !== identity) {
-            performAuthLinkRef.current({reason: 'slas-identity-change'})
+        if (prev === identity) {
+            return
         }
+        // Fail closed: logout clears customerType to null before the guest login,
+        // and that login can fail, so anything other than registered ends the
+        // conversation rather than leaving the shopper's history visible.
+        const isLogout = prev.startsWith('registered:') && customerType !== 'registered'
+        if (isLogout && endCommerceClientConversation()) {
+            // Invalidate any in-flight link for the ended conversation.
+            authLinkGenerationRef.current++
+            lastAuthLinkKeyRef.current = null
+            return
+        }
+        // If the widget can't end or reset (before 1.36.0, or the call failed),
+        // re-link so the conversation at least stops acting as the signed-out shopper.
+        performAuthLinkRef.current({reason: 'slas-identity-change'})
     }, [customerType, usid, isCommerceClientReady])
 
     const isDialog = cc_displayType === 'dialog'
@@ -1105,9 +1182,11 @@ const CommerceClientAgentWindow = ({
             messageAlignment: cc_messageAlignment,
             autoScroll: toOptionalWidgetBoolean(cc_autoScroll),
             openLinksInNewTab: toOptionalWidgetBoolean(cc_openLinksInNewTab),
+            onNavigate,
             showProductDescription: toOptionalWidgetBoolean(cc_showProductDescription),
             showProductCaptions: toOptionalWidgetBoolean(cc_showProductCaptions),
-            promptsConfig: cc_promptsConfig
+            promptsConfig: cc_promptsConfig,
+            enablePageContext: toOptionalWidgetBoolean(cc_enablePageContext)
         }),
         [
             commerceClientElementId,
@@ -1142,9 +1221,11 @@ const CommerceClientAgentWindow = ({
             cc_messageAlignment,
             cc_autoScroll,
             cc_openLinksInNewTab,
+            onNavigate,
             cc_showProductDescription,
             cc_showProductCaptions,
-            cc_promptsConfig
+            cc_promptsConfig,
+            cc_enablePageContext
         ]
     )
 
@@ -1177,7 +1258,8 @@ CommerceClientAgentWindow.propTypes = {
     lastCommerceClientJWTRef: PropTypes.shape({current: PropTypes.string}).isRequired,
     authLinkGenerationRef: PropTypes.shape({current: PropTypes.number}).isRequired,
     authLinkQueueRef: PropTypes.shape({current: PropTypes.object}).isRequired,
-    lastAttemptedCommerceClientJWTRef: PropTypes.shape({current: PropTypes.string}).isRequired
+    lastAttemptedCommerceClientJWTRef: PropTypes.shape({current: PropTypes.string}).isRequired,
+    prevSlasIdentityRef: PropTypes.shape({current: PropTypes.string}).isRequired
 }
 
 /**
@@ -1220,6 +1302,10 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     const authLinkGenerationRef = useRef(0)
     const authLinkQueueRef = useRef(Promise.resolve())
     const lastAttemptedCommerceClientJWTRef = useRef(null)
+    // Kept here, not in the inner widget, so the identity transition survives
+    // a remount of the inner widget (e.g. invalid settings becoming valid).
+    const prevSlasIdentityRef = useRef(undefined)
+    const hasMountedCommerceClientRef = useRef(false)
 
     // Extract enabled state and provider from configuration.
     // `provider` defaults to 'miaw' to preserve backwards compatibility with the
@@ -1240,7 +1326,15 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     const {isLoading: isConfigurationsLoading} = useConfigurations({})
 
     // Only render when the agent is enabled (client-side), the basket has loaded, and configurations API has completed.
-    if (!isShopperAgentEnabled || !basketDoneLoading || isConfigurationsLoading) {
+    // Once the Commerce Client widget has mounted, keep it mounted through later
+    // basket reloads (login/logout swap the basket query): remounting re-injects
+    // the bundle, leaving a second widget instance whose stale client keeps its
+    // SSE stream open and double-handles conversation lifecycle calls.
+    const isReady = basketDoneLoading && !isConfigurationsLoading
+    if (isReady && provider === 'commerce-client') {
+        hasMountedCommerceClientRef.current = true
+    }
+    if (!isShopperAgentEnabled || (!isReady && !hasMountedCommerceClientRef.current)) {
         return null
     }
 
@@ -1255,6 +1349,7 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
                     authLinkGenerationRef={authLinkGenerationRef}
                     authLinkQueueRef={authLinkQueueRef}
                     lastAttemptedCommerceClientJWTRef={lastAttemptedCommerceClientJWTRef}
+                    prevSlasIdentityRef={prevSlasIdentityRef}
                 />
             </div>
         ) : null
