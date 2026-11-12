@@ -7,12 +7,11 @@
 
 import {useEffect, useRef, useState} from 'react'
 import {DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION} from '@salesforce/retail-react-app/app/constants'
-
-const SCRIPT_SRC = '/static/inline-agent-widget.umd.js'
+import {resolveEmbeddedWidgetSourceUrl} from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
 
 let readyPromise = null
 
-const ensureWidget = () => {
+const ensureWidget = (scriptSourceUrl) => {
     if (readyPromise) return readyPromise
 
     if (customElements.get('inline-agent-widget')) {
@@ -20,22 +19,29 @@ const ensureWidget = () => {
         return readyPromise
     }
 
-    // Ensure the script tag exists in <head> (Helmet adds it on SSR, but on
-    // client-only navigation we may need to inject it manually).
-    if (!document.querySelector(`script[src="${SCRIPT_SRC}"]`)) {
-        const script = document.createElement('script')
-        script.src = SCRIPT_SRC
-        script.async = true
-        document.head.appendChild(script)
-    }
-
-    // Wait for the custom element to be registered — works regardless of
-    // whether the script was included in SSR HTML or injected dynamically.
-    readyPromise = customElements.whenDefined('inline-agent-widget').then(() => {
-        if (!customElements.get('inline-agent-widget') && window.InlineAgentWidget?.defineElement) {
-            window.InlineAgentWidget.defineElement()
+    const existing = document.querySelector(`script[src="${scriptSourceUrl}"]`)
+    // An SSR script may have failed before hydration attached an error listener.
+    existing?.remove()
+    const script = document.createElement('script')
+    readyPromise = new Promise((resolve, reject) => {
+        const onError = () => {
+            script.remove()
+            readyPromise = null
+            reject(new Error('Inline agent widget CDN script failed to load'))
         }
+        script.addEventListener('error', onError, {once: true})
+        customElements.whenDefined('inline-agent-widget').then(() => {
+            script.removeEventListener('error', onError)
+            resolve()
+        })
     })
+    script.src = scriptSourceUrl
+    script.async = true
+    // Match Helmet's attributes so it retains the listener-bound script.
+    script.setAttribute('async', 'true')
+    script.setAttribute('data-react-helmet', 'true')
+    document.head.appendChild(script)
+
     return readyPromise
 }
 
@@ -58,18 +64,23 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
     const configured = isConfigured(config)
     const questionsKey = pdpQuestionsKey(pdpQuestions)
     const mode = config?.mode
+    const scriptSourceUrl = resolveEmbeddedWidgetSourceUrl(config)
 
     useEffect(() => {
         if (typeof window === 'undefined') return
         if (!configured) return
         let cancelled = false
-        ensureWidget().then(() => {
-            if (!cancelled) setReady(true)
-        })
+        ensureWidget(scriptSourceUrl)
+            .then(() => {
+                if (!cancelled) setReady(true)
+            })
+            .catch((error) => {
+                if (!cancelled) console.error(error.message)
+            })
         return () => {
             cancelled = true
         }
-    }, [configured])
+    }, [configured, scriptSourceUrl])
 
     useEffect(() => {
         if (!configured || !ready) return
