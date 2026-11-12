@@ -126,6 +126,15 @@ const PlaceholderComponent = () => (
     </Center>
 )
 
+const pagePushPanelStyles = css`
+    @media (min-width: 992px) {
+        .cim-widget-dialog.full-height.commerce-client-shopper-agent {
+            top: var(--cc-panel-top, 0) !important;
+            height: calc(100dvh - var(--cc-panel-top, 0px)) !important;
+        }
+    }
+`
+
 const DrawerMenuItemWithData = withCommerceSdkReact(
     ({itemComponent: ItemComponent, data, ...rest}) => (
         <Fade in={true}>
@@ -427,20 +436,7 @@ const StorefrontApp = (props) => {
 
                         <ScrollToTop />
 
-                        {pagePushActive && (
-                            <Global
-                                styles={css`
-                                    @media (min-width: 992px) {
-                                        .cim-widget-dialog.full-height.commerce-client-shopper-agent {
-                                            top: var(--cc-panel-top, 0) !important;
-                                            height: calc(
-                                                100dvh - var(--cc-panel-top, 0px)
-                                            ) !important;
-                                        }
-                                    }
-                                `}
-                            />
-                        )}
+                        {pagePushActive && <Global styles={pagePushPanelStyles} />}
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
                             {storeLocatorEnabled && (
