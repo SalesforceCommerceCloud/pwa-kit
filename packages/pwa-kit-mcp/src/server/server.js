@@ -132,7 +132,7 @@ class PwaStorefrontMCPServerHighLevel {
     async run() {
         const warning =
             '[DEPRECATED] @salesforce/pwa-kit-mcp is discontinued. Use @salesforce/b2c-dx-mcp instead. Setup instructions: https://salesforcecommercecloud.github.io/b2c-developer-tooling/mcp/'
-        console.error(process.stderr.isTTY ? `\u001b[33m${warning}\u001b[0m` : warning)
+        console.warn(process.stderr.isTTY ? `\u001b[33m${warning}\u001b[0m` : warning)
 
         // Read args passed by the MCP client (from mcp.json "args")
         const argv = process.argv.slice(2)
