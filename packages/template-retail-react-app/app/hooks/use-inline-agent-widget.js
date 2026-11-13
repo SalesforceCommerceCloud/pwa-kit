@@ -20,27 +20,40 @@ const ensureWidget = (scriptSourceUrl) => {
     }
 
     const existing = document.querySelector(`script[src="${scriptSourceUrl}"]`)
-    // An SSR script may have failed before hydration attached an error listener.
-    existing?.remove()
-    const script = document.createElement('script')
+    const script = existing || document.createElement('script')
     readyPromise = new Promise((resolve, reject) => {
+        let settled = false
+        const finish = (error) => {
+            if (settled) return
+            settled = true
+            clearTimeout(timer)
+            script.removeEventListener('error', onError)
+            if (error) {
+                readyPromise = null
+                reject(error)
+            } else {
+                resolve()
+            }
+        }
         const onError = () => {
             script.remove()
-            readyPromise = null
-            reject(new Error('Inline agent widget CDN script failed to load'))
+            finish(new Error('Inline agent widget CDN script failed to load'))
         }
+        const timer = setTimeout(
+            () => finish(new Error('Inline agent widget CDN script registration timed out')),
+            10000
+        )
         script.addEventListener('error', onError, {once: true})
-        customElements.whenDefined('inline-agent-widget').then(() => {
-            script.removeEventListener('error', onError)
-            resolve()
-        })
+        customElements.whenDefined('inline-agent-widget').then(() => finish(), finish)
     })
-    script.src = scriptSourceUrl
-    script.async = true
-    // Match Helmet's attributes so it retains the listener-bound script.
-    script.setAttribute('async', 'true')
-    script.setAttribute('data-react-helmet', 'true')
-    document.head.appendChild(script)
+    if (!existing) {
+        script.src = scriptSourceUrl
+        script.async = true
+        // Match Helmet's attributes so it retains the listener-bound script.
+        script.setAttribute('async', 'true')
+        script.setAttribute('data-react-helmet', 'true')
+        document.head.appendChild(script)
+    }
 
     return readyPromise
 }

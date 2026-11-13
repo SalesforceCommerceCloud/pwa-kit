@@ -49,6 +49,11 @@ describe('InlineAgentWidget', () => {
             expect(document.head.querySelector(`script[src="${source}"]`)).not.toBeNull()
         )
         expect(
+            document.head.querySelector(
+                'link[rel="preconnect"][href="https://cdn.search.cimulate.ai"]'
+            )
+        ).not.toBeNull()
+        expect(
             document.head.querySelector('script[src="/static/inline-agent-widget.umd.js"]')
         ).toBeNull()
     })

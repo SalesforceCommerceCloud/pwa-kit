@@ -247,4 +247,6 @@ but no widget UMD upload is needed. The URL override defaults to empty so it doe
 
 After changing the release, reload any already-open storefront tabs. Custom-element registration persists for the life of the page.
 
+The loader reuses an existing script and waits up to 10 seconds for custom-element registration. A timeout clears the pending readiness promise but retains the script because removing it cannot cancel an in-flight download. A later mount can wait again; a script that failed before hydration may require a page reload. An observed script error removes the failed tag so a later mount can create a replacement.
+
 Subresource Integrity (SRI) is not enforced by this loader. HTTPS and URL validation restrict the script source, but do not verify its bytes. SRI would require a trusted integrity hash for each selected release or URL, applied consistently to SSR and client-injected scripts.

@@ -80,6 +80,7 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
     return (
         <>
             <Helmet>
+                <link rel="preconnect" href="https://cdn.search.cimulate.ai" />
                 <script src={resolveEmbeddedWidgetSourceUrl(config)} async></script>
             </Helmet>
             <div ref={containerRef} />

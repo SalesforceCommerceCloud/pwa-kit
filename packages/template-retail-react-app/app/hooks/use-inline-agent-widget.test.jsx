@@ -58,7 +58,69 @@ describe('embedded widget pre-warm configuration', () => {
         ).toBeNull()
     })
 
-    test('replaces an SSR script that failed before hydration and retries a later load failure', async () => {
+    test.each([false, true])(
+        'times out a stalled SSR script (early failure=%s) without duplicating it',
+        async (earlyFailure) => {
+            jest.useFakeTimers()
+            const getSpy = jest.spyOn(customElements, 'get').mockReturnValue(undefined)
+            let register
+            const definedSpy = jest.spyOn(customElements, 'whenDefined').mockImplementation(
+                () =>
+                    new Promise((resolve) => {
+                        register = resolve
+                    })
+            )
+            const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+            const script = document.createElement('script')
+            script.src = DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+            script.setAttribute('async', 'true')
+            script.setAttribute('data-react-helmet', 'true')
+            document.head.appendChild(script)
+            if (earlyFailure) fireEvent.error(script)
+            try {
+                const first = render(<Mount config={baseConfig} />)
+                const concurrent = render(<Mount config={baseConfig} />)
+                await act(async () => {
+                    jest.advanceTimersByTime(10000)
+                })
+                expect(errorSpy).toHaveBeenCalledWith(
+                    'Inline agent widget CDN script registration timed out'
+                )
+                expect(first.container.querySelector('inline-agent-widget')).toBeNull()
+                expect(script.isConnected).toBe(true)
+                expect(
+                    document.querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
+                ).toHaveLength(1)
+                first.unmount()
+                const retry = render(<Mount config={baseConfig} />)
+                await act(async () => {
+                    jest.advanceTimersByTime(20)
+                })
+                expect(
+                    document.querySelector(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
+                ).toBe(script)
+                fireEvent.error(script)
+                await act(async () => {
+                    register()
+                })
+                expect(retry.container.querySelector('inline-agent-widget')).toBeNull()
+                expect(errorSpy).toHaveBeenCalledWith(
+                    'Inline agent widget CDN script failed to load'
+                )
+                retry.unmount()
+                concurrent.unmount()
+            } finally {
+                cleanup()
+                script.remove()
+                getSpy.mockRestore()
+                definedSpy.mockRestore()
+                errorSpy.mockRestore()
+                jest.useRealTimers()
+            }
+        }
+    )
+
+    test('reuses an SSR script and retries a later load failure', async () => {
         const getSpy = jest.spyOn(customElements, 'get').mockReturnValue(undefined)
         const definedSpy = jest
             .spyOn(customElements, 'whenDefined')
@@ -67,18 +129,19 @@ describe('embedded widget pre-warm configuration', () => {
         try {
             const ssrScript = document.createElement('script')
             ssrScript.src = DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+            ssrScript.setAttribute('async', 'true')
+            ssrScript.setAttribute('data-react-helmet', 'true')
             document.head.appendChild(ssrScript)
-            fireEvent.error(ssrScript)
             const first = render(<Mount config={baseConfig} />)
             const concurrent = render(<Mount config={baseConfig} />)
-            expect(ssrScript.isConnected).toBe(false)
+            expect(ssrScript.isConnected).toBe(true)
             expect(
                 document.querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
             ).toHaveLength(1)
             const failedScript = document.querySelector(
                 `script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`
             )
-            expect(failedScript).not.toBe(ssrScript)
+            expect(failedScript).toBe(ssrScript)
             await act(async () => new Promise((resolve) => requestAnimationFrame(resolve)))
             expect(
                 document.querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
