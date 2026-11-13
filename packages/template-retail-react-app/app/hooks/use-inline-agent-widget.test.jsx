@@ -14,6 +14,12 @@ import {
     resolveEmbeddedWidgetSourceUrl
 } from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
 import useInlineAgentWidget from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
+import loadWidget from '@salesforce/retail-react-app/app/utils/load-inline-agent-widget'
+
+jest.mock('@salesforce/retail-react-app/app/utils/load-inline-agent-widget', () => ({
+    __esModule: true,
+    default: jest.fn()
+}))
 
 const baseConfig = {
     enabled: true,
@@ -31,7 +37,10 @@ const Mount = ({config}) => {
         <>
             {config?.enabled && (
                 <Helmet>
-                    <script src={resolveEmbeddedWidgetSourceUrl(config)} async />
+                    <link
+                        rel="preconnect"
+                        href={new URL(resolveEmbeddedWidgetSourceUrl(config)).origin}
+                    />
                 </Helmet>
             )}
             <div ref={ref} />
@@ -48,7 +57,19 @@ describe('embedded widget pre-warm configuration', () => {
         }
     })
 
-    afterEach(cleanup)
+    beforeEach(() => {
+        jest.resetModules()
+        loadWidget.mockImplementation(
+            jest.requireActual('../utils/load-inline-agent-widget').default
+        )
+    })
+
+    afterEach(() => {
+        cleanup()
+        document
+            .querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
+            .forEach((script) => script.remove())
+    })
 
     test.each([undefined, null])('does not load a script without configuration %s', (config) => {
         const {container} = render(<Mount config={config} />)
@@ -58,27 +79,158 @@ describe('embedded widget pre-warm configuration', () => {
         ).toBeNull()
     })
 
-    test('replaces an SSR script that failed before hydration and retries a later load failure', async () => {
+    test('ignores a download failure after the last consumer unmounts', async () => {
         const getSpy = jest.spyOn(customElements, 'get').mockReturnValue(undefined)
         const definedSpy = jest
             .spyOn(customElements, 'whenDefined')
             .mockReturnValue(new Promise(() => {}))
         const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         try {
+            const consumer = render(<Mount config={baseConfig} />)
+            const script = document.querySelector(
+                `script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`
+            )
+            consumer.unmount()
+            await act(async () => {
+                fireEvent.error(script)
+            })
+            expect(errorSpy).not.toHaveBeenCalled()
+            expect(script.isConnected).toBe(false)
+        } finally {
+            getSpy.mockRestore()
+            definedSpy.mockRestore()
+            errorSpy.mockRestore()
+        }
+    })
+
+    test.each([false, true])(
+        'renders late registration on existing mounts (early failure=%s)',
+        async (earlyFailure) => {
+            jest.useFakeTimers()
+            const constructor = customElements.get('inline-agent-widget')
+            const getSpy = jest.spyOn(customElements, 'get').mockReturnValue(undefined)
+            let resolve
+            const registration = new Promise((yes) => {
+                resolve = yes
+            })
+            const definedSpy = jest
+                .spyOn(customElements, 'whenDefined')
+                .mockReturnValue(registration)
+            const warningSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+            const script = document.createElement('script')
+            script.src = DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+            script.setAttribute('async', 'true')
+            document.head.appendChild(script)
+            if (earlyFailure) fireEvent.error(script)
+            try {
+                const first = render(<Mount config={baseConfig} />)
+                const concurrent = render(<Mount config={baseConfig} />)
+                const unmounted = render(<Mount config={baseConfig} />)
+                unmounted.unmount()
+                await act(async () => {
+                    jest.advanceTimersByTime(10000)
+                })
+                expect(first.container.querySelector('inline-agent-widget')).toBeNull()
+                await act(async () => {
+                    getSpy.mockReturnValue(constructor)
+                    resolve(constructor)
+                })
+                await act(async () => {
+                    jest.advanceTimersByTime(20)
+                })
+                expect(first.container.querySelectorAll('inline-agent-widget')).toHaveLength(1)
+                expect(warningSpy).toHaveBeenCalledTimes(1)
+                expect(concurrent.container.querySelectorAll('inline-agent-widget')).toHaveLength(1)
+                expect(unmounted.container.querySelector('inline-agent-widget')).toBeNull()
+                expect(
+                    document.querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
+                ).toHaveLength(1)
+                expect(
+                    document.querySelector(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
+                ).toBe(script)
+                expect(script.isConnected).toBe(true)
+                expect(jest.getTimerCount()).toBe(0)
+            } finally {
+                cleanup()
+                script.remove()
+                getSpy.mockRestore()
+                definedSpy.mockRestore()
+                warningSpy.mockRestore()
+                jest.useRealTimers()
+            }
+        }
+    )
+
+    test('retains the client-owned script and error handling after final unmount', async () => {
+        const constructor = customElements.get('inline-agent-widget')
+        const getSpy = jest.spyOn(customElements, 'get').mockReturnValue(undefined)
+        let resolve
+        const registration = new Promise((yes) => {
+            resolve = yes
+        })
+        const definedSpy = jest.spyOn(customElements, 'whenDefined').mockReturnValue(registration)
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        try {
+            const first = render(<Mount config={baseConfig} />)
+            const original = document.querySelector(
+                `script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`
+            )
+            first.unmount()
+            await act(async () => new Promise((done) => requestAnimationFrame(done)))
+            expect(original.isConnected).toBe(true)
+            const second = render(<Mount config={baseConfig} />)
+            await act(async () => new Promise((done) => requestAnimationFrame(done)))
+            const replacement = document.querySelector(
+                `script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`
+            )
+            expect(replacement).toBe(original)
+            await act(async () => {
+                fireEvent.error(replacement)
+            })
+            expect(errorSpy).toHaveBeenCalledWith('Inline agent widget CDN script failed to load')
+            expect(replacement.isConnected).toBe(false)
+            second.unmount()
+            const third = render(<Mount config={baseConfig} />)
+            await act(async () => {
+                getSpy.mockReturnValue(constructor)
+                resolve(constructor)
+            })
+            expect(third.container.querySelectorAll('inline-agent-widget')).toHaveLength(1)
+            expect(
+                document.querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
+            ).toHaveLength(1)
+        } finally {
+            cleanup()
+            getSpy.mockRestore()
+            definedSpy.mockRestore()
+            errorSpy.mockRestore()
+        }
+    })
+
+    test('reuses an SSR script and retries a later load failure', async () => {
+        const constructor = customElements.get('inline-agent-widget')
+        const getSpy = jest.spyOn(customElements, 'get').mockReturnValue(undefined)
+        let register
+        const registration = new Promise((resolve) => {
+            register = resolve
+        })
+        const definedSpy = jest.spyOn(customElements, 'whenDefined').mockReturnValue(registration)
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        try {
             const ssrScript = document.createElement('script')
             ssrScript.src = DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
+            ssrScript.setAttribute('async', 'true')
             document.head.appendChild(ssrScript)
-            fireEvent.error(ssrScript)
             const first = render(<Mount config={baseConfig} />)
             const concurrent = render(<Mount config={baseConfig} />)
-            expect(ssrScript.isConnected).toBe(false)
+            expect(ssrScript.isConnected).toBe(true)
             expect(
                 document.querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
             ).toHaveLength(1)
             const failedScript = document.querySelector(
                 `script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`
             )
-            expect(failedScript).not.toBe(ssrScript)
+            expect(failedScript).toBe(ssrScript)
             await act(async () => new Promise((resolve) => requestAnimationFrame(resolve)))
             expect(
                 document.querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
@@ -96,8 +248,11 @@ describe('embedded widget pre-warm configuration', () => {
             expect(failedScript.isConnected).toBe(false)
             first.unmount()
             concurrent.unmount()
-            definedSpy.mockResolvedValue(undefined)
             const second = render(<Mount config={baseConfig} />)
+            await act(async () => {
+                getSpy.mockReturnValue(constructor)
+                register(constructor)
+            })
             await waitFor(() =>
                 expect(second.container.querySelector('inline-agent-widget')).not.toBeNull()
             )

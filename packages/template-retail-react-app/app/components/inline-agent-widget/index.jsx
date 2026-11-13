@@ -80,7 +80,10 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
     return (
         <>
             <Helmet>
-                <script src={resolveEmbeddedWidgetSourceUrl(config)} async></script>
+                <link
+                    rel="preconnect"
+                    href={new URL(resolveEmbeddedWidgetSourceUrl(config)).origin}
+                />
             </Helmet>
             <div ref={containerRef} />
             {failedQuestions.map(({question, provider}) => (

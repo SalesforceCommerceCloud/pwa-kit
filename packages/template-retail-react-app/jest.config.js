@@ -34,7 +34,9 @@ module.exports = {
         '^@salesforce/storefront-next-runtime/design/styles\\.css$':
             '<rootDir>/app/mocks/empty-mock.js'
     },
-    transformIgnorePatterns: ['/node_modules/(?!@salesforce/cc-datacloud-typescript|@salesforce/storefront-next-runtime)'],
+    transformIgnorePatterns: [
+        '/node_modules/(?!@salesforce/cc-datacloud-typescript|@salesforce/storefront-next-runtime)'
+    ],
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     collectCoverageFrom: [
         'app/**/*.{js,jsx}',
@@ -53,6 +55,12 @@ module.exports = {
     ],
     //@TODO: Revert this threshold back to original numbers stattements: 80, branches: 72, functions: 78, lines: 83
     coverageThreshold: {
+        [path.join(__dirname, 'app/utils/load-inline-agent-widget.js')]: {
+            statements: 100,
+            branches: 100,
+            functions: 100,
+            lines: 100
+        },
         global: {
             statements: 73,
             branches: 60,
