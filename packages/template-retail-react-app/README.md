@@ -219,3 +219,32 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 -   [Routing](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html)
 -   [Phased Headless Rollouts](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/phased-headless-rollouts.html)
 -   [Launch Your Storefront](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/launching-your-storefront.html)
+
+### Inline PDP widget CDN
+
+The inline widget loads a versioned release from the trusted Cimulate CDN instead of a UMD copied into the storefront bundle.
+Put the following fields in `app.embeddedAgent`, or inside `EMBEDDED_AGENT_COMMERCE_SETTINGS` on MRT:
+
+```json
+{"cc_embeddedWidgetCdnVersion":"0.1.0","embeddedWidgetSourceUrl":""}
+```
+
+Use `cc_embeddedWidgetCdnVersion` to select a published release. It defaults to `"0.1.0"`; set this field to another published version to switch releases.
+The storefront constructs `https://cdn.search.cimulate.ai/inline-agent-widget/<version>/inline-agent-widget.umd.js`.
+Leave `embeddedWidgetSourceUrl` empty unless an explicit trusted URL override is required.
+The URL version segment uses the same semantic-version validation as the version field.
+A valid nonempty override wins over the version; clear the override when switching back to version selection.
+Invalid URLs use the selected version. Missing or invalid version values use `0.1.0`.
+The version field accepts semantic versions, not `latest`. The selected release must already be published;
+a missing CDN file does not silently switch the shopper to another release.
+
+These fields select the embedded widget release. The floating Cimulate Widget's `cc_cdnVersion` and the
+SCRT2 capabilities version are configured separately.
+
+Only HTTPS inline-widget URLs on `cdn.search.cimulate.ai` are accepted as overrides. SSR and client navigation
+use the same resolver; the existing CSP permits this CDN. Updating the MRT configuration triggers a redeploy,
+but no widget UMD upload is needed. The URL override defaults to empty so it does not mask version selection.
+
+After changing the release, reload any already-open storefront tabs. Custom-element registration persists for the life of the page.
+
+Subresource Integrity (SRI) is not enforced by this loader. HTTPS and URL validation restrict the script source, but do not verify its bytes. SRI would require a trusted integrity hash for each selected release or URL, applied consistently to SSR and client-injected scripts.

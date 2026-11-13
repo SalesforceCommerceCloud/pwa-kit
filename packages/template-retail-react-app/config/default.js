@@ -249,6 +249,8 @@ module.exports = {
         },
         embeddedAgent: {
             enabled: false,
+            cc_embeddedWidgetCdnVersion: '0.1.0',
+            embeddedWidgetSourceUrl: '',
             scrt2Url: '',
             orgId: '',
             esDeveloperName: '',
