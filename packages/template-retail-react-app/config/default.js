@@ -90,7 +90,7 @@ module.exports = {
             // CHANGELOG entry for details. Forwarded as
             // `messagingConfig.enableImageUpload`. Defaults to 'false'.
             cc_enableImageUpload: 'false',
-            // Opt in to PDP context on shopper turns. Requires messaging.umd.js >= 1.52.0
+            // Opt in to PDP context on shopper turns. Requires messaging.umd.js >= 1.53.0
             // for the commerce_agent_context envelope, context chips, and local dividers.
             // Uses public pageContext.set/clear, including seeding before widget mount,
             // and enables the shopper-agent handoff to prime product context.

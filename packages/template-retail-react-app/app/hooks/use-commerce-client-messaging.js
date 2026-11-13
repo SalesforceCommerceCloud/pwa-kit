@@ -134,7 +134,7 @@ const injectCommerceClientWidget = ({
                 typeof pageContext?.clear !== 'function'
             ) {
                 console.error(
-                    'Commerce Client PDP context requires a messaging bundle with the public pageContext.set/clear API (use >= 1.52.0).'
+                    'Commerce Client PDP context requires a messaging bundle with the public pageContext.set/clear API (use >= 1.53.0).'
                 )
                 return false
             }

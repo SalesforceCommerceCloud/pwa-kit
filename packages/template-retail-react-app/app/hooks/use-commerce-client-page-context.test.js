@@ -215,7 +215,7 @@ describe('Commerce Client PDP adapter', () => {
         delete window.CimulateMessaging.eventHandlers.pageContext
         jest.spyOn(console, 'error').mockImplementation(() => {})
         expect(injectCommerceClientWidget(options)).toBe(false)
-        expect(console.error).toHaveBeenCalledWith(expect.stringContaining('>= 1.52.0'))
+        expect(console.error).toHaveBeenCalledWith(expect.stringContaining('>= 1.53.0'))
         expect(inject).not.toHaveBeenCalled()
     })
 
