@@ -6,9 +6,13 @@
  */
 
 let readyPromise = null
+let pendingScript = null
 
 const ensureWidget = (scriptSourceUrl) => {
-    if (readyPromise) return readyPromise
+    if (readyPromise) {
+        if (pendingScript && !pendingScript.isConnected) document.head.appendChild(pendingScript)
+        return readyPromise
+    }
 
     if (customElements.get('inline-agent-widget')) {
         readyPromise = Promise.resolve()
@@ -17,6 +21,7 @@ const ensureWidget = (scriptSourceUrl) => {
 
     const existing = document.querySelector(`script[src="${scriptSourceUrl}"]`)
     const script = existing || document.createElement('script')
+    pendingScript = script
     readyPromise = new Promise((resolve, reject) => {
         let settled = false
         const finish = (error) => {
@@ -24,6 +29,7 @@ const ensureWidget = (scriptSourceUrl) => {
             settled = true
             clearTimeout(timer)
             script.removeEventListener('error', onError)
+            pendingScript = null
             if (error) {
                 readyPromise = null
                 reject(error)
@@ -36,7 +42,10 @@ const ensureWidget = (scriptSourceUrl) => {
             finish(new Error('Inline agent widget CDN script failed to load'))
         }
         const timer = setTimeout(
-            () => finish(new Error('Inline agent widget CDN script registration timed out')),
+            () =>
+                console.warn(
+                    'Inline agent widget CDN script registration is taking longer than 10 seconds'
+                ),
             10000
         )
         script.addEventListener('error', onError, {once: true})
