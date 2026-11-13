@@ -58,6 +58,30 @@ describe('embedded widget pre-warm configuration', () => {
         ).toBeNull()
     })
 
+    test('ignores a download failure after the last consumer unmounts', async () => {
+        const getSpy = jest.spyOn(customElements, 'get').mockReturnValue(undefined)
+        const definedSpy = jest
+            .spyOn(customElements, 'whenDefined')
+            .mockReturnValue(new Promise(() => {}))
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        try {
+            const consumer = render(<Mount config={baseConfig} />)
+            const script = document.querySelector(
+                `script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`
+            )
+            consumer.unmount()
+            await act(async () => {
+                fireEvent.error(script)
+            })
+            expect(errorSpy).not.toHaveBeenCalled()
+            expect(script.isConnected).toBe(false)
+        } finally {
+            getSpy.mockRestore()
+            definedSpy.mockRestore()
+            errorSpy.mockRestore()
+        }
+    })
+
     test.each([false, true])(
         'times out a stalled SSR script (early failure=%s) without duplicating it',
         async (earlyFailure) => {
