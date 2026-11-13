@@ -1,3 +1,4 @@
+## v3.22.0-nightly-20261113080254 (Nov 13, 2026)
 ## v3.22.0-dev (Oct 09, 2026)
 - The SLAS private client proxy now sends the `x-slas-client-auth` header (raw base64 private client credentials) on `/oauth2/login` and `/oauth2/authorize`, so private clients work with SLAS strict client auth. `/oauth2/authorize` (GET) is added to the default `SLAS_PRIVATE_PROXY_ALLOWLIST`, and `SlasProxyAuthType.SLAS_CLIENT_AUTH` is added for custom allow-lists. `/oauth2/trusted-agent/token` continues to use `_sfdc_client_auth`.
 - Request logs now mask the `token`, `login_id`, and `email` query parameter values, matched case-insensitively (for example in passwordless and reset password links) so shopper emails and one-time tokens are not written to logs. [#4092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4092)
