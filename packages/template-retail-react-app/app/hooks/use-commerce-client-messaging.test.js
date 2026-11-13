@@ -402,6 +402,19 @@ describe('injectCommerceClientWidget', () => {
         expect(config).not.toHaveProperty('showProductDescription')
         expect(config).not.toHaveProperty('promptsConfig')
         expect(config.messagingConfig).not.toHaveProperty('showProductCaptions')
+        expect(config).not.toHaveProperty('layoutPreset')
+    })
+
+    test('forwards layoutPreset when provided', () => {
+        injectCommerceClientWidget({...messagingFields, layoutPreset: 'commerce'})
+
+        expect(mockInject).toHaveBeenCalledWith(expect.objectContaining({layoutPreset: 'commerce'}))
+    })
+
+    test('omits layoutPreset when not provided', () => {
+        injectCommerceClientWidget(messagingFields)
+
+        expect(mockInject.mock.calls[0][0]).not.toHaveProperty('layoutPreset')
     })
 
     test('always forwards mode as "messaging"', () => {

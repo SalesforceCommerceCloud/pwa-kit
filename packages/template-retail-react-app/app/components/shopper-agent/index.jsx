@@ -708,7 +708,8 @@ const CommerceClientAgentWindow = ({
         cc_showProductDescription,
         cc_showProductCaptions,
         cc_promptsConfig,
-        cc_enablePageContext
+        cc_enablePageContext,
+        cc_layoutPreset
     } = commerceAgentConfiguration
 
     const navigate = useNavigation()
@@ -1171,6 +1172,7 @@ const CommerceClientAgentWindow = ({
                 }
             },
             theme: cc_theme,
+            layoutPreset: cc_layoutPreset || undefined,
             ...resolveCommerceClientOverrideOptions({cc_overrides, cc_overridesUrl}),
             // Optional widget presentation/behavior configs. Passed through as-is (or
             // string→boolean converted); the injection hook omits any that are unset so
@@ -1211,6 +1213,7 @@ const CommerceClientAgentWindow = ({
             cc_widgetPosition,
             cc_dialogWidth,
             cc_theme,
+            cc_layoutPreset,
             cc_overridesUrl,
             cc_overrides,
             cc_headerConfig,

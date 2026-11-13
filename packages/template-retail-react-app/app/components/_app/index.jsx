@@ -78,6 +78,7 @@ import {EmbeddedSubtreeProvider} from '@salesforce/storefront-next-runtime/desig
 
 // Localization
 import {IntlProvider} from 'react-intl'
+import {Global, css} from '@emotion/react'
 
 // Others
 import {
@@ -100,7 +101,14 @@ initializeRegistry()
 import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import {useShopperAgent} from '@salesforce/retail-react-app/app/hooks/use-shopper-agent'
-import {useCommerceClientPagePush} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-push'
+import {
+    isPagePushEnabled,
+    useCommerceClientPagePush
+} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-push'
+import {
+    CC_HEADER_ID,
+    useCommerceClientPanelPosition
+} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-panel-position'
 import {isShopperAgentExpressPaymentPath} from '@salesforce/retail-react-app/app/components/shopper-agent/express-payment/routes'
 
 // Code-split the optional, client-only Shopper Agent so the component and its messaging
@@ -117,6 +125,15 @@ const PlaceholderComponent = () => (
         <Spinner size="lg" />
     </Center>
 )
+
+const pagePushPanelStyles = css`
+    @media (min-width: 992px) {
+        .cim-widget-dialog.full-height.commerce-client-shopper-agent {
+            top: var(--cc-panel-top, 0) !important;
+            height: calc(100dvh - var(--cc-panel-top, 0px)) !important;
+        }
+    }
+`
 
 const DrawerMenuItemWithData = withCommerceSdkReact(
     ({itemComponent: ItemComponent, data, ...rest}) => (
@@ -264,6 +281,8 @@ const StorefrontApp = (props) => {
     // Shifts page content aside for the Commerce Client side panel when page-push
     // is configured; empty (no shift) otherwise.
     const pagePushProps = useCommerceClientPagePush(commerceAgentConfiguration)
+    const pagePushActive = isPagePushEnabled(commerceAgentConfiguration)
+    useCommerceClientPanelPosition(pagePushActive)
 
     useEffect(() => {
         // update the basket customer email
@@ -417,13 +436,8 @@ const StorefrontApp = (props) => {
 
                         <ScrollToTop />
 
-                        <Box
-                            id="app"
-                            display="flex"
-                            flexDirection="column"
-                            flex={1}
-                            {...pagePushProps}
-                        >
+                        {pagePushActive && <Global styles={pagePushPanelStyles} />}
+                        <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
                             {storeLocatorEnabled && (
                                 <StoreLocatorModal
@@ -431,8 +445,8 @@ const StorefrontApp = (props) => {
                                     onClose={onCloseStoreLocator}
                                 />
                             )}
-                            <Island hydrateOn={'visible'}>
-                                <Box {...styles.headerWrapper}>
+                            <Box id={CC_HEADER_ID} {...styles.headerWrapper}>
+                                <Island hydrateOn={'visible'}>
                                     {!isCheckout ? (
                                         <>
                                             {embeddedHeader && (
@@ -498,49 +512,51 @@ const StorefrontApp = (props) => {
                                     ) : (
                                         <CheckoutHeader />
                                     )}
-                                </Box>
-                            </Island>
-                            {!isOnline && <OfflineBanner />}
-                            <AddToCartModalProvider>
-                                <BonusProductSelectionModalProvider>
-                                    <SkipNavContent
-                                        style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            flex: 1,
-                                            outline: 0
-                                        }}
-                                    >
-                                        <Box
-                                            as="main"
-                                            id="app-main"
-                                            role="main"
-                                            display="flex"
-                                            flexDirection="column"
-                                            flex="1"
+                                </Island>
+                            </Box>
+                            <Box display="flex" flexDirection="column" flex={1} {...pagePushProps}>
+                                {!isOnline && <OfflineBanner />}
+                                <AddToCartModalProvider>
+                                    <BonusProductSelectionModalProvider>
+                                        <SkipNavContent
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                flex: 1,
+                                                outline: 0
+                                            }}
                                         >
-                                            <OfflineBoundary isOnline={false}>
-                                                <PageDesignerProvider
-                                                    clientId="pwa-kit-client"
-                                                    targetOrigin="*"
-                                                    usid={usid}
-                                                    mode={pageDesignerMode}
-                                                >
-                                                    <PageDesignerInit />
-                                                    {children}
-                                                </PageDesignerProvider>
-                                            </OfflineBoundary>
-                                        </Box>
-                                    </SkipNavContent>
+                                            <Box
+                                                as="main"
+                                                id="app-main"
+                                                role="main"
+                                                display="flex"
+                                                flexDirection="column"
+                                                flex="1"
+                                            >
+                                                <OfflineBoundary isOnline={false}>
+                                                    <PageDesignerProvider
+                                                        clientId="pwa-kit-client"
+                                                        targetOrigin="*"
+                                                        usid={usid}
+                                                        mode={pageDesignerMode}
+                                                    >
+                                                        <PageDesignerInit />
+                                                        {children}
+                                                    </PageDesignerProvider>
+                                                </OfflineBoundary>
+                                            </Box>
+                                        </SkipNavContent>
 
-                                    <Island hydrateOn={'visible'}>
-                                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
-                                    </Island>
+                                        <Island hydrateOn={'visible'}>
+                                            {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                                        </Island>
 
-                                    <AuthModal {...authModal} />
-                                    <DntNotification {...dntNotification} />
-                                </BonusProductSelectionModalProvider>
-                            </AddToCartModalProvider>
+                                        <AuthModal {...authModal} />
+                                        <DntNotification {...dntNotification} />
+                                    </BonusProductSelectionModalProvider>
+                                </AddToCartModalProvider>
+                            </Box>
                         </Box>
                     </CurrencyProvider>
                 </IntlProvider>
