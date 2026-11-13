@@ -37,7 +37,10 @@ const Mount = ({config}) => {
         <>
             {config?.enabled && (
                 <Helmet>
-                    <script src={resolveEmbeddedWidgetSourceUrl(config)} async />
+                    <link
+                        rel="preconnect"
+                        href={new URL(resolveEmbeddedWidgetSourceUrl(config)).origin}
+                    />
                 </Helmet>
             )}
             <div ref={ref} />
@@ -61,7 +64,12 @@ describe('embedded widget pre-warm configuration', () => {
         )
     })
 
-    afterEach(cleanup)
+    afterEach(() => {
+        cleanup()
+        document
+            .querySelectorAll(`script[src="${DEFAULT_EMBEDDED_WIDGET_SOURCE_URL}"]`)
+            .forEach((script) => script.remove())
+    })
 
     test.each([undefined, null])('does not load a script without configuration %s', (config) => {
         const {container} = render(<Mount config={config} />)
@@ -112,7 +120,6 @@ describe('embedded widget pre-warm configuration', () => {
             const script = document.createElement('script')
             script.src = DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
             script.setAttribute('async', 'true')
-            script.setAttribute('data-react-helmet', 'true')
             document.head.appendChild(script)
             if (earlyFailure) fireEvent.error(script)
             try {
@@ -154,7 +161,7 @@ describe('embedded widget pre-warm configuration', () => {
         }
     )
 
-    test('retains error handling after final unmount and deferred Helmet cleanup', async () => {
+    test('retains the client-owned script and error handling after final unmount', async () => {
         const constructor = customElements.get('inline-agent-widget')
         const getSpy = jest.spyOn(customElements, 'get').mockReturnValue(undefined)
         let resolve
@@ -170,7 +177,7 @@ describe('embedded widget pre-warm configuration', () => {
             )
             first.unmount()
             await act(async () => new Promise((done) => requestAnimationFrame(done)))
-            expect(original.isConnected).toBe(false)
+            expect(original.isConnected).toBe(true)
             const second = render(<Mount config={baseConfig} />)
             await act(async () => new Promise((done) => requestAnimationFrame(done)))
             const replacement = document.querySelector(
@@ -213,7 +220,6 @@ describe('embedded widget pre-warm configuration', () => {
             const ssrScript = document.createElement('script')
             ssrScript.src = DEFAULT_EMBEDDED_WIDGET_SOURCE_URL
             ssrScript.setAttribute('async', 'true')
-            ssrScript.setAttribute('data-react-helmet', 'true')
             document.head.appendChild(ssrScript)
             const first = render(<Mount config={baseConfig} />)
             const concurrent = render(<Mount config={baseConfig} />)

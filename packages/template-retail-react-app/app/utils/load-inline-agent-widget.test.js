@@ -56,7 +56,7 @@ describe('inline widget script registration', () => {
         expect(load(SOURCE)).toBe(first)
         expect(document.querySelectorAll(`script[src="${SOURCE}"]`)).toHaveLength(1)
         expect(script().async).toBe(true)
-        expect(script().getAttribute('data-react-helmet')).toBe('true')
+        expect(script().getAttribute('data-react-helmet')).toBeNull()
         expect(definedSpy).toHaveBeenCalledTimes(1)
         register()
         await first
@@ -64,6 +64,27 @@ describe('inline widget script registration', () => {
         script().dispatchEvent(new Event('error'))
         expect(script()).not.toBeNull()
         expect(load(SOURCE)).toBe(first)
+    })
+
+    test('captures a failure dispatched during script insertion', async () => {
+        const append = document.head.appendChild.bind(document.head)
+        const appendSpy = jest.spyOn(document.head, 'appendChild').mockImplementation((node) => {
+            const inserted = append(node)
+            node.dispatchEvent(new Event('error'))
+            return inserted
+        })
+        const failed = jest.fn()
+        load(SOURCE).catch(failed)
+        await Promise.resolve()
+        expect(failed).toHaveBeenCalledWith(
+            new Error('Inline agent widget CDN script failed to load')
+        )
+        expect(script()).toBeNull()
+        expect(jest.getTimerCount()).toBe(0)
+        appendSpy.mockRestore()
+        const retry = load(SOURCE)
+        register()
+        await retry
     })
 
     test('registration before the warning threshold reuses the original SSR node', async () => {

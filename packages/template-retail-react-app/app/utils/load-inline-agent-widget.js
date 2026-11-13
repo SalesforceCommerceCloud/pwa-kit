@@ -22,7 +22,7 @@ const ensureWidget = (scriptSourceUrl) => {
     const existing = document.querySelector(`script[src="${scriptSourceUrl}"]`)
     const script = existing || document.createElement('script')
     pendingScript = script
-    readyPromise = new Promise((resolve, reject) => {
+    const attempt = new Promise((resolve, reject) => {
         let settled = false
         const finish = (error) => {
             if (settled) return
@@ -51,16 +51,14 @@ const ensureWidget = (scriptSourceUrl) => {
         script.addEventListener('error', onError, {once: true})
         customElements.whenDefined('inline-agent-widget').then(() => finish(), finish)
     })
+    readyPromise = attempt
     if (!existing) {
         script.src = scriptSourceUrl
         script.async = true
-        // Match Helmet's attributes so it retains the listener-bound script.
-        script.setAttribute('async', 'true')
-        script.setAttribute('data-react-helmet', 'true')
         document.head.appendChild(script)
     }
 
-    return readyPromise
+    return attempt
 }
 
 export default ensureWidget

@@ -5,6 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState, createRef as mockCreateRef} from 'react'
+import {renderToString} from 'react-dom/server'
+import {IntlProvider} from 'react-intl'
+import {Helmet} from 'react-helmet'
 import {screen, act, fireEvent, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import InlineAgentWidget from '@salesforce/retail-react-app/app/components/inline-agent-widget'
@@ -39,23 +42,36 @@ describe('InlineAgentWidget', () => {
         handoffMock.mockReset().mockResolvedValue({seeded: true, provider: 'commerce-client'})
     })
 
-    test('uses the configured CDN source in the page script', async () => {
+    test('emits only preconnect through Helmet and leaves script ownership to the loader', async () => {
         const source =
             'https://cdn.search.cimulate.ai/inline-agent-widget/0.1.1/inline-agent-widget.umd.js'
         renderWithProviders(
             <InlineAgentWidget config={{...BASE_CONFIG, embeddedWidgetSourceUrl: source}} />
         )
         await waitFor(() =>
-            expect(document.head.querySelector(`script[src="${source}"]`)).not.toBeNull()
+            expect(
+                document.head.querySelector(
+                    'link[rel="preconnect"][href="https://cdn.search.cimulate.ai"]'
+                )
+            ).not.toBeNull()
         )
-        expect(
-            document.head.querySelector(
-                'link[rel="preconnect"][href="https://cdn.search.cimulate.ai"]'
+        expect(document.head.querySelector(`script[src="${source}"]`)).toBeNull()
+    })
+
+    test('server rendering does not start an SDK request before client error handling exists', () => {
+        Helmet.canUseDOM = false
+        try {
+            renderToString(
+                <IntlProvider locale="en">
+                    <InlineAgentWidget config={BASE_CONFIG} />
+                </IntlProvider>
             )
-        ).not.toBeNull()
-        expect(
-            document.head.querySelector('script[src="/static/inline-agent-widget.umd.js"]')
-        ).toBeNull()
+            const head = Helmet.renderStatic()
+            expect(head.link.toString()).toContain('rel="preconnect"')
+            expect(head.script.toString()).not.toContain('inline-agent-widget.umd.js')
+        } finally {
+            Helmet.canUseDOM = true
+        }
     })
 
     test.each([undefined, null])(
