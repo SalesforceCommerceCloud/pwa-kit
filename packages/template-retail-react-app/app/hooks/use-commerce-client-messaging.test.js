@@ -12,8 +12,7 @@ import useCommerceClientMessaging, {
 import {
     DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
-    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
-    DEFAULT_COMMERCE_CLIENT_THEME
+    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID
 } from '@salesforce/retail-react-app/app/constants'
 
 const messagingFields = {
@@ -81,7 +80,7 @@ describe('injectCommerceClientWidget', () => {
                 ...DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
                 options: {...DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG.options}
             },
-            theme: {...DEFAULT_COMMERCE_CLIENT_THEME}
+            theme: undefined
         })
     })
 
@@ -93,21 +92,16 @@ describe('injectCommerceClientWidget', () => {
         )
     })
 
-    test('merges theme overrides over the defaults', () => {
-        injectCommerceClientWidget({
-            ...messagingFields,
-            theme: {primaryColor: '#ff0000', fontFamily: 'Arial'}
-        })
+    test('passes theme through to the widget as-is', () => {
+        const theme = {
+            preset: 'commerce',
+            density: 'comfortable',
+            shape: 'round',
+            elevation: 'raised'
+        }
+        injectCommerceClientWidget({...messagingFields, theme})
 
-        expect(mockInject).toHaveBeenCalledWith(
-            expect.objectContaining({
-                theme: {
-                    ...DEFAULT_COMMERCE_CLIENT_THEME,
-                    primaryColor: '#ff0000',
-                    fontFamily: 'Arial'
-                }
-            })
-        )
+        expect(mockInject).toHaveBeenCalledWith(expect.objectContaining({theme}))
     })
 
     test('merges componentConfig overrides including nested options', () => {
@@ -402,19 +396,6 @@ describe('injectCommerceClientWidget', () => {
         expect(config).not.toHaveProperty('showProductDescription')
         expect(config).not.toHaveProperty('promptsConfig')
         expect(config.messagingConfig).not.toHaveProperty('showProductCaptions')
-        expect(config).not.toHaveProperty('layoutPreset')
-    })
-
-    test('forwards layoutPreset when provided', () => {
-        injectCommerceClientWidget({...messagingFields, layoutPreset: 'commerce'})
-
-        expect(mockInject).toHaveBeenCalledWith(expect.objectContaining({layoutPreset: 'commerce'}))
-    })
-
-    test('omits layoutPreset when not provided', () => {
-        injectCommerceClientWidget(messagingFields)
-
-        expect(mockInject.mock.calls[0][0]).not.toHaveProperty('layoutPreset')
     })
 
     test('always forwards mode as "messaging"', () => {

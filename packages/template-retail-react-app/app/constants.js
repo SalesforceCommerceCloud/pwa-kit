@@ -326,20 +326,6 @@ export const DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION = '65'
 export const DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION = '66'
 
 /**
- * Default theme applied to the Commerce Client widget. Individual values can be
- * overridden by passing a partial `theme` object to the hook.
- * These map internally to the `--cim-widget-*` CSS custom properties.
- */
-export const DEFAULT_COMMERCE_CLIENT_THEME = {
-    primaryColor: '#1c1d22',
-    secondaryColor: '#2c2d32',
-    fontColor: '#1a202c',
-    fontFamily: 'inherit',
-    backgroundColor: '#ffffff',
-    borderColor: '#dddddd'
-}
-
-/**
  * Default component configuration for the Commerce Client widget. The widget renders
  * closed by default and is opened programmatically (e.g. from the header agent
  * button) via `eventHandlers.components.toggleWidgetOpen`.
