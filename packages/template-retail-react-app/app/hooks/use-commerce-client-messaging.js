@@ -136,9 +136,9 @@ const injectCommerceClientWidget = ({
                 console.error(
                     'Commerce Client PDP context requires a messaging bundle with the public pageContext.set/clear API (use >= 1.53.0).'
                 )
-                return false
-            }
-            if (initialPageContext) {
+                // Keep chat available without page context on unsupported bundles.
+                messagingConfig.enablePageContext = false
+            } else if (initialPageContext) {
                 // Seed synchronously. Passing messagingConfig.initialPageContext
                 // would let the widget's asynchronous React mount replay an old
                 // snapshot after a subsequent storefront navigation/set/clear.
@@ -214,6 +214,8 @@ const useCommerceClientMessaging = (scriptLoadStatus, options = {}) => {
             const contextKey = JSON.stringify(context)
             if (lastContextRef.current === contextKey) return
             const pageContext = window.CimulateMessaging?.eventHandlers?.pageContext
+            if (typeof pageContext?.set !== 'function' || typeof pageContext?.clear !== 'function')
+                return
             if (context) {
                 pageContext.set(context)
             } else {

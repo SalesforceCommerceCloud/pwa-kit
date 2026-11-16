@@ -211,12 +211,26 @@ describe('Commerce Client PDP adapter', () => {
         expect(api.clear).not.toHaveBeenCalled()
     })
 
-    test('identifies a missing widget API instead of adding a different transport', () => {
+    test('keeps chat available without page context when the widget API is missing', () => {
         delete window.CimulateMessaging.eventHandlers.pageContext
         jest.spyOn(console, 'error').mockImplementation(() => {})
-        expect(injectCommerceClientWidget(options)).toBe(false)
+        expect(injectCommerceClientWidget(options)).toBe(true)
         expect(console.error).toHaveBeenCalledWith(expect.stringContaining('>= 1.53.0'))
-        expect(inject).not.toHaveBeenCalled()
+        expect(inject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                messagingConfig: expect.objectContaining({enablePageContext: false})
+            })
+        )
+    })
+
+    test('continues chat through navigation when the context API is unavailable', () => {
+        delete window.CimulateMessaging.eventHandlers.pageContext
+        jest.spyOn(console, 'error').mockImplementation(() => {})
+        const view = render(tree())
+        view.rerender(tree({product: productB}))
+        view.rerender(tree({showPdp: false}))
+        expect(inject).toHaveBeenCalledTimes(1)
+        expect(inject.mock.calls[0][0].messagingConfig.enablePageContext).toBe(false)
     })
 
     test('SSR without browser globals neither publishes context nor injects the widget', () => {
