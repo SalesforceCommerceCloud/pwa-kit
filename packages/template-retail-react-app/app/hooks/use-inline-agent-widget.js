@@ -8,42 +8,7 @@
 import {useEffect, useRef, useState} from 'react'
 import {DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION} from '@salesforce/retail-react-app/app/constants'
 import {resolveEmbeddedWidgetSourceUrl} from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
-
-let readyPromise = null
-
-const ensureWidget = (scriptSourceUrl) => {
-    if (readyPromise) return readyPromise
-
-    if (customElements.get('inline-agent-widget')) {
-        readyPromise = Promise.resolve()
-        return readyPromise
-    }
-
-    const existing = document.querySelector(`script[src="${scriptSourceUrl}"]`)
-    // An SSR script may have failed before hydration attached an error listener.
-    existing?.remove()
-    const script = document.createElement('script')
-    readyPromise = new Promise((resolve, reject) => {
-        const onError = () => {
-            script.remove()
-            readyPromise = null
-            reject(new Error('Inline agent widget CDN script failed to load'))
-        }
-        script.addEventListener('error', onError, {once: true})
-        customElements.whenDefined('inline-agent-widget').then(() => {
-            script.removeEventListener('error', onError)
-            resolve()
-        })
-    })
-    script.src = scriptSourceUrl
-    script.async = true
-    // Match Helmet's attributes so it retains the listener-bound script.
-    script.setAttribute('async', 'true')
-    script.setAttribute('data-react-helmet', 'true')
-    document.head.appendChild(script)
-
-    return readyPromise
-}
+import ensureWidget from '@salesforce/retail-react-app/app/utils/load-inline-agent-widget'
 
 const isConfigured = (config) => {
     if (!config?.enabled) return false
