@@ -1,4 +1,5 @@
 ## v10.4.0-dev (Oct 20, 2026)
+- [Docs] Remove the obsolete WIP warning from the default `enableHttpOnlySessionCookies` configuration; production support starts with PWA Kit 3.19 and the feature remains opt-in. [#4116](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4116)
 - [Bugfix] Let the client loader own the inline widget CDN script so error handling exists before the request starts; keep a server-rendered CDN preconnect hint. Share loading across mounts and warn after 10 seconds without blocking late registration. [#4113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4113)
 - [Enhancement] Enable the `inline-agent-widget:handoff` listener for hybrid mode so pill clicks and typed questions dispatch to the main Shopper Agent. [#4105](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4105)
 - [Enhancement] Load the inline agent widget from the trusted Cimulate CDN instead of bundling its UMD. Select releases with `cc_embeddedWidgetCdnVersion` (defaults to `0.1.0`); `embeddedWidgetSourceUrl` provides an optional explicit URL override. [#4106](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4106)
