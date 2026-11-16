@@ -279,7 +279,6 @@ module.exports = {
     ssrParameters: {
         ssrFunctionNodeVersion: '24.x',
         // Store the session cookies as HttpOnly for enhanced security.
-        // WIP: Do not enable. This feature is in-progress.
         enableHttpOnlySessionCookies: false,
         proxyConfigs: [
             {
