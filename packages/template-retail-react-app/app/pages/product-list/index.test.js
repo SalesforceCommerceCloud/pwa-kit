@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import {useQueryClient} from '@tanstack/react-query'
+import {getCommerceClientPageContext} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
 import {Helmet} from 'react-helmet'
 import PropTypes from 'prop-types'
 
@@ -554,3 +556,27 @@ test('should filter by inventory when inventory filter is clicked', async () => 
     // Verify URL hasn't changed
     expect(window.location.pathname).toBe('/uk/en-GB/category/mens-clothing-jackets')
 })
+
+test.each(['true', 'false'])(
+    'publishes SRP context for the boolean-like search term %s',
+    async (term) => {
+        let queryClient
+        const ContextProbe = () => {
+            queryClient = useQueryClient()
+            return null
+        }
+        window.history.pushState({}, 'ProductList', `/uk/en-GB/search?q=${term}`)
+        renderWithProviders(
+            <>
+                <MockedComponent />
+                <ContextProbe />
+            </>
+        )
+        expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(getCommerceClientPageContext(queryClient)).toEqual(
+                expect.objectContaining({type: 'srp', query: term})
+            )
+        })
+    }
+)
