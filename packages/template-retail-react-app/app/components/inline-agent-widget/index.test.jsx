@@ -274,20 +274,33 @@ describe('InlineAgentWidget', () => {
         expect(handoffMock).not.toHaveBeenCalled()
     })
 
-    test('mode === "hybrid" falls back to the inline UMD (no handoff listener)', () => {
+    test('mode === "hybrid" wires the handoff listener', () => {
         renderWithProviders(
-            <InlineAgentWidget config={{...BASE_CONFIG, mode: 'hybrid'}} productId="500400" />
+            <InlineAgentWidget
+                config={{...BASE_CONFIG, mode: 'hybrid'}}
+                productId="500400"
+                productName="Serum"
+            />
         )
 
         act(() => {
             document.dispatchEvent(
                 new CustomEvent('inline-agent-widget:handoff', {
-                    detail: {question: 'Hi?'}
+                    detail: {question: 'Hi?', source: 'pill'}
                 })
             )
         })
 
-        expect(handoffMock).not.toHaveBeenCalled()
+        expect(handoffMock).toHaveBeenCalledTimes(1)
+        expect(handoffMock).toHaveBeenCalledWith({
+            question: 'Hi?',
+            signal: expect.any(AbortSignal),
+            productContext: {
+                productId: '500400',
+                productName: 'Serum',
+                pdpUrl: window.location.href
+            }
+        })
     })
 
     test('warns in the console when config.mode is an unknown value', () => {
