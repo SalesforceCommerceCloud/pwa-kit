@@ -36,17 +36,12 @@ describe('useCommerceClientPanelPosition', () => {
     const OriginalResizeObserver = global.ResizeObserver
     const OriginalMutationObserver = global.MutationObserver
     let headerEl
-    let rafCallbacks
 
     beforeEach(() => {
         global.ResizeObserver = MockResizeObserver
         global.MutationObserver = MockMutationObserver
         resizeObserverInstance = null
         mutationObserverInstance = null
-        rafCallbacks = []
-        jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
-            rafCallbacks.push(cb)
-        })
 
         headerEl = document.createElement('div')
         headerEl.id = CC_HEADER_ID
@@ -54,35 +49,17 @@ describe('useCommerceClientPanelPosition', () => {
         document.body.appendChild(headerEl)
     })
 
-    const flushRaf = () => rafCallbacks.forEach((cb) => cb())
-
     afterEach(() => {
         global.ResizeObserver = OriginalResizeObserver
         global.MutationObserver = OriginalMutationObserver
-        window.requestAnimationFrame.mockRestore()
         headerEl.remove()
         document.documentElement.style.removeProperty('--cc-panel-top')
     })
 
-    test('sets --cc-panel-top from header height (no shadow)', () => {
+    test('sets --cc-panel-top from header bottom position', () => {
         renderHook(() => useCommerceClientPanelPosition(true))
-        flushRaf()
 
         expect(document.documentElement.style.getPropertyValue('--cc-panel-top')).toBe('64px')
-    })
-
-    test('includes shadow offset from descendant elements', () => {
-        const child = document.createElement('div')
-        child.style.boxShadow = '0px 1px 3px 0px rgba(0,0,0,0.1)'
-        headerEl.appendChild(child)
-
-        renderHook(() => useCommerceClientPanelPosition(true))
-        flushRaf()
-
-        // 64 (height) + ceil(1 + 3 + 0) = 68
-        expect(document.documentElement.style.getPropertyValue('--cc-panel-top')).toBe('68px')
-
-        child.remove()
     })
 
     test('observes header for resize and mutations', () => {
@@ -112,7 +89,6 @@ describe('useCommerceClientPanelPosition', () => {
 
     test('cleans up properties on unmount', () => {
         const {unmount} = renderHook(() => useCommerceClientPanelPosition(true))
-        flushRaf()
 
         expect(document.documentElement.style.getPropertyValue('--cc-panel-top')).toBe('64px')
 
@@ -134,7 +110,6 @@ describe('useCommerceClientPanelPosition', () => {
         const {rerender} = renderHook(({active}) => useCommerceClientPanelPosition(active), {
             initialProps: {active: true}
         })
-        flushRaf()
 
         expect(document.documentElement.style.getPropertyValue('--cc-panel-top')).toBe('64px')
 

@@ -43,7 +43,7 @@ export const getCommerceAgentConfig = () => {
         cc_enableEscalationToAgent: 'false',
         cc_enableDownloadTranscript: 'true',
         cc_enableImageUpload: 'false',
-        cc_layoutPreset: ''
+        cc_theme: {preset: 'legacy', density: 'compact', shape: 'sharp', elevation: 'flat'}
     }
     return getConfig().app.commerceAgent ?? defaults
 }

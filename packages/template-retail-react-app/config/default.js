@@ -96,12 +96,6 @@ module.exports = {
             // and enables the shopper-agent handoff to prime product context.
             // Forwarded as messagingConfig.enablePageContext; the widget defaults to false.
             cc_enablePageContext: 'false',
-            // Layout preset for the Commerce Client widget: 'standard' (default) or
-            // 'commerce'. The 'commerce' preset activates premium visual styling
-            // (unified product cards, rounded input, sparkle loading indicator).
-            // Forwarded as `layoutPreset`. Empty string means the widget uses its own
-            // default ('standard').
-            cc_layoutPreset: '',
             // Optional URL to customer's component override script. Must use HTTPS;
             // a non-HTTPS or malformed URL is dropped and the widget keeps its defaults.
             // The script defines Web Components that replace default product cards, carousels,
@@ -115,9 +109,13 @@ module.exports = {
             // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
-            // Optional: pass `cc_theme` (object) via COMMERCE_AGENT_SETTINGS to override
-            // the widget theme (primaryColor, secondaryColor, backgroundColor, fontColor,
-            // borderColor, fontFamily).
+            // Theme recipe for the Commerce Client widget. The SDK resolves preset
+            // defaults, trait overrides (density, shape, elevation), and token
+            // overrides internally. Flat legacy fields (primaryColor, etc.) are
+            // still accepted for backward compatibility. Pass via
+            // COMMERCE_AGENT_SETTINGS to override; e.g.
+            //   { "preset": "commerce", "density": "comfortable", "shape": "round", "elevation": "raised" }
+            // cc_theme: { preset: 'legacy', density: 'compact', shape: 'sharp', elevation: 'flat' },
             // Optional: pass `cc_routingAttributes` (object) via COMMERCE_AGENT_SETTINGS to
             // forward Agentforce routing attributes to the widget as `routingAttributes`.
             // Always augmented with `clientVersion` (from `cc_cdnVersion`) and

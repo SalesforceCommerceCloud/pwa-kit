@@ -14,8 +14,7 @@ import {
 import {
     DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
-    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
-    DEFAULT_COMMERCE_CLIENT_THEME
+    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID
 } from '@salesforce/retail-react-app/app/constants'
 
 const onClient = typeof window !== 'undefined'
@@ -96,8 +95,7 @@ const injectCommerceClientWidget = ({
     showProductDescription,
     showProductCaptions,
     promptsConfig,
-    enablePageContext,
-    layoutPreset
+    enablePageContext
 } = {}) => {
     if (!onClient) return false
 
@@ -168,7 +166,7 @@ const injectCommerceClientWidget = ({
                     ...componentConfig?.options
                 }
             },
-            theme: {...DEFAULT_COMMERCE_CLIENT_THEME, ...theme},
+            theme,
             ...(overridesUrl ? {overridesUrl} : {}),
             ...(overrides && typeof overrides === 'object' ? {overrides} : {}),
             ...(headerConfig && typeof headerConfig === 'object' ? {headerConfig} : {}),
@@ -180,8 +178,7 @@ const injectCommerceClientWidget = ({
             ...(typeof openLinksInNewTab === 'boolean' ? {openLinksInNewTab} : {}),
             ...(typeof onNavigate === 'function' ? {onNavigate} : {}),
             ...(typeof showProductDescription === 'boolean' ? {showProductDescription} : {}),
-            ...(promptsConfig && typeof promptsConfig === 'object' ? {promptsConfig} : {}),
-            ...(layoutPreset ? {layoutPreset} : {})
+            ...(promptsConfig && typeof promptsConfig === 'object' ? {promptsConfig} : {})
         })
         return true
     } catch (err) {
