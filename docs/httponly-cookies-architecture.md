@@ -1,6 +1,6 @@
 # HttpOnly Session Cookies — Architecture
 
-> **WIP: This feature is in-progress. Do not enable `enableHttpOnlySessionCookies` in production.**
+> **Production support:** HttpOnly session cookies are supported in production builds starting with PWA Kit 3.19 (released July 2026).
 
 ## Overview
 
