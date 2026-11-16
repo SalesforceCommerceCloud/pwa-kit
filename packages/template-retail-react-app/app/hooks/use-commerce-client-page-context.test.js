@@ -10,6 +10,8 @@ import PropTypes from 'prop-types'
 import {act, render, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider, useQuery} from '@tanstack/react-query'
 import {
+    buildCommerceClientSrpContext,
+    useCommerceClientSrpContext,
     getCommerceClientPageContext,
     useCommerceClientPdpContext
 } from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
@@ -232,7 +234,8 @@ describe('Commerce Client PDP adapter', () => {
                     QueryClientProvider: Provider
                 } = require('@tanstack/react-query')
                 const {
-                    useCommerceClientPdpContext: usePdp
+                    useCommerceClientPdpContext: usePdp,
+                    useCommerceClientSrpContext: useSrp
                 } = require('@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context')
                 const {
                     default: useMessaging
@@ -241,6 +244,7 @@ describe('Commerce Client PDP adapter', () => {
                 const client = new Client()
                 const ServerPage = () => {
                     usePdp({product: productA, requestedProductId: 'A'})
+                    useSrp({query: 'shoes', result: {}, isSuccess: true})
                     useMessaging(ready, options)
                     return null
                 }
@@ -294,5 +298,177 @@ describe('Commerce Client PDP adapter', () => {
         })
         expect(api.set).not.toHaveBeenCalled()
         expect(getCommerceClientPageContext(queryClient).id).toBe('B')
+    })
+})
+
+describe('SRP context normalization', () => {
+    test('query-only and zero-result searches are valid', () => {
+        expect(buildCommerceClientSrpContext(' shoes ', {hits: [], total: 0})).toEqual({
+            type: 'srp',
+            query: 'shoes'
+        })
+    })
+    test('uses raw SCAPI IDs and values, excluding category and inventory controls', () => {
+        expect(
+            buildCommerceClientSrpContext('shoes', {
+                selectedRefinements: {
+                    c_refinementColor: ['Black', 'Purple'],
+                    c_size: '006',
+                    cgid: 'womens',
+                    htype: 'master',
+                    ilids: 'store'
+                }
+            })
+        ).toEqual({
+            type: 'srp',
+            query: 'shoes',
+            refinements: [
+                {name: 'c_refinementColor', values: ['Black', 'Purple']},
+                {name: 'c_size', values: ['006']}
+            ]
+        })
+    })
+    test.each([
+        ['(0..100)', {minPrice: 0, maxPrice: 100}],
+        ['(50..)', {minPrice: 50}],
+        ['(..99.5)', {maxPrice: 99.5}]
+    ])('parses selected price %s', (price, bounds) => {
+        expect(buildCommerceClientSrpContext('shoes', {selectedRefinements: {price}})).toEqual({
+            type: 'srp',
+            query: 'shoes',
+            ...bounds
+        })
+    })
+    test.each(['(..)', '(100..50)', '$50 - $100', '(a..100)', '(NaN..100)', ['(0..100)']])(
+        'rejects invalid price %s',
+        (price) => {
+            expect(
+                buildCommerceClientSrpContext('shoes', {selectedRefinements: {price}})
+            ).toBeNull()
+        }
+    )
+    test.each(['', '   ', undefined])('rejects empty query %s', (query) => {
+        expect(buildCommerceClientSrpContext(query, {})).toBeNull()
+    })
+})
+
+describe('SRP shared context lifecycle', () => {
+    let client, api, inject
+    const Srp = (props) => {
+        useCommerceClientSrpContext(props)
+        return null
+    }
+    beforeEach(() => {
+        client = new QueryClient({defaultOptions: {queries: {retry: false}}})
+        api = {set: jest.fn(), clear: jest.fn()}
+        inject = jest.fn()
+        window.CimulateMessaging = {
+            injectMessagingWidget: inject,
+            eventHandlers: {pageContext: api}
+        }
+    })
+    afterEach(() => {
+        client.clear()
+        delete window.CimulateMessaging
+    })
+    const tree = (props = {}, status = ready, page = 'srp') => (
+        <QueryClientProvider client={client}>
+            <Messaging status={status} />
+            {page === 'srp' && <Srp query="shoes" result={{total: 0}} isSuccess {...props} />}
+            {page === 'pdp' && <Pdp product={productA} requestedProductId="A" />}
+        </QueryClientProvider>
+    )
+    test('seeds initial SRP and retains context during same-request refetch', () => {
+        const view = render(tree())
+        expect(api.set).toHaveBeenLastCalledWith({type: 'srp', query: 'shoes'})
+        view.rerender(tree({isFetching: true}))
+        expect(api.set).toHaveBeenCalledTimes(1)
+        expect(inject).toHaveBeenCalledTimes(1)
+    })
+    test('clears previous query/filter data and publishes only resolved selections', () => {
+        const view = render(tree())
+        view.rerender(tree({query: 'boots', isPreviousData: true}))
+        expect(getCommerceClientPageContext(client)).toBeNull()
+        view.rerender(
+            tree({
+                query: 'boots',
+                result: {selectedRefinements: {c_refinementColor: 'Black', price: '(0..50)'}}
+            })
+        )
+        expect(api.set).toHaveBeenLastCalledWith({
+            type: 'srp',
+            query: 'boots',
+            refinements: [{name: 'c_refinementColor', values: ['Black']}],
+            minPrice: 0,
+            maxPrice: 50
+        })
+        view.rerender(tree({query: 'boots'}))
+        expect(api.set).toHaveBeenLastCalledWith({type: 'srp', query: 'boots'})
+    })
+    test.each([{isSuccess: false}, {isError: true}, {isCategory: true}, {query: ' '}])(
+        'clears unsupported or unresolved state %j',
+        (props) => {
+            const view = render(tree())
+            view.rerender(tree(props))
+            expect(getCommerceClientPageContext(client)).toBeNull()
+        }
+    )
+    test('late widget receives the latest resolved search', () => {
+        const view = render(tree({}, loading))
+        view.rerender(tree({query: 'boots'}, loading))
+        view.rerender(tree({query: 'boots'}))
+        expect(api.set).toHaveBeenLastCalledWith({type: 'srp', query: 'boots'})
+        expect(inject).toHaveBeenCalledTimes(1)
+    })
+    test('PDP and SRP replace each other, and leaving clears without reinjection', () => {
+        const view = render(tree())
+        view.rerender(tree({}, ready, 'pdp'))
+        expect(getCommerceClientPageContext(client).type).toBe('pdp')
+        view.rerender(tree())
+        expect(getCommerceClientPageContext(client).type).toBe('srp')
+        view.rerender(tree({}, ready, 'none'))
+        expect(getCommerceClientPageContext(client)).toBeNull()
+        expect(inject).toHaveBeenCalledTimes(1)
+    })
+    test('an old filter request completing later cannot restore stale selections', async () => {
+        const pending = {}
+        const Search = ({filter}) => {
+            const state = useQuery(
+                ['srp-test', filter],
+                () =>
+                    new Promise((resolve) => {
+                        pending[filter] = resolve
+                    }),
+                {keepPreviousData: true}
+            )
+            return (
+                <Srp
+                    query="shoes"
+                    result={state.data}
+                    isSuccess={state.isSuccess}
+                    isPreviousData={state.isPreviousData}
+                    isError={state.isError}
+                />
+            )
+        }
+        Search.propTypes = {filter: PropTypes.string}
+        const route = (filter) => (
+            <QueryClientProvider client={client}>
+                <Messaging />
+                <Search filter={filter} />
+            </QueryClientProvider>
+        )
+        const view = render(route('Black'))
+        view.rerender(route('Blue'))
+        await act(async () => {
+            pending.Blue({selectedRefinements: {c_refinementColor: 'Blue'}})
+        })
+        await waitFor(() =>
+            expect(getCommerceClientPageContext(client)?.refinements?.[0].values).toEqual(['Blue'])
+        )
+        await act(async () => {
+            pending.Black({selectedRefinements: {c_refinementColor: 'Black'}})
+        })
+        expect(getCommerceClientPageContext(client).refinements[0].values).toEqual(['Blue'])
     })
 })

@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {useCommerceClientSrpContext} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
@@ -161,6 +162,9 @@ const ProductList = (props) => {
         isLoading,
         isFetched,
         isRefetching,
+        isSuccess: isSearchSuccess,
+        isPreviousData: isPreviousSearchData,
+        isError: isSearchError,
         data: productSearchResult
     } = useProductSearch(
         {
@@ -184,6 +188,18 @@ const ProductList = (props) => {
             keepPreviousData: true
         }
     )
+
+    useCommerceClientSrpContext({
+        query:
+            typeof restOfParams.q === 'number' || typeof restOfParams.q === 'boolean'
+                ? String(restOfParams.q)
+                : restOfParams.q,
+        result: productSearchResult,
+        isSuccess: isSearchSuccess,
+        isPreviousData: isPreviousSearchData,
+        isError: isSearchError,
+        isCategory: Boolean(params.categoryId)
+    })
 
     const {error, data: category} = useCategory(
         {
