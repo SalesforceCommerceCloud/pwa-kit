@@ -1,3 +1,7 @@
+## 0.5.1
+- Discontinued PWA Kit MCP. Use [B2C DX MCP](https://salesforcecommercecloud.github.io/b2c-developer-tooling/mcp/) instead.
+- Added deprecation notices to the README, package metadata, and server startup.
+
 ## 0.5.0 (Jul 13, 2026)
 - Add Node 24 support. Drop Node 16 support [#3652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3652)
 - Retired the pwakit_create_component tool [#3437](https://github.com/SalesforceCommerceCloud/pwa-kit/issues/3437)
