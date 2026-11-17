@@ -13,9 +13,7 @@ import {
     getCommerceClientPageContext,
     useCommerceClientPdpContext
 } from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
-import useCommerceClientMessaging, {
-    injectCommerceClientWidget
-} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
 
 const productA = {id: 'A', name: 'Product A', imageGroups: [{images: [{link: '/A.jpg'}]}]}
 const productB = {id: 'B', name: 'Product B'}
@@ -59,7 +57,6 @@ describe('Commerce Client PDP adapter', () => {
 
     const tree = ({
         product = productA,
-        requestedProductId = product.id,
         status = ready,
         showPdp = true,
         enabled = true,
@@ -67,14 +64,7 @@ describe('Commerce Client PDP adapter', () => {
     } = {}) => (
         <QueryClientProvider client={queryClient}>
             <Messaging status={status} enabled={enabled} />
-            {showPdp && (
-                <Pdp
-                    product={product}
-                    requestedProductId={requestedProductId}
-                    enabled={enabled}
-                    {...queryState}
-                />
-            )}
+            {showPdp && <Pdp product={product} enabled={enabled} {...queryState} />}
         </QueryClientProvider>
     )
 
@@ -121,7 +111,7 @@ describe('Commerce Client PDP adapter', () => {
             }
         })
         const view = render(tree())
-        view.rerender(tree({requestedProductId: 'B', isPreviousData: true}))
+        view.rerender(tree({isPreviousData: true}))
         mount()
         expect(activeContext).toBeNull()
         view.rerender(tree({product: productB}))
@@ -132,8 +122,8 @@ describe('Commerce Client PDP adapter', () => {
         const pages = (oldPage) => (
             <QueryClientProvider client={queryClient}>
                 <Messaging />
-                {oldPage && <Pdp key="old" product={productA} requestedProductId="A" />}
-                <Pdp key="new" product={productB} requestedProductId="B" />
+                {oldPage && <Pdp key="old" product={productA} />}
+                <Pdp key="new" product={productB} />
             </QueryClientProvider>
         )
         const view = render(pages(true))
@@ -144,7 +134,7 @@ describe('Commerce Client PDP adapter', () => {
     })
 
     test('bundle-first load applies the product through the public API once resolved', () => {
-        const view = render(tree({product: undefined, requestedProductId: 'A', isLoading: true}))
+        const view = render(tree({product: undefined, isLoading: true}))
         view.rerender(tree())
         expect(api.set).toHaveBeenLastCalledWith(expect.objectContaining({id: 'A'}))
         expect(inject).toHaveBeenCalledTimes(1)
@@ -152,7 +142,7 @@ describe('Commerce Client PDP adapter', () => {
 
     test('A → B clears A while previous data is rendered, then publishes B', () => {
         const view = render(tree())
-        view.rerender(tree({requestedProductId: 'B', isPreviousData: true}))
+        view.rerender(tree({isPreviousData: true}))
         expect(getCommerceClientPageContext(queryClient)).toBeNull()
         expect(api.clear).toHaveBeenCalledTimes(1)
         view.rerender(tree({product: productB}))
@@ -163,16 +153,11 @@ describe('Commerce Client PDP adapter', () => {
     test('failure or a stale completion cannot restore a different requested product', () => {
         const view = render(tree())
         api.set.mockClear()
-        view.rerender(tree({requestedProductId: 'B', isError: true}))
+        view.rerender(tree({isError: true}))
         expect(getCommerceClientPageContext(queryClient)).toBeNull()
-        view.rerender(tree({requestedProductId: 'B', isPreviousData: true}))
+        view.rerender(tree({isPreviousData: true}))
         expect(getCommerceClientPageContext(queryClient)).toBeNull()
         expect(api.set).not.toHaveBeenCalled()
-    })
-
-    test('uses the resolved product ID when it differs from the requested ID', () => {
-        render(tree({requestedProductId: 'product-alias'}))
-        expect(api.set).toHaveBeenCalledWith(expect.objectContaining({id: 'A'}))
     })
 
     test('leaving PDP clears context without a reset, reinjection, or automatic message', () => {
@@ -195,7 +180,7 @@ describe('Commerce Client PDP adapter', () => {
             name: 'Product A',
             imageUrl: '/A.jpg'
         })
-        view.rerender(tree({product: {...productA, id: 'A-black'}, requestedProductId: 'A-black'}))
+        view.rerender(tree({product: {...productA, id: 'A-black'}}))
         expect(api.set).toHaveBeenCalledTimes(1)
     })
 
@@ -229,22 +214,11 @@ describe('Commerce Client PDP adapter', () => {
         expect(api.clear).toHaveBeenCalledTimes(1)
     })
 
-    test('keeps chat available without page context when the widget API is missing', () => {
-        delete window.CimulateMessaging.eventHandlers.pageContext
-        jest.spyOn(console, 'error').mockImplementation(() => {})
-        expect(injectCommerceClientWidget(options)).toBe(true)
-        expect(console.error).toHaveBeenCalledWith(expect.stringContaining('>= 1.53.0'))
-        expect(inject).toHaveBeenCalledWith(
-            expect.objectContaining({
-                messagingConfig: expect.objectContaining({enablePageContext: false})
-            })
-        )
-    })
-
     test('continues chat through navigation when the context API is unavailable', () => {
         delete window.CimulateMessaging.eventHandlers.pageContext
         jest.spyOn(console, 'error').mockImplementation(() => {})
         const view = render(tree())
+        expect(console.error).toHaveBeenCalledWith(expect.stringContaining('>= 1.53.0'))
         view.rerender(tree({product: productB}))
         view.rerender(tree({showPdp: false}))
         expect(inject).toHaveBeenCalledTimes(1)
@@ -303,7 +277,7 @@ describe('Commerce Client PDP adapter', () => {
                     }),
                 {keepPreviousData: true}
             )
-            return <Pdp product={state.data} requestedProductId={id} {...state} />
+            return <Pdp product={state.data} {...state} />
         }
         Loader.propTypes = {id: PropTypes.string}
         const renderRoute = (id) => (

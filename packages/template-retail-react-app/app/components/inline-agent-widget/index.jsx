@@ -38,7 +38,7 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
 
     useEffect(() => {
         setFailedQuestions([])
-        if (!configured || mode !== 'shopper-agent') return
+        if (!configured || (mode !== 'shopper-agent' && mode !== 'hybrid')) return
         if (typeof window === 'undefined') return
 
         const controller = new AbortController()
@@ -80,7 +80,10 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
     return (
         <>
             <Helmet>
-                <script src={resolveEmbeddedWidgetSourceUrl(config)} async></script>
+                <link
+                    rel="preconnect"
+                    href={new URL(resolveEmbeddedWidgetSourceUrl(config)).origin}
+                />
             </Helmet>
             <div ref={containerRef} />
             {failedQuestions.map(({question, provider}) => (

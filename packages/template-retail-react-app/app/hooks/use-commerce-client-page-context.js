@@ -48,17 +48,6 @@ export const useCommerceClientPdpContext = ({
     useClientLayoutEffect(() => {
         if (!enabled) return
         queryClient.setQueryDefaults(COMMERCE_CLIENT_PAGE_CONTEXT_KEY, {cacheTime: Infinity})
-    }, [queryClient, enabled])
-
-    // Commit before the widget's passive injection effect or another browser event.
-    // Retain the latest desired value even if the messaging bundle has not loaded.
-    useClientLayoutEffect(() => {
-        if (!enabled) return
-        queryClient.setQueryData(COMMERCE_CLIENT_PAGE_CONTEXT_KEY, {owner: owner.current, context})
-    }, [queryClient, context, enabled])
-
-    useClientLayoutEffect(() => {
-        if (!enabled) return
         const currentOwner = owner.current
         return () => {
             // An old PDP's cleanup must not clear a newer PDP's committed context.
@@ -69,4 +58,11 @@ export const useCommerceClientPdpContext = ({
             }
         }
     }, [queryClient, enabled])
+
+    // Commit before the widget's passive injection effect or another browser event.
+    // Retain the latest desired value even if the messaging bundle has not loaded.
+    useClientLayoutEffect(() => {
+        if (!enabled) return
+        queryClient.setQueryData(COMMERCE_CLIENT_PAGE_CONTEXT_KEY, {owner: owner.current, context})
+    }, [queryClient, context, enabled])
 }
