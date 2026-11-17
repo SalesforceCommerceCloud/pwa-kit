@@ -152,9 +152,9 @@ export function Region(props: RegionProps): ReactElement | null {
 
     // Null when not in design mode
     const designContext = useDesignContext()
-    const isLivePreviewEnabled = designContext?.pageUpdateMode === 'client';
+    const isLiveCanvasEnabled = designContext?.pageUpdateMode === 'client';
     const livePage =
-        isLivePreviewEnabled && !props.component
+        isLiveCanvasEnabled && !props.component
             ? designContext?.pageDesignerConfig?.page ?? null
             : null
 

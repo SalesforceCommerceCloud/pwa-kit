@@ -465,7 +465,7 @@ describe('Region', () => {
         })
 
         test.each([null, {}, {page: null}])(
-            'falls back to the original page when client preview config is %p',
+            'falls back to the original page when client live canvas config is %p',
             (pageDesignerConfig) => {
                 const originalPage = createPage('original', 'original-component')
                 mockUseDesignContext.mockReturnValue({
@@ -482,7 +482,7 @@ describe('Region', () => {
             }
         )
 
-        test('falls back to the original page when client preview config is omitted', () => {
+        test('falls back to the original page when client live canvas config is omitted', () => {
             const originalPage = createPage('original', 'original-component')
             mockUseDesignContext.mockReturnValue({pageUpdateMode: 'client'})
 

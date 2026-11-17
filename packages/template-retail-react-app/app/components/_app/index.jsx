@@ -244,7 +244,7 @@ const StorefrontApp = (props) => {
     const {data: basket, dataUpdatedAt: basketQueryLastUpdateTime} = useCurrentBasket()
     const config = getConfig()
 
-    const isLivePreviewEnabled = config?.app?.designLivePreview?.enabled === true
+    const isLiveCanvasEnabled = config?.app?.designLiveCanvas?.enabled === true
     const updateBasket = useShopperBasketsMutation('updateBasket')
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
 
@@ -525,7 +525,7 @@ const StorefrontApp = (props) => {
                                                     clientId="pwa-kit-client"
                                                     targetOrigin="*"
                                                     usid={usid}
-                                                    pageUpdateMode={isLivePreviewEnabled ? 'client' : 'server'}
+                                                    pageUpdateMode={isLiveCanvasEnabled ? 'client' : 'server'}
                                                     mode={pageDesignerMode}
                                                 >
                                                     <PageDesignerInit />
@@ -579,7 +579,7 @@ const ComponentPreviewApp = (props) => {
     const location = useLocation()
     const {site, locale} = useMultiSite()
     const {req} = useServerContext()
-    const isLivePreviewEnabled = getConfig()?.app?.designLivePreview?.enabled === true;
+    const isLiveCanvasEnabled = getConfig()?.app?.designLiveCanvas?.enabled === true;
 
     // Determine Page Designer mode from URL - use req for server-side detection
     const pageDesignerMode = useMemo(() => {
@@ -637,7 +637,7 @@ const ComponentPreviewApp = (props) => {
                             clientId="pwa-kit-client"
                             targetOrigin="*"
                             usid={usid}
-                            pageUpdateMode={isLivePreviewEnabled ? 'client' : 'server'}
+                            pageUpdateMode={isLiveCanvasEnabled ? 'client' : 'server'}
                             mode={pageDesignerMode}
                         >
                             <PageDesignerInit />
