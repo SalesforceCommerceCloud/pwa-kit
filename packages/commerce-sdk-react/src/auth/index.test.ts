@@ -73,6 +73,8 @@ jest.mock('commerce-sdk-isomorphic', () => {
                     credentials: config?.fetchOptions?.credentials || 'same-origin'
                 }
             },
+            getAccessToken: jest.fn().mockResolvedValue({}),
+            getTrustedAgentAccessToken: jest.fn().mockResolvedValue({}),
             getPasswordResetToken: jest.fn().mockResolvedValue({}),
             resetPassword: jest.fn().mockResolvedValue({})
         }))
@@ -215,6 +217,109 @@ describe('Auth', () => {
         expect(auth.isTokenExpired(JWTExpired)).toBe(true)
         // @ts-expect-error private method
         expect(() => auth.isTokenExpired()).toThrow()
+    })
+    test.each([
+        [61, 3600, true],
+        [60, 3600, false],
+        [59, 3600, false],
+        [0, 61, false],
+        [0, 60, true],
+        [0, 59, true],
+        [-3600, -1, true]
+    ])('isTokenExpired with iat offset %s and exp offset %s returns %s', (iat, exp, expired) => {
+        const now = 1800000000
+        const clock = jest.spyOn(Date, 'now').mockReturnValue(now * 1000)
+        try {
+            const auth = new Auth(config)
+            const token = jwt.sign({iat: now + iat, exp: now + exp}, 'secret')
+            // @ts-expect-error private method
+            expect(auth.isTokenExpired(token)).toBe(expired)
+        } finally {
+            clock.mockRestore()
+        }
+    })
+
+    test('ready refreshes a stored token issued beyond the clock-skew allowance', async () => {
+        const auth = new Auth(config)
+        const now = Math.floor(Date.now() / 1000)
+        const token = jwt.sign({iat: now + 61, exp: now + 1800}, 'secret')
+        // @ts-expect-error private method
+        auth.set('access_token', token)
+        const refresh = jest.spyOn(auth, 'refreshAccessToken').mockResolvedValue({} as AuthData)
+        try {
+            await auth.ready()
+            expect(refresh).toHaveBeenCalledTimes(1)
+        } finally {
+            refresh.mockRestore()
+        }
+    })
+
+    test.each(['getAccessToken', 'getTrustedAgentAccessToken'] as const)(
+        '%s varies token URLs with a frozen clock and preserves request options',
+        async (method) => {
+            const auth = new Auth(config)
+            const result = {access_token: 'token'}
+            const request = jest.fn().mockResolvedValue(result)
+            const client = {getAccessToken: request, getTrustedAgentAccessToken: request}
+            const clock = jest.spyOn(Date, 'now').mockReturnValue(1800000000000)
+            const random = jest
+                .spyOn(Math, 'random')
+                .mockReturnValueOnce(0.1)
+                .mockReturnValueOnce(0.2)
+            const options = Object.freeze({
+                parameters: Object.freeze({
+                    organizationId: 'org',
+                    c_custom: 'keep',
+                    c_nonce: 'old'
+                }),
+                headers: Object.freeze({Authorization: 'Basic credentials'}),
+                body: Object.freeze({grant_type: 'client_credentials'})
+            })
+            try {
+                // @ts-expect-error private method with a minimal SDK client
+                auth.addTokenRequestNonce(client)
+                await expect(client[method](options, true)).resolves.toBe(result)
+                await expect(client[method](options, false)).resolves.toBe(result)
+                const firstNonce = request.mock.calls[0][0].parameters.c_nonce
+                const secondNonce = request.mock.calls[1][0].parameters.c_nonce
+                expect(firstNonce).toEqual(expect.any(String))
+                expect(firstNonce).not.toBe('old')
+                expect(secondNonce).not.toBe(firstNonce)
+                expect(request).toHaveBeenNthCalledWith(
+                    1,
+                    {...options, parameters: {...options.parameters, c_nonce: firstNonce}},
+                    true
+                )
+                expect(request).toHaveBeenNthCalledWith(
+                    2,
+                    {...options, parameters: {...options.parameters, c_nonce: secondNonce}},
+                    false
+                )
+                expect(request.mock.contexts).toEqual([client, client])
+                expect(options.parameters.c_nonce).toBe('old')
+                const error = Object.assign(new Error('Unauthorized'), {response: {status: 401}})
+                request.mockRejectedValueOnce(error)
+                await expect(client[method](options)).rejects.toBe(error)
+            } finally {
+                clock.mockRestore()
+                random.mockRestore()
+            }
+        }
+    )
+
+    test('adds the nonce to the separate direct private-client auth client', async () => {
+        const auth = new Auth({...config, clientSecret: 'secret'})
+        // @ts-expect-error private method
+        const client = auth.getSlasClientWithClientAuth()
+        const clientMock = (ShopperLogin as unknown as jest.Mock).mock.results.slice(-1)[0].value
+        expect(client).toBe(clientMock)
+        expect(client.clientConfig.headers['x-slas-client-auth']).toBeDefined()
+        // The mocked SDK method is still called through the nonce wrapper.
+        await client.getAccessToken({body: {grant_type: 'client_credentials'}})
+        expect(clientMock.getAccessToken).toHaveBeenCalledWith(
+            expect.objectContaining({parameters: {c_nonce: expect.any(String)}}),
+            undefined
+        )
     })
     test('getAccessToken from local store', () => {
         const auth = new Auth(config)

@@ -377,6 +377,7 @@ class Auth {
                 ...config.fetchOptions
             }
         })
+        this.addTokenRequestNonce(this.client)
 
         // When HttpOnly session cookies are enabled and the storefront is
         // running inside a trusted Storefront Preview iframe, signal the parent
@@ -653,7 +654,41 @@ class Auth {
         const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
-        return validTimeSeconds <= tokenAgeSeconds
+        // Googlebot has been observed reusing expired token responses with a stale
+        // renderer clock. Reject future-issued tokens so this condition triggers a refresh.
+        // Workaround for the Googlebot caching issue tracked in W-24950604.
+        return tokenAgeSeconds < -60 || validTimeSeconds <= tokenAgeSeconds
+    }
+
+    /**
+     * Work around a Googlebot caching issue that reuses stale token responses
+     * (W-24950604). Vary token request URLs even when the renderer's clock is frozen.
+     */
+    private addTokenRequestNonce(client: ShopperLogin<ApiClientConfigParams>) {
+        const wrap = <Method extends 'getAccessToken' | 'getTrustedAgentAccessToken'>(
+            method: Method
+        ) => {
+            // Preserve the SDK overloads and its raw-response/error handling.
+            client[method] = new Proxy(client[method], {
+                apply(request, _thisArg, [options, rawResponse]) {
+                    return Reflect.apply(request, client, [
+                        {
+                            ...options,
+                            parameters: {
+                                ...options?.parameters,
+                                // Non-secret cache buster, not an OAuth/OIDC security nonce.
+                                c_nonce: `${Date.now().toString(36)}-${Math.random()
+                                    .toString(36)
+                                    .slice(2)}`
+                            }
+                        },
+                        rawResponse
+                    ])
+                }
+            })
+        }
+        wrap('getAccessToken')
+        wrap('getTrustedAgentAccessToken')
     }
 
     /**
@@ -1299,7 +1334,7 @@ class Auth {
             return this.client
         }
         const {clientConfig} = this.client
-        return new ShopperLogin({
+        const client = new ShopperLogin({
             ...clientConfig,
             headers: {
                 ...clientConfig.headers,
@@ -1308,6 +1343,8 @@ class Auth {
                 )
             }
         })
+        this.addTokenRequestNonce(client)
+        return client
     }
 
     /**
