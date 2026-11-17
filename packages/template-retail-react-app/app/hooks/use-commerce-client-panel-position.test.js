@@ -106,6 +106,17 @@ describe('useCommerceClientPanelPosition', () => {
         expect(mutationObserverInstance.disconnect).toHaveBeenCalled()
     })
 
+    test('accounts for inner element box-shadow extent', () => {
+        const inner = document.createElement('div')
+        headerEl.appendChild(inner)
+        inner.style.boxShadow = 'rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px'
+
+        renderHook(() => useCommerceClientPanelPosition(true))
+
+        // offset-y(1) + blur(3) + spread(0) = 4
+        expect(document.documentElement.style.getPropertyValue('--cc-panel-top')).toBe('68px')
+    })
+
     test('removes properties when deactivated', () => {
         const {rerender} = renderHook(({active}) => useCommerceClientPanelPosition(active), {
             initialProps: {active: true}
