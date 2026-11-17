@@ -187,7 +187,7 @@ export function Region(props: RegionProps): ReactElement | null {
             | undefined
         const metadata = designMetadata?.regionDefinitions?.find((r) => r.id === regionId)
 
-        let content = (
+        return (
             <>
                 {!regionContext && (
                     <PageDesignerPageMetadataProvider
@@ -197,8 +197,6 @@ export function Region(props: RegionProps): ReactElement | null {
                 {renderRegionContent(region, regionId, metadata, className, rest)}
             </>
         )
-
-        return content;
     }
 
     return <Suspense fallback={fallbackElement}>{renderResolvedPage(props.page)}</Suspense>
