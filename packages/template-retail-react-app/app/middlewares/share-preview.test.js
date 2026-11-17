@@ -91,46 +91,54 @@ describe('sharePreviewMiddleware', () => {
             expect(mockApplyPreviewContext).not.toHaveBeenCalled()
         })
 
-        test('calls next() without fetching when cc-sp_RefArch cookie exists', async () => {
+        test('redirects to clean URL when cc-sp_RefArch cookie exists', async () => {
             const req = createReq({
                 cookie: `cc-at_RefArch=${SHOPPER_TOKEN}; cc-sp_RefArch=1`
             })
             await sharePreviewMiddleware(req, res, next)
-            expect(next).toHaveBeenCalledTimes(1)
+            expect(next).not.toHaveBeenCalled()
             expect(mockApplyPreviewContext).not.toHaveBeenCalled()
-            expect(res.redirect).not.toHaveBeenCalled()
+            expect(res.redirect).toHaveBeenCalledWith(302, '/some/path')
         })
 
-        test('warns and calls next() when no shopper token cookie is present', async () => {
-            await sharePreviewMiddleware(createReq({cookie: 'other=1'}), res, next)
+        test('warns and redirects to clean URL when no shopper token cookie is present', async () => {
+            await sharePreviewMiddleware(
+                createReq({cookie: 'other=1', originalUrl: `/page?previewContext=${MOCK_JWT}`}),
+                res,
+                next
+            )
             expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('no shopper token'))
-            expect(next).toHaveBeenCalledTimes(1)
+            expect(next).not.toHaveBeenCalled()
             expect(mockApplyPreviewContext).not.toHaveBeenCalled()
+            expect(res.redirect).toHaveBeenCalledWith(302, '/page')
         })
     })
 
     describe('SCAPI call failures', () => {
-        test.each([400, 500])('warns and calls next() when SCAPI returns %i', async (status) => {
-            mockApplyPreviewContext.mockRejectedValue(new Error(`${status} Bad Response`))
-            await sharePreviewMiddleware(createReq(), res, next)
-            expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining('apply preview context failed'),
-                {message: `${status} Bad Response`}
-            )
-            expect(next).toHaveBeenCalledTimes(1)
-            expect(res.append).not.toHaveBeenCalled()
-            expect(res.redirect).not.toHaveBeenCalled()
-        })
+        test.each([400, 500])(
+            'warns and redirects to clean URL when SCAPI returns %i',
+            async (status) => {
+                mockApplyPreviewContext.mockRejectedValue(new Error(`${status} Bad Response`))
+                await sharePreviewMiddleware(createReq(), res, next)
+                expect(logger.warn).toHaveBeenCalledWith(
+                    expect.stringContaining('apply preview context failed'),
+                    {message: `${status} Bad Response`}
+                )
+                expect(next).not.toHaveBeenCalled()
+                expect(res.append).not.toHaveBeenCalled()
+                expect(res.redirect).toHaveBeenCalledWith(302, '/some/path')
+            }
+        )
 
-        test('warns and calls next() when the client throws', async () => {
+        test('warns and redirects to clean URL when the client throws', async () => {
             mockApplyPreviewContext.mockRejectedValue(new Error('network down'))
             await sharePreviewMiddleware(createReq(), res, next)
             expect(logger.warn).toHaveBeenCalledWith(
                 expect.stringContaining('apply preview context failed'),
                 {message: 'network down'}
             )
-            expect(next).toHaveBeenCalledTimes(1)
-            expect(res.redirect).not.toHaveBeenCalled()
+            expect(next).not.toHaveBeenCalled()
+            expect(res.redirect).toHaveBeenCalledWith(302, '/some/path')
         })
     })
 

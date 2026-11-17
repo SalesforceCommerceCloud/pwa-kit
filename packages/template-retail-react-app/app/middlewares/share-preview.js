@@ -23,36 +23,45 @@ function parseCookieValue(req, cookieName) {
     return raw ? decodeURIComponent(raw.slice(cookieName.length + 1)) : null
 }
 
+function buildCleanRedirectPath(req) {
+    const url = new URL(req.originalUrl, 'http://localhost')
+    url.searchParams.delete(PREVIEW_CONTEXT_PARAM)
+    const pathname = url.pathname.replace(/^\/\/+/, '/')
+    return `${pathname}${url.search}`
+}
+
 export async function sharePreviewMiddleware(req, res, next) {
     if (process.env.DEPLOY_TARGET === 'production') return next()
 
     const previewToken = req.query?.[PREVIEW_CONTEXT_PARAM]
     if (!previewToken || typeof previewToken !== 'string') return next()
 
+    const redirectPath = buildCleanRedirectPath(req)
+
     const appConfig = getConfig()?.app
     const {organizationId, siteId} = appConfig?.commerceAPI?.parameters || {}
     const cookieName = `${SHARE_PREVIEW_COOKIE}_${siteId}`
 
-    if (parseCookieValue(req, cookieName)) return next()
+    if (parseCookieValue(req, cookieName)) return res.redirect(302, redirectPath)
 
     const shopperToken = parseCookieValue(req, `cc-at_${siteId}`)
     if (!shopperToken) {
         logger.warn('share-preview: no shopper token found, skipping preview context apply')
-        return next()
+        return res.redirect(302, redirectPath)
+    }
+
+    let exp
+    try {
+        const payload = JSON.parse(
+            Buffer.from(previewToken.split('.')[1], 'base64url').toString('utf8')
+        )
+        exp = typeof payload.exp === 'number' ? payload.exp : undefined
+    } catch {
+        logger.warn('share-preview: malformed token, skipping')
+        return res.redirect(302, redirectPath)
     }
 
     try {
-        let exp
-        try {
-            const payload = JSON.parse(
-                Buffer.from(previewToken.split('.')[1], 'base64url').toString('utf8')
-            )
-            exp = typeof payload.exp === 'number' ? payload.exp : undefined
-        } catch {
-            logger.warn('share-preview: malformed token, skipping')
-            return next()
-        }
-
         const proxy = `${getAppOrigin()}${appConfig?.commerceAPI?.proxyPath || '/mobify/proxy/api'}`
         const {clientId, shortCode} = appConfig?.commerceAPI?.parameters || {}
         const client = new ShopperExperience({
@@ -80,12 +89,9 @@ export async function sharePreviewMiddleware(req, res, next) {
             })
         )
 
-        const url = new URL(req.originalUrl, 'http://localhost')
-        url.searchParams.delete(PREVIEW_CONTEXT_PARAM)
-        const pathname = url.pathname.replace(/^\/\/+/, '/')
-        return res.redirect(302, `${pathname}${url.search}`)
+        return res.redirect(302, redirectPath)
     } catch (error) {
         logger.warn('share-preview: apply preview context failed', {message: error.message})
-        return next()
+        return res.redirect(302, redirectPath)
     }
 }
