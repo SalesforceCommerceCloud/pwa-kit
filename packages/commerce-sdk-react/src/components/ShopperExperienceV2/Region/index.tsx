@@ -12,12 +12,14 @@ import {
     PageDesignerPageMetadataProvider,
     useRegionContext
 } from '@salesforce/storefront-next-runtime/design/react/core'
-import type {
+import {
     ComponentDecoratorProps,
     ComponentDesignMetadata,
-    RegionDesignMetadata
+    RegionDesignMetadata,
+    useDesignContext
 } from '@salesforce/storefront-next-runtime/design/react'
 import type {Region as ExtendedRegion} from '../types'
+import {registry} from '../registry'
 
 export type {RegionDesignMetadata}
 
@@ -148,6 +150,14 @@ export function Region(props: RegionProps): ReactElement | null {
     const {regionId, className = '', errorElement, fallbackElement = <div />, ...rest} = props
     const regionContext = useRegionContext()
 
+    // Null when not in design mode
+    const designContext = useDesignContext()
+    const isLivePreviewEnabled = designContext?.pageUpdateMode === 'client';
+    const livePage =
+        isLivePreviewEnabled && !props.component
+            ? designContext?.pageDesignerConfig?.page ?? null
+            : null
+
     // COMPONENT MODE: Rendering a component-level region (nested)
     if (props.component !== undefined) {
         const region = props.component.regions?.find((r) => r.id === regionId)
@@ -163,22 +173,35 @@ export function Region(props: RegionProps): ReactElement | null {
         return renderRegionContent(region, regionId, metadata, className, rest)
     }
 
-    // PAGE MODE: Rendering a page-level region
-    const page = props.page
-    const region = page?.regions?.find((r) => r.id === regionId)
-    if (!region) {
-        return errorElement ? <>{errorElement}</> : null
+    // PAGE MODE: Rendering a page-level region. Synchronous; Suspense stays for
+    // nested component fallbacks. No hooks inside this closure.
+    const renderResolvedPage = (resolvedPage: PageWithDesignMetadata | null) => {
+        const effectivePage = livePage ?? resolvedPage
+        if (!effectivePage) return errorElement ?? null
+
+        const region = effectivePage.regions?.find((r) => r.id === regionId)
+        if (!region) return errorElement ?? null
+
+        const designMetadata = effectivePage.designMetadata as unknown as
+            | {regionDefinitions?: RegionDesignMetadata[]}
+            | undefined
+        const metadata = designMetadata?.regionDefinitions?.find((r) => r.id === regionId)
+
+        let content = (
+            <>
+                {!regionContext && (
+                    <PageDesignerPageMetadataProvider
+                        page={effectivePage as ShopperExperience.schemas['Page']}
+                    />
+                )}
+                {renderRegionContent(region, regionId, metadata, className, rest)}
+            </>
+        )
+
+        return content;
     }
 
-    const metadata = page.designMetadata?.regionDefinitions?.find((r) => r.id === regionId)
-    const {...pageData} = page
-
-    return (
-        <Suspense fallback={fallbackElement}>
-            {!regionContext && <PageDesignerPageMetadataProvider page={pageData} />}
-            {renderRegionContent(region, regionId, metadata, className, rest)}
-        </Suspense>
-    )
+    return <Suspense fallback={fallbackElement}>{renderResolvedPage(props.page)}</Suspense>
 }
 
 export default Region
