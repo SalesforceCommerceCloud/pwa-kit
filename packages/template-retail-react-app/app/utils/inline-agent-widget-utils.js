@@ -72,3 +72,42 @@ export const parsePdpQuestions = (raw, maxCount = MAX_PDP_QUESTIONS) => {
     }
     return out
 }
+
+const EMBEDDED_WIDGET_CDN_BASE = 'https://cdn.search.cimulate.ai/inline-agent-widget'
+const EMBEDDED_WIDGET_VERSION_PATTERN =
+    /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/
+
+export const DEFAULT_EMBEDDED_WIDGET_CDN_VERSION = '0.1.0'
+export const DEFAULT_EMBEDDED_WIDGET_SOURCE_URL = `${EMBEDDED_WIDGET_CDN_BASE}/${DEFAULT_EMBEDDED_WIDGET_CDN_VERSION}/inline-agent-widget.umd.js`
+
+export const resolveEmbeddedWidgetSourceUrl = (config) => {
+    const configuredVersion = config?.cc_embeddedWidgetCdnVersion
+    const trimmedVersion = typeof configuredVersion === 'string' ? configuredVersion.trim() : ''
+    const version = EMBEDDED_WIDGET_VERSION_PATTERN.test(trimmedVersion)
+        ? trimmedVersion
+        : DEFAULT_EMBEDDED_WIDGET_CDN_VERSION
+    const versionUrl = `${EMBEDDED_WIDGET_CDN_BASE}/${version}/inline-agent-widget.umd.js`
+    const source = config?.embeddedWidgetSourceUrl
+    if (typeof source !== 'string' || !source.trim()) return versionUrl
+    try {
+        const url = new URL(source.trim())
+        const sourceVersion = url.pathname.match(
+            /^\/inline-agent-widget\/([^/]+)\/inline-agent-widget\.umd\.js$/
+        )?.[1]
+        if (
+            url.protocol === 'https:' &&
+            url.hostname === 'cdn.search.cimulate.ai' &&
+            !url.port &&
+            !url.username &&
+            !url.password &&
+            EMBEDDED_WIDGET_VERSION_PATTERN.test(sourceVersion || '') &&
+            !url.search &&
+            !url.hash
+        ) {
+            return url.href
+        }
+    } catch {
+        // Invalid overrides use the selected CDN version.
+    }
+    return versionUrl
+}

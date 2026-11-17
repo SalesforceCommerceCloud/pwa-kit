@@ -1,7 +1,5 @@
 # HttpOnly Mode: SLAS Property Storage Mapping
 
-> **WIP: HttpOnly session cookies are in-progress. Do not enable `enableHttpOnlySessionCookies` in production.**
->
 > **Scope: PWA Kit only.** This reference applies to projects built on PWA Kit and the cookie/localStorage routing performed by `commerce-sdk-react` and the SLAS proxy in `pwa-kit-runtime`. **It does not apply to sfNext (sf-next).** sfNext is HttpOnly by default and not every cookie listed here is present there.
 
 Map authentication and session data storage locations when migrating PWA Kit from localStorage to HttpOnly cookies. Enabling `enableHttpOnlySessionCookies` moves sensitive tokens—access tokens, refresh tokens, and IDP credentials—from client-accessible localStorage to HttpOnly cookies that protect against XSS attacks. Use this reference to identify where each SLAS property lives in both non-HttpOnly and HttpOnly modes, and which cookies gain the HttpOnly security flag.

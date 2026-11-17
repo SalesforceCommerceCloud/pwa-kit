@@ -15,6 +15,8 @@ import useInlineAgentWidget, {
 } from '@salesforce/retail-react-app/app/hooks/use-inline-agent-widget'
 import {handoffToShopperAgent} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
 
+import {resolveEmbeddedWidgetSourceUrl} from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
+
 const VALID_MODES = ['inline', 'shopper-agent', 'hybrid']
 const HANDOFF_EVENT = 'inline-agent-widget:handoff'
 
@@ -36,7 +38,7 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
 
     useEffect(() => {
         setFailedQuestions([])
-        if (!configured || mode !== 'shopper-agent') return
+        if (!configured || (mode !== 'shopper-agent' && mode !== 'hybrid')) return
         if (typeof window === 'undefined') return
 
         const controller = new AbortController()
@@ -78,7 +80,10 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
     return (
         <>
             <Helmet>
-                <script src="/static/inline-agent-widget.umd.js" async></script>
+                <link
+                    rel="preconnect"
+                    href={new URL(resolveEmbeddedWidgetSourceUrl(config)).origin}
+                />
             </Helmet>
             <div ref={containerRef} />
             {failedQuestions.map(({question, provider}) => (
@@ -122,6 +127,8 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
 InlineAgentWidget.propTypes = {
     config: PropTypes.shape({
         enabled: PropTypes.bool,
+        cc_embeddedWidgetCdnVersion: PropTypes.string,
+        embeddedWidgetSourceUrl: PropTypes.string,
         scrt2Url: PropTypes.string,
         orgId: PropTypes.string,
         esDeveloperName: PropTypes.string,
