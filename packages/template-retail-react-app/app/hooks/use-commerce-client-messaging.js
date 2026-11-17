@@ -234,6 +234,7 @@ const useCommerceClientMessaging = (scriptLoadStatus, options = {}) => {
                 lastContextRef.current = JSON.stringify(context)
             }
         }
+        if (options.enablePageContext !== true) return
         syncPageContext()
 
         // Cache notifications are synchronous, so navigation clears/updates the

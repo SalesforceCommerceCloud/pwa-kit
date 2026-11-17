@@ -24,7 +24,7 @@ const ready = {loaded: true, error: false}
 const loading = {loaded: false, error: false}
 
 const Pdp = (props) => {
-    useCommerceClientPdpContext(props)
+    useCommerceClientPdpContext({enabled: true, ...props})
     return null
 }
 const Messaging = ({status = ready, enabled = true}) => {
@@ -68,7 +68,12 @@ describe('Commerce Client PDP adapter', () => {
         <QueryClientProvider client={queryClient}>
             <Messaging status={status} enabled={enabled} />
             {showPdp && (
-                <Pdp product={product} requestedProductId={requestedProductId} {...queryState} />
+                <Pdp
+                    product={product}
+                    requestedProductId={requestedProductId}
+                    enabled={enabled}
+                    {...queryState}
+                />
             )}
         </QueryClientProvider>
     )
@@ -160,9 +165,14 @@ describe('Commerce Client PDP adapter', () => {
         api.set.mockClear()
         view.rerender(tree({requestedProductId: 'B', isError: true}))
         expect(getCommerceClientPageContext(queryClient)).toBeNull()
-        view.rerender(tree({requestedProductId: 'B'}))
+        view.rerender(tree({requestedProductId: 'B', isPreviousData: true}))
         expect(getCommerceClientPageContext(queryClient)).toBeNull()
         expect(api.set).not.toHaveBeenCalled()
+    })
+
+    test('uses the resolved product ID when it differs from the requested ID', () => {
+        render(tree({requestedProductId: 'product-alias'}))
+        expect(api.set).toHaveBeenCalledWith(expect.objectContaining({id: 'A'}))
     })
 
     test('leaving PDP clears context without a reset, reinjection, or automatic message', () => {
@@ -209,6 +219,14 @@ describe('Commerce Client PDP adapter', () => {
         expect(inject.mock.calls[0][0].messagingConfig.initialPageContext).toBeUndefined()
         expect(api.set).not.toHaveBeenCalled()
         expect(api.clear).not.toHaveBeenCalled()
+        expect(queryClient.getQueryCache().getAll()).toHaveLength(0)
+    })
+
+    test('disabling page context clears a previously published product', () => {
+        const view = render(tree())
+        view.rerender(tree({enabled: false}))
+        expect(getCommerceClientPageContext(queryClient)).toBeNull()
+        expect(api.clear).toHaveBeenCalledTimes(1)
     })
 
     test('keeps chat available without page context when the widget API is missing', () => {
@@ -254,7 +272,7 @@ describe('Commerce Client PDP adapter', () => {
                 /* eslint-enable @typescript-eslint/no-var-requires */
                 const client = new Client()
                 const ServerPage = () => {
-                    usePdp({product: productA, requestedProductId: 'A'})
+                    usePdp({enabled: true, product: productA})
                     useMessaging(ready, options)
                     return null
                 }

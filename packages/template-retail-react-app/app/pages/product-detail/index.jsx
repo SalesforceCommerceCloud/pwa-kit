@@ -80,6 +80,13 @@ const ProductDetail = () => {
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const embeddedAgentConfig = getConfig()?.app?.embeddedAgent
+    const commerceAgent = getConfig()?.app?.commerceAgent
+    const pageContextEnabled =
+        commerceAgent?.enabled === 'true' &&
+        commerceAgent?.provider === 'commerce-client' &&
+        (commerceAgent?.cc_enablePageContext === true ||
+            (typeof commerceAgent?.cc_enablePageContext === 'string' &&
+                commerceAgent.cc_enablePageContext.trim().toLowerCase() === 'true'))
 
     /****************************** Basket *********************************/
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
@@ -194,14 +201,13 @@ const ProductDetail = () => {
         isProductABundle
     )
 
-    // keepPreviousData is for rendering only: it must not become the new route's
-    // product context or cause a stale variant to rewrite that route's pid.
-    const variant = useVariant(
-        !isPreviousProductData && product?.id === requestedProductId ? product : undefined
-    )
+    const variant = useVariant(product)
+    // When page context is enabled, don't let previous product data rewrite
+    // the new route's pid while the current query is loading.
+    const suppressStaleVariant = pageContextEnabled && isPreviousProductData
     useCommerceClientPdpContext({
+        enabled: pageContextEnabled,
         product,
-        requestedProductId,
         variant,
         isLoading: isProductLoading,
         isPreviousData: isPreviousProductData,
@@ -243,7 +249,7 @@ const ProductDetail = () => {
 
     /**************** Product Variant ****************/
     useEffect(() => {
-        if (!variant) {
+        if (!variant || suppressStaleVariant) {
             return
         }
         // update the variation attributes parameter on
@@ -252,7 +258,7 @@ const ProductDetail = () => {
             pid: variant?.productId
         })
         history.replace(updatedUrl)
-    }, [variant])
+    }, [variant, suppressStaleVariant])
 
     /**************** Wishlist ****************/
     const {data: wishlist, isLoading: isWishlistLoading} = useWishList()

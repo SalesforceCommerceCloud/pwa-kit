@@ -17,8 +17,8 @@ export const getCommerceClientPageContext = (queryClient) =>
 
 /** Publish only resolved data for the current product request, including selected variants. */
 export const useCommerceClientPdpContext = ({
+    enabled = false,
     product,
-    requestedProductId,
     variant,
     isLoading,
     isPreviousData,
@@ -27,7 +27,8 @@ export const useCommerceClientPdpContext = ({
     const queryClient = useQueryClient()
     // Symbols retain identity through React Query's structural sharing.
     const owner = useRef(Symbol('pdp'))
-    const valid = !isLoading && !isPreviousData && !isError && product?.id === requestedProductId
+    // useProduct is keyed by the requested ID; previous data belongs to the old key.
+    const valid = !isLoading && !isPreviousData && !isError && product?.id
     const id = valid ? variant?.productId || product?.id : null
     const name = valid ? product?.name : undefined
     const imageUrl = valid ? product?.imageGroups?.[0]?.images?.[0]?.link : undefined
@@ -47,11 +48,13 @@ export const useCommerceClientPdpContext = ({
     // Commit before the widget's passive injection effect or another browser event.
     // Retain the latest desired value even if the messaging bundle has not loaded.
     useClientLayoutEffect(() => {
+        if (!enabled) return
         queryClient.setQueryDefaults(COMMERCE_CLIENT_PAGE_CONTEXT_KEY, {cacheTime: Infinity})
         queryClient.setQueryData(COMMERCE_CLIENT_PAGE_CONTEXT_KEY, {owner: owner.current, context})
-    }, [queryClient, context])
+    }, [queryClient, context, enabled])
 
     useClientLayoutEffect(() => {
+        if (!enabled) return
         const currentOwner = owner.current
         return () => {
             // An old PDP's cleanup must not clear a newer PDP's committed context.
@@ -61,5 +64,5 @@ export const useCommerceClientPdpContext = ({
                 queryClient.setQueryData(COMMERCE_CLIENT_PAGE_CONTEXT_KEY, {context: null})
             }
         }
-    }, [queryClient])
+    }, [queryClient, enabled])
 }
