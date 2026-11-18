@@ -657,7 +657,10 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'places.googleapis.com',
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
-                        // Commerce Client widget telemetry (Salesforce o11y / Falcon)
+                        // Commerce Client widget telemetry (Salesforce o11y / Falcon). One host
+                        // shared by all customers; each app is identified by its own write-only API
+                        // key, not the host. The o11y team treats this endpoint as stable across
+                        // infra changes.
                         'o11y.sfproxy-core1.sfdc-y37hzm.svc.sfdcfc.net',
                         // Payment gateways
                         // Note: Google Pay requires different CSP entries depending on the integration and environment.
