@@ -319,6 +319,13 @@ export const COMMERCE_CLIENT_OPEN_STATE_KEY = 'commerce-client-agent-open'
 export const DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION = '65'
 
 /**
+ * Default capabilities version for the inline (embedded) agent widget.
+ * Separate from the Commerce Client version because the inline widget
+ * requires v66+ for context-variable support.
+ */
+export const DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION = '66'
+
+/**
  * Default theme applied to the Commerce Client widget. Individual values can be
  * overridden by passing a partial `theme` object to the hook.
  * These map internally to the `--cim-widget-*` CSS custom properties.

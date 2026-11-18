@@ -47,6 +47,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 import AccountPayments from '@salesforce/retail-react-app/app/pages/account/payments'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {clearRememberedAuthEmails} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
@@ -116,6 +117,7 @@ const Account = () => {
 
     const onSignoutClick = async () => {
         setShowLoading(true)
+        clearRememberedAuthEmails()
         await logout.mutateAsync()
         navigate('/login')
     }

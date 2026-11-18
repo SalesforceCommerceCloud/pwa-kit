@@ -60,6 +60,11 @@ export const X_GRANT_TYPE = 'x-grant-type'
 // re-validates the value against its own allow-list before honoring it.
 export const X_PREVIEW_PARENT = 'x-pwakit-preview-parent'
 
+// SLAS strict client auth header: raw base64 of `clientId:clientSecret` (no
+// `Basic ` prefix). SLAS validates it on /oauth2/login and /oauth2/authorize
+// for private clients, where `Authorization` cannot carry client credentials.
+export const X_SLAS_CLIENT_AUTH = 'x-slas-client-auth'
+
 export const CLIENT_KEYS = {
     SHOPPER_BASKETS: 'shopperBaskets',
     SHOPPER_BASKETS_V2: 'shopperBasketsV2',

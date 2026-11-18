@@ -34,7 +34,8 @@ import {
     DWSID_COOKIE_NAME,
     SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG,
     X_GRANT_TYPE,
-    X_PREVIEW_PARENT
+    X_PREVIEW_PARENT,
+    X_SLAS_CLIENT_AUTH
 } from '../constant'
 
 import {Logger} from '../types'
@@ -115,6 +116,13 @@ type AuthorizePasswordlessParams = {
 
 type GetPasswordLessAccessTokenParams = {
     pwdlessLoginToken: string
+    /**
+     * Shopper login ID (typically email) used when the passwordless token was requested.
+     * Must exactly match the ID used during passwordless login.
+     */
+    login_id: string
+    /** Channel / site ID for the passwordless token exchange. */
+    channel_id: string
     /** When true, SLAS will register the customer if not already registered */
     register_customer?: boolean | string
 }
@@ -1273,6 +1281,36 @@ class Auth {
     }
 
     /**
+     * Returns a SLAS client that sends the `x-slas-client-auth` header when a
+     * client secret is configured directly (not via the PWA Kit proxy).
+     *
+     * In PWA Kit private client mode the secret is a placeholder and the proxy
+     * injects the header server-side, so the shared client is returned as-is.
+     * The header is only needed on /oauth2/login and /oauth2/authorize, but the
+     * helpers do not accept per-request headers, so it is set on a copy of the
+     * client config.
+     *
+     * Note: authorizeIDP is not covered. It navigates the browser to SLAS and a
+     * navigation cannot carry custom headers, so strict client auth for IDP
+     * login requires the PWA Kit proxy.
+     */
+    private getSlasClientWithClientAuth(): ShopperLogin<ApiClientConfigParams> {
+        if (!this.clientSecret || this.clientSecret === SLAS_SECRET_PLACEHOLDER) {
+            return this.client
+        }
+        const {clientConfig} = this.client
+        return new ShopperLogin({
+            ...clientConfig,
+            headers: {
+                ...clientConfig.headers,
+                [X_SLAS_CLIENT_AUTH]: stringToBase64(
+                    `${clientConfig.parameters.clientId}:${this.clientSecret}`
+                )
+            }
+        })
+    }
+
+    /**
      * A wrapper method for commerce-sdk-isomorphic helper: loginRegisteredUserB2C.
      *
      * This method uses a body-based API similar to the register function for consistency.
@@ -1291,7 +1329,7 @@ class Auth {
         const {username, password, customParameters} = body
 
         const loginParams: LoginRegisteredUserB2CCredentials = {
-            slasClient: this.client,
+            slasClient: this.getSlasClientWithClientAuth(),
             credentials: {
                 username,
                 password,
@@ -1630,6 +1668,8 @@ class Auth {
 
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
+     * Requires `login_id` and `channel_id`; forwards them to the helper as camelCase
+     * `loginId` / `channelId` (commerce-sdk-isomorphic@5.8.0 maps these to the wire body).
      */
     async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
         const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
@@ -1642,10 +1682,12 @@ class Auth {
             },
             parameters: {
                 pwdlessLoginToken,
+                loginId: parameters.login_id,
+                channelId: parameters.channel_id,
                 dnt: dntPref !== undefined ? String(dntPref) : undefined,
                 ...(usid && {usid}),
                 ...(parameters.register_customer !== undefined && {
-                    register_customer:
+                    registerCustomer:
                         typeof parameters.register_customer === 'boolean'
                             ? String(parameters.register_customer)
                             : parameters.register_customer
@@ -1703,20 +1745,19 @@ class Auth {
 
     /**
      * A wrapper method for the SLAS endpoint: resetPassword.
-     *
+     * Requires `user_id`: SLAS checks it against the user the reset token was issued for.
      */
     async resetPassword(parameters: ShopperLoginTypes.resetPasswordBodyType) {
+        if (!parameters.user_id) {
+            throw new Error('Required argument user_id is not provided')
+        }
         const slasClient = this.client
         const options = {
             headers: {
                 Authorization: ''
             },
             body: {
-                // TODO: remove the eslint disabled after updating OAS
-                // user_id is a valid param for resetPassword
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                ...(parameters.user_id && {user_id: parameters.user_id}),
+                user_id: parameters.user_id,
                 pwd_action_token: parameters.pwd_action_token,
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,

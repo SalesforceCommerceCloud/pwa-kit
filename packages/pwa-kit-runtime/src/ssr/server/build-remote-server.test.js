@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {isBinary, once, RemoteServerFactory} from './build-remote-server'
+import {isBinary, once, RemoteServerFactory, redactUrlForLogging} from './build-remote-server'
 import {
     X_ENCODED_HEADERS,
     X_SITE_ID,
@@ -306,12 +306,21 @@ describe('_matchSlasAllowlistEntry', () => {
         expect(entry?.injectAuth).toBe('sfdc-header')
     })
 
-    test('matches oauth2/login with no credential injection', () => {
+    test('matches oauth2/login with slas-client-auth mode', () => {
         const entry = RemoteServerFactory._matchSlasAllowlistEntry(
             `/shopper/auth/v1/organizations/${ORG}/oauth2/login`,
             'POST'
         )
-        expect(entry?.injectAuth).toBe('none')
+        expect(entry?.injectAuth).toBe('slas-client-auth')
+    })
+
+    test('matches oauth2/authorize with slas-client-auth mode', () => {
+        const entry = RemoteServerFactory._matchSlasAllowlistEntry(
+            `/shopper/auth/v1/organizations/${ORG}/oauth2/authorize`,
+            'GET'
+        )
+        expect(entry?.segments).toEqual(['oauth2', 'authorize'])
+        expect(entry?.injectAuth).toBe('slas-client-auth')
     })
 
     test('matches future API versions via structural prefix', () => {
@@ -2621,5 +2630,31 @@ describe('URL reconstruction for request processing', () => {
         const cleanPath = '/mobify/bundle'
         const newUrl = cleanPath + search
         expect(newUrl).toBe('/mobify/bundle?v=1&t=2')
+    })
+})
+
+describe('redactUrlForLogging', () => {
+    test.each([
+        ['/', '/'],
+        ['/category/mens', '/category/mens'],
+        ['/search?q=shoes&page=2', '/search?q=shoes&page=2'],
+        [
+            '/passwordless-login-landing?token=12345678&login_id=jane%2Bx%40example.com&redirect_url=%2Faccount',
+            '/passwordless-login-landing?token=[REDACTED]&login_id=[REDACTED]&redirect_url=%2Faccount'
+        ],
+        [
+            '/reset-password-landing?token=abc&email=jane%40example.com',
+            '/reset-password-landing?token=[REDACTED]&email=[REDACTED]'
+        ],
+        ['/login?email', '/login?email=[REDACTED]'],
+        ['/login?login%5Fid=jane%40example.com', '/login?login%5Fid=[REDACTED]'],
+        ['/login?Token=abc&EMAIL=jane%40example.com', '/login?Token=[REDACTED]&EMAIL=[REDACTED]'],
+        ['/login?tokenish=1', '/login?tokenish=1']
+    ])('%s -> %s', (url, expected) => {
+        expect(redactUrlForLogging(url)).toBe(expected)
+    })
+
+    test('returns falsy input unchanged', () => {
+        expect(redactUrlForLogging(undefined)).toBeUndefined()
     })
 })

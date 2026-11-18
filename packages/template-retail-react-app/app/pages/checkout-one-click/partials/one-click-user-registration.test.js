@@ -152,7 +152,7 @@ describe('UserRegistration', () => {
         await waitFor(() => {
             expect(authorizePasswordlessLogin.mutateAsync).toHaveBeenCalledWith({
                 userid: 'test@example.com',
-                mode: 'email',
+                mode: 'callback',
                 locale: 'en-US',
                 register_customer: true,
                 last_name: 'test@example.com',
@@ -399,7 +399,9 @@ describe('UserRegistration', () => {
         await waitFor(() => {
             expect(loginPasswordless.mutateAsync).toHaveBeenCalledWith({
                 pwdlessLoginToken: 'otp-123',
-                register_customer: true
+                register_customer: true,
+                login_id: 'test@example.com',
+                channel_id: 'RefArch'
             })
         })
     })

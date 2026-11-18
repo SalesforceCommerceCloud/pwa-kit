@@ -23,13 +23,15 @@ git log --oneline -5
 | Signal | You are at |
 |---|---|
 | On `develop`, version ends `-dev`, no release branch cut | **Step 1 — Pre-release audit** |
+| Release contents or compatibility coverage unverified | **Step 1 — Pre-release audit** |
 | Release branch exists, on a working branch, versions still `-dev` | **Step 2 — Bump + changelogs + PR** |
 | On `prepare-release-*`, versions bumped (not `-dev`), no PR open | **Step 2 — open the PR** (bump-and-PR cycle, at the PR gate) |
-| A `-preview.N` version is published on npm | **Step 3 — Smoke test** |
+| Bump PR merged; any selected exact preview or stable version is absent from npm | **Step 3 publication checkpoint / Step 4 stable verification** |
+| All selected previews are published; scope or testing incomplete | **Step 3 — Scope + smoke test** |
 | A preview is published but a blocker was found | **Step 2 — next `-preview.(N+1)`** |
 | Preview smoke-tested clean, no blockers left | **Step 4 — Final release** |
-| Stable version published, no GitHub release yet, or `npm dist-tag ls @salesforce/pwa-kit-react-sdk` shows `next` still on the old preview | **Step 5 — Post-release** |
-| Stable released, GitHub release done, `next` moved to the stable version | **Step 6 — Merge back** |
+| Stable versions published; notes verification, dist-tags, Snyk, or announcement incomplete | **Step 5 — Post-release** |
+| Post-release checks complete; merge-back ancestry or next-dev versions unverified | **Step 6 — Merge back** |
 
 Tell the operator which step they're on and why. In the same turn — no separate gate — ask if this is their first release. If **yes**, give them the quick overview below to orient them; if **no**, skip it. Either way, start at their step.
 
@@ -97,11 +99,16 @@ Goal: the base is clean and all four version numbers are chosen.
 **Hotfix / patch to an already-released line?** Same process, one difference at the base: **reuse the existing `release-X.Y.x` branch** — don't cut a new one (a fresh cut off develop would collide with the name and drag in unshipped work). Bump a **patch** (`3.19.0` → `3.19.1`), not a minor. The tricky part is *which commits* land on that branch — the fix lives on `develop` (or a fix branch) mixed with work that must **not** ship in a patch. **Work with the operator** to pick the exact commits — don't guess (usually `git cherry-pick <sha>...` onto the working branch, not a full `develop` merge). Confirm the selected set with them before bumping. Then rejoin the normal flow at Step 2.
 
 1. **Audit the base** (default `develop`). It may be missing an unmerged feature branch that should ship, or carry commits that should *not* ship yet (extract those to a separate branch first). Completion: operator confirms the base holds exactly the intended changes.
+   **Compatibility audit:** load "Compatibility audit" in `RELEASE-INTERNALS.md` and dispatch its read-only audit before approving versions. Record findings and coverage gaps as blockers; intentional major-version breaks require operator approval and migration guidance.
 2. **Preview or final?** Preview carries `-preview.N` and gets a git tag; final has no suffix.
 3. **Choose which packages to release and their versions**, each justified from its diff since the last released tag (`git diff v<last-released> -- packages/<pkg>` — the changelog can lie both ways, see above), following the dependents rule above (releasing the SDK or commerce-sdk-react pulls in retail-react-app). Prompt only for the units that ship:
    > 1. Monorepo (sdk): ___  2. commerce-sdk-react: ___  3. retail-react-app: ___  4. mcp: ___
 
    State the resulting `release-<major>.<minor>.x` name back and get a yes.
+
+For a patch to an older release line (for example, `3.19.1` when `3.21.0` is already released), load "Older-line npm tags" in `RELEASE-INTERNALS.md` and capture the baseline before the first preview or stable publish. Confirm the post-publish tag targets with the operator and retain them across preview iterations.
+
+Completion: the operator approves the exact release range and version map, compatibility coverage is complete, and every finding is recorded with its disposition. Audit completion permits previews; unresolved accidental breaks or missing migration guidance block stable shipment.
 
 ## Step 2 — Bump, stamp changelogs, open the PR
 
@@ -111,7 +118,13 @@ Run **the bump-and-PR cycle** with **preview** versions (`-preview.N`), document
 
 **Testing is a multi-team effort.** Each team exercises its own features against the generated preview; the operator drives the core-flow smoke test below and collects blockers reported back. End users start by *generating* a project, and that's where bugs hide (usually a stale asset file in the generator that wasn't updated) — testing the retail app straight from the monorepo would miss them.
 
-**First confirm the preview is actually published** — `npm view @salesforce/pwa-kit-react-sdk@<version>-preview.N version` returns the version, not a 404. Everything below depends on that version being installable; announcing or generating before it points teams at a version that doesn't exist yet.
+**Publication checkpoint:** for every selected package, run `npm view @salesforce/<pkg>@<exact-version> version` and require the expected version. Use the approved release version map, including independent versions. All selected packages must be installable before announcing or generating.
+
+If publication is partial, inspect the publishing leg for the exact merged SHA and repair its failure. **GATE** a retry of the failed workflow jobs at that same SHA/version map (`gh run rerun <run-id> --failed`), stating which missing packages may publish. Already-published versions are skipped. Recheck every selected version; keep testing and post-release blocked until all resolve.
+
+For older-line patches, apply "Older-line npm tags" after every publish attempt, including partial publication and retries. Verify approved tag targets before announcing or handing off testing; retain the original baseline for the next preview and stable release.
+
+**Release scope:** load "Categorized release scope" in `RELEASE-INTERNALS.md`, dispatch its read-only report, and present the verified scope to the operator before testing. Include it with the preview announcement so feature owners know what to exercise; reuse it for final Highlights.
 
 1. **Generate from the just-published preview**, and give the operator this same command to paste into a Slack **announcement** so each team tests its own features against the preview — testing is shared across teams, not the operator's alone:
    ```
@@ -119,11 +132,15 @@ Run **the bump-and-PR cycle** with **preview** versions (`-preview.N`), document
    ```
 2. In the generated project, **you (the agent) run the automated checks**: `npm ci` (or `npm install`), `npm run lint`, `npm run build`, `npm test`. These must pass before the manual pass is worth anyone's time.
 3. **The operator runs the manual happy-path smoke test** — this is theirs, not yours; you can't drive a browser through checkout. Start the local dev server (`npm start`) and walk the core purchase flow end to end: **homepage → browse/search a product → PDP → add to cart → cart → checkout (shipping, payment) → place order → order confirmation.** Hand the operator this flow and wait for their result; a clean build with a broken checkout is still a blocker. Meanwhile each team exercises its own features and reports back.
-4. When testing settles, **ask the operator directly: "any blockers from you or any team?"** — don't infer "clean" from silence. **Blocker found?** Fix on the release branch, then return to **Step 2** for `-preview.(N+1)` — increment N, since republishing the same version is a no-op (lerna skips already-published versions). Once that preview publishes, generate a fresh project from it and **re-test the exact scenario that was blocked** before re-running the full smoke test. Loop until a preview smoke-tests clean across all teams. Completion: the operator explicitly confirms zero blockers from every team; only then proceed to Step 4.
+4. When testing settles, **ask the operator directly: "any blockers from you or any team?"** — don't infer "clean" from silence. **Blocker found?** Fix on the release branch, then return to **Step 2** for `-preview.(N+1)` — increment N, since republishing the same version is a no-op (lerna skips already-published versions). Once that preview publishes, refresh compatibility coverage and scope for the added commits, generate a fresh project, and **re-test the exact scenario that was blocked** before re-running the full smoke test. Loop until a preview smoke-tests clean across all teams. Completion: categorized scope and attribution are complete, automated checks and happy-path/changed-feature tests pass, and the operator explicitly confirms zero testing or compatibility blockers from every team; only then proceed to Step 4.
 
 ## Step 4 — Final release
 
+For an older-line patch, use the baseline and targets recorded before its first publish, following "Older-line npm tags" in `RELEASE-INTERNALS.md`. For a normal top-of-line release, both tags target the shipped stable versions.
+
 Run **the bump-and-PR cycle** again (`RELEASE-INTERNALS.md`) with the clean stable versions (no suffix). Re-verify every changelog reads final — no `-preview` left, dates correct — tag `v<version>`, and **GATE** the final PR into `release-X.Y.x` stating it publishes stable to `latest`. You open it; the **operator merges it.**
+
+Completion: every selected stable version passes the publication checkpoint from Step 3 and older-line tag restoration is verified; only then proceed to post-release.
 
 ## Step 5 — Post-release
 
@@ -136,11 +153,12 @@ Run **the bump-and-PR cycle** again (`RELEASE-INTERNALS.md`) with the clean stab
      gh release create v<version> --title "v<version>" --notes-file <notes.md> --verify-tag
      ```
      Let `gh` decide "latest" (its default: automatic by semver + date). For a normal top-of-line stable that marks it latest, which fires `deploy_latest_release.yml`, redeploying the demo + bug-bounty sites. State that redeploy consequence and wait for the operator's yes before running it.
+   - **Read-back:** run `gh release view v<version> --json body,url,tagName,isDraft,isPrerelease`. Require the intended tag, a published stable release, a non-empty introduction, substantive Highlights, the separator, and Package Changes matching the approved notes. Check every public link and record the release URL and result. Repair discrepancies through a separately gated `gh release edit` and reverify before continuing.
    - Optionally link the Dev Portal changelog anchor (recent releases have often skipped it). It's constructable from the version — strip the dots: `3.17.0` → `#pwa-kit-317-changes`:
      ```
      https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/references/about-pwa-kit-managed-runtime/about.html#pwa-kit-<XYZ>-changes
      ```
-2. **npm dist-tags** (stable releases only). Publishing already tagged the release: previews land on `next`, stables land on `latest` (lerna's default) — so `latest` is already correct. The one thing left after a **stable** release is to move `next` off the old preview and onto the new stable version. Previews need nothing here. **GATE**, since it writes to the public registry. Move `next` on each published package (use the versions just **released**, from the release PR / GitHub release — NOT develop's `package.json`, already back on `-dev`):
+2. **npm dist-tags.** Publishing already tagged the release: previews land on `next`, stables land on `latest` (lerna's default). For a normal top-of-line stable, move `next` off the preview onto the shipped stable; top-of-line previews need no adjustment. For patches to older release lines, verify the targets approved before the first publish using "Older-line npm tags" in `RELEASE-INTERNALS.md`. **GATE**, since tag changes write to the public registry. Use the approved tag/version map, never develop's `package.json`. Normal top-of-line commands:
    ```
    npm dist-tag add @salesforce/pwa-kit-react-sdk@<sdk-v> next
    npm dist-tag add @salesforce/pwa-kit-runtime@<sdk-v> next
@@ -152,18 +170,23 @@ Run **the bump-and-PR cycle** again (`RELEASE-INTERNALS.md`) with the clean stab
    ```
    Only tag packages that actually released. `npm login` first if `npm whoami` fails; npm will prompt for a fresh OTP on each write — enter it each time. Confirm with `npm dist-tag ls @salesforce/<pkg>`.
 3. **Snyk.** Point Snyk at the new release branch (follow the team's internal Snyk setup doc for the exact steps). Completion: the Snyk dashboard tracks `release-X.Y.x`.
-4. **Announce the release on Slack.** Once the stable is on `latest` (step 2 confirmed), **remind the operator to notify everyone** that `<version>` is out. Include the generate command so anyone can smoke-test a fresh storefront off the stable — no `--templateVersion` needed, since the matching retail-react-app is now on `latest`:
+4. **Announce the release on Slack.** Once publication and approved tags are verified, **remind the operator to notify everyone** that `<version>` is out. Include the generate command with exact generator and retail versions from the release map so it also works for patches to older release lines:
    ```
-   npx @salesforce/pwa-kit-create-app@<version> --outputDir /tmp/smoke-test-<version>
+   npx @salesforce/pwa-kit-create-app@<version> --templateVersion <released-retail-version> --outputDir /tmp/smoke-test-<version>
    ```
+
+Completion: GitHub notes pass read-back, every released package's `latest` and `next` match the approved tag targets, Snyk tracks the release branch, and the announcement is sent or explicitly delegated to a named operator.
 
 ## Step 6 — Merge back to develop
 
-Get the release commits onto `develop` and reset it to the next dev version.
+Get the release commits onto `develop`, advance SDK/commerce-sdk-react/retail-react-app to their next dev versions, and keep MCP on its published stable version.
+
+Before merging, capture the release tip SHA, the shipped version map, and all four versions on `origin/develop`. Derive the target map with "Next-dev versions" in `RELEASE-INTERNALS.md`, including MCP's stable-version exception, and confirm it with the operator.
 
 1. Create an **intermediary branch** off the release branch. Merge the latest `develop` *into it* — resolve conflicts here, not on `develop`.
-   - **The merge is a slog — dispatch it to a subagent.** Conflicts span many files (version strings, `package-lock.json`, changelogs) and iterate; keep that churn out of the operator's context. Hand the subagent the intermediary + release + `develop` branch names and this instruction: *merge `develop` into the intermediary branch, resolve every conflict, and return a per-conflict list of what it resolved and how.* Only **version strings** have a deterministic rule: **take develop's `-dev` side** (develop is heading to the next `-dev`, which item 2 below sets — the shipped stable version must not land on develop). **Code conflicts have no blanket side** — both branches changed the same lines, and develop may carry post-release work that must survive alongside the release's shipped change. The subagent reconciles by *intent*, keeping both where both are wanted, and **flags every code conflict it wasn't certain about** so the operator can check it — a wrong pick here silently reverts a shipped change or drops newer develop work. Before pushing, it runs `npx lerna list --long --all` and confirms develop's `-dev` version won every version conflict. It pushes the branch but does **not** open the PR or touch `develop`. **Surface its resolution list to the operator before moving on.**
-2. Bump the monorepo to the next dev version: shipped `X.Y.0` → develop becomes `X.(Y+1).0-dev` (`npm run bump-version -- <X>.<Y+1>.0-dev`).
-3. **GATE — open a PR from the intermediary branch targeting `develop`.** You open it; the **operator merges it**, using a **regular merge, not squash** (squash causes worse conflicts on later releases).
+   - **The merge is a slog — dispatch it to a subagent.** Supply the intermediary/release/`develop` branch names, captured version maps, and approved next-dev targets. Require it to merge `develop` into the intermediary locally and return every conflict resolution. Preserve develop's version strings during conflict resolution; Step 2 applies the target map. Reconcile code by intent, preserving shipped fixes and newer develop work, and flag uncertain resolutions for operator review. The subagent stops before pushing or opening a PR and leaves `develop` untouched. **Surface its resolution list and resolve uncertainties with the operator before moving on.**
+2. Apply **SDK, commerce-sdk-react, and retail-react-app next-dev targets**, SDK first, following "Next-dev versions" in `RELEASE-INTERNALS.md`. Verify MCP remains at its approved published stable version, plus all versions, dependency pins, lockfiles, and changelog headings before opening the PR.
+3. **GATE — open a PR from the intermediary branch targeting `develop`.** You open it; the **operator merges it** using GitHub's **Create a merge commit**, preserving original release commits rather than squashing or rebasing.
+4. Fetch origin and run `git merge-base --is-ancestor <captured-release-tip> origin/develop`; require exit code 0. Verify all four targets (three next-dev units and stable MCP) and dependency pins on the merged `develop`.
 
-Release complete when `develop` is on the next `-dev` version and carries the release commits.
+Release complete when publication, scope/testing, and post-release criteria pass, the captured release tip is an ancestor of `origin/develop`, and every version unit is on its approved target.

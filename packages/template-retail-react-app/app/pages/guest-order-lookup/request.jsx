@@ -81,14 +81,14 @@ const GuestOrderLookupRequest = () => {
                     <Heading as="h1" fontSize="3xl" fontWeight="bold" mb={2}>
                         {formatMessage({
                             id: 'guestOrderLookup.request.heading',
-                            defaultMessage: 'Look Up Your Order'
+                            defaultMessage: 'Order Lookup'
                         })}
                     </Heading>
                     <Text color="gray.600">
                         {formatMessage({
                             id: 'guestOrderLookup.request.subtext',
                             defaultMessage:
-                                'Enter your order details to track your order or view your receipt.'
+                                "Enter your order number and the email address you used for the order. The email address can't be associated with a registered account."
                         })}
                     </Text>
                 </Box>
@@ -106,7 +106,7 @@ const GuestOrderLookupRequest = () => {
                             name="orderNo"
                             label={formatMessage({
                                 id: 'guestOrderLookup.request.label.orderNumber',
-                                defaultMessage: 'Order number'
+                                defaultMessage: 'Order Number'
                             })}
                             type="text"
                             control={control}
@@ -131,7 +131,7 @@ const GuestOrderLookupRequest = () => {
                             name="email"
                             label={formatMessage({
                                 id: 'guestOrderLookup.request.label.email',
-                                defaultMessage: 'Email address'
+                                defaultMessage: 'Email Address'
                             })}
                             type="email"
                             control={control}
@@ -162,7 +162,7 @@ const GuestOrderLookupRequest = () => {
                         >
                             {formatMessage({
                                 id: 'guestOrderLookup.request.button.submit',
-                                defaultMessage: 'Find My Order'
+                                defaultMessage: 'Find Order'
                             })}
                         </Button>
                     </Stack>

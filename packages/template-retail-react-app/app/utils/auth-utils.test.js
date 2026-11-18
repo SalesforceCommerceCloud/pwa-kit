@@ -14,6 +14,16 @@ import {
     getAuthorizePasswordlessErrorMessage,
     getPasswordResetErrorMessage,
     getLoginPasswordlessErrorMessage,
+    getResetPasswordActionErrorMessage,
+    readErrorResponseMessage,
+    rememberPasswordlessLoginId,
+    getRememberedPasswordlessLoginId,
+    clearRememberedPasswordlessLoginId,
+    rememberPasswordResetEmail,
+    getRememberedPasswordResetEmail,
+    clearRememberedPasswordResetEmail,
+    clearRememberedAuthEmails,
+    PASSWORDLESS_LOGIN_ID_TTL_MS,
     TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE,
     TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/utils/auth-utils'
@@ -36,6 +46,17 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths', () => {
         getEnvBasePath: jest.fn(() => '/test')
     }
 })
+
+const mockResponseError = ({status, body, jsonThrows = false}) => {
+    const error = new Error('request failed')
+    error.response = {
+        status,
+        json: jsonThrows
+            ? jest.fn().mockRejectedValue(new SyntaxError('Unexpected end of JSON input'))
+            : jest.fn().mockResolvedValue(body)
+    }
+    return error
+}
 
 describe('getPasswordlessCallbackUrl', function () {
     test.each([undefined, null, ''])('return undefined when callbackURI is %s', (callbackURI) => {
@@ -106,6 +127,13 @@ describe('getPasswordResetErrorMessage', () => {
 describe('getLoginPasswordlessErrorMessage', () => {
     test.each([
         ['invalid token', INVALID_TOKEN_ERROR_MESSAGE],
+        ['login_id does not match stored login_id', INVALID_TOKEN_ERROR_MESSAGE],
+        ['login_id is required', INVALID_TOKEN_ERROR_MESSAGE],
+        ['login id is required for Passwordless Login authentication', INVALID_TOKEN_ERROR_MESSAGE],
+        [
+            'Too many login requests were made. Please try again later.',
+            TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
+        ],
         ['unexpected error message', API_ERROR_MESSAGE],
         [null, API_ERROR_MESSAGE]
     ])(
@@ -114,4 +142,135 @@ describe('getLoginPasswordlessErrorMessage', () => {
             expect(getLoginPasswordlessErrorMessage(errorMessage)).toBe(expectedMessage)
         }
     )
+})
+
+describe('getResetPasswordActionErrorMessage', () => {
+    test.each([
+        ['invalid token', INVALID_TOKEN_ERROR_MESSAGE],
+        ['login_id does not match stored login_id', INVALID_TOKEN_ERROR_MESSAGE],
+        ['login_id is required', INVALID_TOKEN_ERROR_MESSAGE],
+        // "Too many password reset requests…" is from /password/reset (400), not /password/action
+        ['Too many password reset requests were made. Please try again later.', API_ERROR_MESSAGE],
+        ['unexpected error message', API_ERROR_MESSAGE],
+        [null, API_ERROR_MESSAGE]
+    ])(
+        'maps reset password action error "%s" to the correct message descriptor',
+        (errorMessage, expectedMessage) => {
+            expect(getResetPasswordActionErrorMessage(errorMessage)).toBe(expectedMessage)
+        }
+    )
+})
+
+describe('readErrorResponseMessage', () => {
+    test('reads message from JSON body', async () => {
+        const error = mockResponseError({
+            status: 400,
+            body: {message: 'invalid token'}
+        })
+        await expect(readErrorResponseMessage(error)).resolves.toBe('invalid token')
+    })
+
+    test('falls back to error.message when JSON parse fails', async () => {
+        const error = mockResponseError({status: 500, body: null, jsonThrows: true})
+        error.message = 'request failed'
+        await expect(readErrorResponseMessage(error)).resolves.toBe('request failed')
+    })
+
+    test('falls back to error.message when response.json is missing', async () => {
+        const error = new Error('network error')
+        await expect(readErrorResponseMessage(error)).resolves.toBe('network error')
+    })
+})
+
+describe('remembered passwordless login ID', () => {
+    beforeEach(() => {
+        window.localStorage.clear()
+    })
+
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
+    test('returns the exact email that was remembered', () => {
+        rememberPasswordlessLoginId('Shopper+Tag@example.com')
+        expect(getRememberedPasswordlessLoginId()).toBe('Shopper+Tag@example.com')
+    })
+
+    test('returns null when nothing is remembered', () => {
+        expect(getRememberedPasswordlessLoginId()).toBeNull()
+    })
+
+    test('returns null and clears the entry once it expires', () => {
+        const now = Date.now()
+        jest.spyOn(Date, 'now').mockReturnValue(now)
+        rememberPasswordlessLoginId('shopper@example.com')
+        Date.now.mockReturnValue(now + PASSWORDLESS_LOGIN_ID_TTL_MS + 1)
+        expect(getRememberedPasswordlessLoginId()).toBeNull()
+        expect(window.localStorage.getItem('pwdless_login_id')).toBeNull()
+    })
+
+    test('clearRememberedPasswordlessLoginId removes the entry', () => {
+        rememberPasswordlessLoginId('shopper@example.com')
+        clearRememberedPasswordlessLoginId()
+        expect(getRememberedPasswordlessLoginId()).toBeNull()
+    })
+
+    test('ignores and clears a malformed entry', () => {
+        window.localStorage.setItem('pwdless_login_id', 'not-json')
+        expect(getRememberedPasswordlessLoginId()).toBeNull()
+        expect(window.localStorage.getItem('pwdless_login_id')).toBeNull()
+    })
+
+    test('does not store an empty email', () => {
+        rememberPasswordlessLoginId('')
+        expect(window.localStorage.getItem('pwdless_login_id')).toBeNull()
+    })
+})
+
+describe('remembered password reset email', () => {
+    beforeEach(() => {
+        window.localStorage.clear()
+    })
+
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
+    test('returns the exact email that was remembered', () => {
+        rememberPasswordResetEmail('Shopper+Tag@example.com')
+        expect(getRememberedPasswordResetEmail()).toBe('Shopper+Tag@example.com')
+    })
+
+    test('is stored separately from the passwordless email', () => {
+        rememberPasswordResetEmail('reset@example.com')
+        rememberPasswordlessLoginId('passwordless@example.com')
+        expect(getRememberedPasswordResetEmail()).toBe('reset@example.com')
+        clearRememberedPasswordlessLoginId()
+        expect(getRememberedPasswordResetEmail()).toBe('reset@example.com')
+    })
+
+    test('returns null and clears the entry once it expires', () => {
+        const now = Date.now()
+        jest.spyOn(Date, 'now').mockReturnValue(now)
+        rememberPasswordResetEmail('shopper@example.com')
+        Date.now.mockReturnValue(now + PASSWORDLESS_LOGIN_ID_TTL_MS + 1)
+        expect(getRememberedPasswordResetEmail()).toBeNull()
+        expect(window.localStorage.getItem('pwd_reset_email')).toBeNull()
+    })
+
+    test('clearRememberedPasswordResetEmail removes the entry', () => {
+        rememberPasswordResetEmail('shopper@example.com')
+        clearRememberedPasswordResetEmail()
+        expect(getRememberedPasswordResetEmail()).toBeNull()
+    })
+})
+
+describe('clearRememberedAuthEmails', () => {
+    test('removes both remembered emails', () => {
+        rememberPasswordlessLoginId('shopper@example.com')
+        rememberPasswordResetEmail('shopper@example.com')
+        clearRememberedAuthEmails()
+        expect(window.localStorage.getItem('pwdless_login_id')).toBeNull()
+        expect(window.localStorage.getItem('pwd_reset_email')).toBeNull()
+    })
 })

@@ -11,6 +11,7 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {getRememberedPasswordResetEmail} from '@salesforce/retail-react-app/app/utils/auth-utils'
 
 const mockEmail = 'test@email.com'
 const mockToken = '123456'
@@ -69,6 +70,7 @@ useAuthHelper.mockImplementation((param) => {
 
 beforeEach(() => {
     jest.clearAllMocks()
+    window.localStorage.clear()
     getConfig.mockImplementation(() => mockConfig)
 })
 
@@ -154,6 +156,49 @@ describe('usePasswordReset', () => {
             status: 'success',
             position: 'bottom-right'
         })
+    })
+
+    test('getPasswordResetToken remembers the email after the request succeeds', async () => {
+        getPasswordResetToken.mutateAsync.mockResolvedValue({})
+        renderWithProviders(<MockComponent />)
+
+        await fireEvent.click(screen.getByTestId('get-password-reset-token'))
+        await waitFor(() => {
+            expect(getRememberedPasswordResetEmail()).toBe(mockEmail)
+        })
+    })
+
+    test('getPasswordResetToken does not remember the email when the request fails', async () => {
+        const MockFailingComponent = () => {
+            const {getPasswordResetToken: request} = usePasswordReset()
+            return (
+                <button data-testid="request" onClick={() => request(mockEmail).catch(() => {})} />
+            )
+        }
+        getPasswordResetToken.mutateAsync.mockRejectedValue(new Error('failed'))
+        renderWithProviders(<MockFailingComponent />)
+
+        await fireEvent.click(screen.getByTestId('request'))
+        await waitFor(() => {
+            expect(getPasswordResetToken.mutateAsync).toHaveBeenCalled()
+        })
+        expect(getRememberedPasswordResetEmail()).toBeNull()
+    })
+
+    test('resetPassword clears the remembered email on success', async () => {
+        resetPassword.mutateAsync.mockResolvedValue({})
+        window.localStorage.setItem(
+            'pwd_reset_email',
+            JSON.stringify({loginId: mockEmail, expiresAt: Date.now() + 60000})
+        )
+        renderWithProviders(<MockComponent />)
+
+        await fireEvent.click(screen.getByTestId('reset-password'))
+        await waitFor(() => {
+            expect(resetPassword.mutateAsync).toHaveBeenCalled()
+        })
+        resetPassword.mutateAsync.mock.calls[0][1].onSuccess()
+        expect(getRememberedPasswordResetEmail()).toBeNull()
     })
 
     test('resetPasswordLandingPath is returned', () => {

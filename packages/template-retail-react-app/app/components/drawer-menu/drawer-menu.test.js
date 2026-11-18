@@ -142,6 +142,8 @@ describe('DrawerMenu', () => {
 
     test('handles logout action for registered users', async () => {
         useCustomerType.mockReturnValue({isRegistered: true})
+        window.localStorage.setItem('pwdless_login_id', 'stored')
+        window.localStorage.setItem('pwd_reset_email', 'stored')
 
         const {user} = renderWithProviders(<DrawerMenu isOpen={true} root={mockCategories.root} />)
 
@@ -154,6 +156,8 @@ describe('DrawerMenu', () => {
         await user.click(logoutButton)
 
         expect(mockLogout.mutateAsync).toHaveBeenCalledTimes(1)
+        expect(window.localStorage.getItem('pwdless_login_id')).toBeNull()
+        expect(window.localStorage.getItem('pwd_reset_email')).toBeNull()
         await waitFor(() => {
             expect(mockNavigate).toHaveBeenCalledWith('/login')
         })

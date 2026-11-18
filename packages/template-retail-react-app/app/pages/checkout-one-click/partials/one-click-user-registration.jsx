@@ -25,10 +25,23 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useCustomerType, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {
+    getLoginPasswordlessErrorMessage,
+    getPasswordlessCallbackUrl,
+    MISSING_PASSWORDLESS_LOGIN_ID_ERROR,
+    readErrorResponseMessage,
+    rememberPasswordlessLoginId,
+    TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
+} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {nanoid} from 'nanoid'
+
+const registrationCallbackURL = getPasswordlessCallbackUrl(
+    getConfig()?.app?.login?.registrationVerification?.callbackURI
+)
 
 export default function UserRegistration({
     enableUserRegistration,
@@ -45,7 +58,7 @@ export default function UserRegistration({
     const {isGuest} = useCustomerType()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
-    const {locale} = useMultiSite()
+    const {site, locale} = useMultiSite()
     const {formatMessage} = useIntl()
     const showToast = useToast()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
@@ -53,6 +66,8 @@ export default function UserRegistration({
 
     const {isOpen: isOtpOpen, onOpen: onOtpOpen, onClose: onOtpClose} = useDisclosure()
     const otpSentRef = useRef(false)
+    // Exact email sent to authorizePasswordless — SLAS compares login_id case-sensitively
+    const lastEmailSentRef = useRef(null)
     const [registrationSucceeded, setRegistrationSucceeded] = useState(false)
     const [isLoadingOtp, setIsLoadingOtp] = useState(false)
 
@@ -81,17 +96,21 @@ export default function UserRegistration({
         }
         // Kick off OTP for guests when they opt in
         if (checked && isGuest && basket?.customerInfo?.email && !otpSentRef.current) {
+            const authorizeEmail = basket.customerInfo.email
             setIsLoadingOtp(true)
             if (onLoadingChange) onLoadingChange(true)
             try {
                 await authorizePasswordlessLogin.mutateAsync({
-                    userid: basket.customerInfo.email,
-                    mode: 'email',
+                    userid: authorizeEmail,
+                    mode: 'callback',
+                    ...(registrationCallbackURL && {callbackURI: registrationCallbackURL}),
                     locale: locale?.id,
                     register_customer: true,
-                    last_name: basket.customerInfo.email,
-                    email: basket.customerInfo.email
+                    last_name: authorizeEmail,
+                    email: authorizeEmail
                 })
+                lastEmailSentRef.current = authorizeEmail
+                rememberPasswordlessLoginId(authorizeEmail)
                 otpSentRef.current = true
                 onOtpOpen()
             } catch (_e) {
@@ -172,10 +191,20 @@ export default function UserRegistration({
     }
 
     const handleOtpVerification = async (otpCode) => {
+        const loginId = lastEmailSentRef.current || basket?.customerInfo?.email
+        if (!loginId) {
+            return {
+                success: false,
+                error: formatMessage(MISSING_PASSWORDLESS_LOGIN_ID_ERROR)
+            }
+        }
+
         try {
             const token = await loginPasswordless.mutateAsync({
                 pwdlessLoginToken: otpCode,
-                register_customer: true
+                register_customer: true,
+                login_id: loginId,
+                channel_id: site.id
             })
 
             const customerId = token?.customer_id || token?.customerId
@@ -188,10 +217,20 @@ export default function UserRegistration({
             }
             handleOtpClose()
             setRegistrationSucceeded(true)
-        } catch (_e) {
-            // Let OtpAuth surface errors via its own UI/toast
+            return {success: true}
+        } catch (e) {
+            if (e.response?.status === 429) {
+                return {
+                    success: false,
+                    error: formatMessage(TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE)
+                }
+            }
+            const errorMessage = await readErrorResponseMessage(e)
+            return {
+                success: false,
+                error: formatMessage(getLoginPasswordlessErrorMessage(errorMessage))
+            }
         }
-        return {success: true}
     }
 
     // Hide the form if the "Checkout as Guest" button was clicked
@@ -316,14 +355,17 @@ export default function UserRegistration({
                     setValue: () => {}
                 }}
                 handleSendEmailOtp={async (email) => {
-                    return authorizePasswordlessLogin.mutateAsync({
+                    await authorizePasswordlessLogin.mutateAsync({
                         userid: email,
-                        mode: 'email',
+                        mode: 'callback',
+                        ...(registrationCallbackURL && {callbackURI: registrationCallbackURL}),
                         locale: locale?.id,
                         register_customer: true,
                         last_name: email,
                         email
                     })
+                    lastEmailSentRef.current = email
+                    rememberPasswordlessLoginId(email)
                 }}
                 handleOtpVerification={handleOtpVerification}
             />

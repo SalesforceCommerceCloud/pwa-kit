@@ -1,5 +1,7 @@
 # 🚀 PWA Kit MCP Server
 
+> **Discontinued:** Use [B2C DX MCP](https://salesforcecommercecloud.github.io/b2c-developer-tooling/mcp/) to connect your AI assistant to B2C Commerce tools, documentation, skills, and APIs.
+
 An MCP server that enhances the entire development lifecycle of PWA Kit storefront apps — from project creation and management to AI-assisted coding, testing, and implementation of best practices — all within your IDE.
 
 ## 🔍 What is MCP?

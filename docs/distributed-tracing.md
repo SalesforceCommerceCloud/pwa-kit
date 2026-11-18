@@ -33,10 +33,11 @@ DT env var**.
 | Env var | Effect |
 |---------|--------|
 | `OTEL_TRACING_ENABLED=true` | Enables DT (and `server_timing`'s OTel path). Resolved via `getOTELConfig().enabled`. |
+| `MRT_DISTRIBUTED_TRACING_ENABLED=true` | Alternative MRT-managed switch that enables the same shared tracing paths. |
 | `OTEL_SERVICE_NAME` | Affects `server_timing` only. DT's `service.name` is a hardcoded constant (`pwa-kit-react-sdk`) and ignores this var. |
 
-When `OTEL_TRACING_ENABLED` is unset (or anything other than `"true"`), DT is a
-complete no-op: no spans, no header injection, zero behavior change.
+When neither tracing flag is set to `"true"`, DT is a complete no-op: no spans,
+no header injection, zero behavior change.
 
 Set the env var via MRT environment configuration. No code change or redeploy of
 application code is required to toggle it.
@@ -101,7 +102,7 @@ packages/pwa-kit-react-sdk/src/
     mrt-console-span-exporter.js        ← stdout exporter (MRT scrape contract)
     react-rendering.js                  ← wires server + child spans into the render path
   utils/
-    opentelemetry-config.js             ← getOTELConfig(): the OTEL_TRACING_ENABLED master switch
+    opentelemetry-config.js             ← getOTELConfig(): the shared tracing master switch
   ssr/universal/components/with-react-query/
     index.js                            ← creates per-query scapi:* child spans (OTel-free; uses res.locals helper)
 

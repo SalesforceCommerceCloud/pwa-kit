@@ -28,6 +28,96 @@ export const TOO_MANY_PASSWORD_RESET_ATTEMPTS_ERROR_MESSAGE = defineMessage({
     id: 'global.error.too_many_password_reset_requests'
 })
 
+export const MISSING_PASSWORDLESS_LOGIN_ID_ERROR = defineMessage({
+    defaultMessage: 'Your email is missing for this verification. Click Resend Code and try again.',
+    id: 'global.error.missing_passwordless_login_id'
+})
+
+export const CONFIRM_PASSWORDLESS_EMAIL_MESSAGE = defineMessage({
+    defaultMessage: 'To finish signing in, enter the email address you used to request the link.',
+    id: 'login_page.info.confirm_passwordless_email'
+})
+
+const PASSWORDLESS_LOGIN_ID_STORAGE_KEY = 'pwdless_login_id'
+const PASSWORD_RESET_EMAIL_STORAGE_KEY = 'pwd_reset_email'
+// Long enough to cover the SLAS passwordless and password reset token lifetimes
+export const PASSWORDLESS_LOGIN_ID_TTL_MS = 15 * 60 * 1000
+
+const rememberEmail = (storageKey, loginId) => {
+    if (typeof window === 'undefined' || !loginId) return
+    try {
+        window.localStorage.setItem(
+            storageKey,
+            JSON.stringify({loginId, expiresAt: Date.now() + PASSWORDLESS_LOGIN_ID_TTL_MS})
+        )
+    } catch {
+        // Storage unavailable (e.g. disabled); the landing page asks for the email instead
+    }
+}
+
+const clearRememberedEmail = (storageKey) => {
+    if (typeof window === 'undefined') return
+    try {
+        window.localStorage.removeItem(storageKey)
+    } catch {
+        // Storage unavailable
+    }
+}
+
+const getRememberedEmail = (storageKey) => {
+    if (typeof window === 'undefined') return null
+    try {
+        const stored = JSON.parse(window.localStorage.getItem(storageKey))
+        if (stored?.loginId && stored.expiresAt > Date.now()) return stored.loginId
+        if (stored) clearRememberedEmail(storageKey)
+    } catch {
+        clearRememberedEmail(storageKey)
+    }
+    return null
+}
+
+/**
+ * Remembers the exact email sent to authorizePasswordless so a magic link opened in another
+ * tab of the same browser can send it as login_id. Kept out of the magic link URL so the
+ * shopper email doesn't end up in server logs, browser history, or Referer headers.
+ */
+export const rememberPasswordlessLoginId = (loginId) =>
+    rememberEmail(PASSWORDLESS_LOGIN_ID_STORAGE_KEY, loginId)
+
+export const clearRememberedPasswordlessLoginId = () =>
+    clearRememberedEmail(PASSWORDLESS_LOGIN_ID_STORAGE_KEY)
+
+/**
+ * Returns the email remembered by rememberPasswordlessLoginId, or null if none or expired.
+ */
+export const getRememberedPasswordlessLoginId = () =>
+    getRememberedEmail(PASSWORDLESS_LOGIN_ID_STORAGE_KEY)
+
+/**
+ * Remembers the email a password reset link was requested for, so the reset landing page
+ * opened in the same browser can prefill it. Stored separately from the passwordless email.
+ */
+export const rememberPasswordResetEmail = (email) =>
+    rememberEmail(PASSWORD_RESET_EMAIL_STORAGE_KEY, email)
+
+export const clearRememberedPasswordResetEmail = () =>
+    clearRememberedEmail(PASSWORD_RESET_EMAIL_STORAGE_KEY)
+
+/**
+ * Returns the email remembered by rememberPasswordResetEmail, or null if none or expired.
+ */
+export const getRememberedPasswordResetEmail = () =>
+    getRememberedEmail(PASSWORD_RESET_EMAIL_STORAGE_KEY)
+
+/**
+ * Clears both remembered emails. Call on logout so an email saved for an unused link
+ * doesn't stay in storage after the session ends (e.g. on a shared computer).
+ */
+export const clearRememberedAuthEmails = () => {
+    clearRememberedPasswordlessLoginId()
+    clearRememberedPasswordResetEmail()
+}
+
 // Shared error patterns for token-based auth features (passwordless login, password reset)
 const TOKEN_BASED_AUTH_FEATURE_UNAVAILABLE_ERRORS = [
     /no callback_uri is registered/i,
@@ -45,6 +135,18 @@ const PASSWORD_RESET_FEATURE_UNAVAILABLE_ERRORS = TOKEN_BASED_AUTH_FEATURE_UNAVA
 
 const TOO_MANY_REQUESTS_ERROR = /too many .* requests/i
 
+// Exact SLAS ValidationUtil messages for missing/mismatched login_id
+const MISSING_OR_MISMATCHED_LOGIN_ID_ERRORS = [
+    'login_id does not match stored login_id',
+    'login_id is required',
+    'login id is required for Passwordless Login authentication'
+]
+
+const isMissingOrMismatchedLoginIdError = (errorMessage) => {
+    const normalized = String(errorMessage).toLowerCase()
+    return MISSING_OR_MISMATCHED_LOGIN_ID_ERRORS.some((msg) => msg.toLowerCase() === normalized)
+}
+
 /**
  * Returns the absolute URL for the passwordless login callback.
  * If the callback URI is already absolute, it is returned as-is; otherwise it is
@@ -61,6 +163,25 @@ export const getPasswordlessCallbackUrl = (callbackURI) => {
         return callbackURI
     }
     return `${getAppOrigin()}${getEnvBasePath()}${callbackURI}`
+}
+
+/**
+ * Safely read an error message from a ResponseError-like object's JSON body.
+ * Guards against missing responses and empty/non-JSON bodies.
+ *
+ * @param {Error & {response?: Response}} error
+ * @returns {Promise<string|undefined>}
+ */
+export const readErrorResponseMessage = async (error) => {
+    if (typeof error?.response?.json !== 'function') {
+        return error?.message
+    }
+    try {
+        const errorData = await error.response.json()
+        return errorData?.message ?? error?.message
+    } catch {
+        return error?.message
+    }
 }
 
 /**
@@ -105,7 +226,25 @@ export const getPasswordResetErrorMessage = (errorMessage) => {
  * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
  */
 export const getLoginPasswordlessErrorMessage = (errorMessage) => {
-    if (INVALID_TOKEN_ERROR.test(errorMessage)) {
+    if (INVALID_TOKEN_ERROR.test(errorMessage) || isMissingOrMismatchedLoginIdError(errorMessage)) {
+        return INVALID_TOKEN_ERROR_MESSAGE
+    }
+    if (TOO_MANY_REQUESTS_ERROR.test(errorMessage)) {
+        return TOO_MANY_LOGIN_ATTEMPTS_ERROR_MESSAGE
+    }
+    return API_ERROR_MESSAGE
+}
+
+/**
+ * Maps error message from resetPassword (password/action) mutation to the appropriate
+ * user-friendly error message descriptor. Rate limits on this endpoint are empty-body 429s
+ * and must be handled via response.status at the call site (not message matching here).
+ *
+ * @param {string} errorMessage - The error message from the API
+ * @returns {Object} - The message descriptor object (from defineMessage) that can be passed to formatMessage
+ */
+export const getResetPasswordActionErrorMessage = (errorMessage) => {
+    if (INVALID_TOKEN_ERROR.test(errorMessage) || isMissingOrMismatchedLoginIdError(errorMessage)) {
         return INVALID_TOKEN_ERROR_MESSAGE
     }
     return API_ERROR_MESSAGE

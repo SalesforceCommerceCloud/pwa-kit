@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="${pdict.localeId}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>${pdict.emailTitle}</title>
+  <style type="text/css">
+    @media only screen and (max-width:600px) {
+      .email-card { padding:24px !important; }
+      .email-outer { padding:24px 16px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#F3F3F3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F3F3F3;">
+    <tr>
+      <td class="email-outer" align="center" style="padding:48px 20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;width:100%;">
+
+          <!-- Brand name -->
+          <tr>
+            <td align="center" style="padding-bottom:20px;">
+              <!-- Replace with your brand name or logo image -->
+              <span style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#181818;">${Resource.msg('email.brandName', 'email', '')}</span>
+            </td>
+          </tr>
+
+          <!-- Card -->
+          <tr>
+            <td class="email-card" style="background-color:#FFFFFF;border-top:3px solid #181818;padding:40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">

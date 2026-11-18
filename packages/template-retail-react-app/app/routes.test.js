@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import routes from '@salesforce/retail-react-app/app/routes'
+import routes, {getDynamicRoutes} from '@salesforce/retail-react-app/app/routes'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Mock getConfig to return test values
@@ -16,6 +16,7 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
 describe('Routes', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        getConfig.mockReturnValue(mockConfig)
     })
 
     test('exports a valid react-router configuration', () => {
@@ -29,6 +30,37 @@ describe('Routes', () => {
     })
 
     describe('Dynamic routes', () => {
+        describe('Shopper Agent express-payment routes', () => {
+            test.each(['/Payments-Express', '/Payments-ExpressProduct'])(
+                'adds %s case-sensitively when Shopper Agent is enabled',
+                (path) => {
+                    getConfig.mockReturnValue({
+                        ...mockConfig,
+                        app: {
+                            ...mockConfig.app,
+                            commerceAgent: {
+                                ...mockConfig.app.commerceAgent,
+                                enabled: 'true'
+                            }
+                        }
+                    })
+
+                    const route = routes().find((candidate) => candidate.path === path)
+
+                    expect(route).toMatchObject({exact: true, sensitive: true})
+                }
+            )
+
+            test.each(['/Payments-Express', '/Payments-ExpressProduct'])(
+                'does not add %s when Shopper Agent is disabled',
+                (path) => {
+                    const route = routes().find((candidate) => candidate.path === path)
+
+                    expect(route).toBeUndefined()
+                }
+            )
+        })
+
         describe('Reset password landing route', () => {
             test.each([
                 ['path is null', null],
@@ -347,6 +379,38 @@ describe('Routes', () => {
                 expect(socialRoute).toBeDefined()
                 expect(socialRoute.exact).toBe(true)
             })
+        })
+    })
+
+    describe('getDynamicRoutes', () => {
+        test('returns the landing routes from the given config for extending projects', () => {
+            const paths = getDynamicRoutes({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    login: {
+                        resetPassword: {landingPath: '/reset-password-landing'},
+                        passwordless: {enabled: true, landingPath: '/passwordless-login-landing'}
+                    }
+                }
+            }).map((route) => route.path)
+
+            expect(paths).toEqual(
+                expect.arrayContaining(['/reset-password-landing', '/passwordless-login-landing'])
+            )
+            expect(paths).not.toContain('*')
+        })
+
+        test('falls back to getConfig when no config is passed', () => {
+            getConfig.mockReturnValue({
+                ...mockConfig,
+                app: {
+                    ...mockConfig.app,
+                    login: {resetPassword: {landingPath: '/custom-reset-landing'}}
+                }
+            })
+
+            expect(getDynamicRoutes().map((route) => route.path)).toContain('/custom-reset-landing')
         })
     })
 })

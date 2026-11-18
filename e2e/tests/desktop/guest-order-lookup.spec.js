@@ -164,7 +164,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
 
         expect(page.url()).toContain('/order-lookup')
         // Confirm Step 1 heading is visible
-        await expect(page.getByRole('heading', {name: /look up your order/i})).toBeVisible()
+        await expect(page.getByRole('heading', {name: /order lookup/i})).toBeVisible()
     })
 
     test('Step 1: fill order number + email, submit → routed to /order-lookup/verify (anti-enumeration)', async ({
@@ -176,14 +176,14 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
         await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
 
-        await expect(page.getByRole('heading', {name: /look up your order/i})).toBeVisible()
+        await expect(page.getByRole('heading', {name: /order lookup/i})).toBeVisible()
 
         await page.getByLabel(/order number/i).fill('ORD-001234')
         await page.getByLabel(/email address/i).fill('shopper@example.com')
 
         await Promise.all([
             page.waitForURL('**/order-lookup/verify/**'),
-            page.getByRole('button', {name: /find my order/i}).click()
+            page.getByRole('button', {name: /find order/i}).click()
         ])
 
         expect(page.url()).toContain('/order-lookup/verify')
@@ -207,7 +207,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
 
         await Promise.all([
             page.waitForURL('**/order-lookup/verify/**'),
-            page.getByRole('button', {name: /find my order/i}).click()
+            page.getByRole('button', {name: /find order/i}).click()
         ])
 
         // Now on Step 2 — fill the code one digit at a time
@@ -240,7 +240,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
 
         await Promise.all([
             page.waitForURL('**/order-lookup/verify/**'),
-            page.getByRole('button', {name: /find my order/i}).click()
+            page.getByRole('button', {name: /find order/i}).click()
         ])
 
         await fillOtpCode(page, '123456')
@@ -276,7 +276,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
 
         await Promise.all([
             page.waitForURL('**/order-lookup/verify/**'),
-            page.getByRole('button', {name: /find my order/i}).click()
+            page.getByRole('button', {name: /find order/i}).click()
         ])
 
         await fillOtpCode(page, '999888')
@@ -311,7 +311,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
 
         await Promise.all([
             page.waitForURL('**/order-lookup/verify/**'),
-            page.getByRole('button', {name: /find my order/i}).click()
+            page.getByRole('button', {name: /find order/i}).click()
         ])
 
         await fillOtpCode(page, '123456')
@@ -368,7 +368,7 @@ test.describe('Guest Order Access — happy path (feature-on)', () => {
 
         await Promise.all([
             page.waitForURL('**/order-lookup/verify/**'),
-            page.getByRole('button', {name: /find my order/i}).click()
+            page.getByRole('button', {name: /find order/i}).click()
         ])
 
         await fillOtpCode(page, '123456')
@@ -559,7 +559,7 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
 
         await page.goto(FEATURE_ON_BASE_URL + '/order-lookup')
         await answerConsentTrackingForm(page)
-        await expect(page.getByRole('heading', {name: /look up your order/i})).toBeVisible()
+        await expect(page.getByRole('heading', {name: /order lookup/i})).toBeVisible()
 
         const results = await new AxeBuilder({page})
             .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
@@ -586,7 +586,7 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
 
         await Promise.all([
             page.waitForURL('**/order-lookup/verify/**'),
-            page.getByRole('button', {name: /find my order/i}).click()
+            page.getByRole('button', {name: /find order/i}).click()
         ])
 
         await expect(page.getByRole('heading', {name: /verify your email/i})).toBeVisible()
@@ -617,7 +617,7 @@ test.describe('Guest Order Access — a11y (zero critical violations, feature-on
 
         await Promise.all([
             page.waitForURL('**/order-lookup/verify/**'),
-            page.getByRole('button', {name: /find my order/i}).click()
+            page.getByRole('button', {name: /find order/i}).click()
         ])
 
         await fillOtpCode(page, '123456')

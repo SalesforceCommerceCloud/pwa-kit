@@ -6,41 +6,16 @@
  */
 
 import {useEffect, useRef, useState} from 'react'
-import {DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION} from '@salesforce/retail-react-app/app/constants'
+import {DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION} from '@salesforce/retail-react-app/app/constants'
+import {resolveEmbeddedWidgetSourceUrl} from '@salesforce/retail-react-app/app/utils/inline-agent-widget-utils'
+import ensureWidget from '@salesforce/retail-react-app/app/utils/load-inline-agent-widget'
 
-const SCRIPT_SRC = '/static/inline-agent-widget.umd.js'
-
-let readyPromise = null
-
-const ensureWidget = () => {
-    if (readyPromise) return readyPromise
-
-    if (customElements.get('inline-agent-widget')) {
-        readyPromise = Promise.resolve()
-        return readyPromise
-    }
-
-    // Ensure the script tag exists in <head> (Helmet adds it on SSR, but on
-    // client-only navigation we may need to inject it manually).
-    if (!document.querySelector(`script[src="${SCRIPT_SRC}"]`)) {
-        const script = document.createElement('script')
-        script.src = SCRIPT_SRC
-        script.async = true
-        document.head.appendChild(script)
-    }
-
-    // Wait for the custom element to be registered — works regardless of
-    // whether the script was included in SSR HTML or injected dynamically.
-    readyPromise = customElements.whenDefined('inline-agent-widget').then(() => {
-        if (!customElements.get('inline-agent-widget') && window.InlineAgentWidget?.defineElement) {
-            window.InlineAgentWidget.defineElement()
-        }
-    })
-    return readyPromise
+const isConfigured = (config) => {
+    if (!config?.enabled) return false
+    // shopper-agent never opens a SCRT2 session — only `enabled` matters.
+    if (config?.mode === 'shopper-agent') return true
+    return Boolean(config?.scrt2Url && config?.orgId && config?.esDeveloperName)
 }
-
-const isConfigured = (config) =>
-    Boolean(config?.enabled && config?.scrt2Url && config?.orgId && config?.esDeveloperName)
 
 // Stable string key for the pdpQuestions array so the sync effect's dependency
 // is by value, not identity. An empty/undefined list serializes to "" so it
@@ -53,18 +28,24 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
     const containerRef = useRef(null)
     const configured = isConfigured(config)
     const questionsKey = pdpQuestionsKey(pdpQuestions)
+    const mode = config?.mode
+    const scriptSourceUrl = resolveEmbeddedWidgetSourceUrl(config)
 
     useEffect(() => {
         if (typeof window === 'undefined') return
         if (!configured) return
         let cancelled = false
-        ensureWidget().then(() => {
-            if (!cancelled) setReady(true)
-        })
+        ensureWidget(scriptSourceUrl)
+            .then(() => {
+                if (!cancelled) setReady(true)
+            })
+            .catch((error) => {
+                if (!cancelled) console.error(error.message)
+            })
         return () => {
             cancelled = true
         }
-    }, [configured])
+    }, [configured, scriptSourceUrl])
 
     useEffect(() => {
         if (!configured || !ready) return
@@ -72,13 +53,18 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
         if (containerRef.current.querySelector('inline-agent-widget')) return
 
         const el = document.createElement('inline-agent-widget')
-        el.setAttribute('scrt2-url', config.scrt2Url)
-        el.setAttribute('org-id', config.orgId)
-        el.setAttribute('es-developer-name', config.esDeveloperName)
-        el.setAttribute('capabilities-version', DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION)
+        if (mode) el.setAttribute('mode', mode)
+        // SCRT2 fields are only set when they're real — shopper-agent mode
+        // doesn't need them and the UMD's config-validation skips the check
+        // when `mode="shopper-agent"`.
+        if (config.scrt2Url) el.setAttribute('scrt2-url', config.scrt2Url)
+        if (config.orgId) el.setAttribute('org-id', config.orgId)
+        if (config.esDeveloperName) el.setAttribute('es-developer-name', config.esDeveloperName)
+        el.setAttribute('capabilities-version', DEFAULT_EMBEDDED_AGENT_CAPABILITIES_VERSION)
         if (config.placeholder) el.setAttribute('placeholder', config.placeholder)
         if (config.persistSession !== false) el.setAttribute('persist-session', '')
         if (config.enableLogging) el.setAttribute('enable-logging', '')
+        if (config.preWarm !== false) el.setAttribute('pre-warm', '')
         // Seed pdp-questions at create time when we already have them, so the
         // pills paint in the same frame the widget mounts (no visible pop-in
         // from the attribute-sync effect below).
@@ -94,7 +80,7 @@ const useInlineAgentWidget = (config, {pdpQuestions, productName} = {}) => {
         return () => {
             el.remove()
         }
-    }, [configured, ready, config])
+    }, [configured, ready, config, mode])
 
     // Keep the pdp-questions attribute in sync with the current product. Runs
     // separately from element creation so a variant switch / SPA nav to a new
