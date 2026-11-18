@@ -49,10 +49,7 @@ export const useCommerceClientPanelPosition = (isActive) => {
         const update = () => {
             const bottom = header.getBoundingClientRect().bottom
             if (bottom > 0) {
-                // Account for box-shadow extending below the header's content box.
-                const shadow = getComputedStyle(
-                    header.lastElementChild || header
-                ).boxShadow
+                const shadow = getComputedStyle(header.lastElementChild || header).boxShadow
                 const shadowExtent = parseShadowExtent(shadow)
                 root.style.setProperty('--cc-panel-top', `${bottom + shadowExtent}px`)
             }
