@@ -53,7 +53,8 @@ const useFabAnimation = (isVisible, prefersReducedMotion) => {
     const [isExpanded, setIsExpanded] = useState(true)
     const [showSheen, setShowSheen] = useState(false)
     const timersRef = useRef([])
-    const interactingRef = useRef(false)
+    const hoverRef = useRef(false)
+    const focusRef = useRef(false)
     const cycleRef = useRef({})
 
     useEffect(() => {
@@ -63,7 +64,8 @@ const useFabAnimation = (isVisible, prefersReducedMotion) => {
             return undefined
         }
 
-        interactingRef.current = false
+        hoverRef.current = false
+        focusRef.current = false
 
         const cancelTimers = () => {
             timersRef.current.forEach(clearTimeout)
@@ -96,7 +98,7 @@ const useFabAnimation = (isVisible, prefersReducedMotion) => {
             holdExpanded()
             if (!prefersReducedMotion) {
                 scheduleTimer(() => {
-                    if (!interactingRef.current) startCollapsedPhase()
+                    if (!hoverRef.current && !focusRef.current) startCollapsedPhase()
                 }, COLLAPSE_DELAY)
             }
         }
@@ -107,17 +109,27 @@ const useFabAnimation = (isVisible, prefersReducedMotion) => {
         return cancelTimers
     }, [isVisible, prefersReducedMotion])
 
-    const onInteractionStart = useCallback(() => {
-        interactingRef.current = true
+    const onHoverStart = useCallback(() => {
+        hoverRef.current = true
         cycleRef.current.holdExpanded?.()
     }, [])
 
-    const onInteractionEnd = useCallback(() => {
-        interactingRef.current = false
-        cycleRef.current.startCollapsedPhase?.()
+    const onHoverEnd = useCallback(() => {
+        hoverRef.current = false
+        if (!focusRef.current) cycleRef.current.startCollapsedPhase?.()
     }, [])
 
-    return {isExpanded, showSheen, onInteractionStart, onInteractionEnd}
+    const onFocusStart = useCallback(() => {
+        focusRef.current = true
+        cycleRef.current.holdExpanded?.()
+    }, [])
+
+    const onFocusEnd = useCallback(() => {
+        focusRef.current = false
+        if (!hoverRef.current) cycleRef.current.startCollapsedPhase?.()
+    }, [])
+
+    return {isExpanded, showSheen, onHoverStart, onHoverEnd, onFocusStart, onFocusEnd}
 }
 
 /**
@@ -137,10 +149,8 @@ const CommerceClientFab = ({
     const [isPanelOpen, setIsPanelOpen] = useState(isPanelOpenByDefault)
     const prefersReducedMotion = usePrefersReducedMotion()
     const isVisible = !isPanelOpen
-    const {isExpanded, showSheen, onInteractionStart, onInteractionEnd} = useFabAnimation(
-        isVisible,
-        prefersReducedMotion
-    )
+    const {isExpanded, showSheen, onHoverStart, onHoverEnd, onFocusStart, onFocusEnd} =
+        useFabAnimation(isVisible, prefersReducedMotion)
 
     useEffect(() => {
         if (!onClient) return undefined
@@ -186,10 +196,10 @@ const CommerceClientFab = ({
                 data-testid="commerce-client-fab"
                 aria-label={accessibleLabel}
                 onClick={() => openCommerceClientWidget(true)}
-                onMouseEnter={onInteractionStart}
-                onMouseLeave={onInteractionEnd}
-                onFocus={onInteractionStart}
-                onBlur={onInteractionEnd}
+                onMouseEnter={onHoverStart}
+                onMouseLeave={onHoverEnd}
+                onFocus={onFocusStart}
+                onBlur={onFocusEnd}
                 position="fixed"
                 bottom={6}
                 {...(position === 'bottom-left' ? {left: 6} : {right: 6})}
