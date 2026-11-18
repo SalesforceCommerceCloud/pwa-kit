@@ -51,7 +51,7 @@ const onClient = typeof window !== 'undefined'
  * @param {string} [options.globalClassName] - Custom class added to widget elements for CSS specificity
  * @param {boolean} [options.isDevelopment] - When true, logs widget events to the console
  * @param {Object} [options.componentConfig] - Partial component config merged over the defaults
- * @param {Object} [options.theme] - Partial theme merged over the defaults
+ * @param {Object} [options.theme] - Theme recipe passed through to the widget (the SDK resolves preset defaults internally)
  * @param {string} [options.overridesUrl] - URL to customer's component override script (sets window.CimulateOverrides)
  * @param {Object} [options.overrides] - Inline map of override keys (e.g. `ProductTile`) to registered custom element tag names. The widget takes a single override source, so callers should pass this or `overridesUrl`, not both
  * @param {Object} [options.headerConfig] - Header styling config forwarded as `headerConfig` (e.g. `logoUrl`, `headerText`, `headerBackgroundColor`, `headerTextColor`, `headerTextFontSize`, `headerTextFontWeight`, `headerTextFontFamily`, `headerTextTextAlign`)
