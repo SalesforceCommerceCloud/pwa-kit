@@ -45,5 +45,5 @@ export const getCommerceAgentConfig = () => {
         cc_enableImageUpload: 'false',
         cc_theme: {preset: 'legacy', density: 'compact', shape: 'sharp', elevation: 'flat'}
     }
-    return getConfig().app.commerceAgent ?? defaults
+    return {...defaults, ...getConfig().app.commerceAgent}
 }

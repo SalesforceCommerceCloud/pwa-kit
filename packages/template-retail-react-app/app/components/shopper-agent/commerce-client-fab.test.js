@@ -256,6 +256,62 @@ describe('CommerceClientFab', () => {
         expect(fab).toHaveStyle({maxWidth: '56px'})
     })
 
+    test('stays expanded when hover ends but focus remains', () => {
+        renderWithProviders(<CommerceClientFab />)
+
+        const fab = screen.getByTestId('commerce-client-fab')
+
+        act(() => jest.advanceTimersByTime(1000))
+        expect(fab).toHaveStyle({maxWidth: '56px'})
+
+        // Hover + focus
+        act(() => {
+            fireEvent.mouseEnter(fab)
+            fireEvent.focus(fab)
+        })
+        expect(fab).toHaveStyle({maxWidth: '320px'})
+
+        // Release hover only — focus still active
+        act(() => {
+            fireEvent.mouseLeave(fab)
+        })
+        expect(fab).toHaveStyle({maxWidth: '320px'})
+
+        // Release focus — now collapses
+        act(() => {
+            fireEvent.blur(fab)
+        })
+        expect(fab).toHaveStyle({maxWidth: '56px'})
+    })
+
+    test('stays expanded when focus ends but hover remains', () => {
+        renderWithProviders(<CommerceClientFab />)
+
+        const fab = screen.getByTestId('commerce-client-fab')
+
+        act(() => jest.advanceTimersByTime(1000))
+        expect(fab).toHaveStyle({maxWidth: '56px'})
+
+        // Hover + focus
+        act(() => {
+            fireEvent.mouseEnter(fab)
+            fireEvent.focus(fab)
+        })
+        expect(fab).toHaveStyle({maxWidth: '320px'})
+
+        // Release focus only — hover still active
+        act(() => {
+            fireEvent.blur(fab)
+        })
+        expect(fab).toHaveStyle({maxWidth: '320px'})
+
+        // Release hover — now collapses
+        act(() => {
+            fireEvent.mouseLeave(fab)
+        })
+        expect(fab).toHaveStyle({maxWidth: '56px'})
+    })
+
     test('stays expanded permanently when prefers-reduced-motion is enabled', () => {
         const originalMatchMedia = window.matchMedia
         window.matchMedia = jest.fn().mockImplementation((query) => ({
