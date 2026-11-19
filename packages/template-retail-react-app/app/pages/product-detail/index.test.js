@@ -139,7 +139,9 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
 }))
 
 jest.mock('@salesforce/retail-react-app/app/components/inline-agent-widget', () => {
-    return () => null
+    return function MockInlineAgent() {
+        return <div data-testid="mock-inline-agent" />
+    }
 })
 
 const MockedComponent = () => {
@@ -334,12 +336,15 @@ test('does not write the previous product variant to a new PDP and updates pid o
         expect(new URLSearchParams(window.location.search).get('pid')).toBe(oldVariant.productId)
     )
 
+    expect(await screen.findByTestId('mock-inline-agent')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', {name: 'Go to product B'}))
     await waitFor(() => expect(productBRequested).toHaveBeenCalled())
+    expect(screen.queryByTestId('mock-inline-agent')).not.toBeInTheDocument()
     expect(window.location.pathname).toBe('/uk/en-GB/product/requested-b')
     expect(new URLSearchParams(window.location.search).get('pid')).toBeNull()
 
     resolveProductB()
+    await waitFor(() => expect(screen.getByTestId('mock-inline-agent')).toBeInTheDocument())
     await waitFor(() =>
         expect(new URLSearchParams(window.location.search).get('pid')).toBe(nextVariant.productId)
     )

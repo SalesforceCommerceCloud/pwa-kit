@@ -68,7 +68,12 @@ const waitForProvider = (signal) =>
         check()
     })
 
-export const handoffToShopperAgent = async ({question, productContext = {}, signal} = {}) => {
+export const handoffToShopperAgent = async ({
+    question,
+    productContext = {},
+    signal,
+    primePageContext = true
+} = {}) => {
     if (!onClient) return {opened: false, seeded: false, provider: 'none'}
 
     const trimmed = typeof question === 'string' ? question.trim() : ''
@@ -92,7 +97,7 @@ export const handoffToShopperAgent = async ({question, productContext = {}, sign
 
     let seeded = false
     if (provider === 'commerce-client') {
-        primeCimulatePageContext(productContext)
+        if (primePageContext) primeCimulatePageContext(productContext)
         seeded = await trySendViaCimulate(trimmed)
     }
 

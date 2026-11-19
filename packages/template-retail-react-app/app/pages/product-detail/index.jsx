@@ -831,14 +831,20 @@ const ProductDetail = () => {
                                 showDeliveryOptions={storeLocatorEnabled}
                                 showDeliveryEstimate={true}
                                 actionFooter={
-                                    <InlineAgentWidget
-                                        config={embeddedAgentConfig}
-                                        pdpQuestions={parsePdpQuestions(
-                                            productResponse?.c_pdpQuestions
-                                        )}
-                                        productName={productResponse?.name}
-                                        productId={productResponse?.id}
-                                    />
+                                    pageContextEnabled &&
+                                    (isPreviousProductData ||
+                                        isProductLoading ||
+                                        isProductError) ? null : (
+                                        <InlineAgentWidget
+                                            config={embeddedAgentConfig}
+                                            pdpQuestions={parsePdpQuestions(
+                                                productResponse?.c_pdpQuestions
+                                            )}
+                                            productName={productResponse?.name}
+                                            productId={productResponse?.id}
+                                            pageContextManaged={pageContextEnabled}
+                                        />
+                                    )
                                 }
                             />
                             <InformationAccordion product={product} />

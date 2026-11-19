@@ -14,6 +14,7 @@ import {
     useCommerceClientPdpContext
 } from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
 import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import {handoffToShopperAgent} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
 
 const productA = {id: 'A', name: 'Product A', imageGroups: [{images: [{link: '/A.jpg'}]}]}
 const productB = {id: 'B', name: 'Product B'}
@@ -168,6 +169,33 @@ describe('Commerce Client PDP adapter', () => {
         expect(window.CimulateMessaging.eventHandlers.sendMessage).not.toHaveBeenCalled()
         expect(inject).toHaveBeenCalledTimes(1)
         expect(getCommerceClientPageContext(queryClient)).toBeNull()
+    })
+
+    test('leaving while the next product loads clears context restored by an inline handoff', async () => {
+        let widgetContext = null
+        api.set.mockImplementation((context) => {
+            widgetContext = context
+        })
+        api.clear.mockImplementation(() => {
+            widgetContext = null
+        })
+        window.CimulateMessaging.eventHandlers.components = {toggleWidgetOpen: jest.fn()}
+        window.CimulateMessaging.eventHandlers.session = {
+            sendMessage: jest.fn().mockResolvedValue(undefined)
+        }
+        const view = render(tree())
+        view.rerender(tree({isPreviousData: true}))
+        expect(widgetContext).toBeNull()
+        await act(async () => {
+            await handoffToShopperAgent({
+                question: 'Tell me about this',
+                productContext: {productId: 'A'}
+            })
+        })
+        expect(widgetContext).toEqual({type: 'pdp', id: 'A'})
+        view.rerender(tree({showPdp: false}))
+        expect(getCommerceClientPageContext(queryClient)).toBeNull()
+        expect(widgetContext).toBeNull()
     })
 
     test('an authoritative variant selection uses the existing id field', () => {

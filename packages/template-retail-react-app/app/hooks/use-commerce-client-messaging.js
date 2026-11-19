@@ -208,11 +208,11 @@ const useCommerceClientMessaging = (scriptLoadStatus, options = {}) => {
             return
         }
 
-        const syncPageContext = () => {
+        const syncPageContext = (forceClear = false) => {
             if (!hasInjectedRef.current || options.enablePageContext !== true) return
             const context = getCommerceClientPageContext(queryClient)
             const contextKey = JSON.stringify(context)
-            if (lastContextRef.current === contextKey) return
+            if (lastContextRef.current === contextKey && (context || !forceClear)) return
             const pageContext = window.CimulateMessaging?.eventHandlers?.pageContext
             if (typeof pageContext?.set !== 'function' || typeof pageContext?.clear !== 'function')
                 return
@@ -244,7 +244,8 @@ const useCommerceClientMessaging = (scriptLoadStatus, options = {}) => {
                 event.type === 'updated' &&
                 event.query.queryKey[0] === COMMERCE_CLIENT_PAGE_CONTEXT_KEY[0]
             ) {
-                syncPageContext()
+                // Another widget integration can set context after we last cleared it.
+                syncPageContext(true)
             }
         })
     }, [scriptLoadStatus, options, queryClient])
