@@ -516,3 +516,25 @@ describe('useCommerceClientMessaging', () => {
         expect(mockInject).toHaveBeenCalledTimes(1)
     })
 })
+
+test('forwards direct cart and optional iframe configuration only in direct mode', () => {
+    const inject = jest.fn()
+    window.CimulateMessaging = {injectMessagingWidget: inject}
+    injectCommerceClientWidget({
+        ...messagingFields,
+        cartTransport: 'direct',
+        storefrontCartPageUrl: '/embedded-cart'
+    })
+    expect(inject.mock.calls[0][0].messagingConfig).toMatchObject({
+        cartTransport: 'direct',
+        storefrontCartPageUrl: '/embedded-cart'
+    })
+    injectCommerceClientWidget({
+        ...messagingFields,
+        cartTransport: 'agent',
+        storefrontCartPageUrl: '/embedded-cart'
+    })
+    expect(inject.mock.calls[1][0].messagingConfig).not.toHaveProperty('cartTransport')
+    expect(inject.mock.calls[1][0].messagingConfig).not.toHaveProperty('storefrontCartPageUrl')
+    delete window.CimulateMessaging
+})

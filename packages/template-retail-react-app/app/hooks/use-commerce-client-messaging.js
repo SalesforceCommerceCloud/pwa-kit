@@ -88,7 +88,9 @@ const injectCommerceClientWidget = ({
     showProductDescription,
     showProductCaptions,
     promptsConfig,
-    enablePageContext
+    enablePageContext,
+    cartTransport,
+    storefrontCartPageUrl
 } = {}) => {
     if (!onClient) return false
 
@@ -118,6 +120,11 @@ const injectCommerceClientWidget = ({
         }
         if (typeof enablePageContext === 'boolean') {
             messagingConfig.enablePageContext = enablePageContext
+        }
+
+        if (cartTransport === 'direct') {
+            messagingConfig.cartTransport = 'direct'
+            if (storefrontCartPageUrl) messagingConfig.storefrontCartPageUrl = storefrontCartPageUrl
         }
 
         commerceClient.injectMessagingWidget({
