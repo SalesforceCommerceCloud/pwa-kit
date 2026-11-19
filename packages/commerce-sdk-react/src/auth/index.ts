@@ -63,6 +63,8 @@ interface AuthConfig extends ApiClientConfigParams {
     cookieDomain?: string
     /** When true, session tokens are set as HttpOnly cookies */
     enableHttpOnlySessionCookies?: boolean
+    /** Opt in to the browser token-response cache workaround. Defaults to false. */
+    enableTokenResponseCacheWorkaround?: boolean
 }
 
 interface JWTHeaders {
@@ -351,8 +353,10 @@ class Auth {
 
     private hybridAuthEnabled: boolean
     private enableHttpOnlySessionCookies: boolean
+    private enableTokenResponseCacheWorkaround: boolean
 
     constructor(config: AuthConfig) {
+        this.enableTokenResponseCacheWorkaround = config.enableTokenResponseCacheWorkaround === true
         // Special proxy endpoint for injecting SLAS private client secret.
         // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
         this.client = new ShopperLogin({
@@ -657,7 +661,10 @@ class Auth {
         // Googlebot has been observed reusing expired token responses with a stale
         // renderer clock. Reject future-issued tokens so this condition triggers a refresh.
         // Workaround for the Googlebot caching issue tracked in W-24950604.
-        return tokenAgeSeconds < -60 || validTimeSeconds <= tokenAgeSeconds
+        return (
+            (this.enableTokenResponseCacheWorkaround && tokenAgeSeconds < -60) ||
+            validTimeSeconds <= tokenAgeSeconds
+        )
     }
 
     /**
@@ -665,6 +672,7 @@ class Auth {
      * (W-24950604). Vary token request URLs even when the renderer's clock is frozen.
      */
     private addTokenRequestNonce(client: ShopperLogin<ApiClientConfigParams>) {
+        if (!this.enableTokenResponseCacheWorkaround) return
         const wrap = <Method extends 'getAccessToken' | 'getTrustedAgentAccessToken'>(
             method: Method
         ) => {

@@ -1,6 +1,6 @@
 # Configurable Googlebot token-cache workaround
 
-Status: Agreed design; configuration gating is not yet implemented.
+Status: Implemented; live rollout verification remains.
 
 Decision date: November 18, 2026.
 
@@ -10,7 +10,7 @@ Tracking: [W-24950604](https://gus.lightning.force.com/lightning/r/ADM_Work__c/a
 
 Googlebot has been observed reusing stale SLAS token responses while its renderer clock is behind real time. The stale clock can make an expired JWT appear usable to the storefront, resulting in repeated SCAPI 401s. The exact caching layer has not been directly observed.
 
-The initial port of the commerce-sdk-react 3.4.0 hotfix adds a fresh `c_nonce` query parameter to token requests and treats JWTs issued more than 60 seconds in the future as expired. That port currently applies these additions universally. This decision narrows their scope through existing PWA Kit application configuration and request classification.
+The initial port of the commerce-sdk-react 3.4.0 hotfix adds a fresh `c_nonce` query parameter to token requests and treats JWTs issued more than 60 seconds in the future as expired. That initial port applied these additions universally. This decision narrows their scope through existing PWA Kit application configuration and request classification.
 
 The workaround is opt-in and targets a configurable request class. A fixed `bot` class would exclude storefronts that use custom request-class names.
 

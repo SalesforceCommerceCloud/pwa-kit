@@ -63,6 +63,8 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     pageDesignerParams?: PageDesignerParams
     /** When true, proxy returns tokens in HttpOnly cookies. */
     enableHttpOnlySessionCookies?: boolean
+    /** Opt in to the Googlebot token-response cache workaround. Defaults to false. */
+    enableTokenResponseCacheWorkaround?: boolean
 }
 
 /**
@@ -164,7 +166,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         hybridAuthEnabled = false,
         cookieDomain,
         pageDesignerParams = {},
-        enableHttpOnlySessionCookies = false
+        enableHttpOnlySessionCookies = false,
+        enableTokenResponseCacheWorkaround = false
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -216,7 +219,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             refreshTokenGuestCookieTTL,
             hybridAuthEnabled,
             cookieDomain,
-            enableHttpOnlySessionCookies
+            enableHttpOnlySessionCookies,
+            enableTokenResponseCacheWorkaround
         })
     }, [
         clientId,
@@ -241,7 +245,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         apiClients,
         hybridAuthEnabled,
         cookieDomain,
-        enableHttpOnlySessionCookies
+        enableHttpOnlySessionCookies,
+        enableTokenResponseCacheWorkaround
     ])
 
     const dwsid = auth.get(DWSID_COOKIE_NAME)
@@ -386,7 +391,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 refreshTokenRegisteredCookieTTL,
                 refreshTokenGuestCookieTTL,
                 pageDesignerParams,
-                enableHttpOnlySessionCookies
+                enableHttpOnlySessionCookies,
+                enableTokenResponseCacheWorkaround
             }}
         >
             <CommerceApiContext.Provider value={updatedClients}>

@@ -218,46 +218,74 @@ describe('Auth', () => {
         // @ts-expect-error private method
         expect(() => auth.isTokenExpired()).toThrow()
     })
-    test.each([
-        [61, 3600, true],
-        [60, 3600, false],
-        [59, 3600, false],
-        [0, 61, false],
-        [0, 60, true],
-        [0, 59, true],
-        [-3600, -1, true]
-    ])('isTokenExpired with iat offset %s and exp offset %s returns %s', (iat, exp, expired) => {
-        const now = 1800000000
-        const clock = jest.spyOn(Date, 'now').mockReturnValue(now * 1000)
-        try {
-            const auth = new Auth(config)
-            const token = jwt.sign({iat: now + iat, exp: now + exp}, 'secret')
-            // @ts-expect-error private method
-            expect(auth.isTokenExpired(token)).toBe(expired)
-        } finally {
-            clock.mockRestore()
-        }
+    describe.each([undefined, false, true])('token expiration workaround %s', (enabled) => {
+        test.each([
+            [61, 3600, true],
+            [60, 3600, false],
+            [59, 3600, false],
+            [0, 61, false],
+            [0, 60, true],
+            [0, 59, true],
+            [-3600, -1, true]
+        ])(
+            'isTokenExpired with iat offset %s and exp offset %s returns %s',
+            (iat, exp, expired) => {
+                const now = 1800000000
+                const clock = jest.spyOn(Date, 'now').mockReturnValue(now * 1000)
+                try {
+                    const auth = new Auth({...config, enableTokenResponseCacheWorkaround: enabled})
+                    const token = jwt.sign({iat: now + iat, exp: now + exp}, 'secret')
+                    // @ts-expect-error private method
+                    expect(auth.isTokenExpired(token)).toBe(iat > 60 ? enabled === true : expired)
+                } finally {
+                    clock.mockRestore()
+                }
+            }
+        )
     })
 
-    test('ready refreshes a stored token issued beyond the clock-skew allowance', async () => {
-        const auth = new Auth(config)
-        const now = Math.floor(Date.now() / 1000)
-        const token = jwt.sign({iat: now + 61, exp: now + 1800}, 'secret')
-        // @ts-expect-error private method
-        auth.set('access_token', token)
-        const refresh = jest.spyOn(auth, 'refreshAccessToken').mockResolvedValue({} as AuthData)
-        try {
-            await auth.ready()
-            expect(refresh).toHaveBeenCalledTimes(1)
-        } finally {
-            refresh.mockRestore()
+    test.each([false, true])(
+        'ready only refreshes a future-issued token when enabled (%s)',
+        async (enabled) => {
+            const auth = new Auth({...config, enableTokenResponseCacheWorkaround: enabled})
+            const now = Math.floor(Date.now() / 1000)
+            const token = jwt.sign({iat: now + 61, exp: now + 1800}, 'secret')
+            // @ts-expect-error private method
+            auth.set('access_token', token)
+            const refresh = jest.spyOn(auth, 'refreshAccessToken').mockResolvedValue({} as AuthData)
+            try {
+                await auth.ready()
+                expect(refresh).toHaveBeenCalledTimes(enabled ? 1 : 0)
+            } finally {
+                refresh.mockRestore()
+            }
         }
-    })
+    )
+
+    test.each([false, true])(
+        'HttpOnly browser expiry is unchanged by the workaround (%s)',
+        async (enabled) => {
+            const auth = new Auth({
+                ...config,
+                enableHttpOnlySessionCookies: true,
+                enableTokenResponseCacheWorkaround: enabled
+            })
+            // @ts-expect-error private method
+            auth.set('cc-at-expires', String(Math.floor(Date.now() / 1000) + 1800))
+            const refresh = jest.spyOn(auth, 'refreshAccessToken').mockResolvedValue({} as AuthData)
+            try {
+                await auth.ready()
+                expect(refresh).not.toHaveBeenCalled()
+            } finally {
+                refresh.mockRestore()
+            }
+        }
+    )
 
     test.each(['getAccessToken', 'getTrustedAgentAccessToken'] as const)(
         '%s varies token URLs with a frozen clock and preserves request options',
         async (method) => {
-            const auth = new Auth(config)
+            const auth = new Auth({...config, enableTokenResponseCacheWorkaround: true})
             const result = {access_token: 'token'}
             const request = jest.fn().mockResolvedValue(result)
             const client = {getAccessToken: request, getTrustedAgentAccessToken: request}
@@ -307,20 +335,29 @@ describe('Auth', () => {
         }
     )
 
-    test('adds the nonce to the separate direct private-client auth client', async () => {
-        const auth = new Auth({...config, clientSecret: 'secret'})
-        // @ts-expect-error private method
-        const client = auth.getSlasClientWithClientAuth()
-        const clientMock = (ShopperLogin as unknown as jest.Mock).mock.results.slice(-1)[0].value
-        expect(client).toBe(clientMock)
-        expect(client.clientConfig.headers['x-slas-client-auth']).toBeDefined()
-        // The mocked SDK method is still called through the nonce wrapper.
-        await client.getAccessToken({body: {grant_type: 'client_credentials'}})
-        expect(clientMock.getAccessToken).toHaveBeenCalledWith(
-            expect.objectContaining({parameters: {c_nonce: expect.any(String)}}),
-            undefined
-        )
-    })
+    test.each([false, true])(
+        'direct private-client auth uses its workaround setting (%s)',
+        async (enabled) => {
+            const auth = new Auth({
+                ...config,
+                clientSecret: 'secret',
+                enableTokenResponseCacheWorkaround: enabled
+            })
+            // @ts-expect-error private method
+            const client = auth.getSlasClientWithClientAuth()
+            const clientMock = (ShopperLogin as unknown as jest.Mock).mock.results.slice(-1)[0]
+                .value
+            expect(client).toBe(clientMock)
+            expect(client.clientConfig.headers['x-slas-client-auth']).toBeDefined()
+            await client.getAccessToken({body: {grant_type: 'client_credentials'}})
+            const nonceOptions = expect.objectContaining({
+                parameters: {c_nonce: expect.any(String)}
+            })
+            expect(clientMock.getAccessToken.mock.calls[0][0]).toEqual(
+                enabled ? nonceOptions : {body: {grant_type: 'client_credentials'}}
+            )
+        }
+    )
     test('getAccessToken from local store', () => {
         const auth = new Auth(config)
         // @ts-expect-error private method

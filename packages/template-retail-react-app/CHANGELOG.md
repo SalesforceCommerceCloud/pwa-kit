@@ -1,4 +1,5 @@
 ## v10.4.0-dev (Oct 20, 2026)
+- [Bugfix] Add opt-in `app.commerceAPI.tokenResponseCacheWorkaround` settings (`enabled` and `requestClass`) to scope the Googlebot token-cache workaround to matching browser documents. Disabled by default; server rendering is unchanged.
 - [Docs] Remove the obsolete WIP warning from the default `enableHttpOnlySessionCookies` configuration; production support starts with PWA Kit 3.19 and the feature remains opt-in. [#4116](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4116)
 - [Bugfix] Let the client loader own the inline widget CDN script so error handling exists before the request starts; keep a server-rendered CDN preconnect hint. Share loading across mounts and warn after 10 seconds without blocking late registration. [#4113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4113)
 - [Enhancement] Enable the `inline-agent-widget:handoff` listener for hybrid mode so pill clicks and typed questions dispatch to the main Shopper Agent. [#4105](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4105)

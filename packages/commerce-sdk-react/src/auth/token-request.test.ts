@@ -25,70 +25,100 @@ const body = {
     client_id: 'clientId'
 }
 
-describe.each([
-    ['standard', {proxy: `${host}/mobify/proxy/api`}, '/mobify/proxy/api'],
-    [
-        'private HttpOnly',
-        {
-            proxy: host,
-            enablePWAKitPrivateClient: true,
-            enableHttpOnlySessionCookies: true,
-            privateClientProxyEndpoint: `${host}/mobify/slas/private`
-        },
-        '/mobify/slas/private'
-    ],
-    [
-        'public HttpOnly',
-        {
-            proxy: host,
-            enableHttpOnlySessionCookies: true,
-            publicClientProxyEndpoint: `${host}/mobify/slas/public`
-        },
-        '/mobify/slas/public'
-    ]
-] as const)('%s token requests', (_name, options, prefix) => {
-    test.each([
-        ['getAccessToken', '/oauth2/token'],
-        ['getTrustedAgentAccessToken', '/oauth2/trusted-agent/token']
-    ] as const)('%s sends the nonce through the real SDK', async (method, endpoint) => {
-        const auth = new Auth({...config, ...options})
-        const response = {access_token: 'test-token'}
-        const scope = nock(host)
-            .post(`${prefix}/shopper/auth/v1/organizations/organizationId${endpoint}`)
-            .query((query) => {
-                expect(query.c_nonce).toEqual(expect.any(String))
-                expect(query.c_custom).toBe('keep')
-                return true
+describe.each([undefined, false, true])('workaround enabled: %s', (enabled) => {
+    describe.each([
+        ['standard', {proxy: `${host}/mobify/proxy/api`}, '/mobify/proxy/api'],
+        [
+            'private HttpOnly',
+            {
+                proxy: host,
+                enablePWAKitPrivateClient: true,
+                enableHttpOnlySessionCookies: true,
+                privateClientProxyEndpoint: `${host}/mobify/slas/private`
+            },
+            '/mobify/slas/private'
+        ],
+        [
+            'public HttpOnly',
+            {
+                proxy: host,
+                enableHttpOnlySessionCookies: true,
+                publicClientProxyEndpoint: `${host}/mobify/slas/public`
+            },
+            '/mobify/slas/public'
+        ]
+    ] as const)('%s token requests', (_name, options, prefix) => {
+        test.each([
+            ['getAccessToken', '/oauth2/token'],
+            ['getTrustedAgentAccessToken', '/oauth2/trusted-agent/token']
+        ] as const)('%s sends the nonce through the real SDK', async (method, endpoint) => {
+            const auth = new Auth({
+                ...config,
+                ...options,
+                enableTokenResponseCacheWorkaround: enabled
             })
-            .reply(200, response)
-        // @ts-expect-error private client
-        await expect(auth.client[method]({body, parameters: {c_custom: 'keep'}})).resolves.toEqual(
-            response
-        )
-        expect(scope.isDone()).toBe(true)
-    })
+            const response = {access_token: 'test-token'}
+            const scope = nock(host)
+                .post(`${prefix}/shopper/auth/v1/organizations/organizationId${endpoint}`)
+                .query((query) => {
+                    const generatedNonce = expect.any(String)
+                    expect(query.c_nonce).toEqual(enabled ? generatedNonce : 'caller-nonce')
+                    expect(query.c_nonce === 'caller-nonce').toBe(!enabled)
+                    expect(query.c_custom).toBe('keep')
+                    return true
+                })
+                .reply(200, response)
+            await expect(
+                // @ts-expect-error private client with compatible options for both token methods
+                auth.client[method]({body, parameters: {c_custom: 'keep', c_nonce: 'caller-nonce'}})
+            ).resolves.toEqual(response)
+            expect(scope.isDone()).toBe(true)
+        })
 
-    test('preserves raw responses and SDK error response bodies', async () => {
-        const auth = new Auth({...config, ...options})
-        const path = `${prefix}/shopper/auth/v1/organizations/organizationId/oauth2/token`
-        const response = {message: 'invalid refresh_token'}
-        const scope = nock(host)
-            .post(path)
-            .query(true)
-            .reply(401, response)
-            .post(path)
-            .query(true)
-            .reply(401, response)
-        // @ts-expect-error private client
-        const raw = await auth.client.getAccessToken({body}, true)
-        expect(raw.status).toBe(401)
-        expect(await raw.json()).toEqual(response)
-        // @ts-expect-error private client
-        const error = await auth.client.getAccessToken({body}).catch((error: unknown) => error)
-        expect(error).toBeInstanceOf(ResponseError)
-        const responseError = error as ResponseError
-        expect(responseError.response.status).toBe(401)
-        expect(await responseError.response.json()).toEqual(response)
-        expect(scope.isDone()).toBe(true)
+        test('does not inject a nonce unless explicitly enabled', async () => {
+            const auth = new Auth({
+                ...config,
+                ...options,
+                enableTokenResponseCacheWorkaround: enabled
+            })
+            const scope = nock(host)
+                .post(`${prefix}/shopper/auth/v1/organizations/organizationId/oauth2/token`)
+                .query((query) => {
+                    expect(typeof query.c_nonce).toBe(enabled ? 'string' : 'undefined')
+                    return true
+                })
+                .reply(200, {})
+            // @ts-expect-error private client
+            await auth.client.getAccessToken({body})
+            expect(scope.isDone()).toBe(true)
+        })
+
+        test('preserves raw responses and SDK error response bodies', async () => {
+            const auth = new Auth({
+                ...config,
+                ...options,
+                enableTokenResponseCacheWorkaround: enabled
+            })
+            const path = `${prefix}/shopper/auth/v1/organizations/organizationId/oauth2/token`
+            const response = {message: 'invalid refresh_token'}
+            const scope = nock(host)
+                .post(path)
+                .query(true)
+                .reply(401, response)
+                .post(path)
+                .query(true)
+                .reply(401, response)
+            // @ts-expect-error private client
+            const raw = await auth.client.getAccessToken({body}, true)
+            expect(raw.status).toBe(401)
+            expect(await raw.json()).toEqual(response)
+            // @ts-expect-error private client
+            const error = await auth.client.getAccessToken({body}).catch((error: unknown) => error)
+            expect(error).toBeInstanceOf(ResponseError)
+            const responseError = error as ResponseError
+            expect(responseError.response.status).toBe(401)
+            expect(await responseError.response.json()).toEqual(response)
+            expect(scope.isDone()).toBe(true)
+        })
     })
 })

@@ -181,6 +181,12 @@ module.exports = {
         },
         sites,
         commerceAPI: {
+            // Opt matching browser request classes into the Googlebot token-cache workaround.
+            // Classify requests via setRequestClass() in app/request-processor.js.
+            tokenResponseCacheWorkaround: {
+                enabled: false,
+                requestClass: 'bot'
+            },
             proxyPath: `/mobify/proxy/api`,
             parameters: {
                 clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
