@@ -6,6 +6,11 @@
  */
 
 import React, {useEffect, useRef, useMemo} from 'react'
+import useCommerceClientCart from '@salesforce/retail-react-app/app/hooks/use-commerce-client-cart'
+import {
+    normalizeCartTransport,
+    normalizeCartPageUrl
+} from '@salesforce/retail-react-app/app/utils/commerce-client-cart'
 import {defineMessage, useIntl} from 'react-intl'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {
@@ -611,6 +616,12 @@ const toOptionalWidgetBoolean = (value) => {
     return normalized === 'true'
 }
 
+const CommerceClientCart = ({ready, expressEnabled}) => {
+    useCommerceClientCart({enabled: true, ready, expressEnabled})
+    return null
+}
+CommerceClientCart.propTypes = {ready: PropTypes.bool, expressEnabled: PropTypes.bool}
+
 /**
  * Internal component that renders the Commerce Client messaging widget.
  *
@@ -708,7 +719,10 @@ const CommerceClientAgentWindow = ({
         cc_showProductDescription,
         cc_showProductCaptions,
         cc_promptsConfig,
-        cc_enablePageContext
+        cc_enablePageContext,
+        cc_cartTransport,
+        cc_storefrontCartPageUrl,
+        cc_expressCheckoutEnabled
     } = commerceAgentConfiguration
 
     const navigate = useNavigation()
@@ -1184,7 +1198,12 @@ const CommerceClientAgentWindow = ({
             showProductDescription: toOptionalWidgetBoolean(cc_showProductDescription),
             showProductCaptions: toOptionalWidgetBoolean(cc_showProductCaptions),
             promptsConfig: cc_promptsConfig,
-            enablePageContext: toOptionalWidgetBoolean(cc_enablePageContext)
+            enablePageContext: toOptionalWidgetBoolean(cc_enablePageContext),
+            cartTransport: normalizeCartTransport(cc_cartTransport),
+            storefrontCartPageUrl:
+                normalizeCartTransport(cc_cartTransport) === 'direct'
+                    ? normalizeCartPageUrl(cc_storefrontCartPageUrl)
+                    : ''
         }),
         [
             commerceClientElementId,
@@ -1222,7 +1241,9 @@ const CommerceClientAgentWindow = ({
             cc_showProductDescription,
             cc_showProductCaptions,
             cc_promptsConfig,
-            cc_enablePageContext
+            cc_enablePageContext,
+            cc_cartTransport,
+            cc_storefrontCartPageUrl
         ]
     )
 
@@ -1231,6 +1252,12 @@ const CommerceClientAgentWindow = ({
 
     return (
         <>
+            {normalizeCartTransport(cc_cartTransport) === 'direct' && (
+                <CommerceClientCart
+                    ready={isCommerceClientReady}
+                    expressEnabled={cc_expressCheckoutEnabled === 'true'}
+                />
+            )}
             <div id={commerceClientElementId} data-testid="commerce-client-agent-widget" />
             {/* Gate the FAB on bundle load; before injection there is no widget for its click to reach. */}
             {showFab && scriptLoadStatus?.loaded && !scriptLoadStatus?.error && (

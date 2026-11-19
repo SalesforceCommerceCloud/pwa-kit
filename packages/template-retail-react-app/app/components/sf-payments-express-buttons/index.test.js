@@ -2860,3 +2860,124 @@ describe('onShippingMethodChange PayPal PATCH', () => {
         )
     })
 })
+
+describe('Shopper Agent iframe payment integration', () => {
+    const basket = makeBasket('iframe-basket')
+    const order = makeOrder('iframe-order', {
+        paymentInstruments: [
+            {paymentMethodId: 'Salesforce Payments', paymentInstrumentId: 'pi-iframe'}
+        ]
+    })
+    beforeEach(() => {
+        mockValidateTestCaptureConfig = {}
+        mockOnCancelMocks = {endConfirming: jest.fn(), toast: jest.fn()}
+        mockAttemptFailOrderMocks = createAttemptFailOrderMocks({order, basket})
+    })
+    afterEach(() => {
+        mockValidateTestCaptureConfig = null
+        mockOnCancelMocks = null
+        mockAttemptFailOrderMocks = null
+    })
+    test('reports a successful order to the iframe without navigating', async () => {
+        const report = jest.fn()
+        const guard = jest.fn().mockResolvedValue(basket)
+        const {config} = await renderAndGetConfig({
+            prepareBasket: async () => basket,
+            beforeExpressPayment: guard,
+            onExpressPaymentResult: report,
+            walletsOnly: true
+        })
+        await config.actions.onClick('applepay')
+        await flush()
+        await config.actions.createIntent()
+        dispatchPaymentEvent('sfp:paymentapprove')
+        await waitFor(() =>
+            expect(report).toHaveBeenCalledWith({status: 'success', orderId: 'iframe-order'})
+        )
+        expect(guard).toHaveBeenCalled()
+        expect(mockNavigate).not.toHaveBeenCalled()
+    })
+    test('does not prepare a payment when the live quote guard fails', async () => {
+        const report = jest.fn()
+        const {config} = await renderAndGetConfig({
+            prepareBasket: async () => basket,
+            beforeExpressPayment: async () => {
+                throw new Error('total changed')
+            },
+            onExpressPaymentResult: report
+        })
+        await config.actions.onClick('googlepay')
+        await flush()
+        await expect(config.actions.createIntent()).rejects.toThrow('total changed')
+        expect(mockAttemptFailOrderMocks.createOrder).not.toHaveBeenCalled()
+        expect(report).toHaveBeenCalledWith({status: 'failure'})
+        expect(mockNavigate).not.toHaveBeenCalled()
+    })
+    test('reports cancellation and failure without navigating the iframe', async () => {
+        const report = jest.fn()
+        const {config} = await renderAndGetConfig({
+            prepareBasket: async () => basket,
+            onExpressPaymentResult: report
+        })
+        await config.actions.onClick('googlepay')
+        await flush()
+        dispatchPaymentEvent('sfp:paymentcancel')
+        await waitFor(() => expect(report).toHaveBeenCalledWith({status: 'cancel'}))
+        dispatchPaymentEvent('sfp:paymenterror')
+        await waitFor(() => expect(report).toHaveBeenCalledWith({status: 'failure'}))
+        expect(mockNavigate).not.toHaveBeenCalled()
+    })
+    test('refuses payment if billing or preparation changes the amount already quoted by the wallet', async () => {
+        const report = jest.fn()
+        const {config} = await renderAndGetConfig({
+            prepareBasket: async () => basket,
+            beforeExpressPayment: async () => ({...basket, orderTotal: 101}),
+            onExpressPaymentResult: report
+        })
+        await config.actions.onClick('googlepay')
+        await flush()
+        await expect(config.actions.createIntent()).rejects.toThrow('wallet total changed')
+        expect(mockAttemptFailOrderMocks.createOrder).not.toHaveBeenCalled()
+        expect(report).toHaveBeenCalledWith({status: 'failure'})
+    })
+
+    test('advances the wallet quote after a shipping method change', async () => {
+        const updated = {
+            ...basket,
+            orderTotal: 125,
+            shipments: [{shipmentId: 'me', shippingMethod: {id: 'express'}}]
+        }
+        mockValidateTestMocks = {
+            updateShippingMethod: jest.fn().mockResolvedValue(updated),
+            refetchShippingMethods: jest.fn().mockResolvedValue({
+                data: {applicableShippingMethods: [{id: 'express', name: 'Express', price: 25}]}
+            })
+        }
+        const report = jest.fn()
+        const guard = jest.fn().mockResolvedValueOnce(basket).mockResolvedValue(updated)
+        const {config} = await renderAndGetConfig({
+            prepareBasket: async () => basket,
+            beforeExpressPayment: guard,
+            onExpressPaymentResult: report
+        })
+        await config.actions.onClick('googlepay')
+        await flush()
+        const callback = {updateShippingMethod: jest.fn()}
+        await config.actions.onShippingMethodChange({id: 'express'}, callback)
+        expect(callback.updateShippingMethod).toHaveBeenCalledWith(
+            expect.objectContaining({total: '125'})
+        )
+        await config.actions.createIntent()
+        expect(mockAttemptFailOrderMocks.createOrder).toHaveBeenCalledTimes(1)
+        mockValidateTestMocks = null
+    })
+
+    test('rejects other methods in the chat wallet surface', async () => {
+        const {config} = await renderAndGetConfig({
+            prepareBasket: async () => basket,
+            walletsOnly: true
+        })
+        await expect(config.actions.onClick('paypal')).rejects.toThrow('not supported')
+        expect(mockAttemptFailOrderMocks.createOrder).not.toHaveBeenCalled()
+    })
+})

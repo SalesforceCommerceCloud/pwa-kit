@@ -65,8 +65,29 @@ const SFPaymentsExpressButtons = ({
     expressButtonLayout = 'vertical',
     maximumButtonCount = undefined,
     onPaymentMethodsRendered,
-    onExpressPaymentCompleted
+    onExpressPaymentCompleted,
+    onExpressPaymentResult,
+    beforeExpressPayment,
+    walletsOnly = false
 }) => {
+    const quotedAmountRef = useRef(initialAmount)
+    const integrationRef = useRef()
+    integrationRef.current = {onExpressPaymentResult, beforeExpressPayment, walletsOnly}
+    const reportResult = (result) => integrationRef.current.onExpressPaymentResult?.(result)
+    const validateLiveBasket = async () => {
+        if (prepareBasketPromise.current) {
+            expressBasket.current = await prepareBasketPromise.current
+            prepareBasketPromise.current = null
+        }
+        if (integrationRef.current.beforeExpressPayment) {
+            expressBasket.current = await integrationRef.current.beforeExpressPayment(
+                expressBasket.current
+            )
+            if (expressBasket.current?.orderTotal !== quotedAmountRef.current) {
+                throw new Error('The wallet total changed. Open View Cart before paying again.')
+            }
+        }
+    }
     const intl = useIntl()
     const navigate = useNavigation()
     const toast = useToast()
@@ -428,7 +449,14 @@ const SFPaymentsExpressButtons = ({
             orderRef.current = null
 
             const onClick = async (type) => {
+                if (
+                    integrationRef.current.walletsOnly &&
+                    !['applepay', 'googlepay'].includes(type)
+                ) {
+                    throw new Error('This wallet is not supported in chat.')
+                }
                 // reset payment, order and failorder flags
+                quotedAmountRef.current = initialAmount
                 isPaymentInProgress.current = true
                 failOrderCalledRef.current = false
                 orderRef.current = null
@@ -448,7 +476,11 @@ const SFPaymentsExpressButtons = ({
                             expressBasket.current = basket
                         })
                         .catch((e) => {
-                            prepareBasketPromise.current = null // Clear the promise so handlers don't try to await it
+                            // Retain the rejected preparation in iframe mode so a
+                            // later callback cannot proceed with an old basket.
+                            if (!integrationRef.current.onExpressPaymentResult)
+                                prepareBasketPromise.current = null
+                            reportResult({status: 'failure'})
                             // Don't show toast for validation errors
                             if (!e.isValidationError) {
                                 showErrorMessage(e.message || ERROR_MESSAGE_KEYS.PREPARE_BASKET)
@@ -534,12 +566,26 @@ const SFPaymentsExpressButtons = ({
             const onCancel = async () => {
                 isPaymentInProgress.current = false
                 endConfirming()
+                // A wallet may cancel while its initial basket read is pending.
+                if (prepareBasketPromise.current) {
+                    try {
+                        await prepareBasketPromise.current
+                    } catch (error) {
+                        /* No basket to clean up. */
+                    }
+                    prepareBasketPromise.current = null
+                }
+                if (integrationRef.current.onExpressPaymentResult && orderRef.current?.orderNo) {
+                    await attemptFailOrder(orderRef.current.orderNo)
+                }
                 await cleanupExpressBasket()
+                reportResult({status: 'cancel'})
                 showErrorMessage(ERROR_MESSAGE_KEYS.DEFAULT)
             }
 
             const onShippingAddressChange = async (shippingAddress, callback) => {
                 try {
+                    if (integrationRef.current.beforeExpressPayment) await validateLiveBasket()
                     // Wait for basket to be prepared if it's not ready yet
                     if (prepareBasketPromise.current) {
                         try {
@@ -626,17 +672,20 @@ const SFPaymentsExpressButtons = ({
                         updatedBasket,
                         updatedShippingMethods
                     )
+                    quotedAmountRef.current = Number(expressCallback.total)
                     callback.updateShippingAddress(expressCallback)
                 } catch (e) {
                     callback.updateShippingAddress({
                         errors: ['fail']
                     })
+                    reportResult({status: 'failure'})
                     showErrorMessage()
                 }
             }
 
             const onShippingMethodChange = async (shippingMethod, callback) => {
                 try {
+                    if (integrationRef.current.beforeExpressPayment) await validateLiveBasket()
                     // Wait for basket to be prepared if it's not ready yet
                     if (prepareBasketPromise.current) {
                         try {
@@ -707,16 +756,20 @@ const SFPaymentsExpressButtons = ({
                         updatedBasket,
                         updatedShippingMethods
                     )
+                    quotedAmountRef.current = Number(expressCallback.total)
                     callback.updateShippingMethod(expressCallback)
                 } catch (e) {
                     callback.updateShippingMethod({
                         errors: ['fail']
                     })
+                    reportResult({status: 'failure'})
                     showErrorMessage()
                 }
             }
             //Async function to handle before payer approve event.  This is called before payment is confirmed
             const onPayerApprove = async (billingDetails, shippingDetails) => {
+                if (integrationRef.current.beforeExpressPayment && !orderRef.current)
+                    await validateLiveBasket()
                 // Set confirmingBasket to show loading spinner during address updates
                 startConfirming(expressBasket.current)
 
@@ -862,6 +915,7 @@ const SFPaymentsExpressButtons = ({
             }
 
             const createIntentFunction = async (paymentData = {}) => {
+                if (integrationRef.current.beforeExpressPayment) await validateLiveBasket()
                 const gateway = getGatewayFromPaymentMethod(
                     paymentMethodType,
                     paymentConfig?.paymentMethods,
@@ -1036,11 +1090,16 @@ const SFPaymentsExpressButtons = ({
 
                     endConfirming()
 
-                    // Navigate to confirmation page with the order number
-                    navigate(`/checkout/confirmation/${orderRef.current?.orderNo}`)
+                    // An iframe reports the result to its host instead of navigating.
+                    if (integrationRef.current.onExpressPaymentResult) {
+                        reportResult({status: 'success', orderId: orderRef.current?.orderNo})
+                    } else {
+                        navigate(`/checkout/confirmation/${orderRef.current?.orderNo}`)
+                    }
                     isPaymentInProgress.current = false
                 } catch (error) {
                     endConfirming()
+                    reportResult({status: 'failure'})
                 }
             }
 
@@ -1056,25 +1115,39 @@ const SFPaymentsExpressButtons = ({
                 const basketRecovered = await attemptFailOrder(orderRef.current?.orderNo)
 
                 endConfirming()
+                reportResult({status: 'failure'})
                 if (basketRecovered) {
                     showErrorMessage(ERROR_MESSAGE_KEYS.FAIL_ORDER)
                 } else {
                     showErrorMessage(ERROR_MESSAGE_KEYS.ORDER_RECOVERY_FAILED)
                     // Only navigate to cart if NOT on PDP
-                    if (usage !== EXPRESS_BUY_NOW) {
+                    if (
+                        usage !== EXPRESS_BUY_NOW &&
+                        !integrationRef.current.onExpressPaymentResult
+                    ) {
                         navigate('/cart')
                     }
                 }
             }
 
             const handlePaymentMethodsRendered = (details) => {
-                if (onPaymentMethodsRendered && details.detail.rendered.length > 0) {
-                    onPaymentMethodsRendered()
+                if (
+                    onPaymentMethodsRendered &&
+                    (details.detail.rendered.length > 0 ||
+                        integrationRef.current.onExpressPaymentResult)
+                ) {
+                    onPaymentMethodsRendered(details.detail)
                 }
             }
 
             const paymentMethodSet = {
-                paymentMethods: paymentConfig.paymentMethods,
+                paymentMethods: integrationRef.current.walletsOnly
+                    ? paymentConfig.paymentMethods.filter((method) =>
+                          ['card', 'applepay', 'googlepay'].includes(
+                              method.paymentMethodType || method.id
+                          )
+                      )
+                    : paymentConfig.paymentMethods,
                 paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts || []
             }
             const config = {
@@ -1093,8 +1166,22 @@ const SFPaymentsExpressButtons = ({
                     onClick: onClick,
                     onShippingAddressChange: onShippingAddressChange,
                     onShippingMethodChange: onShippingMethodChange,
-                    createIntent: createIntentFunction,
-                    onPayerApprove: onPayerApprove
+                    createIntent: async (...args) => {
+                        try {
+                            return await createIntentFunction(...args)
+                        } catch (error) {
+                            if (integrationRef.current.onExpressPaymentResult) await paymentError()
+                            throw error
+                        }
+                    },
+                    onPayerApprove: async (...args) => {
+                        try {
+                            return await onPayerApprove(...args)
+                        } catch (error) {
+                            if (integrationRef.current.onExpressPaymentResult) await paymentError()
+                            throw error
+                        }
+                    }
                 },
                 options: {
                     shippingAddressRequired: true,
@@ -1159,7 +1246,11 @@ SFPaymentsExpressButtons.propTypes = {
     expressButtonLayout: PropTypes.oneOf(['horizontal', 'vertical']),
     maximumButtonCount: PropTypes.number,
     onPaymentMethodsRendered: PropTypes.func,
-    onExpressPaymentCompleted: PropTypes.func
+    onExpressPaymentCompleted: PropTypes.func,
+    // Optional iframe integration. Ordinary storefront consumers keep navigation.
+    onExpressPaymentResult: PropTypes.func,
+    beforeExpressPayment: PropTypes.func,
+    walletsOnly: PropTypes.bool
 }
 
 export default SFPaymentsExpressButtons

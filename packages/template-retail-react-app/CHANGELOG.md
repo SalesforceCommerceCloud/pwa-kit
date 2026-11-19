@@ -1,4 +1,5 @@
 ## v10.4.0-dev (Oct 20, 2026)
+- [Feature] Add opt-in Shopper Agent direct cart actions and two-way basket synchronization for Commerce Client 1.58.1+, with shopper-change/uncertain-write guards, optional cart iframe configuration, and a Salesforce Payments cart iframe provider. Real sandbox/device wallet validation remains pending.
 - [Docs] Remove the obsolete WIP warning from the default `enableHttpOnlySessionCookies` configuration; production support starts with PWA Kit 3.19 and the feature remains opt-in. [#4116](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4116)
 - [Bugfix] Let the client loader own the inline widget CDN script so error handling exists before the request starts; keep a server-rendered CDN preconnect hint. Share loading across mounts and warn after 10 seconds without blocking late registration. [#4113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4113)
 - [Enhancement] Enable the `inline-agent-widget:handoff` listener for hybrid mode so pill clicks and typed questions dispatch to the main Shopper Agent. [#4105](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4105)
