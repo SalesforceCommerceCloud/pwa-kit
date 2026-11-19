@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/pwa-kit-mcp",
-  "version": "0.5.1",
+  "version": "0.5.1-nightly-20261119080304",
   "private": false,
   "description": "[DEPRECATED] MCP server that helps you build Salesforce Commerce Cloud PWA Kit Composable Storefront",
   "deprecated": "Discontinued. Use @salesforce/b2c-dx-mcp instead. See https://salesforcecommercecloud.github.io/b2c-developer-tooling/mcp/ for setup instructions.",
@@ -55,9 +55,9 @@
   "devDependencies": {
     "@babel/node": "^7.22.5",
     "@playwright/test": "^1.61.1",
-    "@salesforce/pwa-kit-dev": "3.22.0-dev",
+    "@salesforce/pwa-kit-dev": "3.22.0-nightly-20261119080304",
     "cross-env": "^5.2.1",
-    "internal-lib-build": "3.22.0-dev",
+    "internal-lib-build": "3.22.0-nightly-20261119080304",
     "nodemon": "^2.0.22"
   },
   "engines": {
