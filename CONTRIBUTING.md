@@ -63,10 +63,9 @@ If you’re experiencing an issue, check the open issues first. If someone hasn�
 > **Note**: All your commits must be signed. To learn how to set up commit signing, see this help doc from GitHub: [Managing Commit Signature Verification](https://docs.github.com/en/authentication/managing-commit-signature-verification).
 
 1. Create an issue.
-2. Create a fork of this repository.
-3. Create a branch off the develop branch.
-4. Add your changes to your branch.
-5. Create a pull request against the develop branch.
+2. Create a branch off the develop branch.
+3. Add your changes to your branch.
+4. Create a pull request against the develop branch.
 
 ## 🏅 Best Practices
 
