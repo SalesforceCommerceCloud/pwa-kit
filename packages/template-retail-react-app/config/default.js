@@ -90,6 +90,12 @@ module.exports = {
             // CHANGELOG entry for details. Forwarded as
             // `messagingConfig.enableImageUpload`. Defaults to 'false'.
             cc_enableImageUpload: 'false',
+            // Opt in to PDP context on shopper turns. Requires messaging.umd.js >= 1.53.0
+            // for the commerce_agent_context envelope, context chips, and local dividers.
+            // Uses public pageContext.set/clear, including seeding before widget mount,
+            // and enables the shopper-agent handoff to prime product context.
+            // Forwarded as messagingConfig.enablePageContext; the widget defaults to false.
+            cc_enablePageContext: 'false',
             // Optional URL to customer's component override script. Must use HTTPS;
             // a non-HTTPS or malformed URL is dropped and the widget keeps its defaults.
             // The script defines Web Components that replace default product cards, carousels,
@@ -136,10 +142,6 @@ module.exports = {
             // Optional: pass `cc_promptsConfig` (object) via COMMERCE_AGENT_SETTINGS to configure the
             // prompts extension. Forwarded as `promptsConfig`; requires `isOpen`, `isInline`, and
             // `elementId` to mount, plus optional fields like `staticQuestions` and `promptsDisplay`.
-            // Optional: pass `cc_enablePageContext` ('true' | 'false') via COMMERCE_AGENT_SETTINGS,
-            // forwarded as the boolean `enablePageContext`. Enables window.CimulateMessaging.
-            // eventHandlers.pageContext.set — required for the shopper-agent handoff to prime
-            // product context before the drawer opens.
             // None of the above set a storefront default — the widget applies its own defaults when
             // a value is omitted.
         },
