@@ -79,6 +79,15 @@ const AppConfig = ({children, locals = {}}) => {
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
+    const tokenCacheWorkaround = commerceApiConfig.tokenResponseCacheWorkaround
+    // Request classes are assigned by the storefront's request processor. Only
+    // opt matching browser documents into the Googlebot caching workaround.
+    const enableTokenResponseCacheWorkaround =
+        typeof window !== 'undefined' &&
+        tokenCacheWorkaround?.enabled === true &&
+        typeof tokenCacheWorkaround.requestClass === 'string' &&
+        tokenCacheWorkaround.requestClass.length > 0 &&
+        window.Progressive?.ssrOptions?.requestClass === tokenCacheWorkaround.requestClass
 
     const appOrigin = useAppOrigin()
 
@@ -128,6 +137,7 @@ const AppConfig = ({children, locals = {}}) => {
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
             // hybridAuthEnabled={true}
             cookieDomain={commerceApiConfig.cookieDomain}
+            enableTokenResponseCacheWorkaround={enableTokenResponseCacheWorkaround}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
             pageDesignerParams={pageDesignerParams}
             enableHttpOnlySessionCookies={

@@ -5,9 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import useCommerceApi from './hooks/useCommerceApi'
-import {renderWithProviders} from './test-utils'
+import {renderWithProviders, DEFAULT_TEST_CONFIG} from './test-utils'
+import CommerceApiProvider from './provider'
 import Auth from './auth'
 import {DWSID_COOKIE_NAME, SERVER_AFFINITY_HEADER_KEY} from './constant'
 
@@ -99,6 +100,41 @@ describe('provider', () => {
             expect.objectContaining({
                 cookieDomain: '.example.com'
             })
+        )
+    })
+
+    test.each([undefined, false, true])(
+        'forwards the token-cache workaround setting (%s)',
+        (enabled) => {
+            renderWithProviders(<h1>test</h1>, {enableTokenResponseCacheWorkaround: enabled})
+            expect(Auth).toHaveBeenCalledWith(
+                expect.objectContaining({enableTokenResponseCacheWorkaround: enabled ?? false})
+            )
+        }
+    )
+
+    test('only recreates Auth when the effective workaround setting changes', () => {
+        const component = (enabled: boolean, label: string) => (
+            <CommerceApiProvider
+                {...DEFAULT_TEST_CONFIG}
+                disableAuthInit
+                enableTokenResponseCacheWorkaround={enabled}
+            >
+                <h1>{label}</h1>
+            </CommerceApiProvider>
+        )
+        const {rerender} = render(component(false, 'first'))
+        rerender(component(false, 'unrelated render'))
+        expect(Auth).toHaveBeenCalledTimes(1)
+        rerender(component(true, 'enabled'))
+        expect(Auth).toHaveBeenCalledTimes(2)
+        expect(Auth).toHaveBeenLastCalledWith(
+            expect.objectContaining({enableTokenResponseCacheWorkaround: true})
+        )
+        rerender(component(false, 'disabled'))
+        expect(Auth).toHaveBeenCalledTimes(3)
+        expect(Auth).toHaveBeenLastCalledWith(
+            expect.objectContaining({enableTokenResponseCacheWorkaround: false})
         )
     })
 
