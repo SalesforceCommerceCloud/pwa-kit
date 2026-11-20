@@ -90,7 +90,8 @@ module.exports = {
             // CHANGELOG entry for details. Forwarded as
             // `messagingConfig.enableImageUpload`. Defaults to 'false'.
             cc_enableImageUpload: 'false',
-            // Opt in to PDP and query-backed SRP context on shopper turns. Requires messaging.umd.js >= 1.53.0
+            // Opt in to PDP and keyword SRP context on shopper turns. Requires messaging.umd.js >= 1.53.0.
+            // Product rows and category-only context require a messaging bundle with SRP-8 support.
             // for the commerce_agent_context envelope, context chips, and local dividers.
             // Uses public pageContext.set/clear, including seeding before widget mount,
             // and enables the shopper-agent handoff to prime product context.

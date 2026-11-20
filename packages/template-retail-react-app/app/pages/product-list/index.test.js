@@ -574,8 +574,11 @@ test.each(['true', 'false'])(
         )
         expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
         await waitFor(() => {
-            expect(getCommerceClientPageContext(queryClient)).toEqual(
-                expect.objectContaining({type: 'srp', query: term})
+            const context = getCommerceClientPageContext(queryClient)
+            expect(context).toEqual(expect.objectContaining({type: 'srp', query: term}))
+            const tiles = screen.getAllByTestId(/^sf-product-tile-/)
+            expect(context.products.map(({id}) => id)).toEqual(
+                tiles.map((tile) => tile.dataset.testid.replace('sf-product-tile-', ''))
             )
         })
     }

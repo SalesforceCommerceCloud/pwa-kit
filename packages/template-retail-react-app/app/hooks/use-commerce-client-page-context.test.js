@@ -305,7 +305,51 @@ describe('SRP context normalization', () => {
     test('query-only and zero-result searches are valid', () => {
         expect(buildCommerceClientSrpContext(' shoes ', {hits: [], total: 0})).toEqual({
             type: 'srp',
-            query: 'shoes'
+            query: 'shoes',
+            products: []
+        })
+    })
+    test('captures the ordered grid, including ID-only rows and verified promotional prices', () => {
+        const hits = [
+            {
+                productId: 'b',
+                productName: 'Boot',
+                price: 40,
+                productPromotions: [{promotionalPrice: 25}]
+            },
+            {productId: 'a'},
+            {productId: 'c', productName: 'Set', hitType: 'set', price: 10}
+        ]
+        expect(
+            buildCommerceClientSrpContext(
+                'boots',
+                {
+                    hits,
+                    total: 93,
+                    selectedSortingOption: 'price-low-to-high'
+                },
+                {currency: 'USD'}
+            )
+        ).toEqual({
+            type: 'srp',
+            query: 'boots',
+            sortRuleId: 'price-low-to-high',
+            currencyCode: 'USD',
+            products: [{id: 'b', name: 'Boot', price: 25}, {id: 'a'}, {id: 'c', name: 'Set'}]
+        })
+    })
+    test('caps queryless browse and marks omitted rows', () => {
+        const hits = Array.from({length: 51}, (_, i) => ({productId: String(i)}))
+        const result = buildCommerceClientSrpContext(
+            null,
+            {hits},
+            {category: {id: 'shoes', name: 'Shoes'}}
+        )
+        expect(result).toEqual({
+            type: 'srp',
+            category: {id: 'shoes', name: 'Shoes'},
+            productsPartial: true,
+            products: hits.slice(0, 50).map(({productId}) => ({id: productId}))
         })
     })
     test('uses raw SCAPI IDs and values, excluding category and inventory controls', () => {
@@ -374,7 +418,7 @@ describe('SRP shared context lifecycle', () => {
     const tree = (props = {}, status = ready, page = 'srp') => (
         <QueryClientProvider client={client}>
             <Messaging status={status} />
-            {page === 'srp' && <Srp query="shoes" result={{total: 0}} isSuccess {...props} />}
+            {page === 'srp' && <Srp query="shoes" result={{}} isSuccess {...props} />}
             {page === 'pdp' && <Pdp product={productA} requestedProductId="A" />}
         </QueryClientProvider>
     )
@@ -405,14 +449,27 @@ describe('SRP shared context lifecycle', () => {
         view.rerender(tree({query: 'boots'}))
         expect(api.set).toHaveBeenLastCalledWith({type: 'srp', query: 'boots'})
     })
-    test.each([{isSuccess: false}, {isError: true}, {isCategory: true}, {query: ' '}])(
-        'clears unsupported or unresolved state %j',
-        (props) => {
-            const view = render(tree())
-            view.rerender(tree(props))
-            expect(getCommerceClientPageContext(client)).toBeNull()
-        }
-    )
+    test.each([
+        {isSuccess: false},
+        {isError: true},
+        {requestedCategoryId: 'coats', category: {id: 'boots', name: 'Boots'}},
+        {query: ' '}
+    ])('clears unsupported or unresolved state %j', (props) => {
+        const view = render(tree())
+        view.rerender(tree(props))
+        expect(getCommerceClientPageContext(client)).toBeNull()
+    })
+    test('publishes queryless category context when the matching category resolves', () => {
+        const browse = {query: null, requestedCategoryId: 'coats'}
+        const view = render(tree(browse))
+        expect(getCommerceClientPageContext(client)).toBeNull()
+        view.rerender(tree({...browse, category: {id: 'coats', name: 'Coats'}, result: {hits: []}}))
+        expect(api.set).toHaveBeenLastCalledWith({
+            type: 'srp',
+            category: {id: 'coats', name: 'Coats'},
+            products: []
+        })
+    })
     test('late widget receives the latest resolved search', () => {
         const view = render(tree({}, loading))
         view.rerender(tree({query: 'boots'}, loading))

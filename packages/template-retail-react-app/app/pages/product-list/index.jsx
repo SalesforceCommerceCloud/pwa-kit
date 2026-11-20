@@ -68,6 +68,7 @@ import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/comp
 
 // Hooks
 import {
+    useCurrency,
     useLimitUrls,
     usePageUrls,
     useSortUrls,
@@ -127,6 +128,7 @@ const ProductList = (props) => {
     const activeData = useActiveData()
     const {res} = useServerContext()
     const customerId = useCustomerId()
+    const {currency} = useCurrency()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
@@ -189,18 +191,6 @@ const ProductList = (props) => {
         }
     )
 
-    useCommerceClientSrpContext({
-        query:
-            typeof restOfParams.q === 'number' || typeof restOfParams.q === 'boolean'
-                ? String(restOfParams.q)
-                : restOfParams.q,
-        result: productSearchResult,
-        isSuccess: isSearchSuccess,
-        isPreviousData: isPreviousSearchData,
-        isError: isSearchError,
-        isCategory: Boolean(params.categoryId)
-    })
-
     const {error, data: category} = useCategory(
         {
             parameters: {
@@ -211,6 +201,20 @@ const ProductList = (props) => {
             enabled: !isSearch && !!params.categoryId
         }
     )
+
+    useCommerceClientSrpContext({
+        query:
+            typeof restOfParams.q === 'number' || typeof restOfParams.q === 'boolean'
+                ? String(restOfParams.q)
+                : restOfParams.q,
+        result: productSearchResult,
+        isSuccess: isSearchSuccess,
+        isPreviousData: isPreviousSearchData,
+        isError: isSearchError,
+        requestedCategoryId: params.categoryId,
+        category: params.categoryId ? category : undefined,
+        currency
+    })
 
     // Apply disallow list to refinements.
     if (productSearchResult?.refinements) {
