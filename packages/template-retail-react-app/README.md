@@ -254,6 +254,5 @@ Subresource Integrity (SRI) is not enforced by this loader. HTTPS and URL valida
 ### Shopper Agent direct cart (opt-in)
 
 Commerce Client widget 1.58.1+ supports direct cart buttons using the current PWA
-basket, two-way cart synchronization, an optional merchant-owned cart iframe, and
-an opt-in Salesforce Payments wallet provider. `cc_cartTransport` defaults to
+basket, two-way cart synchronization, and an optional merchant-owned cart iframe. `cc_cartTransport` defaults to
 `agent`. See [configuration, behavior and validation checklist](../../docs/shopper-agent-direct-cart.md).

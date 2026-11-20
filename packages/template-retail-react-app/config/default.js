@@ -46,8 +46,6 @@ module.exports = {
             cc_cartTransport: 'agent',
             // Optional merchant-owned embeddable cart; Cart override takes precedence.
             cc_storefrontCartPageUrl: '',
-            // Requires Salesforce Payments CART express checkout and device validation.
-            cc_expressCheckoutEnabled: 'false',
             // Optional explicit bundle URL. Overrides cc_cdnVersion when set; use for local
             // dev (http://localhost:...) or an SFCC self-hosted bundle.
             commerceClientScriptSourceUrl: '',

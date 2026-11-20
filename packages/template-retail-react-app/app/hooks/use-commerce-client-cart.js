@@ -16,7 +16,6 @@ import {
     useUsid
 } from '@salesforce/commerce-sdk-react'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
-import {useExpressCheckoutEnabled} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {
     CART_ACTION_EVENT,
@@ -27,14 +26,10 @@ import {
     createCommerceClientCart,
     mapBasketToWidgetCart
 } from '@salesforce/retail-react-app/app/utils/commerce-client-cart'
-import {
-    createWalletLaunch,
-    removeWalletLaunch
-} from '@salesforce/retail-react-app/app/utils/commerce-client-wallet'
 
 // Raw SDK writes bypass React Query's automatic cache updates: an old shopper's
 // response must never enter the current shopper's cache. There is no write retry.
-const useCommerceClientCart = ({enabled, ready, expressEnabled}) => {
+const useCommerceClientCart = ({enabled, ready}) => {
     const api = useCommerceApi()
     const {getTokenWhenReady} = useAccessToken()
     const customerId = useCustomerId()
@@ -50,7 +45,6 @@ const useCommerceClientCart = ({enabled, ready, expressEnabled}) => {
         customerType,
         usid
     ])
-    const {cart: walletEnabled} = useExpressCheckoutEnabled()
     const queryClient = useQueryClient()
     const {data} = useCustomerBaskets(
         {parameters: {customerId}},
@@ -58,8 +52,6 @@ const useCommerceClientCart = ({enabled, ready, expressEnabled}) => {
     )
     const basket = data?.baskets?.find((entry) => !entry.temporaryBasket)
     const publishedRef = useRef()
-    const launchRef = useRef(null)
-    const cartRef = useRef(null)
     const current = useRef()
     current.current = {
         api,
@@ -68,8 +60,7 @@ const useCommerceClientCart = ({enabled, ready, expressEnabled}) => {
         identity,
         siteId: site?.id,
         currency,
-        buildUrl,
-        walletEnabled: expressEnabled && walletEnabled
+        buildUrl
     }
 
     const adapter = useMemo(
@@ -175,20 +166,9 @@ const useCommerceClientCart = ({enabled, ready, expressEnabled}) => {
                 },
                 publish: (activeBasket) => {
                     const session = current.current
-                    removeWalletLaunch(launchRef.current)
-                    const launch = session.walletEnabled
-                        ? createWalletLaunch({
-                              basket: activeBasket,
-                              identity: session.identity,
-                              url: session.buildUrl('/Payments-Express')
-                          })
-                        : null
-                    launchRef.current = launch?.id || null
                     const cart = mapBasketToWidgetCart(activeBasket, {
-                        checkoutUrl: session.buildUrl('/checkout'),
-                        expressPaymentUrl: launch?.url || null
+                        checkoutUrl: session.buildUrl('/checkout')
                     })
-                    cartRef.current = cart
                     publishedRef.current = basketVersion(activeBasket)
                     // Match the supported SDK customer-basket query by customer, site and
                     // resource. Preserve temporary baskets used by PDP Buy Now.
@@ -213,10 +193,7 @@ const useCommerceClientCart = ({enabled, ready, expressEnabled}) => {
                     return cart
                 },
                 clear: () => {
-                    removeWalletLaunch(launchRef.current)
-                    launchRef.current = null
                     publishedRef.current = undefined
-                    cartRef.current = null
                     window.CimulateMessaging?.eventHandlers?.cart?.update?.(
                         mapBasketToWidgetCart(null)
                     )
@@ -224,15 +201,6 @@ const useCommerceClientCart = ({enabled, ready, expressEnabled}) => {
             }),
         [queryClient]
     )
-
-    const invalidateWallet = () => {
-        removeWalletLaunch(launchRef.current)
-        launchRef.current = null
-        if (cartRef.current?.expressPaymentUrl) {
-            cartRef.current = {...cartRef.current, expressPaymentUrl: null}
-            window.CimulateMessaging?.eventHandlers?.cart?.update?.(cartRef.current)
-        }
-    }
 
     useEffect(() => {
         if (!enabled) return undefined
@@ -243,7 +211,6 @@ const useCommerceClientCart = ({enabled, ready, expressEnabled}) => {
 
     useEffect(() => {
         if (!enabled || !ready || basketVersion(basket) === publishedRef.current) return
-        invalidateWallet()
         adapter.refresh().catch(() => {})
     }, [adapter, basket, enabled, ready])
 
@@ -252,13 +219,9 @@ const useCommerceClientCart = ({enabled, ready, expressEnabled}) => {
         const handleAction = (event) => {
             const request = event.detail
             if (typeof request?.respond !== 'function') return
-            if (request.action !== 'get') invalidateWallet()
             adapter.action(request).then(request.respond)
         }
-        const refresh = () => {
-            invalidateWallet()
-            return adapter.refresh().catch(() => {})
-        }
+        const refresh = () => adapter.refresh().catch(() => {})
         window.addEventListener(CART_ACTION_EVENT, handleAction)
         window.addEventListener(CART_UPDATE_EVENT, refresh)
         window.addEventListener(CART_CHANGED_EVENT, refresh)

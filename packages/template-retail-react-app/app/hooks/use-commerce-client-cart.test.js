@@ -53,9 +53,6 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
             initialData: {baskets: [mockBasket()], total: 1}
         })
 }))
-jest.mock('@salesforce/retail-react-app/app/hooks/use-sf-payments', () => ({
-    useExpressCheckoutEnabled: () => ({cart: false})
-}))
 jest.mock('@salesforce/retail-react-app/app/hooks/use-currency', () => ({
     useCurrency: () => ({currency: 'USD'})
 }))
@@ -67,7 +64,7 @@ let queryClient
 let update
 const setup = () =>
     renderHook((props) => useCommerceClientCart(props), {
-        initialProps: {enabled: true, ready: true, expressEnabled: false},
+        initialProps: {enabled: true, ready: true},
         wrapper: ({children}) => (
             <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
         )
@@ -186,7 +183,7 @@ it('does not publish an old shopper response into the new cache', async () => {
     await waitFor(() => expect(release).toBeDefined())
     mockCustomerId = 'shopper-b'
     mockApi.shopperBasketsV2.getBasket.mockResolvedValue(mockBasket(7))
-    rerender({enabled: true, ready: true, expressEnabled: false})
+    rerender({enabled: true, ready: true})
     await act(async () => {
         release(mockBasket(99))
         await pending
