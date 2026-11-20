@@ -10,8 +10,7 @@ Add these fields to the existing `app.commerceAgent` configuration:
 {
     "cc_cdnVersion": "1.58.1",
     "cc_cartTransport": "direct",
-    "cc_storefrontCartPageUrl": "",
-    "cc_expressCheckoutEnabled": "false"
+    "cc_storefrontCartPageUrl": ""
 }
 ```
 
@@ -53,7 +52,7 @@ edits. A successful explicit **View Cart** read, after the original request has
 settled, is required to unlock editing; background sync cannot unlock it. Browser
 timeouts cannot cancel a server-side mutation. Check the basket before deliberately
 repeating an add. Shopper/site/locale/currency changes clear the widget's current
-basket, revoke wallet launches, and invalidate old reads and queued actions.
+basket and invalidate old reads and queued actions.
 
 ## Optional merchant-owned cart iframe
 
@@ -75,35 +74,11 @@ window.parent.dispatchEvent(
 Cross-origin cart pages require their own validated message bridge and shopper
 session setup. This implementation does not accept cross-origin cart messages.
 
-## Salesforce Payments wallets
+## Checkout
 
-Set `cc_expressCheckoutEnabled: 'true'` and enable Salesforce Payments express
-checkout for `CART` in the site's existing payment configuration. The opt-in
-provider reuses `SFPaymentsExpressButtons` in `/Payments-Express`; it keeps the
-existing shell's same-origin parent validation, resizing and lifecycle protocol.
-The neutral provider remains available as an application replacement point, and
-product-surface express payments remain unavailable through this cart provider.
-
-Only nonempty, non-temporary baskets with a positive known payable total and one
-standard delivery shipment qualify. Pickup/multiship baskets use standard
-checkout. The SDK determines Apple Pay/Google Pay availability on the current
-device and gateway; other payment methods are excluded from the chat surface.
-Apple Pay still requires merchant/domain registration and a supported device.
-
-A wallet URL carries an opaque launch id, valid for fifteen minutes, bound in
-same-origin session storage to the shopper, site, locale, currency, basket id and
-quote version. Addresses and payment details are not copied into that record.
-The provider checks the active basket on mount and on click, and re-reads the live
-quote before shipping/payment/order callbacks. It rejects a changed shopper,
-revoked launch, changed line items or a total that differs from the latest wallet
-quote. Legitimate wallet shipping updates advance the expected quote. Commerce
-API and the existing Salesforce Payments order/payment flow remain authoritative.
-
-Success reports the order id through `express.payment.success`; cancellation and
-failure use the existing lifecycle messages. The iframe signals a fresh parent
-cart read after each outcome, including possible shipping/address changes, without
-waiting for an agent turn. Normal storefront payment consumers keep their existing
-confirmation navigation. Standard Checkout remains on the widget cart.
+The built-in direct cart links to standard storefront checkout. Merchants who
+want express payment in Shopper Agent can build an integration using the
+[existing PWA Kit provider framework](https://developer.salesforce.com/docs/commerce/commerce-api/guide/express-checkout.html).
 
 ## SFRA parity and validation checklist
 
@@ -116,18 +91,15 @@ Based on [SFRA PR #135](https://github.com/SalesforceCommerceCloud/plugin_commer
 - [x] Authoritative reads, storefront/widget synchronization and header cart state.
 - [x] Shopper-change invalidation and View Cart recovery after uncertain writes.
 - [x] Optional iframe configuration and same-origin cart-changed signal.
-- [x] Existing Salesforce Payments component reused with cart-bound wallet launches,
-      live-quote checks and lifecycle/cart-refresh callbacks.
+- [x] Standard storefront checkout link.
 - [ ] Real sandbox storefront/agent end-to-end validation with widget 1.58.1+.
-- [ ] Real-device Apple Pay and Google Pay: availability, successful payment,
-      cancellation, failure, shipping changes, stale quote and shopper switch.
+- [ ] Wallet parity is deferred to merchant payment providers.
 - [ ] Merchant cart iframe/Cart override and merchant-specific product flows.
 
 Automated tests cover direct add, each cart action, two-way sync, empty baskets,
-shopper changes, stale/late responses, uncertain writes, wallet launch validation,
-live totals, availability and success/cancel/failure callbacks. These tests use
+shopper changes, stale/late responses, and uncertain writes. These tests use
 fixtures. A separate browser fixture smoke test with the released **1.58.1** UMD
 verified View Cart, variant/line ids on quantity changes, removal and widget count
-updates. **No real sandbox wallet/device case has been verified**. Product sets,
+updates. Product sets,
 configurable bundles, option-selection and bonus-product selection need existing
 storefront-specific UI, as in SFRA.

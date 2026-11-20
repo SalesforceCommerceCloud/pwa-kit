@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// Opt-in provider; reports unavailable unless direct cart and Salesforce Payments
-// CART express checkout are enabled and a current, bound cart launch is present.
-export {default} from './providers/salesforce-express-payment-provider'
+// Application-owned replacement point. The shell imports only this entry file.
+// The neutral default renders nothing and reports unavailable until the application
+// explicitly selects a supported payment provider.
+export {default} from './providers/unavailable-express-payment-provider'

@@ -27,14 +27,10 @@ export const normalizeCartPageUrl = (value) => {
     }
 }
 
-// Bind a wallet launch to the entire quote, including shipping, discounts and
-// payment state. This is a freshness check; Commerce API remains the authority.
+// Compare storefront basket data with the last basket published to the widget.
 export const basketVersion = (basket) => JSON.stringify(basket || null)
 
-export const mapBasketToWidgetCart = (
-    basket,
-    {checkoutUrl = '/checkout', expressPaymentUrl = null} = {}
-) => {
+export const mapBasketToWidgetCart = (basket, {checkoutUrl = '/checkout'} = {}) => {
     const coupons = (basket?.couponItems || []).map(({code, couponItemId, status}) => ({
         code,
         id: couponItemId,
@@ -112,7 +108,7 @@ export const mapBasketToWidgetCart = (
         bodyMessage: null,
         footerMessage: null,
         checkoutButtonUrl: checkoutUrl,
-        expressPaymentUrl
+        expressPaymentUrl: null
     }
 }
 

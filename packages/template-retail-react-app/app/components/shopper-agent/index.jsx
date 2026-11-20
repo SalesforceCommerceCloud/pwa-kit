@@ -616,11 +616,11 @@ const toOptionalWidgetBoolean = (value) => {
     return normalized === 'true'
 }
 
-const CommerceClientCart = ({ready, expressEnabled}) => {
-    useCommerceClientCart({enabled: true, ready, expressEnabled})
+const CommerceClientCart = ({ready}) => {
+    useCommerceClientCart({enabled: true, ready})
     return null
 }
-CommerceClientCart.propTypes = {ready: PropTypes.bool, expressEnabled: PropTypes.bool}
+CommerceClientCart.propTypes = {ready: PropTypes.bool}
 
 /**
  * Internal component that renders the Commerce Client messaging widget.
@@ -721,8 +721,7 @@ const CommerceClientAgentWindow = ({
         cc_promptsConfig,
         cc_enablePageContext,
         cc_cartTransport,
-        cc_storefrontCartPageUrl,
-        cc_expressCheckoutEnabled
+        cc_storefrontCartPageUrl
     } = commerceAgentConfiguration
 
     const navigate = useNavigation()
@@ -1253,10 +1252,7 @@ const CommerceClientAgentWindow = ({
     return (
         <>
             {normalizeCartTransport(cc_cartTransport) === 'direct' && (
-                <CommerceClientCart
-                    ready={isCommerceClientReady}
-                    expressEnabled={cc_expressCheckoutEnabled === 'true'}
-                />
+                <CommerceClientCart ready={isCommerceClientReady} />
             )}
             <div id={commerceClientElementId} data-testid="commerce-client-agent-widget" />
             {/* Gate the FAB on bundle load; before injection there is no widget for its click to reach. */}
