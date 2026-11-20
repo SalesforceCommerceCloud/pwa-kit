@@ -10,8 +10,9 @@ import {
     mockCustomerBaskets,
     mockedCustomerProductLists
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
-import {Route, Switch} from 'react-router-dom'
+import {Route, Switch, useHistory} from 'react-router-dom'
 import {rest} from 'msw'
+import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
 import ProductDetail from '.'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
@@ -40,6 +41,7 @@ jest.setTimeout(60000)
 jest.useFakeTimers()
 
 const mockAddToWishlist = jest.fn()
+const mockCommerceAgentConfiguration = {current: undefined}
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
@@ -99,7 +101,8 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
         app: {
             ...mockConfig.app,
             storeLocatorEnabled: true,
-            multishipEnabled: false
+            multishipEnabled: false,
+            commerceAgent: mockCommerceAgentConfiguration.current
         }
     }))
 }))
@@ -136,7 +139,9 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
 }))
 
 jest.mock('@salesforce/retail-react-app/app/components/inline-agent-widget', () => {
-    return () => null
+    return function MockInlineAgent() {
+        return <div data-testid="mock-inline-agent" />
+    }
 })
 
 const MockedComponent = () => {
@@ -152,6 +157,7 @@ const MockedComponent = () => {
 
 beforeEach(() => {
     jest.resetModules()
+    mockCommerceAgentConfiguration.current = undefined
 
     // Default mock for useSelectedStore (no selected store by default)
     mockUseSelectedStore.mockImplementation(() => ({
@@ -212,6 +218,196 @@ test('should render product details page', async () => {
         expect(screen.getAllByTestId('product-view')).toHaveLength(1)
         expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
     })
+})
+
+test('publishes the resolved PDP product and selected variant to the Commerce Client', async () => {
+    mockCommerceAgentConfiguration.current = {
+        enabled: 'true',
+        provider: 'commerce-client',
+        cc_enablePageContext: 'true'
+    }
+    const setContext = jest.fn()
+    window.CimulateMessaging = {
+        injectMessagingWidget: jest.fn(),
+        eventHandlers: {pageContext: {set: setContext, clear: jest.fn()}}
+    }
+    const Messaging = () => {
+        useCommerceClientMessaging(
+            {loaded: true, error: false},
+            {enablePageContext: true, scrt2Url: 'scrt', orgId: 'org', esDeveloperName: 'agent'}
+        )
+        return null
+    }
+    const variant = masterProduct.variants.find(
+        ({variationValues}) => variationValues.color === 'JJ169XX' && variationValues.size === '9LG'
+    )
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            const id = req.params.productId
+            return res(
+                ctx.json(
+                    id === masterProduct.id ? masterProduct : {...masterProduct, id, variants: []}
+                )
+            )
+        })
+    )
+
+    try {
+        renderWithProviders(
+            <>
+                <Messaging />
+                <MockedComponent />
+            </>
+        )
+        await waitFor(() =>
+            expect(setContext).toHaveBeenCalledWith(expect.objectContaining({id: masterProduct.id}))
+        )
+        fireEvent.click(await screen.findByRole('radio', {name: /^black$/i}))
+        fireEvent.click(await screen.findByRole('radio', {name: /^l$/i}))
+        await waitFor(() =>
+            expect(setContext).toHaveBeenLastCalledWith(
+                expect.objectContaining({id: variant.productId})
+            )
+        )
+    } finally {
+        delete window.CimulateMessaging
+    }
+})
+
+test('does not write the previous product variant to a new PDP and updates pid on selection', async () => {
+    mockCommerceAgentConfiguration.current = {
+        enabled: 'true',
+        provider: 'commerce-client',
+        cc_enablePageContext: 'true'
+    }
+    const oldVariant = masterProduct.variants.find(
+        ({variationValues}) => variationValues.color === 'JJ169XX' && variationValues.size === '9MD'
+    )
+    const nextProduct = {
+        ...masterProduct,
+        id: 'canonical-product-b',
+        name: 'Product B',
+        variants: masterProduct.variants.map((variant) => ({
+            ...variant,
+            productId: `b-${variant.productId}`
+        }))
+    }
+    const nextVariant = nextProduct.variants.find(
+        ({variationValues}) => variationValues.color === 'JJ169XX' && variationValues.size === '9LG'
+    )
+    const changedVariant = nextProduct.variants.find(
+        ({variationValues}) => variationValues.color === 'JJ169XX' && variationValues.size === '9MD'
+    )
+    let resolveProductB
+    const productBRequested = jest.fn()
+    const NavigateToB = () => {
+        const history = useHistory()
+        return (
+            <button
+                onClick={() => history.push('/uk/en-GB/product/requested-b?color=JJ169XX&size=9LG')}
+            >
+                Go to product B
+            </button>
+        )
+    }
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            const id = req.params.productId
+            if (id === 'requested-b') {
+                productBRequested()
+                return new Promise((resolve) => {
+                    resolveProductB = () => resolve(res(ctx.json(nextProduct)))
+                })
+            }
+            if (id.startsWith('b-')) return res(ctx.json({...nextProduct, id}))
+            return res(ctx.json({...masterProduct, id}))
+        })
+    )
+
+    renderWithProviders(
+        <>
+            <NavigateToB />
+            <MockedComponent />
+        </>
+    )
+    fireEvent.click(await screen.findByRole('radio', {name: /^black$/i}))
+    fireEvent.click(await screen.findByRole('radio', {name: /^m$/i}))
+    await waitFor(() =>
+        expect(new URLSearchParams(window.location.search).get('pid')).toBe(oldVariant.productId)
+    )
+
+    expect(await screen.findByTestId('mock-inline-agent')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', {name: 'Go to product B'}))
+    await waitFor(() => expect(productBRequested).toHaveBeenCalled())
+    expect(screen.queryByTestId('mock-inline-agent')).not.toBeInTheDocument()
+    expect(window.location.pathname).toBe('/uk/en-GB/product/requested-b')
+    expect(new URLSearchParams(window.location.search).get('pid')).toBeNull()
+
+    resolveProductB()
+    await waitFor(() => expect(screen.getByTestId('mock-inline-agent')).toBeInTheDocument())
+    await waitFor(() =>
+        expect(new URLSearchParams(window.location.search).get('pid')).toBe(nextVariant.productId)
+    )
+    fireEvent.click(await screen.findByRole('radio', {name: /^m$/i}))
+    await waitFor(() =>
+        expect(new URLSearchParams(window.location.search).get('pid')).toBe(
+            changedVariant.productId
+        )
+    )
+})
+
+test.each([
+    [
+        'agent disabled',
+        {enabled: 'false', provider: 'commerce-client', cc_enablePageContext: 'true'}
+    ],
+    [
+        'page context disabled',
+        {enabled: 'true', provider: 'commerce-client', cc_enablePageContext: 'false'}
+    ],
+    ['MIAW provider', {enabled: 'true', provider: 'miaw', cc_enablePageContext: 'true'}]
+])('preserves existing variant URL behavior with %s', async (_label, config) => {
+    mockCommerceAgentConfiguration.current = config
+    const selectedVariant = masterProduct.variants.find(
+        ({variationValues}) => variationValues.color === 'JJ169XX' && variationValues.size === '9MD'
+    )
+    const staleVariant = masterProduct.variants.find(
+        ({variationValues}) => variationValues.color === 'JJ169XX' && variationValues.size === '9LG'
+    )
+    const NavigateToB = () => {
+        const history = useHistory()
+        return (
+            <button
+                onClick={() => history.push('/uk/en-GB/product/requested-b?color=JJ169XX&size=9LG')}
+            >
+                Go to product B
+            </button>
+        )
+    }
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            const id = req.params.productId
+            if (id === 'requested-b') return res(ctx.delay(0), ctx.json(masterProduct))
+            return res(ctx.json({...masterProduct, id}))
+        })
+    )
+    renderWithProviders(
+        <>
+            <NavigateToB />
+            <MockedComponent />
+        </>
+    )
+    fireEvent.click(await screen.findByRole('radio', {name: /^black$/i}))
+    fireEvent.click(await screen.findByRole('radio', {name: /^m$/i}))
+    await waitFor(() =>
+        expect(new URLSearchParams(window.location.search).get('pid')).toBe(
+            selectedVariant.productId
+        )
+    )
+    fireEvent.click(screen.getByRole('button', {name: 'Go to product B'}))
+    await waitFor(() =>
+        expect(new URLSearchParams(window.location.search).get('pid')).toBe(staleVariant.productId)
+    )
 })
 
 test('should add to wishlist', async () => {

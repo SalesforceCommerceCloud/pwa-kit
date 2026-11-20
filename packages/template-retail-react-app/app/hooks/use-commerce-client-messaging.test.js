@@ -5,7 +5,17 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {renderHook} from '@testing-library/react'
+import React from 'react'
+import {renderHook as renderTestingHook} from '@testing-library/react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+
+const renderHook = (callback, options) => {
+    const queryClient = new QueryClient()
+    const wrapper = ({children}) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
+    return renderTestingHook(callback, {...options, wrapper})
+}
 import useCommerceClientMessaging, {
     injectCommerceClientWidget
 } from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
