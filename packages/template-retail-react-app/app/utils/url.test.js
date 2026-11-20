@@ -480,6 +480,38 @@ describe('removeSiteLocaleFromPath', function () {
         expect(pathName).toBe('/account/wishlist')
     })
 
+    test('keeps segments that start with the site alias or locale', () => {
+        expect(removeSiteLocaleFromPath('/uk/en-GB/category/en-GB-sale')).toBe(
+            '/category/en-GB-sale'
+        )
+        expect(removeSiteLocaleFromPath('/uk/en-GB/category/uk-exclusives')).toBe(
+            '/category/uk-exclusives'
+        )
+    })
+
+    test('keeps segments that equal the site alias or locale after the leading ones', () => {
+        expect(removeSiteLocaleFromPath('/uk/en-GB/category/uk')).toBe('/category/uk')
+        expect(removeSiteLocaleFromPath('/uk/en-GB/category/en-GB/shoes')).toBe(
+            '/category/en-GB/shoes'
+        )
+    })
+
+    test('keeps a first segment that only starts with the locale', () => {
+        expect(removeSiteLocaleFromPath('/en-GB-sale/shoes')).toBe('/en-GB-sale/shoes')
+    })
+
+    test('keeps the query string and hash', () => {
+        expect(removeSiteLocaleFromPath('/uk/en-GB/account?tab=orders#top')).toBe(
+            '/account?tab=orders#top'
+        )
+    })
+
+    test('removes nothing from the path when the site and locale are in the query string', () => {
+        expect(removeSiteLocaleFromPath('/category/uk?site=uk&locale=en-GB')).toBe(
+            '/category/uk?site=uk&locale=en-GB'
+        )
+    })
+
     test('return expected path name when no locale or site alias appear', () => {
         const pathName = removeSiteLocaleFromPath('/account/wishlist')
         expect(pathName).toBe('/account/wishlist')
