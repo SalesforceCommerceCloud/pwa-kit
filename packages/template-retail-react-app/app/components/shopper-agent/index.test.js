@@ -1563,6 +1563,23 @@ describe('ShopperAgent Component', () => {
             expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
         })
 
+        test.each([
+            [undefined, undefined],
+            ['true', true],
+            ['false', false],
+            [' True ', true]
+        ])(
+            'forwards cc_enablePageContext %s using widget boolean conventions',
+            (value, expected) => {
+                renderCommerceClient({cc_enablePageContext: value})
+                expect(useCommerceClientMessaging).toHaveBeenLastCalledWith(
+                    expect.anything(),
+                    expect.objectContaining({enablePageContext: expected})
+                )
+                expect(mockedUseMiaw).not.toHaveBeenCalled()
+            }
+        )
+
         describe('floating action button gating', () => {
             test('renders the FAB once the bundle has loaded when cc_showFab is true', () => {
                 mockedUseScript.mockReturnValue({loaded: true, error: false})
