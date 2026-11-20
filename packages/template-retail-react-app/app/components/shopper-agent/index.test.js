@@ -67,6 +67,7 @@ const mockEmbeddedService = {
 // Mock window.embeddedservice_bootstrap
 Object.defineProperty(window, 'embeddedservice_bootstrap', {
     value: mockEmbeddedService,
+    configurable: true,
     writable: true
 })
 
@@ -78,6 +79,11 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-script', () => ({
 
 // Mock the useCommerceClientMessaging hook (Commerce Client provider)
 jest.mock('@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging', () => ({
+    __esModule: true,
+    default: jest.fn()
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-commerce-client-cart', () => ({
     __esModule: true,
     default: jest.fn()
 }))
@@ -1555,6 +1561,28 @@ describe('ShopperAgent Component', () => {
                     basketDoneLoading={true}
                 />
             )
+
+        test('forwards direct transport and the optional cart iframe', () => {
+            renderCommerceClient({
+                cc_cdnVersion: '1.58.1',
+                cc_cartTransport: 'direct',
+                cc_storefrontCartPageUrl: '/embedded-cart'
+            })
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    cartTransport: 'direct',
+                    storefrontCartPageUrl: '/embedded-cart'
+                })
+            )
+        })
+        test('defaults to agent transport and ignores cart iframe configuration in agent mode', () => {
+            renderCommerceClient({cc_storefrontCartPageUrl: '/embedded-cart'})
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({cartTransport: 'agent', storefrontCartPageUrl: ''})
+            )
+        })
 
         test('renders the Commerce Client widget when settings are valid', () => {
             renderCommerceClient()

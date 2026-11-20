@@ -96,7 +96,9 @@ const injectCommerceClientWidget = ({
     showProductDescription,
     showProductCaptions,
     promptsConfig,
-    enablePageContext
+    enablePageContext,
+    cartTransport,
+    storefrontCartPageUrl
 } = {}) => {
     if (!onClient) return false
 
@@ -147,6 +149,11 @@ const injectCommerceClientWidget = ({
                 // The bundle may retain proxy state from an earlier mount.
                 pageContext.clear()
             }
+        }
+
+        if (cartTransport === 'direct') {
+            messagingConfig.cartTransport = 'direct'
+            if (storefrontCartPageUrl) messagingConfig.storefrontCartPageUrl = storefrontCartPageUrl
         }
 
         commerceClient.injectMessagingWidget({
