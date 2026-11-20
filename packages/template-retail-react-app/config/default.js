@@ -265,6 +265,9 @@ module.exports = {
         },
         googleCloudAPI: {
             apiKey: process.env.GOOGLE_CLOUD_API_KEY
+        },
+        designLiveCanvas: {
+            enabled: false
         }
     },
     externals: [],
