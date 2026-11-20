@@ -53,6 +53,9 @@ permissions:
 
 jobs:
     test_e2e_private_client:
+        # Fork PRs cannot access the AWS/MRT secrets required to deploy a test target.
+        # Keep deployment restricted to trusted events, as in the unit-test workflow.
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         runs-on: ubuntu-latest
         # Run inside the official Playwright Docker image, which has Chromium
         # and all OS deps pre-installed at /ms-playwright. This avoids the
