@@ -51,47 +51,62 @@ describe.each([undefined, false, true])('workaround enabled: %s', (enabled) => {
         test.each([
             ['getAccessToken', '/oauth2/token'],
             ['getTrustedAgentAccessToken', '/oauth2/trusted-agent/token']
-        ] as const)('%s sends the nonce through the real SDK', async (method, endpoint) => {
-            const auth = new Auth({
-                ...config,
-                ...options,
-                enableTokenResponseCacheWorkaround: enabled
-            })
-            const response = {access_token: 'test-token'}
-            const scope = nock(host)
-                .post(`${prefix}/shopper/auth/v1/organizations/organizationId${endpoint}`)
-                .query((query) => {
-                    const generatedNonce = expect.any(String)
-                    expect(query.c_nonce).toEqual(enabled ? generatedNonce : 'caller-nonce')
-                    expect(query.c_nonce === 'caller-nonce').toBe(!enabled)
-                    expect(query.c_custom).toBe('keep')
-                    return true
+        ] as const)(
+            '%s applies the workaround only to standard token requests',
+            async (method, endpoint) => {
+                const auth = new Auth({
+                    ...config,
+                    ...options,
+                    enableTokenResponseCacheWorkaround: enabled
                 })
-                .reply(200, response)
-            await expect(
-                // @ts-expect-error private client with compatible options for both token methods
-                auth.client[method]({body, parameters: {c_custom: 'keep', c_nonce: 'caller-nonce'}})
-            ).resolves.toEqual(response)
-            expect(scope.isDone()).toBe(true)
-        })
+                const response = {access_token: 'test-token'}
+                const scope = nock(host)
+                    .post(`${prefix}/shopper/auth/v1/organizations/organizationId${endpoint}`)
+                    .query((query) => {
+                        const injectNonce = enabled && method === 'getAccessToken'
+                        const generatedNonce = expect.any(String)
+                        expect(query.c_nonce).toEqual(injectNonce ? generatedNonce : 'caller-nonce')
+                        expect(query.c_nonce === 'caller-nonce').toBe(!injectNonce)
+                        expect(query.c_custom).toBe('keep')
+                        return true
+                    })
+                    .reply(200, response)
+                await expect(
+                    // @ts-expect-error private client with compatible options for both token methods
+                    auth.client[method]({
+                        body,
+                        parameters: {c_custom: 'keep', c_nonce: 'caller-nonce'}
+                    })
+                ).resolves.toEqual(response)
+                expect(scope.isDone()).toBe(true)
+            }
+        )
 
-        test('does not inject a nonce unless explicitly enabled', async () => {
-            const auth = new Auth({
-                ...config,
-                ...options,
-                enableTokenResponseCacheWorkaround: enabled
-            })
-            const scope = nock(host)
-                .post(`${prefix}/shopper/auth/v1/organizations/organizationId/oauth2/token`)
-                .query((query) => {
-                    expect(typeof query.c_nonce).toBe(enabled ? 'string' : 'undefined')
-                    return true
+        test.each([
+            ['getAccessToken', '/oauth2/token'],
+            ['getTrustedAgentAccessToken', '/oauth2/trusted-agent/token']
+        ] as const)(
+            '%s injects a nonce only when in scope and enabled',
+            async (method, endpoint) => {
+                const auth = new Auth({
+                    ...config,
+                    ...options,
+                    enableTokenResponseCacheWorkaround: enabled
                 })
-                .reply(200, {})
-            // @ts-expect-error private client
-            await auth.client.getAccessToken({body})
-            expect(scope.isDone()).toBe(true)
-        })
+                const scope = nock(host)
+                    .post(`${prefix}/shopper/auth/v1/organizations/organizationId${endpoint}`)
+                    .query((query) => {
+                        expect(typeof query.c_nonce).toBe(
+                            enabled && method === 'getAccessToken' ? 'string' : 'undefined'
+                        )
+                        return true
+                    })
+                    .reply(200, {})
+                // @ts-expect-error private client
+                await auth.client[method]({body})
+                expect(scope.isDone()).toBe(true)
+            }
+        )
 
         test('preserves raw responses and SDK error response bodies', async () => {
             const auth = new Auth({

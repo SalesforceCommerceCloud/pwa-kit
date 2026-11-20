@@ -77,7 +77,7 @@ The browser-only decision targets the observed Googlebot renderer issue and pres
 
 When enabled:
 
-- Add a fresh timestamp-and-random `c_nonce` on every `getAccessToken` and `getTrustedAgentAccessToken` invocation. The random component lets the URL vary even with a frozen renderer clock.
+- Add a fresh timestamp-and-random `c_nonce` on every `getAccessToken` invocation. The random component lets the URL vary even with a frozen renderer clock.
 - Apply the same setting to the separate client used for direct private-client authentication, as well as standard, private HttpOnly, and public HttpOnly proxy routes.
 - Preserve existing request parameters, headers, bodies, receiver binding, raw-response mode, response parsing, and SDK errors. Do not introduce retries at this layer.
 - Treat a readable JWT with `iat` more than 60 seconds ahead of the browser clock as expired. Exactly 60 seconds ahead remains allowed. This check triggers the existing refresh path.
@@ -91,6 +91,7 @@ The existing 60-second expiration buffer and SDK 401 refresh-and-retry handling 
 - Prefer the existing request class over a second user-agent classifier inside Auth: storefronts already control classification and may use custom names.
 - Prefer an application-level predicate and a library-level boolean over reading PWA globals inside Commerce SDK React: this keeps platform-specific decisions in the storefront.
 - Gate both additions together so disabling the workaround restores the previous behavior without leaving part of the workaround active.
+- Exclude `getTrustedAgentAccessToken` requests: Googlebot does not use the trusted-agent authentication flow.
 - Leave customer-specific diagnostics, PerimeterX changes, the separate PDP fallback, OAuth/OIDC nonce handling, and other token endpoints outside this change.
 
 `c_nonce` is a non-secret cache buster, not an OAuth/OIDC security nonce. It does not guarantee bypassing every renderer reuse mechanism.
@@ -104,7 +105,8 @@ Expected changes are limited to the Retail React App default configuration and `
 - Verify SSR stays disabled even for a matching class, and browser hydration computes the browser-specific value.
 - Verify provider configuration changes reach the Auth instance without rebuilding it on unrelated renders.
 - Verify enabled token requests have distinct nonces under a frozen clock; disabled requests receive no injected nonce and preserve caller-supplied custom parameters.
-- Preserve coverage of both token methods, direct private-client cloning, standard/HttpOnly proxy URLs, SDK errors, and raw responses.
+- Verify trusted-agent token requests remain unchanged even when enabled, including caller-supplied custom parameters.
+- Preserve coverage of direct private-client cloning, standard/HttpOnly proxy URLs, SDK errors, and raw responses.
 - Test future-`iat` offsets of 59, 60, and 61 seconds with the setting enabled and disabled, plus the unchanged expiration buffer.
 - Confirm the future-`iat` condition reaches the existing refresh path when enabled and does not change HttpOnly browser expiry handling.
 

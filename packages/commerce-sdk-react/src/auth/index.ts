@@ -673,30 +673,25 @@ class Auth {
      */
     private addTokenRequestNonce(client: ShopperLogin<ApiClientConfigParams>) {
         if (!this.enableTokenResponseCacheWorkaround) return
-        const wrap = <Method extends 'getAccessToken' | 'getTrustedAgentAccessToken'>(
-            method: Method
-        ) => {
-            // Preserve the SDK overloads and its raw-response/error handling.
-            client[method] = new Proxy(client[method], {
-                apply(request, _thisArg, [options, rawResponse]) {
-                    return Reflect.apply(request, client, [
-                        {
-                            ...options,
-                            parameters: {
-                                ...options?.parameters,
-                                // Non-secret cache buster, not an OAuth/OIDC security nonce.
-                                c_nonce: `${Date.now().toString(36)}-${Math.random()
-                                    .toString(36)
-                                    .slice(2)}`
-                            }
-                        },
-                        rawResponse
-                    ])
-                }
-            })
-        }
-        wrap('getAccessToken')
-        wrap('getTrustedAgentAccessToken')
+        // Googlebot does not use the trusted-agent authentication flow.
+        // Preserve the SDK overloads and its raw-response/error handling.
+        client.getAccessToken = new Proxy(client.getAccessToken, {
+            apply(request, _thisArg, [options, rawResponse]) {
+                return Reflect.apply(request, client, [
+                    {
+                        ...options,
+                        parameters: {
+                            ...options?.parameters,
+                            // Non-secret cache buster, not an OAuth/OIDC security nonce.
+                            c_nonce: `${Date.now().toString(36)}-${Math.random()
+                                .toString(36)
+                                .slice(2)}`
+                        }
+                    },
+                    rawResponse
+                ])
+            }
+        })
     }
 
     /**

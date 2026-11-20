@@ -282,7 +282,7 @@ describe('Auth', () => {
         }
     )
 
-    test.each(['getAccessToken', 'getTrustedAgentAccessToken'] as const)(
+    test.each(['getAccessToken'] as const)(
         '%s varies token URLs with a frozen clock and preserves request options',
         async (method) => {
             const auth = new Auth({...config, enableTokenResponseCacheWorkaround: true})
@@ -334,6 +334,18 @@ describe('Auth', () => {
             }
         }
     )
+
+    test.each([false, true])('leaves the trusted-agent token method unchanged (%s)', (enabled) => {
+        const auth = new Auth({...config, enableTokenResponseCacheWorkaround: enabled})
+        const trustedAgentRequest = jest.fn()
+        const client = {
+            getAccessToken: jest.fn(),
+            getTrustedAgentAccessToken: trustedAgentRequest
+        }
+        // @ts-expect-error private method with a minimal SDK client
+        auth.addTokenRequestNonce(client)
+        expect(client.getTrustedAgentAccessToken).toBe(trustedAgentRequest)
+    })
 
     test.each([false, true])(
         'direct private-client auth uses its workaround setting (%s)',
