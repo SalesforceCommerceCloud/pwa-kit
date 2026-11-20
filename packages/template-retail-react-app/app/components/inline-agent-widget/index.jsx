@@ -20,7 +20,13 @@ import {resolveEmbeddedWidgetSourceUrl} from '@salesforce/retail-react-app/app/u
 const VALID_MODES = ['inline', 'shopper-agent', 'hybrid']
 const HANDOFF_EVENT = 'inline-agent-widget:handoff'
 
-const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
+const InlineAgentWidget = ({
+    config,
+    pdpQuestions,
+    productName,
+    productId,
+    pageContextManaged = false
+}) => {
     const containerRef = useInlineAgentWidget(config, {pdpQuestions, productName})
     const [failedQuestions, setFailedQuestions] = useState([])
     const mode = config?.mode
@@ -51,6 +57,7 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
                 result = await handoffToShopperAgent({
                     question,
                     signal: controller.signal,
+                    ...(pageContextManaged ? {primePageContext: false} : {}),
                     productContext: {
                         productId,
                         productName,
@@ -73,7 +80,7 @@ const InlineAgentWidget = ({config, pdpQuestions, productName, productId}) => {
             controller.abort()
             document.removeEventListener(HANDOFF_EVENT, onHandoff)
         }
-    }, [configured, mode, productId, productName])
+    }, [configured, mode, productId, productName, pageContextManaged])
 
     if (!isConfigured(config)) return null
 
@@ -137,7 +144,8 @@ InlineAgentWidget.propTypes = {
     }),
     pdpQuestions: PropTypes.arrayOf(PropTypes.string),
     productName: PropTypes.string,
-    productId: PropTypes.string
+    productId: PropTypes.string,
+    pageContextManaged: PropTypes.bool
 }
 
 export default InlineAgentWidget
