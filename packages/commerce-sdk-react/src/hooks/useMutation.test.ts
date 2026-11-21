@@ -12,7 +12,8 @@ import {
     renderHookWithProviders,
     waitAndExpectSuccess,
     waitAndExpectError,
-    DEFAULT_TEST_CONFIG
+    DEFAULT_TEST_CONFIG,
+    DEFAULT_TEST_HOST
 } from '../test-utils'
 import {useMutation, useCustomMutation} from './useMutation'
 import Auth from '../auth'
@@ -214,6 +215,96 @@ describe('useCustomMutation', () => {
         // and returns the SFRA hook details.
         const error = result.current.error as {response: Response}
         await expect(error.response.json()).resolves.toEqual(errorBody)
+    })
+})
+
+describe('useCustomMutation request forwarding', () => {
+    beforeEach(() => nock.cleanAll())
+
+    const apiName = 'hello-world'
+    const customApiPathParameters = {endpointPath: 'test-hello-world', apiName}
+
+    // Echoes what actually reached the endpoint, so the tests assert on the outgoing request.
+    const mockEchoEndpoint = () =>
+        mockMutationEndpoints(apiName, (uri: string, requestBody: any) => {
+            const query: Record<string, string> = {}
+            new URL(uri, DEFAULT_TEST_HOST).searchParams.forEach((value, key) => {
+                query[key] = value
+            })
+            return {query, requestBody}
+        })
+
+    test('sends the body passed to mutate', async () => {
+        mockEchoEndpoint()
+        const {result} = renderHookWithProviders(() =>
+            useCustomMutation({options: {method: 'POST', customApiPathParameters}})
+        )
+        act(() => result.current.mutate({body: {test: '123'}}))
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toMatchObject({requestBody: {test: '123'}})
+    })
+    test('sends the query parameters passed to mutate', async () => {
+        mockEchoEndpoint()
+        const {result} = renderHookWithProviders(() =>
+            useCustomMutation({options: {method: 'POST', customApiPathParameters}})
+        )
+        act(() => result.current.mutate({parameters: {additional: 'value'}}))
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toMatchObject({
+            query: {additional: 'value', siteId: DEFAULT_TEST_CONFIG.siteId}
+        })
+    })
+    test('mutate args take priority over the hook options and keep the other parameters', async () => {
+        mockEchoEndpoint()
+        const {result} = renderHookWithProviders(() =>
+            useCustomMutation({
+                options: {
+                    method: 'POST',
+                    customApiPathParameters,
+                    body: {source: 'hook'},
+                    parameters: {fromHook: 'kept', overridden: 'hook'}
+                }
+            })
+        )
+        act(() =>
+            result.current.mutate({
+                body: {source: 'mutate'},
+                parameters: {overridden: 'mutate'}
+            })
+        )
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toMatchObject({
+            query: {fromHook: 'kept', overridden: 'mutate'},
+            requestBody: {source: 'mutate'}
+        })
+    })
+    test('does not re-encode a body that is already a string', async () => {
+        mockEchoEndpoint()
+        const {result} = renderHookWithProviders(() =>
+            useCustomMutation({options: {method: 'POST', customApiPathParameters}})
+        )
+        act(() => result.current.mutate({body: JSON.stringify({test: '123'})}))
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toMatchObject({requestBody: {test: '123'}})
+    })
+    test('falls back to the hook options when mutate is called without args', async () => {
+        mockEchoEndpoint()
+        const {result} = renderHookWithProviders(() =>
+            useCustomMutation({
+                options: {
+                    method: 'POST',
+                    customApiPathParameters,
+                    body: {source: 'hook'},
+                    parameters: {fromHook: 'kept'}
+                }
+            })
+        )
+        act(() => result.current.mutate())
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toMatchObject({
+            query: {fromHook: 'kept'},
+            requestBody: {source: 'hook'}
+        })
     })
 })
 

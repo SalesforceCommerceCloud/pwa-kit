@@ -8,6 +8,7 @@ import Auth from '../auth'
 import {CommerceApiProviderProps} from '../provider'
 import {Logger} from '../types'
 import {CustomEndpointArg, OptionalCustomEndpointClientConfig, TMutationVariables} from './types'
+import {isObject} from './utils'
 import {onClient, parseResponseBodyClone} from '../utils'
 
 /**
@@ -69,6 +70,17 @@ export const handleInvalidToken = async (error: any, auth: Auth, logger: Logger)
 }
 
 /**
+ * `callCustomEndpoint` hands the body to `fetch` as is and defaults the content type to JSON, so
+ * plain objects and arrays must be serialized here. Anything else (e.g. a string, `FormData` or
+ * `URLSearchParams`) is already a valid fetch body and is left untouched.
+ */
+const serializeCustomEndpointBody = (body: unknown) => {
+    const prototype = isObject(body) && Object.getPrototypeOf(body)
+    const isPlainObject = prototype === Object.prototype || prototype === null
+    return isPlainObject || Array.isArray(body) ? JSON.stringify(body) : body
+}
+
+/**
  * A helper function for preparing a call to the SCAPI custom API endpoint
  */
 export const generateCustomEndpointOptions = (
@@ -105,7 +117,12 @@ export const generateCustomEndpointOptions = (
                 ...globalHeaders,
                 ...options.options?.headers,
                 ...(args?.headers ? args.headers : {})
-            }
+            },
+            // Same priority as the headers above: mutate func args win over the mutation config.
+            body: serializeCustomEndpointBody(args?.body ?? options.options?.body),
+            ...(args?.parameters
+                ? {parameters: {...options.options?.parameters, ...args.parameters}}
+                : {})
         },
         clientConfig: {
             ...globalClientConfig,
