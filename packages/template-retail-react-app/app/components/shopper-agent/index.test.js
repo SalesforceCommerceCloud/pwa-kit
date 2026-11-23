@@ -1809,6 +1809,21 @@ describe('ShopperAgent Component', () => {
             expect(widgetOptions).not.toHaveProperty('overrides')
         })
 
+        test('forwards cc_theme with preset to the widget options', () => {
+            const theme = {
+                preset: 'commerce',
+                density: 'comfortable',
+                shape: 'round',
+                elevation: 'raised'
+            }
+            renderCommerceClient({cc_theme: theme})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({theme})
+            )
+        })
+
         test('opens the widget automatically when cc_isOpen is true', () => {
             renderCommerceClient({cc_isOpen: 'true'})
 

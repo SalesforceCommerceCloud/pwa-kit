@@ -114,9 +114,13 @@ module.exports = {
             // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
-            // Optional: pass `cc_theme` (object) via COMMERCE_AGENT_SETTINGS to override
-            // the widget theme (primaryColor, secondaryColor, backgroundColor, fontColor,
-            // borderColor, fontFamily).
+            // Theme recipe for the Commerce Client widget. The SDK resolves preset
+            // defaults, trait overrides (density, shape, elevation), and token
+            // overrides internally. Flat legacy fields (primaryColor, etc.) are
+            // still accepted for backward compatibility. Pass via
+            // COMMERCE_AGENT_SETTINGS to override; e.g.
+            //   { "preset": "commerce", "density": "comfortable", "shape": "round", "elevation": "raised" }
+            // cc_theme: { preset: 'legacy', density: 'compact', shape: 'sharp', elevation: 'flat' },
             // Optional: pass `cc_routingAttributes` (object) via COMMERCE_AGENT_SETTINGS to
             // forward Agentforce routing attributes to the widget as `routingAttributes`.
             // Always augmented with `clientVersion` (from `cc_cdnVersion`) and
