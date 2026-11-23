@@ -213,10 +213,18 @@ it('does not publish a read that finishes after its deadline', async () => {
     jest.useRealTimers()
 })
 
-it('defaults transport to agent and validates optional iframe URLs', () => {
-    expect(normalizeCartTransport()).toBe('agent')
-    expect(normalizeCartTransport('invalid')).toBe('agent')
-    expect(normalizeCartTransport('direct')).toBe('direct')
+it.each(['direct', 'DIRECT', ' Direct '])('uses direct cart transport for %j', (value) => {
+    expect(normalizeCartTransport(value)).toBe('direct')
+})
+
+it.each([undefined, null, true, 'invalid', '   '])(
+    'falls back to agent cart transport for %j',
+    (value) => {
+        expect(normalizeCartTransport(value)).toBe('agent')
+    }
+)
+
+it('validates optional iframe URLs', () => {
     expect(normalizeCartPageUrl('/cart?embedded=true')).toBe('/cart?embedded=true')
     expect(normalizeCartPageUrl('https://merchant.example/cart')).toBe(
         'https://merchant.example/cart'

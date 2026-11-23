@@ -11,7 +11,8 @@ export const CART_CHANGED_EVENT = 'commerceclient:cart-changed'
 // Catalog decoration is excluded from serialized basket/version state.
 export const CART_PRODUCTS = Symbol('commerce-client-products')
 
-export const normalizeCartTransport = (value) => (value === 'direct' ? 'direct' : 'agent')
+export const normalizeCartTransport = (value) =>
+    typeof value === 'string' && value.trim().toLowerCase() === 'direct' ? 'direct' : 'agent'
 
 export const normalizeCartPageUrl = (value) => {
     if (typeof value !== 'string' || !value.trim()) return ''
