@@ -90,11 +90,11 @@ module.exports = {
             // CHANGELOG entry for details. Forwarded as
             // `messagingConfig.enableImageUpload`. Defaults to 'false'.
             cc_enableImageUpload: 'false',
-            // Opt in to PDP and keyword SRP context on shopper turns. Requires messaging.umd.js >= 1.53.0.
-            // Product rows and category-only context require a messaging bundle with SRP-8 support.
+            // Opt in to PDP and results-page context on shopper turns. Requires messaging.umd.js >= 1.53.0
             // for the commerce_agent_context envelope, context chips, and local dividers.
             // Uses public pageContext.set/clear, including seeding before widget mount,
             // and enables the shopper-agent handoff to prime product context.
+            // Product rows and category-only context require a messaging bundle with SRP-8 support.
             // Forwarded as messagingConfig.enablePageContext; the widget defaults to false.
             cc_enablePageContext: 'false',
             // Optional URL to customer's component override script. Must use HTTPS;
@@ -110,9 +110,13 @@ module.exports = {
             // Optional: pass `cc_searchConfig` (object) via COMMERCE_AGENT_SETTINGS
             // to customize the widget search input. Forwarded to the widget as
             // `searchConfig`: { placeholder, buttonLabel, buttonType, buttonIconUrl }.
-            // Optional: pass `cc_theme` (object) via COMMERCE_AGENT_SETTINGS to override
-            // the widget theme (primaryColor, secondaryColor, backgroundColor, fontColor,
-            // borderColor, fontFamily).
+            // Theme recipe for the Commerce Client widget. The SDK resolves preset
+            // defaults, trait overrides (density, shape, elevation), and token
+            // overrides internally. Flat legacy fields (primaryColor, etc.) are
+            // still accepted for backward compatibility. Pass via
+            // COMMERCE_AGENT_SETTINGS to override; e.g.
+            //   { "preset": "commerce", "density": "comfortable", "shape": "round", "elevation": "raised" }
+            // cc_theme: { preset: 'legacy', density: 'compact', shape: 'sharp', elevation: 'flat' },
             // Optional: pass `cc_routingAttributes` (object) via COMMERCE_AGENT_SETTINGS to
             // forward Agentforce routing attributes to the widget as `routingAttributes`.
             // Always augmented with `clientVersion` (from `cc_cdnVersion`) and
@@ -282,7 +286,6 @@ module.exports = {
     ssrParameters: {
         ssrFunctionNodeVersion: '24.x',
         // Store the session cookies as HttpOnly for enhanced security.
-        // WIP: Do not enable. This feature is in-progress.
         enableHttpOnlySessionCookies: false,
         proxyConfigs: [
             {

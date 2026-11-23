@@ -5,7 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useCommerceClientSrpContext} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
+import {
+    isCommerceClientPageContextEnabled,
+    useCommerceClientSrpContext
+} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
@@ -130,7 +133,8 @@ const ProductList = (props) => {
     const customerId = useCustomerId()
     const {currency} = useCurrency()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const appConfig = getConfig()?.app
+    const storeLocatorEnabled = appConfig?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
@@ -203,6 +207,7 @@ const ProductList = (props) => {
     )
 
     useCommerceClientSrpContext({
+        enabled: isCommerceClientPageContextEnabled(appConfig?.commerceAgent),
         query:
             typeof restOfParams.q === 'number' || typeof restOfParams.q === 'boolean'
                 ? String(restOfParams.q)

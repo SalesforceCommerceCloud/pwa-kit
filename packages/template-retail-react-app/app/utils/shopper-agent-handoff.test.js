@@ -43,6 +43,17 @@ const installMiaw = () => {
 }
 
 describe('handoffToShopperAgent', () => {
+    it('does not overwrite storefront-managed page context during a handoff', async () => {
+        const sendMessage = jest.fn()
+        const {pageContextSet} = installCommerceClient({sendMessage})
+        await handoffToShopperAgent({
+            question: 'hello',
+            productContext: {productId: 'A'},
+            primePageContext: false
+        })
+        expect(pageContextSet).not.toHaveBeenCalled()
+        expect(sendMessage).toHaveBeenCalledWith('hello')
+    })
     it('returns a no-op result when no provider is on window', async () => {
         jest.useFakeTimers()
         const pending = handoffToShopperAgent({question: 'is this fish-safe?'})

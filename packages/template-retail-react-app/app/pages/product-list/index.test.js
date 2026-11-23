@@ -11,6 +11,7 @@ import {Helmet} from 'react-helmet'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
     mockProductSearch,
     mockedEmptyCustomerProductList,
@@ -560,26 +561,37 @@ test('should filter by inventory when inventory filter is clicked', async () => 
 test.each(['true', 'false'])(
     'publishes SRP context for the boolean-like search term %s',
     async (term) => {
+        const appConfig = getConfig().app
+        const originalConfig = appConfig.commerceAgent
+        appConfig.commerceAgent = {
+            enabled: 'true',
+            provider: 'commerce-client',
+            cc_enablePageContext: 'true'
+        }
         let queryClient
         const ContextProbe = () => {
             queryClient = useQueryClient()
             return null
         }
-        window.history.pushState({}, 'ProductList', `/uk/en-GB/search?q=${term}`)
-        renderWithProviders(
-            <>
-                <MockedComponent />
-                <ContextProbe />
-            </>
-        )
-        expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
-        await waitFor(() => {
-            const context = getCommerceClientPageContext(queryClient)
-            expect(context).toEqual(expect.objectContaining({type: 'srp', query: term}))
-            const tiles = screen.getAllByTestId(/^sf-product-tile-/)
-            expect(context.products.map(({id}) => id)).toEqual(
-                tiles.map((tile) => tile.dataset.testid.replace('sf-product-tile-', ''))
+        try {
+            window.history.pushState({}, 'ProductList', `/uk/en-GB/search?q=${term}`)
+            renderWithProviders(
+                <>
+                    <MockedComponent />
+                    <ContextProbe />
+                </>
             )
-        })
+            expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+            await waitFor(() => {
+                const context = getCommerceClientPageContext(queryClient)
+                expect(context).toEqual(expect.objectContaining({type: 'srp', query: term}))
+                const tiles = screen.getAllByTestId(/^sf-product-tile-/)
+                expect(context.products.map(({id}) => id)).toEqual(
+                    tiles.map((tile) => tile.dataset.testid.replace('sf-product-tile-', ''))
+                )
+            })
+        } finally {
+            appConfig.commerceAgent = originalConfig
+        }
     }
 )

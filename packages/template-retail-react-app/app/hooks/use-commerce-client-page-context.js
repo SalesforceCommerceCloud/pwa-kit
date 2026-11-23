@@ -18,16 +18,24 @@ const useClientLayoutEffect = typeof window === 'undefined' ? useEffect : useLay
 export const getCommerceClientPageContext = (queryClient) =>
     queryClient.getQueryData(COMMERCE_CLIENT_PAGE_CONTEXT_KEY)?.context ?? null
 
+export const isCommerceClientPageContextEnabled = (commerceAgent) =>
+    commerceAgent?.enabled === 'true' &&
+    commerceAgent?.provider === 'commerce-client' &&
+    (commerceAgent?.cc_enablePageContext === true ||
+        (typeof commerceAgent?.cc_enablePageContext === 'string' &&
+            commerceAgent.cc_enablePageContext.trim().toLowerCase() === 'true'))
+
 /** Publish only resolved data for the current product request, including selected variants. */
 export const useCommerceClientPdpContext = ({
+    enabled = false,
     product,
-    requestedProductId,
     variant,
     isLoading,
     isPreviousData,
     isError
 }) => {
-    const valid = !isLoading && !isPreviousData && !isError && product?.id === requestedProductId
+    // useProduct is keyed by the requested ID; previous data belongs to the old key.
+    const valid = !isLoading && !isPreviousData && !isError && product?.id
     const id = valid ? variant?.productId || product?.id : null
     const name = valid ? product?.name : undefined
     const imageUrl = valid ? product?.imageGroups?.[0]?.images?.[0]?.link : undefined
@@ -44,23 +52,18 @@ export const useCommerceClientPdpContext = ({
         [id, name, imageUrl]
     )
 
-    useCommerceClientPageContext(context)
+    useCommerceClientPageContext(context, enabled)
 }
 
 // Share the same ownership and synchronization for PDP and SRP.
-const useCommerceClientPageContext = (context) => {
+const useCommerceClientPageContext = (context, enabled) => {
     const queryClient = useQueryClient()
     // Symbols retain identity through React Query's structural sharing.
     const owner = useRef(Symbol('page-context'))
 
-    // Commit before the widget's passive injection effect or another browser event.
-    // Retain the latest desired value even if the messaging bundle has not loaded.
     useClientLayoutEffect(() => {
+        if (!enabled) return
         queryClient.setQueryDefaults(COMMERCE_CLIENT_PAGE_CONTEXT_KEY, {cacheTime: Infinity})
-        queryClient.setQueryData(COMMERCE_CLIENT_PAGE_CONTEXT_KEY, {owner: owner.current, context})
-    }, [queryClient, context])
-
-    useClientLayoutEffect(() => {
         const currentOwner = owner.current
         return () => {
             // An old page's cleanup must not clear a newer page's committed context.
@@ -70,7 +73,14 @@ const useCommerceClientPageContext = (context) => {
                 queryClient.setQueryData(COMMERCE_CLIENT_PAGE_CONTEXT_KEY, {context: null})
             }
         }
-    }, [queryClient])
+    }, [queryClient, enabled])
+
+    // Commit before the widget's passive injection effect or another browser event.
+    // Retain the latest desired value even if the messaging bundle has not loaded.
+    useClientLayoutEffect(() => {
+        if (!enabled) return
+        queryClient.setQueryData(COMMERCE_CLIENT_PAGE_CONTEXT_KEY, {owner: owner.current, context})
+    }, [queryClient, context, enabled])
 }
 
 const getListingProduct = (hit, currency) => {
@@ -162,6 +172,7 @@ export const buildCommerceClientSrpContext = (query, result, {category, currency
 }
 
 export const useCommerceClientSrpContext = ({
+    enabled = false,
     query,
     result,
     isSuccess,
@@ -175,7 +186,8 @@ export const useCommerceClientSrpContext = ({
     // (including refinements, inventory, sorting and pagination). Same-key refetches
     // retain valid context; a different key's placeholder data must clear it.
     const serialized = JSON.stringify(
-        isSuccess &&
+        enabled &&
+            isSuccess &&
             !isPreviousData &&
             !isError &&
             (!requestedCategoryId || category?.id === requestedCategoryId)
@@ -183,5 +195,5 @@ export const useCommerceClientSrpContext = ({
             : null
     )
     const context = useMemo(() => JSON.parse(serialized), [serialized])
-    useCommerceClientPageContext(context)
+    useCommerceClientPageContext(context, enabled)
 }

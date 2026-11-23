@@ -14,8 +14,7 @@ import {
 import {
     DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
-    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
-    DEFAULT_COMMERCE_CLIENT_THEME
+    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID
 } from '@salesforce/retail-react-app/app/constants'
 
 const onClient = typeof window !== 'undefined'
@@ -52,7 +51,7 @@ const onClient = typeof window !== 'undefined'
  * @param {string} [options.globalClassName] - Custom class added to widget elements for CSS specificity
  * @param {boolean} [options.isDevelopment] - When true, logs widget events to the console
  * @param {Object} [options.componentConfig] - Partial component config merged over the defaults
- * @param {Object} [options.theme] - Partial theme merged over the defaults
+ * @param {Object} [options.theme] - Theme recipe passed through to the widget (the SDK resolves preset defaults internally)
  * @param {string} [options.overridesUrl] - URL to customer's component override script (sets window.CimulateOverrides)
  * @param {Object} [options.overrides] - Inline map of override keys (e.g. `ProductTile`) to registered custom element tag names. The widget takes a single override source, so callers should pass this or `overridesUrl`, not both
  * @param {Object} [options.headerConfig] - Header styling config forwarded as `headerConfig` (e.g. `logoUrl`, `headerText`, `headerBackgroundColor`, `headerTextColor`, `headerTextFontSize`, `headerTextFontWeight`, `headerTextFontFamily`, `headerTextTextAlign`)
@@ -136,9 +135,9 @@ const injectCommerceClientWidget = ({
                 console.error(
                     'Commerce Client PDP context requires a messaging bundle with the public pageContext.set/clear API (use >= 1.53.0).'
                 )
-                return false
-            }
-            if (initialPageContext) {
+                // Keep chat available without page context on unsupported bundles.
+                messagingConfig.enablePageContext = false
+            } else if (initialPageContext) {
                 // Seed synchronously. Passing messagingConfig.initialPageContext
                 // would let the widget's asynchronous React mount replay an old
                 // snapshot after a subsequent storefront navigation/set/clear.
@@ -167,7 +166,7 @@ const injectCommerceClientWidget = ({
                     ...componentConfig?.options
                 }
             },
-            theme: {...DEFAULT_COMMERCE_CLIENT_THEME, ...theme},
+            theme,
             ...(overridesUrl ? {overridesUrl} : {}),
             ...(overrides && typeof overrides === 'object' ? {overrides} : {}),
             ...(headerConfig && typeof headerConfig === 'object' ? {headerConfig} : {}),
@@ -208,12 +207,14 @@ const useCommerceClientMessaging = (scriptLoadStatus, options = {}) => {
             return
         }
 
-        const syncPageContext = () => {
+        const syncPageContext = (forceClear = false) => {
             if (!hasInjectedRef.current || options.enablePageContext !== true) return
             const context = getCommerceClientPageContext(queryClient)
             const contextKey = JSON.stringify(context)
-            if (lastContextRef.current === contextKey) return
+            if (lastContextRef.current === contextKey && (context || !forceClear)) return
             const pageContext = window.CimulateMessaging?.eventHandlers?.pageContext
+            if (typeof pageContext?.set !== 'function' || typeof pageContext?.clear !== 'function')
+                return
             if (context) {
                 pageContext.set(context)
             } else {
@@ -232,6 +233,7 @@ const useCommerceClientMessaging = (scriptLoadStatus, options = {}) => {
                 lastContextRef.current = JSON.stringify(context)
             }
         }
+        if (options.enablePageContext !== true) return
         syncPageContext()
 
         // Cache notifications are synchronous, so navigation clears/updates the
@@ -241,7 +243,8 @@ const useCommerceClientMessaging = (scriptLoadStatus, options = {}) => {
                 event.type === 'updated' &&
                 event.query.queryKey[0] === COMMERCE_CLIENT_PAGE_CONTEXT_KEY[0]
             ) {
-                syncPageContext()
+                // Another widget integration can set context after we last cleared it.
+                syncPageContext(true)
             }
         })
     }, [scriptLoadStatus, options, queryClient])

@@ -11,13 +11,12 @@ import {act, render, waitFor} from '@testing-library/react'
 import {QueryClient, QueryClientProvider, useQuery} from '@tanstack/react-query'
 import {
     buildCommerceClientSrpContext,
-    useCommerceClientSrpContext,
     getCommerceClientPageContext,
-    useCommerceClientPdpContext
+    useCommerceClientPdpContext,
+    useCommerceClientSrpContext
 } from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
-import useCommerceClientMessaging, {
-    injectCommerceClientWidget
-} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import useCommerceClientMessaging from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
+import {handoffToShopperAgent} from '@salesforce/retail-react-app/app/utils/shopper-agent-handoff'
 
 const productA = {id: 'A', name: 'Product A', imageGroups: [{images: [{link: '/A.jpg'}]}]}
 const productB = {id: 'B', name: 'Product B'}
@@ -26,7 +25,7 @@ const ready = {loaded: true, error: false}
 const loading = {loaded: false, error: false}
 
 const Pdp = (props) => {
-    useCommerceClientPdpContext(props)
+    useCommerceClientPdpContext({enabled: true, ...props})
     return null
 }
 const Messaging = ({status = ready, enabled = true}) => {
@@ -61,7 +60,6 @@ describe('Commerce Client PDP adapter', () => {
 
     const tree = ({
         product = productA,
-        requestedProductId = product.id,
         status = ready,
         showPdp = true,
         enabled = true,
@@ -69,9 +67,7 @@ describe('Commerce Client PDP adapter', () => {
     } = {}) => (
         <QueryClientProvider client={queryClient}>
             <Messaging status={status} enabled={enabled} />
-            {showPdp && (
-                <Pdp product={product} requestedProductId={requestedProductId} {...queryState} />
-            )}
+            {showPdp && <Pdp product={product} enabled={enabled} {...queryState} />}
         </QueryClientProvider>
     )
 
@@ -118,7 +114,7 @@ describe('Commerce Client PDP adapter', () => {
             }
         })
         const view = render(tree())
-        view.rerender(tree({requestedProductId: 'B', isPreviousData: true}))
+        view.rerender(tree({isPreviousData: true}))
         mount()
         expect(activeContext).toBeNull()
         view.rerender(tree({product: productB}))
@@ -129,8 +125,8 @@ describe('Commerce Client PDP adapter', () => {
         const pages = (oldPage) => (
             <QueryClientProvider client={queryClient}>
                 <Messaging />
-                {oldPage && <Pdp key="old" product={productA} requestedProductId="A" />}
-                <Pdp key="new" product={productB} requestedProductId="B" />
+                {oldPage && <Pdp key="old" product={productA} />}
+                <Pdp key="new" product={productB} />
             </QueryClientProvider>
         )
         const view = render(pages(true))
@@ -141,7 +137,7 @@ describe('Commerce Client PDP adapter', () => {
     })
 
     test('bundle-first load applies the product through the public API once resolved', () => {
-        const view = render(tree({product: undefined, requestedProductId: 'A', isLoading: true}))
+        const view = render(tree({product: undefined, isLoading: true}))
         view.rerender(tree())
         expect(api.set).toHaveBeenLastCalledWith(expect.objectContaining({id: 'A'}))
         expect(inject).toHaveBeenCalledTimes(1)
@@ -149,7 +145,7 @@ describe('Commerce Client PDP adapter', () => {
 
     test('A → B clears A while previous data is rendered, then publishes B', () => {
         const view = render(tree())
-        view.rerender(tree({requestedProductId: 'B', isPreviousData: true}))
+        view.rerender(tree({isPreviousData: true}))
         expect(getCommerceClientPageContext(queryClient)).toBeNull()
         expect(api.clear).toHaveBeenCalledTimes(1)
         view.rerender(tree({product: productB}))
@@ -160,9 +156,9 @@ describe('Commerce Client PDP adapter', () => {
     test('failure or a stale completion cannot restore a different requested product', () => {
         const view = render(tree())
         api.set.mockClear()
-        view.rerender(tree({requestedProductId: 'B', isError: true}))
+        view.rerender(tree({isError: true}))
         expect(getCommerceClientPageContext(queryClient)).toBeNull()
-        view.rerender(tree({requestedProductId: 'B'}))
+        view.rerender(tree({isPreviousData: true}))
         expect(getCommerceClientPageContext(queryClient)).toBeNull()
         expect(api.set).not.toHaveBeenCalled()
     })
@@ -177,6 +173,33 @@ describe('Commerce Client PDP adapter', () => {
         expect(getCommerceClientPageContext(queryClient)).toBeNull()
     })
 
+    test('leaving while the next product loads clears context restored by an inline handoff', async () => {
+        let widgetContext = null
+        api.set.mockImplementation((context) => {
+            widgetContext = context
+        })
+        api.clear.mockImplementation(() => {
+            widgetContext = null
+        })
+        window.CimulateMessaging.eventHandlers.components = {toggleWidgetOpen: jest.fn()}
+        window.CimulateMessaging.eventHandlers.session = {
+            sendMessage: jest.fn().mockResolvedValue(undefined)
+        }
+        const view = render(tree())
+        view.rerender(tree({isPreviousData: true}))
+        expect(widgetContext).toBeNull()
+        await act(async () => {
+            await handoffToShopperAgent({
+                question: 'Tell me about this',
+                productContext: {productId: 'A'}
+            })
+        })
+        expect(widgetContext).toEqual({type: 'pdp', id: 'A'})
+        view.rerender(tree({showPdp: false}))
+        expect(getCommerceClientPageContext(queryClient)).toBeNull()
+        expect(widgetContext).toBeNull()
+    })
+
     test('an authoritative variant selection uses the existing id field', () => {
         const view = render(tree())
         api.set.mockClear()
@@ -187,7 +210,7 @@ describe('Commerce Client PDP adapter', () => {
             name: 'Product A',
             imageUrl: '/A.jpg'
         })
-        view.rerender(tree({product: {...productA, id: 'A-black'}, requestedProductId: 'A-black'}))
+        view.rerender(tree({product: {...productA, id: 'A-black'}}))
         expect(api.set).toHaveBeenCalledTimes(1)
     })
 
@@ -211,14 +234,25 @@ describe('Commerce Client PDP adapter', () => {
         expect(inject.mock.calls[0][0].messagingConfig.initialPageContext).toBeUndefined()
         expect(api.set).not.toHaveBeenCalled()
         expect(api.clear).not.toHaveBeenCalled()
+        expect(queryClient.getQueryCache().getAll()).toHaveLength(0)
     })
 
-    test('identifies a missing widget API instead of adding a different transport', () => {
+    test('disabling page context clears a previously published product', () => {
+        const view = render(tree())
+        view.rerender(tree({enabled: false}))
+        expect(getCommerceClientPageContext(queryClient)).toBeNull()
+        expect(api.clear).toHaveBeenCalledTimes(1)
+    })
+
+    test('continues chat through navigation when the context API is unavailable', () => {
         delete window.CimulateMessaging.eventHandlers.pageContext
         jest.spyOn(console, 'error').mockImplementation(() => {})
-        expect(injectCommerceClientWidget(options)).toBe(false)
+        const view = render(tree())
         expect(console.error).toHaveBeenCalledWith(expect.stringContaining('>= 1.53.0'))
-        expect(inject).not.toHaveBeenCalled()
+        view.rerender(tree({product: productB}))
+        view.rerender(tree({showPdp: false}))
+        expect(inject).toHaveBeenCalledTimes(1)
+        expect(inject.mock.calls[0][0].messagingConfig.enablePageContext).toBe(false)
     })
 
     test('SSR without browser globals neither publishes context nor injects the widget', () => {
@@ -234,8 +268,7 @@ describe('Commerce Client PDP adapter', () => {
                     QueryClientProvider: Provider
                 } = require('@tanstack/react-query')
                 const {
-                    useCommerceClientPdpContext: usePdp,
-                    useCommerceClientSrpContext: useSrp
+                    useCommerceClientPdpContext: usePdp
                 } = require('@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context')
                 const {
                     default: useMessaging
@@ -243,8 +276,7 @@ describe('Commerce Client PDP adapter', () => {
                 /* eslint-enable @typescript-eslint/no-var-requires */
                 const client = new Client()
                 const ServerPage = () => {
-                    usePdp({product: productA, requestedProductId: 'A'})
-                    useSrp({query: 'shoes', result: {}, isSuccess: true})
+                    usePdp({enabled: true, product: productA})
                     useMessaging(ready, options)
                     return null
                 }
@@ -275,7 +307,7 @@ describe('Commerce Client PDP adapter', () => {
                     }),
                 {keepPreviousData: true}
             )
-            return <Pdp product={state.data} requestedProductId={id} {...state} />
+            return <Pdp product={state.data} {...state} />
         }
         Loader.propTypes = {id: PropTypes.string}
         const renderRoute = (id) => (
@@ -399,7 +431,7 @@ describe('SRP context normalization', () => {
 describe('SRP shared context lifecycle', () => {
     let client, api, inject
     const Srp = (props) => {
-        useCommerceClientSrpContext(props)
+        useCommerceClientSrpContext({enabled: true, ...props})
         return null
     }
     beforeEach(() => {
@@ -419,7 +451,7 @@ describe('SRP shared context lifecycle', () => {
         <QueryClientProvider client={client}>
             <Messaging status={status} />
             {page === 'srp' && <Srp query="shoes" result={{}} isSuccess {...props} />}
-            {page === 'pdp' && <Pdp product={productA} requestedProductId="A" />}
+            {page === 'pdp' && <Pdp product={productA} />}
         </QueryClientProvider>
     )
     test('seeds initial SRP and retains context during same-request refetch', () => {
@@ -428,6 +460,15 @@ describe('SRP shared context lifecycle', () => {
         view.rerender(tree({isFetching: true}))
         expect(api.set).toHaveBeenCalledTimes(1)
         expect(inject).toHaveBeenCalledTimes(1)
+    })
+    test('only publishes listing context when enabled and clears it on opt-out', () => {
+        const view = render(tree({enabled: false}))
+        expect(client.getQueryCache().getAll()).toHaveLength(0)
+        expect(api.set).not.toHaveBeenCalled()
+        view.rerender(tree())
+        expect(api.set).toHaveBeenLastCalledWith({type: 'srp', query: 'shoes'})
+        view.rerender(tree({enabled: false}))
+        expect(getCommerceClientPageContext(client)).toBeNull()
     })
     test('clears previous query/filter data and publishes only resolved selections', () => {
         const view = render(tree())

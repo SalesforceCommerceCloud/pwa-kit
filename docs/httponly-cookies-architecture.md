@@ -1,6 +1,6 @@
 # HttpOnly Session Cookies — Architecture
 
-> **WIP: This feature is in-progress. Do not enable `enableHttpOnlySessionCookies` in production.**
+> **Production support:** HttpOnly session cookies are supported in production builds starting with PWA Kit 3.19. The feature is opt-in: set `ssrParameters.enableHttpOnlySessionCookies` to `true` to turn it on.
 
 ## Overview
 

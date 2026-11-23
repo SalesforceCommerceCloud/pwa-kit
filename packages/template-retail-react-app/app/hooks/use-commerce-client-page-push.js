@@ -14,6 +14,29 @@ const onClient = typeof window !== 'undefined'
 const DEFAULT_PANEL_WIDTH = '420px'
 
 /**
+ * Whether the page-push layout is configured (agent enabled, commerce-client
+ * provider, full-height dialog, cc_pagePush on). Use this to gate layout
+ * restructuring and panel-position hooks without duplicating the check.
+ */
+export const isPagePushEnabled = (commerceAgentConfiguration = {}) => {
+    const {
+        enabled = 'false',
+        provider = 'miaw',
+        cc_pagePush = 'false',
+        cc_displayType = 'dialog',
+        cc_dialogFullHeight = 'true'
+    } = commerceAgentConfiguration
+
+    return (
+        enabled === 'true' &&
+        provider === 'commerce-client' &&
+        cc_pagePush === 'true' &&
+        cc_displayType === 'dialog' &&
+        cc_dialogFullHeight === 'true'
+    )
+}
+
+/**
  * Derives the layout props that shift storefront content aside to make room for
  * the Commerce Client widget's full-height side panel (the "page push" effect).
  *
@@ -37,25 +60,13 @@ const DEFAULT_PANEL_WIDTH = '420px'
  */
 export const useCommerceClientPagePush = (commerceAgentConfiguration = {}) => {
     const {
-        enabled = 'false',
-        provider = 'miaw',
-        cc_pagePush = 'false',
         cc_displayType = 'dialog',
-        cc_dialogFullHeight = 'true',
         cc_widgetPosition = 'bottom-right',
         cc_dialogWidth = DEFAULT_PANEL_WIDTH,
         cc_isOpen = 'false'
     } = commerceAgentConfiguration
 
-    // Page-push only applies to a rendered, full-height Commerce Client side panel:
-    // modal and inline chat widgets never occupy the edge of the viewport, and a
-    // disabled agent has no panel to make room for.
-    const isPagePushConfigured =
-        enabled === 'true' &&
-        provider === 'commerce-client' &&
-        cc_pagePush === 'true' &&
-        cc_displayType === 'dialog' &&
-        cc_dialogFullHeight === 'true'
+    const isPagePushConfigured = isPagePushEnabled(commerceAgentConfiguration)
 
     // Seed from cc_isOpen for SSR/hydration consistency; the persisted open-state is
     // reconciled client-side in the mount effect below (sessionStorage is SSR-unsafe).
