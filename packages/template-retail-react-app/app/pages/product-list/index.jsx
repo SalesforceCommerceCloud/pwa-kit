@@ -5,10 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {
-    isCommerceClientPageContextEnabled,
-    useCommerceClientSrpContext
-} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
@@ -77,6 +73,10 @@ import {
     useSortUrls,
     useSearchParams
 } from '@salesforce/retail-react-app/app/hooks'
+import {
+    isCommerceClientPageContextEnabled,
+    useCommerceClientSrpContext
+} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
@@ -134,6 +134,7 @@ const ProductList = (props) => {
     const {currency} = useCurrency()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
     const appConfig = getConfig()?.app
+    const pageContextEnabled = isCommerceClientPageContextEnabled(appConfig?.commerceAgent)
     const storeLocatorEnabled = appConfig?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     /**************** Page State ****************/
@@ -195,19 +196,21 @@ const ProductList = (props) => {
         }
     )
 
-    const {error, data: category} = useCategory(
+    const {error, data: resolvedCategory} = useCategory(
         {
             parameters: {
                 id: params.categoryId
             }
         },
         {
-            enabled: !isSearch && !!params.categoryId
+            enabled: !!params.categoryId && (!isSearch || pageContextEnabled)
         }
     )
 
+    const category = isSearch ? undefined : resolvedCategory
+
     useCommerceClientSrpContext({
-        enabled: isCommerceClientPageContextEnabled(appConfig?.commerceAgent),
+        enabled: pageContextEnabled,
         query:
             typeof restOfParams.q === 'number' || typeof restOfParams.q === 'boolean'
                 ? String(restOfParams.q)
@@ -216,10 +219,9 @@ const ProductList = (props) => {
         isSuccess: isSearchSuccess,
         isPreviousData: isPreviousSearchData,
         isError: isSearchError,
-        // Keyword searches already apply the route's category through cgid.
-        // Only queryless browse waits for the separate category lookup.
+        // Scoped search results are valid before the category name resolves.
         requestedCategoryId: isSearch ? undefined : params.categoryId,
-        category: !isSearch && params.categoryId ? category : undefined,
+        category: resolvedCategory?.id === params.categoryId ? resolvedCategory : undefined,
         currency
     })
 
@@ -231,7 +233,7 @@ const ProductList = (props) => {
     }
 
     /**************** Error Handling ****************/
-    const errorStatus = error?.response?.status
+    const errorStatus = isSearch ? undefined : error?.response?.status
     switch (errorStatus) {
         case undefined:
             // No Error.
