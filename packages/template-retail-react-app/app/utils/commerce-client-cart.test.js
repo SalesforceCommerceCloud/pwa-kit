@@ -274,7 +274,16 @@ it('maps product images, selected variant labels, discounts and unformatted amou
         orderTotal: 18,
         taxTotal: 0,
         taxation: 'gross',
-        couponItems: [{code: 'SAVE', status: 'applied'}],
+        couponItems: [
+            {code: 'SAVE', couponItemId: 'coupon-1', statusCode: 'applied', valid: true},
+            {code: 'MANUAL', couponItemId: 'coupon-2', statusCode: 'adhoc', valid: true},
+            {
+                code: 'LATER',
+                couponItemId: 'coupon-3',
+                statusCode: 'no_applicable_promotion',
+                valid: true
+            }
+        ],
         orderPriceAdjustments: [{price: -2, itemText: 'Save two'}],
         [CART_PRODUCTS]: {
             'variant-blue-small': {
@@ -292,7 +301,15 @@ it('maps product images, selected variant labels, discounts and unformatted amou
         taxes: 0,
         taxationMode: 'gross',
         promotionsDiscount: 2,
-        couponsApplied: [{code: 'SAVE'}],
+        coupons: [
+            {code: 'SAVE', id: 'coupon-1', status: 'applied'},
+            {code: 'MANUAL', id: 'coupon-2', status: 'applied'},
+            {code: 'LATER', id: 'coupon-3', status: 'no_applicable_promotion'}
+        ],
+        couponsApplied: [
+            {code: 'SAVE', id: 'coupon-1', status: 'applied'},
+            {code: 'MANUAL', id: 'coupon-2', status: 'applied'}
+        ],
         items: [
             {
                 imageUrl: '/shirt.jpg',

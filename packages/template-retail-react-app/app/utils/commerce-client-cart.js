@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {isCouponApplied} from '@salesforce/retail-react-app/app/utils/coupon-utils'
+
 export const CART_ACTION_EVENT = 'cimulate:cart-action'
 export const CART_UPDATE_EVENT = 'cimulate:cart-update'
 export const CART_CHANGED_EVENT = 'commerceclient:cart-changed'
@@ -32,10 +34,10 @@ export const normalizeCartPageUrl = (value) => {
 export const basketVersion = (basket) => JSON.stringify(basket || null)
 
 export const mapBasketToWidgetCart = (basket, {checkoutUrl = '/checkout'} = {}) => {
-    const coupons = (basket?.couponItems || []).map(({code, couponItemId, status}) => ({
-        code,
-        id: couponItemId,
-        status
+    const coupons = (basket?.couponItems || []).map((item) => ({
+        code: item.code,
+        id: item.couponItemId,
+        status: isCouponApplied(item) ? 'applied' : item.statusCode
     }))
     const promotions = (basket?.orderPriceAdjustments || [])
         .map((entry) => entry.itemText || entry.promotionId)
