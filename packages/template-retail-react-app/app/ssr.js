@@ -609,9 +609,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
                         '*.demandware.net',
-                        '*.adyen.com',
-                        'pay.google.com', // Google Pay payment handler icon
-                        'www.gstatic.com', // optional, if icon is on gstatic
                         // Commerce Client messaging widget images
                         'cimulate.ai',
                         '*.cimulate.ai',
@@ -636,13 +633,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                         ...getCommerceClientOverridesCspSources(config.app.commerceAgent),
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
-                        // Payment gateways
-                        '*.stripe.com',
-                        '*.paypal.com',
-                        '*.adyen.com',
-                        'pay.google.com',
-                        'www.gstatic.com',
-                        '*.demandware.net', // Used to load a valid payment scripts in test environment
                         'maps.googleapis.com',
                         'places.googleapis.com'
                     ],
@@ -662,21 +652,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // key, not the host. The o11y team treats this endpoint as stable across
                         // infra changes.
                         'o11y.sfproxy-core1.sfdc-y37hzm.svc.sfdcfc.net',
-                        // Payment gateways
-                        // Note: Google Pay requires different CSP entries depending on the integration and environment.
-                        // - 'pay.google.com' and 'payments.google.com' are generally needed for the SDK to load and create payment tokens.
-                        // - 'google.com/pay/' and 'www.google.com/pay/' may be required for certain flows (especially with Adyen) or in some browsers
-                        //   where the interactive payment sheet makes server calls directly to google.com/pay.
-                        // - You may need to adjust these URLs based on your environments.
-                        '*.demandware.net', // Used to load a valid payment scripts in test environment
-                        '*.adyen.com',
-                        '*.paypal.com',
-                        'pay.google.com',
-                        'payments.google.com',
-                        'google.com/pay',
-                        'google.com/pay/',
-                        'www.google.com/pay',
-                        'www.google.com/pay/',
                         // Connect to SFCC/ODS instances
                         '*.demandware.net'
                     ],
@@ -685,13 +660,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // routes in a same-origin iframe.
                         "'self'",
                         // Allow frames from Salesforce site.com (Needed for MIAW)
-                        '*.site.com',
-                        // Payment gateways
-                        '*.stripe.com',
-                        '*.paypal.com',
-                        '*.adyen.com',
-                        'payments.google.com',
-                        'pay.google.com'
+                        '*.site.com'
                     ],
                     'frame-ancestors': [
                         // Allow Page Designer to embed the storefront in an iframe
@@ -842,46 +811,6 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
-
-    // Helper function to transform relative icon paths to absolute URLs
-    function transformIconPaths(data, ecomServerHost) {
-        const baseUrl = `https://${ecomServerHost}/on/demandware.static/Sites-Site/-/-/internal`
-        const methodTypes = data?.paymentMethodTypes
-        if (methodTypes) {
-            for (const method of Object.values(methodTypes)) {
-                for (const image of method.images ?? []) {
-                    if (image.src?.startsWith('/icons/')) {
-                        image.src = `${baseUrl}${image.src}`
-                    }
-                }
-            }
-        }
-        return data
-    }
-
-    // Helper function to fetch payment metadata from the Commerce Cloud instance
-    app.get('/api/payment-metadata', async (req, res) => {
-        try {
-            const response = await fetch(config.app.sfPayments.metadataUrl, {
-                headers: {Accept: 'application/json'}
-            })
-            if (!response.ok) {
-                throw new Error(`Metadata request failed with status: ${response.status}`)
-            }
-            const data = await response.json()
-            const transformedData = transformIconPaths(
-                data,
-                new URL(config.app.sfPayments.metadataUrl).hostname
-            )
-            res.setHeader('Content-Type', 'application/json')
-            res.json(transformedData)
-        } catch (error) {
-            res.status(500).json({
-                error: 'Failed to fetch metadata',
-                details: error.message
-            })
-        }
-    })
 
     // S15: defense-in-depth throttle on /api/order-lookup/* endpoints
     app.use(createVerifyThrottle())

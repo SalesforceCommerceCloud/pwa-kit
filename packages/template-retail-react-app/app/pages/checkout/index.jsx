@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Alert,
@@ -24,8 +24,6 @@ import {
 } from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
-import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
-import SFPaymentsSheet from '@salesforce/retail-react-app/app/pages/checkout/partials/sf-payments-sheet'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
 import ShippingMethods from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-methods'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
@@ -46,14 +44,7 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {
-    useSFPaymentsEnabled,
-    useSFPayments,
-    useExpressCheckoutEnabled
-} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 import {GoogleAPIProvider} from '@salesforce/retail-react-app/app/pages/checkout/util/google-api-provider'
-
-let persistedPaymentsError = null
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -61,7 +52,6 @@ const Checkout = () => {
     const {step} = useCheckout()
     const [error, setError] = useState()
     const {data: basket, derivedData} = useCurrentBasket()
-    const {confirmingBasket} = useSFPayments()
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
     const {mutateAsync: updatePaymentInstrumentInBasket} = useShopperBasketsMutation(
@@ -73,12 +63,7 @@ const Checkout = () => {
     const isPasswordlessEnabled = !!passwordless?.enabled
     const {removeEmptyShipments} = useMultiship(basket)
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-    const sfPaymentsEnabled = useSFPaymentsEnabled()
-    const {checkout: showExpressOnCheckout} = useExpressCheckoutEnabled()
-    const placeOrderCheckoutStep = sfPaymentsEnabled ? 4 : 5
-    const sfPaymentsSheetRef = useRef(null)
-    const [expressPaymentMethodsRendered, setExpressPaymentMethodsRendered] = useState(false)
-    const [shouldHidePlaceOrderButton, setShouldHidePlaceOrderButton] = useState(false)
+    const placeOrderCheckoutStep = 5
 
     // cart has both pickup and delivery orders
     const isDeliveryAndPickupOrder =
@@ -106,19 +91,6 @@ const Checkout = () => {
         }
     }, [basket?.basketId])
 
-    // Restore error if component remounted after payments error causes a refresh
-    useEffect(() => {
-        if (persistedPaymentsError && !error) {
-            setError(persistedPaymentsError)
-            persistedPaymentsError = null // Clear it after restoring
-        }
-    }, [])
-
-    // Callback to handle when payment method requires its own pay button
-    const handleRequiresPayButtonChange = (requiresPayButton) => {
-        setShouldHidePlaceOrderButton(requiresPayButton === false)
-    }
-
     const doCreateOrder = async () => {
         // Sync payment instrument amount to current orderTotal right before placing
         // the order. The amount stamped at addPaymentInstrumentToBasket time can go
@@ -142,29 +114,17 @@ const Checkout = () => {
         })
     }
 
-    const handlePaymentError = (errorMessage) => {
-        persistedPaymentsError = errorMessage
-        setError(errorMessage)
-    }
-
     const submitOrder = async () => {
         setIsLoading(true)
         try {
-            let order
-            if (sfPaymentsEnabled) {
-                order = await sfPaymentsSheetRef.current.confirmPayment()
-            } else {
-                order = await doCreateOrder()
-            }
+            const order = await doCreateOrder()
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
-            if (!persistedPaymentsError) {
-                const message = formatMessage({
-                    id: 'checkout.message.generic_error',
-                    defaultMessage: 'An unexpected error occurred during checkout.'
-                })
-                setError(message)
-            }
+            const message = formatMessage({
+                id: 'checkout.message.generic_error',
+                defaultMessage: 'An unexpected error occurred during checkout.'
+            })
+            setError(message)
         } finally {
             setIsLoading(false)
         }
@@ -190,35 +150,6 @@ const Checkout = () => {
                                     {error}
                                 </Alert>
                             )}
-                            {showExpressOnCheckout && (
-                                <Box
-                                    layerStyle="card"
-                                    rounded={[0, 0, 'base']}
-                                    px={[4, 4, 6]}
-                                    position="relative"
-                                    display={expressPaymentMethodsRendered ? 'block' : 'none'}
-                                >
-                                    <Heading
-                                        fontSize="lg"
-                                        lineHeight="30px"
-                                        tabIndex="0"
-                                        marginBottom="1rem"
-                                    >
-                                        <FormattedMessage
-                                            defaultMessage="Express Checkout"
-                                            id="checkout.heading.express_checkout"
-                                        />
-                                    </Heading>
-                                    <SFPaymentsExpress
-                                        expressButtonLayout="horizontal"
-                                        maximumButtonCount={3}
-                                        onPaymentMethodsRendered={() =>
-                                            setExpressPaymentMethodsRendered(true)
-                                        }
-                                    />
-                                </Box>
-                            )}
-
                             <ContactInfo
                                 isSocialEnabled={isSocialEnabled}
                                 isPasswordlessEnabled={isPasswordlessEnabled}
@@ -235,18 +166,9 @@ const Checkout = () => {
                                 </>
                             )}
 
-                            {sfPaymentsEnabled ? (
-                                <SFPaymentsSheet
-                                    ref={sfPaymentsSheetRef}
-                                    onRequiresPayButtonChange={handleRequiresPayButtonChange}
-                                    onCreateOrder={doCreateOrder}
-                                    onError={handlePaymentError}
-                                />
-                            ) : (
-                                <Payment />
-                            )}
+                            <Payment />
 
-                            {step === placeOrderCheckoutStep && !shouldHidePlaceOrderButton && (
+                            {step === placeOrderCheckoutStep && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
                                     <Container variant="form">
                                         <Button
@@ -273,7 +195,7 @@ const Checkout = () => {
                             showCartItems={true}
                         />
 
-                        {step === placeOrderCheckoutStep && !shouldHidePlaceOrderButton && (
+                        {step === placeOrderCheckoutStep && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
                                 <Button w="full" onClick={submitOrder} isLoading={isLoading}>
                                     <FormattedMessage
@@ -287,7 +209,7 @@ const Checkout = () => {
                 </Grid>
             </Container>
 
-            {step === placeOrderCheckoutStep && !shouldHidePlaceOrderButton && (
+            {step === placeOrderCheckoutStep && (
                 <Box
                     display={{lg: 'none'}}
                     position="sticky"
@@ -309,8 +231,6 @@ const Checkout = () => {
                     </Container>
                 </Box>
             )}
-            {/* Loading overlay during express payment confirmation */}
-            {confirmingBasket && <LoadingSpinner wrapperStyles={{position: 'fixed'}} />}
         </Box>
     )
 }

@@ -1,4 +1,5 @@
 ## v3.22.0-dev
+- [Breaking] Generated projects no longer include Salesforce Payments. `app.sfPayments`, payment-gateway Content Security Policy entries, and `/api/payment-metadata` are removed from the config and `ssr.js` templates.
 - [Docs] Remove the obsolete WIP warning from the generated `enableHttpOnlySessionCookies` configuration; production support starts with PWA Kit 3.19 and the feature remains opt-in. [#4116](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4116)
 - [Bugfix] Generated extensible projects now include the config-gated routes from `@salesforce/retail-react-app` via `getDynamicRoutes`. Previously the reset password landing page (on by default) and the passwordless login landing page returned 404, so emailed magic links could not complete. In hybrid projects the SFRA catch-all route still matches last.
 - [Security] Keep the generated `ssr.js.hbs` templates in sync with `template-retail-react-app`: passwordless magic links carry only the token, not the shopper email. [#4092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4092)

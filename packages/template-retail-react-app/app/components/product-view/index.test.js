@@ -205,16 +205,6 @@ beforeEach(() => {
                     data: []
                 })
             )
-        }),
-        rest.get('*/api/payment-metadata', (req, res, ctx) => {
-            return res(
-                ctx.delay(0),
-                ctx.status(200),
-                ctx.json({
-                    apiKey: 'test-key',
-                    publishableKey: 'pk_test'
-                })
-            )
         })
     )
 })

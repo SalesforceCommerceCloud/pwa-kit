@@ -29,7 +29,6 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import Link from '@salesforce/retail-react-app/app/components/link'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import {LockIcon} from '@salesforce/retail-react-app/app/components/icons'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {
     getPriceData,
@@ -37,12 +36,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
-import SFPaymentsExpress from '@salesforce/retail-react-app/app/components/sf-payments-express'
 import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
-import {
-    useSFPayments,
-    useExpressCheckoutEnabled
-} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 import {
     getRemainingAvailableBonusProductsForProduct,
@@ -94,13 +88,6 @@ export const AddToCartModal = () => {
         : Array.isArray(itemsAdded)
         ? itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
         : 0
-    const {miniCart: showExpressOnMiniCart} = useExpressCheckoutEnabled()
-    const {confirmingBasket} = useSFPayments()
-
-    // Close modal after express payment completes
-    const handleExpressPaymentCompleted = () => {
-        onClose()
-    }
 
     // Bonus product logic
     const {data: productsWithPromotions, ruleBasedQualifyingProductsMap} =
@@ -139,19 +126,6 @@ export const AddToCartModal = () => {
                 containerProps={{'data-testid': 'add-to-cart-modal'}}
                 position="relative"
             >
-                {confirmingBasket && (
-                    <LoadingSpinner
-                        wrapperStyles={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            zIndex: 9999,
-                            borderRadius: {base: 'none', md: 'base'}
-                        }}
-                    />
-                )}
                 <ModalHeader paddingY="8" bgColor="white">
                     <Heading as="h1" fontSize="2xl">
                         {intl.formatMessage(
@@ -487,14 +461,6 @@ export const AddToCartModal = () => {
                                         id: 'add_to_cart_modal.link.checkout'
                                     })}
                                 </Button>
-
-                                {showExpressOnMiniCart && (
-                                    <SFPaymentsExpress
-                                        expressButtonLayout="vertical"
-                                        maximumButtonCount={1}
-                                        onExpressPaymentCompleted={handleExpressPaymentCompleted}
-                                    />
-                                )}
                             </Stack>
                         </Box>
                     </Flex>
@@ -564,14 +530,6 @@ export const AddToCartModal = () => {
                                 id: 'add_to_cart_modal.link.checkout'
                             })}
                         </Button>
-
-                        {showExpressOnMiniCart && (
-                            <SFPaymentsExpress
-                                expressButtonLayout="vertical"
-                                maximumButtonCount={1}
-                                onExpressPaymentCompleted={handleExpressPaymentCompleted}
-                            />
-                        )}
                     </Stack>
                 </ModalFooter>
             </ModalContent>

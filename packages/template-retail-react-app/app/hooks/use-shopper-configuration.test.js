@@ -23,13 +23,13 @@ describe('useShopperConfiguration', () => {
         useConfigurations.mockReturnValue({
             data: {
                 configurations: [
-                    {id: 'SalesforcePaymentsAllowed', value: true},
+                    {id: 'FeatureFlagAllowed', value: true},
                     {id: 'AnotherConfig', value: false}
                 ]
             }
         })
 
-        const {result} = renderHook(() => useShopperConfiguration('SalesforcePaymentsAllowed'))
+        const {result} = renderHook(() => useShopperConfiguration('FeatureFlagAllowed'))
 
         expect(result.current).toBe(true)
     })
@@ -210,18 +210,14 @@ describe('useShopperConfiguration', () => {
         useConfigurations.mockReturnValue({
             data: {
                 configurations: [
-                    {id: 'SalesforcePaymentsAllowed', value: true},
-                    {id: 'salesforcepaymentsallowed', value: false}
+                    {id: 'FeatureFlagAllowed', value: true},
+                    {id: 'featureflagallowed', value: false}
                 ]
             }
         })
 
-        const {result: result1} = renderHook(() =>
-            useShopperConfiguration('SalesforcePaymentsAllowed')
-        )
-        const {result: result2} = renderHook(() =>
-            useShopperConfiguration('salesforcepaymentsallowed')
-        )
+        const {result: result1} = renderHook(() => useShopperConfiguration('FeatureFlagAllowed'))
+        const {result: result2} = renderHook(() => useShopperConfiguration('featureflagallowed'))
 
         expect(result1.current).toBe(true)
         expect(result2.current).toBe(false)
