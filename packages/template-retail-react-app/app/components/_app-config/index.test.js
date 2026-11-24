@@ -155,14 +155,14 @@ describe('AppConfig', () => {
         )
         test('SSR stays disabled and the browser render enables a matching document', () => {
             window.Progressive = {ssrOptions: {requestClass: 'bot'}}
-            const descriptor = Object.getOwnPropertyDescriptor(global, 'window')
+            const windowGetter = jest.spyOn(global, 'window', 'get')
             const element = component({enabled: true, requestClass: 'bot'})
             try {
-                Object.defineProperty(global, 'window', {configurable: true, value: undefined})
+                windowGetter.mockReturnValue(undefined)
                 renderToString(element)
                 expect(captured.enableTokenResponseCacheWorkaround).toBe(false)
             } finally {
-                Object.defineProperty(global, 'window', descriptor)
+                windowGetter.mockRestore()
             }
             render(element)
             expect(captured.enableTokenResponseCacheWorkaround).toBe(true)
