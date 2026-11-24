@@ -58,11 +58,20 @@ See the comments above **`mrtDataStore`** in `config/default.js` for related env
 
 ## Smart Search storefront
 
-Smart Search is off by default. To enable it, set these variables in your local `.env` or deployment environment:
+Smart Search is off by default.
+
+### Shared Commerce Agent API
+
+Set `COMMERCE_AGENT_SEARCH_API_ORIGIN` in the PWA server environment to the shared Commerce Agent HTTPS origin. Use the same origin for every storefront that calls that service environment. The PWA takes `organizationId` and `shortCode` from its existing Commerce API config and `siteId` from the active storefront.
+
+The PWA sends both the query and the turn stream request under `/api/v1/agent/organizations/{organizationId}/`. The Commerce Agent service uses the org ID to route each request. The integration uses browser-accessible SLAS shopper tokens and falls back to regular product search if it cannot obtain one.
+
+### Storefront settings
+
+To enable Smart Search for a storefront, set these variables in its local `.env` or deployment environment:
 
 ```bash
 ENABLE_COMMERCE_AGENT_SEARCH=true
-COMMERCE_AGENT_SEARCH_API_ORIGIN=https://commerce-agent.example.com
 SMART_SEARCH_STOREFRONT_SETTINGS='{
   "brand": "Example Store",
   "collections": [{"id": "new-arrivals", "label": "New Arrivals"}],
@@ -71,7 +80,6 @@ SMART_SEARCH_STOREFRONT_SETTINGS='{
 }'
 ```
 
-- **API.** Set `COMMERCE_AGENT_SEARCH_API_ORIGIN` to the trusted HTTPS origin that accepts this storefront’s SLAS shopper token. PWA Kit reads it on the server. It takes the organization ID and short code from the existing Commerce API configuration and the site from the current storefront. The integration uses browser-accessible SLAS tokens and falls back to regular product search if it cannot obtain one.
 - **Storefront.** `brand` and `collections` enable the redesigned header and home page. Use real catalog category IDs. The first collection is featured on the home page. The optional `prompts`, `headline`, `description`, and `heroImage` customize the hero. Omit `heroImage` to use a gradient, or use a bundled `static/` path or an HTTPS image URL. Add any custom image CDN origin to the `app.productImageOrigins` array in your storefront config.
 - **Chat.** Use `COMMERCE_AGENT_SETTINGS` to configure your Commerce Client deployment. Enable `cc_enablePageContext` with a widget bundle that supports search page context. Set `cc_pagePush` to `"true"` for a docked desktop panel. `cc_enableShopperAuthLink` defaults to `"true"`. Set it to `"false"` for an independent messaging session, for example when testing a separate sandbox agent.
 - **Local overrides.** Use the ignored `config/local.js` for sandbox-specific site, catalog, and widget settings. Supply a private SLAS client secret through `PWA_KIT_SLAS_CLIENT_SECRET`.

@@ -840,6 +840,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     // the access token in an `Authorization: SLAS` header and the refresh
     // token in the body.
     registerTokenBridgeRoute(app)
+    // The API origin is shared. The proxy uses the configured Commerce API org to scope each request.
     registerCommerceAgentSearch(app, config, process.env.COMMERCE_AGENT_SEARCH_API_ORIGIN)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))

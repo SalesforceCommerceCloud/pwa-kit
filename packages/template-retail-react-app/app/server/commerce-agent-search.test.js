@@ -32,14 +32,18 @@ const res = () => {
     })
 }
 
-test('forwards product search with the configured origin and current storefront identity', async () => {
+test.each([
+    {organizationId: 'f_ecom_example', shortCode: 'example'},
+    {organizationId: 'f_ecom_second', shortCode: 'second'}
+])('uses the shared API origin for $organizationId', async (parameters) => {
     const outcome = {
         route: 'search',
         initialContent: {type: 'search', productSearchResult: {total: 1}}
     }
     const fetchImpl = jest.fn().mockResolvedValue({ok: true, json: async () => outcome})
     const output = res()
-    await createCommerceAgentSearch({config, apiOrigin, fetchImpl}).query(
+    const storefrontConfig = {...config, app: {...config.app, commerceAPI: {parameters}}}
+    await createCommerceAgentSearch({config: storefrontConfig, apiOrigin, fetchImpl}).query(
         {
             headers,
             body: {
@@ -55,9 +59,9 @@ test('forwards product search with the configured origin and current storefront 
     )
     const [[url, init]] = fetchImpl.mock.calls
     expect(url.origin).toBe(apiOrigin)
-    expect(url.pathname).toBe('/api/v1/agent/organizations/f_ecom_example/query')
+    expect(url.pathname).toBe(`/api/v1/agent/organizations/${parameters.organizationId}/query`)
     expect(url.searchParams.get('siteId')).toBe(siteId)
-    expect(url.searchParams.get('shortCode')).toBe('example')
+    expect(url.searchParams.get('shortCode')).toBe(parameters.shortCode)
     expect(init).toEqual(
         expect.objectContaining({
             method: 'POST',
