@@ -11,7 +11,6 @@ import {readOverview, TURN_ID} from '@salesforce/retail-react-app/app/utils/comm
 import {handoffSearch} from '@salesforce/retail-react-app/app/utils/commerce-agent-search-handoff'
 import {openShopperAgentWidget} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
-const loading = {isLoading: true, isFetched: false, isRefetching: false}
 const overviewError = 'The AI overview could not be completed.'
 
 export default function useCommerceAgentSearch(enabled, search, locationKey, autoHandoff) {
@@ -51,7 +50,7 @@ export default function useCommerceAgentSearch(enabled, search, locationKey, aut
         const controller = new AbortController()
         const {signal} = controller
         active.current = {key, signal, sent: new Set()}
-        setState({...loading, key})
+        setState({key})
         const request = JSON.parse(key)
         const update = (change) => {
             if (!signal.aborted)
@@ -62,7 +61,7 @@ export default function useCommerceAgentSearch(enabled, search, locationKey, aut
         const load = async () => {
             const {siteId} = request.search
             const base = (getEnvBasePath() || '') + '/api/commerce-agent'
-            let hasProducts = false
+            let overviewStarted = false
             try {
                 const token = await tokenGetter.current()
                 if (signal.aborted) return
@@ -78,32 +77,16 @@ export default function useCommerceAgentSearch(enabled, search, locationKey, aut
                 if (!response.ok) throw new Error('Commerce Agent query failed')
                 const result = await response.json()
                 if (signal.aborted) return
-                if (result.route === 'agent') {
-                    update({isLoading: false, isFetched: true, agentRouted: true})
+                if (result?.route === 'agent') {
+                    update({agentRouted: true})
                     if (request.autoHandoff) void openAgent()
                     return
                 }
-                const products = result.initialContent?.productSearchResult
-                if (
-                    result.route !== 'search' ||
-                    result.initialContent?.type !== 'search' ||
-                    !products ||
-                    typeof products !== 'object' ||
-                    Array.isArray(products)
-                )
-                    throw new Error('Commerce Agent returned invalid products')
-                hasProducts = true
-                const turnId = result.nextStep?.type === 'stream' ? result.nextStep.turnId : null
-                const hasOverview = TURN_ID.test(turnId || '')
-                update({
-                    data: products,
-                    isLoading: false,
-                    isFetched: true,
-                    hasOverview,
-                    streaming: hasOverview,
-                    text: ''
-                })
-                if (!hasOverview) return
+                if (result?.route !== 'search' || result.nextStep?.type !== 'stream') return
+                const {turnId} = result.nextStep
+                if (typeof turnId !== 'string' || !TURN_ID.test(turnId)) return
+                overviewStarted = true
+                update({hasOverview: true, streaming: true, text: ''})
                 const events = await fetch(
                     base + '/turns/' + turnId + '/events?' + new URLSearchParams({siteId}),
                     {
@@ -119,12 +102,12 @@ export default function useCommerceAgentSearch(enabled, search, locationKey, aut
                 })
                 update({streaming: false})
             } catch {
-                update(hasProducts ? {streaming: false, error: overviewError} : {fallback: true})
+                if (overviewStarted) update({streaming: false, error: overviewError})
             }
         }
         void load()
         return () => controller.abort()
     }, [key, openAgent])
 
-    return {...(key && state?.key === key ? state : loading), openAgent}
+    return {...(key && state?.key === key ? state : {}), openAgent}
 }

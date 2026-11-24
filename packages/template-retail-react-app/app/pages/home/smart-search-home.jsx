@@ -24,7 +24,8 @@ import ProductScroller from '@salesforce/retail-react-app/app/components/product
 import SmartSearchInput from '@salesforce/retail-react-app/app/components/commerce-agent-search/search-input'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {searchUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
+import {categoryUrlBuilder, searchUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 import {openShopperAgentWidget} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 import {
     askAiButton,
@@ -46,6 +47,8 @@ const SmartSearchHome = ({storefront}) => {
     const heroSrc = heroImage?.startsWith('static/') ? getAssetUrl(heroImage) : heroImage
     const [featured, setFeatured] = useState(collections[0])
     const navigate = useNavigation()
+    const agent = getCommerceAgentConfig()
+    const canOpenAgent = agent.enabled === 'true' && agent.provider === 'commerce-client'
     const {data, isLoading} = useProductSearch({
         parameters: {
             refine: ['cgid=' + featured.id],
@@ -197,7 +200,7 @@ const SmartSearchHome = ({storefront}) => {
                             {featured.label}
                         </Heading>
                         <Link
-                            to={'/category/' + featured.id}
+                            to={categoryUrlBuilder(featured)}
                             color={colors.accent}
                             fontWeight="semibold"
                             whiteSpace="nowrap"
@@ -234,7 +237,7 @@ const SmartSearchHome = ({storefront}) => {
                             <Flex
                                 as={Link}
                                 key={id}
-                                to={'/category/' + id}
+                                to={categoryUrlBuilder({id})}
                                 minH={{base: 24, md: 36}}
                                 align="end"
                                 justify="space-between"
@@ -255,39 +258,41 @@ const SmartSearchHome = ({storefront}) => {
                         ))}
                     </SimpleGrid>
                 </Box>
-                <Flex
-                    as="section"
-                    flexWrap="wrap"
-                    align="center"
-                    justify="space-between"
-                    gap={6}
-                    bg={colors.tint}
-                    border="1px solid"
-                    borderColor={colors.border}
-                    borderRadius="16px"
-                    p={{base: 6, md: 9}}
-                >
-                    <Stack spacing={2}>
-                        <Heading
-                            as="h2"
-                            fontFamily={editorialFont}
-                            fontSize={{base: '2xl', md: '4xl'}}
-                            fontWeight="normal"
-                        >
-                            Not sure where to start?
-                        </Heading>
-                        <Text color={colors.muted}>
-                            Get help comparing products and narrowing down your options.
-                        </Text>
-                    </Stack>
-                    <Button
-                        {...askAiButton}
-                        leftIcon={<SparkleIcon boxSize={4} />}
-                        onClick={openShopperAgentWidget}
+                {canOpenAgent && (
+                    <Flex
+                        as="section"
+                        flexWrap="wrap"
+                        align="center"
+                        justify="space-between"
+                        gap={6}
+                        bg={colors.tint}
+                        border="1px solid"
+                        borderColor={colors.border}
+                        borderRadius="16px"
+                        p={{base: 6, md: 9}}
                     >
-                        Chat with the shopping agent
-                    </Button>
-                </Flex>
+                        <Stack spacing={2}>
+                            <Heading
+                                as="h2"
+                                fontFamily={editorialFont}
+                                fontSize={{base: '2xl', md: '4xl'}}
+                                fontWeight="normal"
+                            >
+                                Not sure where to start?
+                            </Heading>
+                            <Text color={colors.muted}>
+                                Get help comparing products and narrowing down your options.
+                            </Text>
+                        </Stack>
+                        <Button
+                            {...askAiButton}
+                            leftIcon={<SparkleIcon boxSize={4} />}
+                            onClick={openShopperAgentWidget}
+                        >
+                            Chat with the shopping agent
+                        </Button>
+                    </Flex>
+                )}
             </Stack>
         </Box>
     )

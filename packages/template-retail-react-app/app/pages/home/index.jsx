@@ -50,6 +50,7 @@ import {
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
 import {getSmartSearchStorefront} from '@salesforce/retail-react-app/app/utils/config-utils'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const SmartSearchHome = loadable(() =>
     import('@salesforce/retail-react-app/app/pages/home/smart-search-home')
@@ -66,7 +67,8 @@ const Home = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
-    const storefront = getSmartSearchStorefront()
+    const {site} = useMultiSite()
+    const storefront = getSmartSearchStorefront(site?.id)
 
     const {res} = useServerContext()
     if (res) {
@@ -96,7 +98,7 @@ const Home = () => {
         dataCloud.sendViewPage(pathname)
     }, [])
 
-    if (storefront) return <SmartSearchHome storefront={storefront} />
+    if (storefront) return <SmartSearchHome key={site.id} storefront={storefront} />
 
     return (
         <Box data-testid="home-page" layerStyle="page">

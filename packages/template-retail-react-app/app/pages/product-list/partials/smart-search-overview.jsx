@@ -38,27 +38,20 @@ const Sparkle = () => (
     </Flex>
 )
 
-const SmartSearchOverview = ({search, query, canOpenAgent}) => {
-    const {
-        agentRouted,
-        handoffError,
-        hasOverview,
-        streaming,
-        data,
-        text = '',
-        error,
-        openAgent
-    } = search
+const SmartSearchOverview = ({search, query, productSearchResult, canOpenAgent}) => {
+    const {agentRouted, handoffError, hasOverview, streaming, text = '', error, openAgent} = search
     const [expanded, setExpanded] = useState(false)
     const [question, setQuestion] = useState('')
     const overviewId = useId()
-    const matches = (data?.hits ?? []).filter(({productName}) => productName).slice(0, 3)
+    const matches = (productSearchResult?.hits ?? [])
+        .filter(({productName}) => productName)
+        .slice(0, 3)
     const names = matches.map(({productName}) => productName)
     const canDiscussResults = canOpenAgent && matches.length > 0
 
     const ask = (prompt) =>
         openAgent(prompt, {
-            resultCount: data.total,
+            resultCount: productSearchResult.total,
             matches: names.map((name) => name.slice(0, 160)),
             ...(text && !streaming && !error && {overview: text.slice(0, 1600)})
         })
@@ -266,6 +259,7 @@ const SmartSearchOverview = ({search, query, canOpenAgent}) => {
 SmartSearchOverview.propTypes = {
     search: PropTypes.object.isRequired,
     query: PropTypes.string.isRequired,
+    productSearchResult: PropTypes.object,
     canOpenAgent: PropTypes.bool.isRequired
 }
 

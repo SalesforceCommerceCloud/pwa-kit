@@ -172,7 +172,7 @@ const ProductList = (props) => {
     const {site, locale} = useMultiSite()
     const {currency} = useCurrency()
     const appConfig = getConfig()?.app
-    const smartSearchLayout = Boolean(isSearch && getSmartSearchStorefront())
+    const smartSearchLayout = Boolean(isSearch && getSmartSearchStorefront(site.id))
     const canOpenCommerceAgent =
         appConfig?.commerceAgent?.enabled === 'true' &&
         appConfig.commerceAgent.provider === 'commerce-client'
@@ -201,7 +201,14 @@ const ProductList = (props) => {
             history.action !== 'POP'
     )
 
-    const scapi = useProductSearch(
+    const {
+        isLoading,
+        isFetched,
+        isRefetching,
+        isPreviousData,
+        isError,
+        data: productSearchResult
+    } = useProductSearch(
         {
             parameters: {
                 ...restOfParams,
@@ -220,17 +227,11 @@ const ProductList = (props) => {
                 refine
             }
         },
-        {
-            ...(useSmartSearchApi && {enabled: !!agentSearch.fallback}),
-            keepPreviousData: true
-        }
+        {keepPreviousData: true}
     )
-    const {
-        isLoading,
-        isFetched,
-        isRefetching,
-        data: productSearchResult
-    } = useSmartSearchApi && !agentSearch.fallback ? agentSearch : scapi
+    // Cached products from the previous search can remain in the grid during navigation.
+    const currentSearchResults = isPreviousData || isError ? undefined : productSearchResult
+    const showOverview = agentSearch.hasOverview && Boolean(currentSearchResults)
 
     const {error, data: category} = useCategory(
         {
@@ -525,22 +526,20 @@ const ProductList = (props) => {
                 )}
                 {smartSearchLayout &&
                     useSmartSearchApi &&
-                    !agentSearch.fallback &&
                     (agentSearch.agentRouted ||
-                        agentSearch.hasOverview ||
-                        agentSearch.data?.total > 0) && (
+                        showOverview ||
+                        currentSearchResults?.total > 0) && (
                         <SmartSearchOverview
                             key={location.key || searchQuery}
                             query={searchQuery}
                             search={agentSearch}
+                            productSearchResult={currentSearchResults}
                             canOpenAgent={canOpenCommerceAgent}
                         />
                     )}
                 {useSmartSearchApi &&
-                    (!smartSearchLayout || agentSearch.fallback) &&
-                    (agentSearch.agentRouted ||
-                        agentSearch.hasOverview ||
-                        agentSearch.fallback) && (
+                    !smartSearchLayout &&
+                    (agentSearch.agentRouted || showOverview) && (
                         <Box borderWidth="1px" borderRadius="md" p={4} mb={4} role="status">
                             {agentSearch.agentRouted ? (
                                 <>
@@ -557,7 +556,7 @@ const ProductList = (props) => {
                                         </Button>
                                     )}
                                 </>
-                            ) : agentSearch.hasOverview ? (
+                            ) : (
                                 <>
                                     <Heading as="h2" size="sm" mb={2}>
                                         AI overview
@@ -570,10 +569,6 @@ const ProductList = (props) => {
                                     </Text>
                                     {agentSearch.error && <Text>{agentSearch.error}</Text>}
                                 </>
-                            ) : (
-                                <Text>
-                                    AI search is unavailable. Showing product search results.
-                                </Text>
                             )}
                         </Box>
                     )}
@@ -629,11 +624,7 @@ const ProductList = (props) => {
                             smartSearch={smartSearchLayout}
                         />
                         <Stack
-                            display={
-                                smartSearchLayout && agentSearch.agentRouted
-                                    ? 'none'
-                                    : {base: 'flex', md: 'none'}
-                            }
+                            display={{base: 'flex', md: 'none'}}
                             direction="row"
                             justify="flex-start"
                             align="center"
@@ -693,7 +684,6 @@ const ProductList = (props) => {
 
                 {/* Body  */}
                 <Grid
-                    display={smartSearchLayout && agentSearch.agentRouted ? 'none' : undefined}
                     templateColumns={{
                         base: '1fr',
                         md: smartSearchLayout ? '210px minmax(0, 1fr)' : '280px 1fr'

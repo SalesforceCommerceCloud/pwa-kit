@@ -33,49 +33,78 @@ const res = () => {
 }
 
 test.each([
-    {organizationId: 'f_ecom_example', shortCode: 'example'},
-    {organizationId: 'f_ecom_second', shortCode: 'second'}
-])('uses the shared API origin for $organizationId', async (parameters) => {
-    const outcome = {
-        route: 'search',
-        initialContent: {type: 'search', productSearchResult: {total: 1}}
+    {
+        organizationId: 'f_ecom_example',
+        shortCode: 'example',
+        activeSite: 'ExampleSite',
+        locale: 'en-US',
+        currency: 'USD'
+    },
+    {
+        organizationId: 'f_ecom_second',
+        shortCode: 'second',
+        activeSite: 'OtherSite',
+        locale: 'en-GB',
+        currency: 'GBP'
     }
-    const fetchImpl = jest.fn().mockResolvedValue({ok: true, json: async () => outcome})
-    const output = res()
-    const storefrontConfig = {...config, app: {...config.app, commerceAPI: {parameters}}}
-    await createCommerceAgentSearch({config: storefrontConfig, apiOrigin, fetchImpl}).query(
-        {
-            headers,
-            body: {
-                siteId,
-                query: 'vest',
-                locale: 'en-US',
-                currency: 'USD',
-                limit: 25,
-                sort: 'best-matches'
+])(
+    'uses the shared API origin for $organizationId',
+    async ({organizationId, shortCode, activeSite, locale, currency}) => {
+        const outcome = {
+            route: 'search',
+            initialContent: {type: 'search', productSearchResult: {total: 1}}
+        }
+        const fetchImpl = jest.fn().mockResolvedValue({ok: true, json: async () => outcome})
+        const output = res()
+        const storefrontConfig = {
+            app: {
+                commerceAPI: {parameters: {organizationId, shortCode}},
+                sites: [
+                    {
+                        id: activeSite,
+                        l10n: {supportedLocales: [{id: locale}], supportedCurrencies: [currency]}
+                    }
+                ]
             }
-        },
-        output
-    )
-    const [[url, init]] = fetchImpl.mock.calls
-    expect(url.origin).toBe(apiOrigin)
-    expect(url.pathname).toBe(`/api/v1/agent/organizations/${parameters.organizationId}/query`)
-    expect(url.searchParams.get('siteId')).toBe(siteId)
-    expect(url.searchParams.get('shortCode')).toBe(parameters.shortCode)
-    expect(init).toEqual(
-        expect.objectContaining({
-            method: 'POST',
-            redirect: 'error',
-            body: JSON.stringify({query: 'vest'}),
-            headers: {
-                Authorization: 'Bearer shopper',
-                Accept: 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-    )
-    expect(output.json).toHaveBeenCalledWith(outcome)
-})
+        }
+        await createCommerceAgentSearch({config: storefrontConfig, apiOrigin, fetchImpl}).query(
+            {
+                headers,
+                body: {
+                    siteId: activeSite,
+                    query: 'vest',
+                    locale,
+                    currency,
+                    organizationId: 'f_ecom_unconfigured',
+                    shortCode: 'unconfigured',
+                    limit: 25,
+                    sort: 'best-matches'
+                }
+            },
+            output
+        )
+        const [[url, init]] = fetchImpl.mock.calls
+        expect(url.origin).toBe(apiOrigin)
+        expect(url.pathname).toBe(`/api/v1/agent/organizations/${organizationId}/query`)
+        expect(url.searchParams.get('siteId')).toBe(activeSite)
+        expect(url.searchParams.get('shortCode')).toBe(shortCode)
+        expect(url.searchParams.get('locale')).toBe(locale)
+        expect(url.searchParams.get('currency')).toBe(currency)
+        expect(init).toEqual(
+            expect.objectContaining({
+                method: 'POST',
+                redirect: 'error',
+                body: JSON.stringify({query: 'vest'}),
+                headers: {
+                    Authorization: 'Bearer shopper',
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+        )
+        expect(output.json).toHaveBeenCalledWith(outcome)
+    }
+)
 
 test('flushes SSE before the upstream stream closes', async () => {
     let source

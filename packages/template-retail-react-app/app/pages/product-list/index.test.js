@@ -24,6 +24,7 @@ import ProductList from '.'
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
 import {useProductSearch, useCategory} from '@salesforce/commerce-sdk-react'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const MOCK_USE_QUERY_RESULT = {
     data: undefined,
@@ -68,6 +69,9 @@ jest.mock('@salesforce/retail-react-app/app/components/image/utils', () => ({
     isServer: jest.fn().mockReturnValue(true)
 }))
 
+const {useProductSearch: useNativeProductSearch} = jest.requireActual(
+    '@salesforce/commerce-sdk-react'
+)
 let mockProductListSearchResponse = mockProductSearch
 
 const MockedComponent = ({isLoading}) => {
@@ -461,6 +465,65 @@ test('should display Search Results for when searching', async () => {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+})
+
+test('renders native products while the parallel Commerce Agent query is pending', async () => {
+    const appConfig = getConfig().app
+    const originalSetting = appConfig.commerceAgentSearch
+    appConfig.commerceAgentSearch = {enabled: true}
+    useProductSearch.mockImplementation(useNativeProductSearch)
+    const nativeSearch = jest.fn()
+    const agentQuery = jest.fn()
+    const agentProductName = 'Commerce Agent product fixture'
+    let releaseQuery
+    const queryReady = new Promise((resolve) => {
+        releaseQuery = resolve
+    })
+    global.server.use(
+        rest.get('*/product-search', (req, res, ctx) => {
+            nativeSearch(req.url.searchParams.get('q'))
+            return res(ctx.status(200), ctx.json(mockProductSearch))
+        }),
+        rest.post('*/api/commerce-agent/query', async (req, res, ctx) => {
+            agentQuery((await req.json()).query)
+            await queryReady
+            return res(
+                ctx.status(200),
+                ctx.json({
+                    route: 'search',
+                    initialContent: {
+                        type: 'search',
+                        productSearchResult: {
+                            ...mockProductSearch,
+                            hits: [{...mockProductSearch.hits[0], productName: agentProductName}]
+                        }
+                    },
+                    nextStep: {type: 'stream', turnId: 'turn_test'}
+                })
+            )
+        }),
+        rest.get('*/api/commerce-agent/turns/turn_test/events', (req, res, ctx) =>
+            res(ctx.status(502))
+        )
+    )
+    try {
+        window.history.pushState({}, 'ProductList', '/uk/en-GB/search?q=jacket')
+        renderWithProviders(<MockedComponent />, {
+            wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
+        })
+        await waitFor(() => expect(agentQuery).toHaveBeenCalledWith('jacket'))
+        expect(await screen.findByText(/Classic Glen Plaid Pant/i)).toBeInTheDocument()
+        expect(nativeSearch).toHaveBeenCalledWith('jacket')
+        releaseQuery()
+        expect(
+            await screen.findByText('The AI overview could not be completed.')
+        ).toBeInTheDocument()
+        expect(screen.getByText(/Classic Glen Plaid Pant/i)).toBeInTheDocument()
+        expect(screen.queryByText(agentProductName)).not.toBeInTheDocument()
+    } finally {
+        releaseQuery()
+        appConfig.commerceAgentSearch = originalSetting
+    }
 })
 
 test('clicking a filter on search result will change url', async () => {

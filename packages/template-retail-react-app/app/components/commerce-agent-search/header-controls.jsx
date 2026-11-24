@@ -10,6 +10,7 @@ import {Box, Button, Flex} from '@salesforce/retail-react-app/app/components/sha
 import Link from '@salesforce/retail-react-app/app/components/link'
 import SmartSearchInput from '@salesforce/retail-react-app/app/components/commerce-agent-search/search-input'
 import {SparkleIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import {smartSearchColors} from '@salesforce/retail-react-app/app/components/commerce-agent-search/styles'
 
 const SmartSearchHeaderControls = ({storefront, onLogoClick, onAgentClick, children}) => (
@@ -36,7 +37,7 @@ const SmartSearchHeaderControls = ({storefront, onLogoClick, onAgentClick, child
             color={smartSearchColors.ink}
         >
             {storefront.collections.slice(0, 6).map(({id, label}) => (
-                <Link key={id} to={'/category/' + id} whiteSpace="nowrap">
+                <Link key={id} to={categoryUrlBuilder({id})} whiteSpace="nowrap">
                     {label}
                 </Link>
             ))}

@@ -64,23 +64,27 @@ Smart Search is off by default.
 
 Set `COMMERCE_AGENT_SEARCH_API_ORIGIN` in the PWA server environment to the shared Commerce Agent HTTPS origin. Use the same origin for every storefront that calls that service environment. The PWA takes `organizationId` and `shortCode` from its existing Commerce API config and `siteId` from the active storefront.
 
-The PWA sends both the query and the turn stream request under `/api/v1/agent/organizations/{organizationId}/`. The Commerce Agent service uses the org ID to route each request. The integration uses browser-accessible SLAS shopper tokens and falls back to regular product search if it cannot obtain one.
+For an eligible Smart Search, the PWA runs regular product search and the Commerce Agent query in parallel. Regular product search supplies the grid, filters, and sort options. The PWA uses the Commerce Agent route to open the Shopper Agent or a returned turn ID to stream the AI overview. Both Commerce Agent requests use the storefront's SLAS shopper token under `/api/v1/agent/organizations/{organizationId}/`.
 
 ### Storefront settings
 
-To enable Smart Search for a storefront, set these variables in its local `.env` or deployment environment:
+Configure each Commerce organization in its own PWA deployment using the existing `app.commerceAPI`, `app.sites`, and Shopper Agent settings. Deployments can share the Commerce Agent API origin for that environment. Enable Smart Search with these variables in the deployment environment or local `.env`:
 
 ```bash
 ENABLE_COMMERCE_AGENT_SEARCH=true
 SMART_SEARCH_STOREFRONT_SETTINGS='{
-  "brand": "Example Store",
-  "collections": [{"id": "new-arrivals", "label": "New Arrivals"}],
-  "prompts": ["Travel bags", "Help me choose a gift"],
-  "heroImage": "static/img/hero.png"
+  "bySite": {
+    "ExampleSiteId": {
+      "brand": "Example Store",
+      "collections": [{"id": "replace-with-a-catalog-category-id", "label": "Featured"}],
+      "prompts": ["Help me choose a gift"],
+      "heroImage": "static/img/hero.png"
+    }
+  }
 }'
 ```
 
-- **Storefront.** `brand` and `collections` enable the redesigned header and home page. Use real catalog category IDs. The first collection is featured on the home page. The optional `prompts`, `headline`, `description`, and `heroImage` customize the hero. Omit `heroImage` to use a gradient, or use a bundled `static/` path or an HTTPS image URL. Add any custom image CDN origin to the `app.productImageOrigins` array in your storefront config.
+- **Storefront.** Key `bySite` by the exact `app.sites[].id`, using the category IDs from that site's catalog with their original case. `brand` and `collections` enable the redesigned header and home page, and the first collection is featured. Sites without a layout use the standard header and home page. A flat settings object is supported for `app.defaultSite`. The optional `prompts`, `headline`, `description`, and `heroImage` customize the hero. Omit `heroImage` to use a gradient, or use a bundled `static/` path or an HTTPS image URL. Add any custom image CDN origin to the `app.productImageOrigins` array in your storefront config.
 - **Chat.** Use `COMMERCE_AGENT_SETTINGS` to configure your Commerce Client deployment. Enable `cc_enablePageContext` with a widget bundle that supports search page context. Set `cc_pagePush` to `"true"` for a docked desktop panel. `cc_enableShopperAuthLink` defaults to `"true"`. Set it to `"false"` for an independent messaging session, for example when testing a separate sandbox agent.
 - **Local overrides.** Use the ignored `config/local.js` for sandbox-specific site, catalog, and widget settings. Supply a private SLAS client secret through `PWA_KIT_SLAS_CLIENT_SECRET`.
 

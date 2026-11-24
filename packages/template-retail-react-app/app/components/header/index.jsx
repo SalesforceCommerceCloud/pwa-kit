@@ -54,6 +54,7 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {
     getCommerceAgentConfig,
     getSmartSearchStorefront
@@ -150,7 +151,8 @@ const Header = ({
 
     const styles = useMultiStyleConfig('Header')
     const {oneClickCheckout = {}} = getConfig().app || {}
-    const storefront = getSmartSearchStorefront()
+    const {site} = useMultiSite()
+    const storefront = getSmartSearchStorefront(site?.id)
     const isOneClickCheckoutEnabled = oneClickCheckout.enabled
 
     // Filter navigation links based on 1CC configuration
