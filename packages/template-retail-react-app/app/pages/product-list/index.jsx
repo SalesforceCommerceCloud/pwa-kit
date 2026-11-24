@@ -216,8 +216,10 @@ const ProductList = (props) => {
         isSuccess: isSearchSuccess,
         isPreviousData: isPreviousSearchData,
         isError: isSearchError,
-        requestedCategoryId: params.categoryId,
-        category: params.categoryId ? category : undefined,
+        // Keyword searches already apply the route's category through cgid.
+        // Only queryless browse waits for the separate category lookup.
+        requestedCategoryId: isSearch ? undefined : params.categoryId,
+        category: !isSearch && params.categoryId ? category : undefined,
         currency
     })
 

@@ -558,40 +558,51 @@ test('should filter by inventory when inventory filter is clicked', async () => 
     expect(window.location.pathname).toBe('/uk/en-GB/category/mens-clothing-jackets')
 })
 
-test.each(['true', 'false'])(
-    'publishes SRP context for the boolean-like search term %s',
-    async (term) => {
-        const appConfig = getConfig().app
-        const originalConfig = appConfig.commerceAgent
-        appConfig.commerceAgent = {
-            enabled: 'true',
-            provider: 'commerce-client',
-            cc_enablePageContext: 'true'
-        }
-        let queryClient
-        const ContextProbe = () => {
-            queryClient = useQueryClient()
-            return null
-        }
-        try {
-            window.history.pushState({}, 'ProductList', `/uk/en-GB/search?q=${term}`)
-            renderWithProviders(
-                <>
-                    <MockedComponent />
-                    <ContextProbe />
-                </>
-            )
-            expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
-            await waitFor(() => {
-                const context = getCommerceClientPageContext(queryClient)
-                expect(context).toEqual(expect.objectContaining({type: 'srp', query: term}))
-                const tiles = screen.getAllByTestId(/^sf-product-tile-/)
-                expect(context.products.map(({id}) => id)).toEqual(
-                    tiles.map((tile) => tile.dataset.testid.replace('sf-product-tile-', ''))
-                )
-            })
-        } finally {
-            appConfig.commerceAgent = originalConfig
-        }
+test.each([
+    ['/search?q=true', 'true', undefined],
+    ['/search?q=false', 'false', undefined],
+    ['/category/mens-clothing-jackets?q=boots', 'boots', 'mens-clothing-jackets']
+])('publishes SRP context for %s', async (path, term, categoryId) => {
+    const appConfig = getConfig().app
+    const originalConfig = appConfig.commerceAgent
+    appConfig.commerceAgent = {
+        enabled: 'true',
+        provider: 'commerce-client',
+        cc_enablePageContext: 'true'
     }
-)
+    useCategory.mockReturnValue({data: undefined})
+    let queryClient
+    const ContextProbe = () => {
+        queryClient = useQueryClient()
+        return null
+    }
+    try {
+        window.history.pushState({}, 'ProductList', `/uk/en-GB${path}`)
+        renderWithProviders(
+            <>
+                <MockedComponent />
+                <ContextProbe />
+            </>
+        )
+        expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+        expect(useCategory).toHaveBeenCalledWith({parameters: {id: categoryId}}, {enabled: false})
+        expect(useProductSearch).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({
+                    refine: categoryId ? [`cgid=${categoryId}`] : []
+                })
+            }),
+            {keepPreviousData: true}
+        )
+        await waitFor(() => {
+            const context = getCommerceClientPageContext(queryClient)
+            expect(context).toEqual(expect.objectContaining({type: 'srp', query: term}))
+            const tiles = screen.getAllByTestId(/^sf-product-tile-/)
+            expect(context.products.map(({id}) => id)).toEqual(
+                tiles.map((tile) => tile.dataset.testid.replace('sf-product-tile-', ''))
+            )
+        })
+    } finally {
+        appConfig.commerceAgent = originalConfig
+    }
+})
