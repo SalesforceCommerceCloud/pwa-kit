@@ -116,6 +116,26 @@ export const mapBasketToWidgetCart = (basket, {checkoutUrl = '/checkout'} = {}) 
 const CHECK_CART = 'Open View Cart to check the basket before making another change.'
 const SHOPPER_CHANGED = 'Your shopper session changed. Open View Cart before trying again.'
 
+// Only explicit rejections from the write itself can bypass the recovery barrier.
+const getWriteRejectionMessage = (error, action) => {
+    switch (error?.response?.status) {
+        case 400:
+        case 422:
+            if (action === 'coupon')
+                return 'This coupon code could not be applied. Check the code and try again.'
+            if (action === 'quantity')
+                return 'This quantity could not be applied. Check the quantity and try again.'
+            return 'The cart change was rejected. Check your selection and try again.'
+        case 401:
+        case 403:
+            return 'Your shopper session could not be verified. Refresh the page and try again.'
+        case 404:
+            return 'The basket or item is no longer available. Open View Cart to refresh it.'
+        default:
+            return undefined
+    }
+}
+
 /** Serialized, single-attempt adapter. Neither a timeout nor a failed follow-up
  * read resends a write. Only an explicit successful View Cart read clears an
  * uncertain-write barrier, after the original request has settled. */
@@ -195,6 +215,12 @@ export const createCommerceClientCart = ({
                             pendingWrites++
                             try {
                                 await writeBasket(request, basket, identity)
+                            } catch (error) {
+                                const message = getWriteRejectionMessage(error, request.action)
+                                if (!message) throw error
+                                const sameShopper =
+                                    identity === getIdentity() && epoch === generation
+                                return {ok: false, error: sameShopper ? message : SHOPPER_CHANGED}
                             } finally {
                                 pendingWrites--
                             }

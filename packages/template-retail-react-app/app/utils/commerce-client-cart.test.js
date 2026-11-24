@@ -122,9 +122,38 @@ it('rejects old or mismatched line ids', async () => {
     expect(state.writeBasket).not.toHaveBeenCalled()
 })
 
+const scapiError = (status) => Object.assign(new Error('SCAPI error'), {response: {status}})
+
+it.each([400, 401, 403, 404, 422])(
+    'leaves edits enabled after SCAPI rejects a write with %s',
+    async (status) => {
+        const state = setup()
+        state.writeBasket.mockRejectedValueOnce(scapiError(status))
+        const rejected = await state.adapter.action({action: 'coupon', code: 'INVALID'})
+        expect(rejected).toMatchObject({ok: false})
+        expect(rejected.error).not.toContain('check the basket before making another change')
+        if (status === 400) expect(rejected.error).toContain('coupon code')
+        expect(await state.adapter.action({action: 'coupon', code: 'SAVE'})).toMatchObject({
+            ok: true
+        })
+        expect(state.writeBasket).toHaveBeenCalledTimes(2)
+    }
+)
+
+it.each([408, 500])('keeps edits locked after an uncertain write response (%s)', async (status) => {
+    const state = setup()
+    state.writeBasket.mockRejectedValueOnce(scapiError(status))
+    expect(await state.adapter.action(add)).toMatchObject({
+        ok: false,
+        error: expect.stringContaining('View Cart')
+    })
+    expect(await state.adapter.action(add)).toMatchObject({ok: false})
+    expect(state.writeBasket).toHaveBeenCalledTimes(1)
+})
+
 it('never retries a write after a failed follow-up read; requires explicit View Cart recovery', async () => {
     const state = setup()
-    state.readBasket.mockResolvedValueOnce(basket()).mockRejectedValueOnce(new Error('network'))
+    state.readBasket.mockResolvedValueOnce(basket()).mockRejectedValueOnce(scapiError(400))
     expect(await state.adapter.action(add)).toMatchObject({
         ok: false,
         error: expect.stringContaining('View Cart')
