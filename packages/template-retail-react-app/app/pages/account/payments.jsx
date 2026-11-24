@@ -31,10 +31,7 @@ import FormActionButtons from '@salesforce/retail-react-app/app/components/forms
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import ActionCard from '@salesforce/retail-react-app/app/components/action-card'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useConfigurations} from '@salesforce/commerce-sdk-react'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
-
-export const SALESFORCE_PAYMENTS_ALLOWED = 'SalesforcePaymentsAllowed'
 
 const BoxArrow = () => {
     return (
@@ -63,11 +60,6 @@ const AccountPayments = () => {
     const addPaymentForm = useForm()
     const [isDefaultModalOpen, setIsDefaultModalOpen] = useState(false)
     const [pendingDefaultPayment, setPendingDefaultPayment] = useState(null)
-    const {
-        data: configurations,
-        isLoading: isLoadingConfigurations,
-        error: configurationsError
-    } = useConfigurations()
     const createCustomerPaymentInstrument = useShopperCustomersMutation(
         'createCustomerPaymentInstrument'
     )
@@ -77,10 +69,6 @@ const AccountPayments = () => {
     const updateCustomerPaymentInstrument = useShopperCustomersMutation(
         'updateCustomerPaymentInstrument'
     )
-
-    const isSalesforcePaymentsEnabled = configurations?.configurations?.find(
-        (config) => config.id === SALESFORCE_PAYMENTS_ALLOWED
-    )?.value
 
     const onAddPaymentSubmit = async (values) => {
         const body = createCreditCardPaymentBodyFromForm(values)
@@ -212,7 +200,7 @@ const AccountPayments = () => {
     }
 
     // Show loading state
-    if (isLoadingCustomer || isLoadingConfigurations) {
+    if (isLoadingCustomer) {
         return (
             <Container layerStyle="page">
                 <Stack spacing={6}>
@@ -236,7 +224,7 @@ const AccountPayments = () => {
     }
 
     // Show error state
-    if (error || configurationsError) {
+    if (error) {
         return (
             <Container layerStyle="page">
                 <Stack spacing={6}>
@@ -285,26 +273,20 @@ const AccountPayments = () => {
                                 id="account.payments.placeholder.heading"
                             />
                         </Text>
-                        {!isSalesforcePaymentsEnabled && (
-                            <div>
-                                <Text color="gray.600" mt={1}>
-                                    <FormattedMessage
-                                        defaultMessage="Add a new payment method to check out faster."
-                                        id="account.payments.placeholder.text"
-                                    />
-                                </Text>
-                                <Button
-                                    mt={4}
-                                    onClick={openAdd}
-                                    leftIcon={<PlusIcon boxSize={3} />}
-                                >
-                                    <FormattedMessage
-                                        defaultMessage="Add Payment Method"
-                                        id="account_payments.button.add_payment"
-                                    />
-                                </Button>
-                            </div>
-                        )}
+                        <div>
+                            <Text color="gray.600" mt={1}>
+                                <FormattedMessage
+                                    defaultMessage="Add a new payment method to check out faster."
+                                    id="account.payments.placeholder.text"
+                                />
+                            </Text>
+                            <Button mt={4} onClick={openAdd} leftIcon={<PlusIcon boxSize={3} />}>
+                                <FormattedMessage
+                                    defaultMessage="Add Payment Method"
+                                    id="account_payments.button.add_payment"
+                                />
+                            </Button>
+                        </div>
                     </Box>
                     {isAdding && (
                         <Box
@@ -345,26 +327,24 @@ const AccountPayments = () => {
                 </Heading>
 
                 <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4} gridAutoFlow="row dense">
-                    {!isSalesforcePaymentsEnabled && (
-                        <Button
-                            variant="outline"
-                            border="1px dashed"
-                            borderColor="gray.200"
-                            color="blue.600"
-                            height={{lg: 'full'}}
-                            minHeight={11}
-                            rounded="base"
-                            fontWeight="medium"
-                            leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
-                            onClick={openAdd}
-                        >
-                            <FormattedMessage
-                                defaultMessage="Add Payment Method"
-                                id="account_payments.button.add_payment"
-                            />
-                            {isAdding && <BoxArrow />}
-                        </Button>
-                    )}
+                    <Button
+                        variant="outline"
+                        border="1px dashed"
+                        borderColor="gray.200"
+                        color="blue.600"
+                        height={{lg: 'full'}}
+                        minHeight={11}
+                        rounded="base"
+                        fontWeight="medium"
+                        leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
+                        onClick={openAdd}
+                    >
+                        <FormattedMessage
+                            defaultMessage="Add Payment Method"
+                            id="account_payments.button.add_payment"
+                        />
+                        {isAdding && <BoxArrow />}
+                    </Button>
 
                     {isAdding && (
                         <Box

@@ -28,10 +28,9 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
 }))
 jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
 
-// Mock the mutations and configurations
+// Mock the customer payment instrument mutations
 const mockMutate = jest.fn()
 const mockDelete = jest.fn()
-const mockUseConfigurations = jest.fn()
 const mockUpdate = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const original = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -48,8 +47,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
                 return {mutateAsync: mockUpdate}
             }
             return original.useShopperCustomersMutation(action)
-        },
-        useConfigurations: () => mockUseConfigurations()
+        }
     }
 })
 
@@ -82,17 +80,6 @@ describe('AccountPayments', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
-        // Default mock for useConfigurations - Salesforce Payments disabled (to show add payment button by default)
-        mockUseConfigurations.mockReturnValue({
-            data: {
-                configurations: [
-                    {
-                        id: 'SalesforcePaymentsAllowed',
-                        value: false
-                    }
-                ]
-            }
-        })
     })
 
     test('removes a payment instrument via remove link (shows toast)', async () => {
@@ -356,22 +343,11 @@ describe('AccountPayments', () => {
         expect(mockRefetch).not.toHaveBeenCalled()
     })
 
-    test('shows add payment button when no payment methods and Salesforce Payments is disabled', () => {
+    test('shows add payment button when there are no payment methods', () => {
         mockUseCurrentCustomer.mockReturnValue({
             data: {customerId: 'test-customer-id', paymentInstruments: []},
             isLoading: false,
             error: null
-        })
-        // Mock Salesforce Payments as disabled
-        mockUseConfigurations.mockReturnValue({
-            data: {
-                configurations: [
-                    {
-                        id: 'SalesforcePaymentsAllowed',
-                        value: false
-                    }
-                ]
-            }
         })
 
         renderWithProviders(<AccountPayments />)
@@ -380,77 +356,15 @@ describe('AccountPayments', () => {
         expect(screen.getByRole('button', {name: /add payment/i})).toBeInTheDocument()
     })
 
-    test('hides add payment button when no payment methods and Salesforce Payments is enabled', () => {
-        mockUseCurrentCustomer.mockReturnValue({
-            data: {customerId: 'test-customer-id', paymentInstruments: []},
-            isLoading: false,
-            error: null
-        })
-        // Mock Salesforce Payments as enabled (default from beforeEach)
-        mockUseConfigurations.mockReturnValue({
-            data: {
-                configurations: [
-                    {
-                        id: 'SalesforcePaymentsAllowed',
-                        value: true
-                    }
-                ]
-            }
-        })
-
-        renderWithProviders(<AccountPayments />)
-
-        expect(screen.getByText(/no saved payment methods/i)).toBeInTheDocument()
-        expect(screen.queryByRole('button', {name: /add payment/i})).not.toBeInTheDocument()
-    })
-
-    test('hides add payment button when there are existing payment methods and Salesforce Payments is enabled', () => {
+    test('shows add payment button when there are existing payment methods', () => {
         mockUseCurrentCustomer.mockReturnValue({
             data: mockCustomer,
             isLoading: false,
             error: null
         })
-        // Mock Salesforce Payments as enabled
-        mockUseConfigurations.mockReturnValue({
-            data: {
-                configurations: [
-                    {
-                        id: 'SalesforcePaymentsAllowed',
-                        value: true
-                    }
-                ]
-            }
-        })
 
         renderWithProviders(<AccountPayments />)
 
-        // Should hide add payment button when Salesforce Payments is enabled, even with existing payment methods
-        expect(screen.queryByRole('button', {name: /add payment/i})).not.toBeInTheDocument()
-        expect(screen.getByText('Visa')).toBeInTheDocument()
-        expect(screen.getByText('Mastercard')).toBeInTheDocument()
-    })
-
-    test('shows add payment button when there are existing payment methods and Salesforce Payments is disabled', () => {
-        mockUseCurrentCustomer.mockReturnValue({
-            data: mockCustomer,
-            isLoading: false,
-            error: null
-        })
-        // Mock Salesforce Payments as disabled
-        mockUseConfigurations.mockReturnValue({
-            data: {
-                configurations: [
-                    {
-                        id: 'SalesforcePaymentsAllowed',
-                        value: false
-                    }
-                ]
-            }
-        })
-
-        renderWithProviders(<AccountPayments />)
-
-        // Should show add payment button when Salesforce Payments is disabled, even with existing payment methods
         expect(screen.getByRole('button', {name: /add payment/i})).toBeInTheDocument()
         expect(screen.getByText('Visa')).toBeInTheDocument()
         expect(screen.getByText('Mastercard')).toBeInTheDocument()
@@ -536,14 +450,9 @@ describe('AccountPayments', () => {
         expect(mockRefetch).not.toHaveBeenCalled()
     })
 
-    test('handles the isLoading state for the shopper configuration API', () => {
+    test('shows a loading state while the customer is loading', () => {
         mockUseCurrentCustomer.mockReturnValue({
             data: {customerId: 'test-customer-id', paymentInstruments: []},
-            isLoading: false,
-            error: null
-        })
-        mockUseConfigurations.mockReturnValue({
-            data: null,
             isLoading: true,
             error: null
         })
@@ -553,14 +462,9 @@ describe('AccountPayments', () => {
         expect(screen.getByText(/loading payment methods/i)).toBeInTheDocument()
     })
 
-    test('handles the error state for the shopper configuration API', () => {
+    test('shows an error state when the customer fails to load', () => {
         mockUseCurrentCustomer.mockReturnValue({
             data: {customerId: 'test-customer-id', paymentInstruments: []},
-            isLoading: false,
-            error: null
-        })
-        mockUseConfigurations.mockReturnValue({
-            data: null,
             isLoading: false,
             error: new Error('Failed to load payment methods')
         })
@@ -571,30 +475,5 @@ describe('AccountPayments', () => {
             screen.getByText(/couldn.?t load the payment methods\.? try again\.?/i)
         ).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /retry/i})).toBeInTheDocument()
-    })
-
-    test('handles missing SalesforcePaymentsAllowed configuration gracefully', () => {
-        mockUseCurrentCustomer.mockReturnValue({
-            data: {customerId: 'test-customer-id', paymentInstruments: []},
-            isLoading: false,
-            error: null
-        })
-        // Mock configurations without SalesforcePaymentsAllowed
-        mockUseConfigurations.mockReturnValue({
-            data: {
-                configurations: [
-                    {
-                        id: 'SomeOtherConfig',
-                        value: true
-                    }
-                ]
-            }
-        })
-
-        renderWithProviders(<AccountPayments />)
-
-        expect(screen.getByText(/no saved payment methods/i)).toBeInTheDocument()
-        // Should show add payment button when configuration is missing (falsy value)
-        expect(screen.getByRole('button', {name: /add payment/i})).toBeInTheDocument()
     })
 })

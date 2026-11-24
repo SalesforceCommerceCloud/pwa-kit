@@ -94,13 +94,6 @@ describe('useCurrentBasket', function () {
         jest.resetModules()
         // Mock necessary endpoints
         global.server.use(
-            rest.get('*/api/payment-metadata', (req, res, ctx) => {
-                return res(
-                    ctx.delay(0),
-                    ctx.status(200),
-                    ctx.json({apiKey: 'test-key', publishableKey: 'pk_test'})
-                )
-            }),
             rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
                 return res(
                     ctx.delay(0),

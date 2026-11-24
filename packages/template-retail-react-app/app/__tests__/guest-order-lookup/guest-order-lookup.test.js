@@ -914,7 +914,7 @@ describe('S15: createVerifyThrottle', () => {
         // Unrelated paths also unaffected
         const next = makeNext()
         const res = makeThrottleRes()
-        throttle(makeThrottleReq(ip, '/api/payment-metadata'), res, next)
+        throttle(makeThrottleReq(ip, '/cart'), res, next)
         expect(next).toHaveBeenCalled()
         expect(res.status).not.toHaveBeenCalled()
     })

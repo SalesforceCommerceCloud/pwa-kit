@@ -11,7 +11,6 @@ import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-uti
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMemo} from 'react'
-import {useSFPayments} from '@salesforce/retail-react-app/app/hooks/use-sf-payments'
 
 /**
  * This hook combine some commerce-react-sdk hooks to provide more derived data for Retail App baskets
@@ -21,20 +20,17 @@ import {useSFPayments} from '@salesforce/retail-react-app/app/hooks/use-sf-payme
 export const useCurrentBasket = ({id = ''} = {}) => {
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const customerId = useCustomerId()
-    const {confirmingBasket} = useSFPayments()
     const {data: basketsData, ...restOfQuery} = useCustomerBaskets(
         {parameters: {customerId}},
         {
             enabled: !!customerId && !isServer
         }
     )
-    // Select the current basket, prioritizing confirmingBasket, then matching id, then first non-temporary basket
+    // Select the current basket by matching id, then the first non-temporary basket.
     // Filters out temporary baskets to prevent them from showing in the cart
     const currentBasket =
-        confirmingBasket && !confirmingBasket.temporaryBasket
-            ? confirmingBasket
-            : basketsData?.baskets?.find((basket) => basket?.basketId === id) ||
-              basketsData?.baskets?.find((basket) => !basket.temporaryBasket)
+        basketsData?.baskets?.find((basket) => basket?.basketId === id) ||
+        basketsData?.baskets?.find((basket) => !basket.temporaryBasket)
 
     const memoizedDerived = useMemo(() => {
         // count the number of items in each shipment and rollup total

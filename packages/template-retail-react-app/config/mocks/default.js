@@ -125,12 +125,7 @@ module.exports = {
             enabled: false
         },
         storeLocatorEnabled: true,
-        multishipEnabled: true,
-        sfPayments: {
-            enabled: true,
-            sdkUrl: '',
-            metadataUrl: ''
-        }
+        multishipEnabled: true
     },
     // This list contains server-side only libraries that you don't want to be compiled by webpack
     externals: [],

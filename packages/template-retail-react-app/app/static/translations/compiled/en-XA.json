@@ -2495,20 +2495,6 @@
       "value": "]"
     }
   ],
-  "checkout.heading.express_checkout": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḗẋƥřḗḗşş Ƈħḗḗƈķǿǿŭŭŧ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "checkout.label.user_registration": [
     {
       "type": 0,
@@ -2531,48 +2517,6 @@
     {
       "type": 0,
       "value": "Ȧƞ ŭŭƞḗḗẋƥḗḗƈŧḗḗḓ ḗḗřřǿǿř ǿǿƈƈŭŭřřḗḗḓ ḓŭŭřīƞɠ ƈħḗḗƈķǿǿŭŭŧ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "checkout.message.payment_button_cancel": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ẏǿǿŭŭř ȧȧŧŧḗḗḿƥŧḗḗḓ ƥȧȧẏḿḗḗƞŧ ẇȧȧş ŭŭƞşŭŭƈƈḗḗşşƒŭŭŀ. Ẏǿǿŭŭ ħȧȧṽḗḗ ƞǿǿŧ ƀḗḗḗḗƞ ƈħȧȧřɠḗḗḓ ȧȧƞḓ ẏǿǿŭŭř ǿǿřḓḗḗř ħȧȧş ƞǿǿŧ ƀḗḗḗḗƞ ƥŀȧȧƈḗḗḓ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "checkout.message.payment_confirm_failure": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƥȧȧẏḿḗḗƞŧ ƈǿǿƞƒīřḿȧȧŧīǿǿƞ ƒȧȧīŀḗḗḓ. Ẏǿǿŭŭř ǿǿřḓḗḗř ħȧȧş ƀḗḗḗḗƞ ƈȧȧƞƈḗḗŀḗḗḓ ȧȧƞḓ ẏǿǿŭŭř ƀȧȧşķḗḗŧ ħȧȧş ƀḗḗḗḗƞ řḗḗşŧǿǿřḗḗḓ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ ǿǿř şḗḗŀḗḗƈŧ ȧȧ ḓīƒƒḗḗřḗḗƞŧ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "checkout.message.payment_processing_failed": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƥȧȧẏḿḗḗƞŧ ƥřǿǿƈḗḗşşīƞɠ ƒȧȧīŀḗḗḓ. Ẏǿǿŭŭř ǿǿřḓḗḗř ħȧȧş ƀḗḗḗḗƞ ƈȧȧƞƈḗḗŀḗḗḓ ȧȧƞḓ ẏǿǿŭŭř ƀȧȧşķḗḗŧ ħȧȧş ƀḗḗḗḗƞ řḗḗşŧǿǿřḗḗḓ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ ǿǿř şḗḗŀḗḗƈŧ ȧȧ ḓīƒƒḗḗřḗḗƞŧ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ."
     },
     {
       "type": 0,
@@ -2643,34 +2587,6 @@
     {
       "type": 0,
       "value": "Ƈřḗḗȧȧŧḗḗ Ȧƈƈǿǿŭŭƞŧ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "checkout_confirmation.heading.afterpay_clearpay": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ȧƒŧḗḗřƥȧȧẏ/Ƈŀḗḗȧȧřƥȧȧẏ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "checkout_confirmation.heading.bancontact": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ɓȧȧƞƈǿǿƞŧȧȧƈŧ"
     },
     {
       "type": 0,
@@ -2751,48 +2667,6 @@
       "value": "]"
     }
   ],
-  "checkout_confirmation.heading.eps": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "ḖƤŞ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "checkout_confirmation.heading.ideal": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "īḒḖȦĿ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "checkout_confirmation.heading.klarna": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ķŀȧȧřƞȧȧ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "checkout_confirmation.heading.order_summary": [
     {
       "type": 0,
@@ -2867,20 +2741,6 @@
       "value": "]"
     }
   ],
-  "checkout_confirmation.heading.sepa_debit": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "ŞḖƤȦ Ḓḗḗƀīŧ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "checkout_confirmation.heading.shipping_address": [
     {
       "type": 0,
@@ -2917,20 +2777,6 @@
     {
       "type": 0,
       "value": "Ŧħȧȧƞķ ẏǿǿŭŭ ƒǿǿř ẏǿǿŭŭř ǿǿřḓḗḗř!"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "checkout_confirmation.heading.unknown": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŭƞķƞǿǿẇƞ"
     },
     {
       "type": 0,
@@ -8781,76 +8627,6 @@
       "value": "]"
     }
   ],
-  "payment_processing.error.unsuccessful": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ẏǿǿŭŭř ȧȧŧŧḗḗḿƥŧḗḗḓ ƥȧȧẏḿḗḗƞŧ ẇȧȧş ŭŭƞşŭŭƈƈḗḗşşƒŭŭŀ. Ẏǿǿŭŭ ħȧȧṽḗḗ ƞǿǿŧ ƀḗḗḗḗƞ ƈħȧȧřɠḗḗḓ ȧȧƞḓ ẏǿǿŭŭř ǿǿřḓḗḗř ħȧȧş ƞǿǿŧ ƀḗḗḗḗƞ ƥŀȧȧƈḗḗḓ. Ƥŀḗḗȧȧşḗḗ şḗḗŀḗḗƈŧ ȧȧ ḓīƒƒḗḗřḗḗƞŧ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ȧȧƞḓ şŭŭƀḿīŧ ƥȧȧẏḿḗḗƞŧ ȧȧɠȧȧīƞ ŧǿǿ ƈǿǿḿƥŀḗḗŧḗḗ ẏǿǿŭŭř ƈħḗḗƈķǿǿŭŭŧ ȧȧƞḓ ƥŀȧȧƈḗḗ ẏǿǿŭŭř ǿǿřḓḗḗř."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "payment_processing.heading.payment_processing": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƥȧȧẏḿḗḗƞŧ Ƥřǿǿƈḗḗşşīƞɠ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "payment_processing.link.return_to_checkout": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Řḗḗŧŭŭřƞ ŧǿǿ Ƈħḗḗƈķǿǿŭŭŧ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "payment_processing.message.unexpected_error": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŧħḗḗřḗḗ ẇȧȧş ȧȧƞ ŭŭƞḗḗẋƥḗḗƈŧḗḗḓ ḗḗřřǿǿř ƥřǿǿƈḗḗşşīƞɠ ẏǿǿŭŭř ƥȧȧẏḿḗḗƞŧ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "payment_processing.message.working_on_your_payment": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ẇǿǿřķīƞɠ ǿǿƞ ẏǿǿŭŭř ƥȧȧẏḿḗḗƞŧ..."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "payment_selection.button.view_all": [
     {
       "type": 0,
@@ -9861,20 +9637,6 @@
     {
       "type": 0,
       "value": "Şḗḗḗḗ ƒŭŭŀŀ ḓḗḗŧȧȧīŀş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "product_view.prepareBasket": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŭƞȧȧƀŀḗḗ ŧǿǿ ḓḗḗŧḗḗřḿīƞḗḗ ƥřǿǿḓŭŭƈŧ ĪḒ ƒǿǿř ƀȧȧşķḗḗŧ"
     },
     {
       "type": 0,
@@ -10965,132 +10727,6 @@
     {
       "type": 0,
       "value": "Īƞ Şŧǿǿƈķ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "sf_payments_order_summary.label.bank.unknown": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŭƞķƞǿǿẇƞ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "sf_payments_order_summary.label.brand.amex": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ȧḿḗḗřīƈȧȧƞ Ḗẋƥřḗḗşş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "sf_payments_order_summary.label.brand.diners": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḓīƞḗḗřş Ƈŀŭŭƀ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "sf_payments_order_summary.label.brand.discover": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḓīşƈǿǿṽḗḗř"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "sf_payments_order_summary.label.brand.jcb": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "ĴƇƁ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "sf_payments_order_summary.label.brand.mastercard": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "ḾȧȧşŧḗḗřƇȧȧřḓ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "sf_payments_order_summary.label.brand.unionpay": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƈħīƞȧȧ ŬƞīǿǿƞƤȧȧẏ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "sf_payments_order_summary.label.brand.unknown": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŭƞķƞǿǿẇƞ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "sf_payments_order_summary.label.brand.visa": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ṽīşȧȧ"
     },
     {
       "type": 0,
