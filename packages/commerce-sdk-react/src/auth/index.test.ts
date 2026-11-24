@@ -355,6 +355,11 @@ describe('Auth', () => {
                 clientSecret: 'secret',
                 enableTokenResponseCacheWorkaround: enabled
             })
+            const request = jest.fn().mockResolvedValue({})
+            ;(ShopperLogin as unknown as jest.Mock).mockImplementationOnce((clientConfig) => ({
+                clientConfig,
+                getAccessToken: request
+            }))
             // @ts-expect-error private method
             const client = auth.getSlasClientWithClientAuth()
             const clientMock = (ShopperLogin as unknown as jest.Mock).mock.results.slice(-1)[0]
@@ -365,7 +370,7 @@ describe('Auth', () => {
             const nonceOptions = expect.objectContaining({
                 parameters: {c_nonce: expect.any(String)}
             })
-            expect(clientMock.getAccessToken.mock.calls[0][0]).toEqual(
+            expect(request.mock.calls[0][0]).toEqual(
                 enabled ? nonceOptions : {body: {grant_type: 'client_credentials'}}
             )
         }

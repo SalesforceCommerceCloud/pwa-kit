@@ -675,7 +675,7 @@ class Auth {
         if (!this.enableTokenResponseCacheWorkaround) return
         // Googlebot does not use the trusted-agent authentication flow.
         // Preserve the SDK overloads and its raw-response/error handling.
-        client.getAccessToken = new Proxy(client.getAccessToken, {
+        client.getAccessToken = new Proxy(client.getAccessToken.bind(client), {
             apply(request, _thisArg, [options, rawResponse]) {
                 return Reflect.apply(request, client, [
                     {
