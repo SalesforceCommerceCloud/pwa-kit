@@ -1563,6 +1563,23 @@ describe('ShopperAgent Component', () => {
             expect(screen.getByTestId('commerce-client-agent-widget')).toBeInTheDocument()
         })
 
+        test.each([
+            [undefined, undefined],
+            ['true', true],
+            ['false', false],
+            [' True ', true]
+        ])(
+            'forwards cc_enablePageContext %s using widget boolean conventions',
+            (value, expected) => {
+                renderCommerceClient({cc_enablePageContext: value})
+                expect(useCommerceClientMessaging).toHaveBeenLastCalledWith(
+                    expect.anything(),
+                    expect.objectContaining({enablePageContext: expected})
+                )
+                expect(mockedUseMiaw).not.toHaveBeenCalled()
+            }
+        )
+
         describe('floating action button gating', () => {
             test('renders the FAB once the bundle has loaded when cc_showFab is true', () => {
                 mockedUseScript.mockReturnValue({loaded: true, error: false})
@@ -1762,6 +1779,21 @@ describe('ShopperAgent Component', () => {
             const widgetOptions = calls[calls.length - 1][1]
 
             expect(widgetOptions).not.toHaveProperty('overrides')
+        })
+
+        test('forwards cc_theme with preset to the widget options', () => {
+            const theme = {
+                preset: 'commerce',
+                density: 'comfortable',
+                shape: 'round',
+                elevation: 'raised'
+            }
+            renderCommerceClient({cc_theme: theme})
+
+            expect(mockedUseCommerceClientMessaging).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({theme})
+            )
         })
 
         test('opens the widget automatically when cc_isOpen is true', () => {

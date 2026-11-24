@@ -5,15 +5,24 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {renderHook} from '@testing-library/react'
+import React from 'react'
+import {renderHook as renderTestingHook} from '@testing-library/react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+
+const renderHook = (callback, options) => {
+    const queryClient = new QueryClient()
+    const wrapper = ({children}) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
+    return renderTestingHook(callback, {...options, wrapper})
+}
 import useCommerceClientMessaging, {
     injectCommerceClientWidget
 } from '@salesforce/retail-react-app/app/hooks/use-commerce-client-messaging'
 import {
     DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
     DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
-    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID,
-    DEFAULT_COMMERCE_CLIENT_THEME
+    DEFAULT_COMMERCE_CLIENT_ELEMENT_ID
 } from '@salesforce/retail-react-app/app/constants'
 
 const messagingFields = {
@@ -81,7 +90,7 @@ describe('injectCommerceClientWidget', () => {
                 ...DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG,
                 options: {...DEFAULT_COMMERCE_CLIENT_COMPONENT_CONFIG.options}
             },
-            theme: {...DEFAULT_COMMERCE_CLIENT_THEME}
+            theme: undefined
         })
     })
 
@@ -93,21 +102,16 @@ describe('injectCommerceClientWidget', () => {
         )
     })
 
-    test('merges theme overrides over the defaults', () => {
-        injectCommerceClientWidget({
-            ...messagingFields,
-            theme: {primaryColor: '#ff0000', fontFamily: 'Arial'}
-        })
+    test('passes theme through to the widget as-is', () => {
+        const theme = {
+            preset: 'commerce',
+            density: 'comfortable',
+            shape: 'round',
+            elevation: 'raised'
+        }
+        injectCommerceClientWidget({...messagingFields, theme})
 
-        expect(mockInject).toHaveBeenCalledWith(
-            expect.objectContaining({
-                theme: {
-                    ...DEFAULT_COMMERCE_CLIENT_THEME,
-                    primaryColor: '#ff0000',
-                    fontFamily: 'Arial'
-                }
-            })
-        )
+        expect(mockInject).toHaveBeenCalledWith(expect.objectContaining({theme}))
     })
 
     test('merges componentConfig overrides including nested options', () => {

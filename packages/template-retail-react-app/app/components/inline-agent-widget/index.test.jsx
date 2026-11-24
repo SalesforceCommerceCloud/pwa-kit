@@ -208,6 +208,29 @@ describe('InlineAgentWidget', () => {
         expect(payload.productContext.productName).toBe('Serum')
     })
 
+    test.each(['shopper-agent', 'hybrid'])(
+        'leaves managed context to the PDP adapter in %s mode',
+        (mode) => {
+            renderWithProviders(
+                <InlineAgentWidget
+                    config={{...BASE_CONFIG, mode}}
+                    productId="A"
+                    pageContextManaged
+                />
+            )
+            act(() =>
+                document.dispatchEvent(
+                    new CustomEvent('inline-agent-widget:handoff', {
+                        detail: {question: 'About this?'}
+                    })
+                )
+            )
+            expect(handoffMock).toHaveBeenCalledWith(
+                expect.objectContaining({primePageContext: false})
+            )
+        }
+    )
+
     test('hands off every embedded interaction with the current PDP context', () => {
         renderWithProviders(
             <InlineAgentWidget

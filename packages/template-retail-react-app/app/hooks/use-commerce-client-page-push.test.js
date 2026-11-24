@@ -6,7 +6,10 @@
  */
 
 import {act, renderHook} from '@testing-library/react'
-import {useCommerceClientPagePush} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-push'
+import {
+    isPagePushEnabled,
+    useCommerceClientPagePush
+} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-push'
 import {COMMERCE_CLIENT_UI_STATE_EVENT} from '@salesforce/retail-react-app/app/constants'
 import {getPersistedCommerceClientOpenState} from '@salesforce/retail-react-app/app/utils/shopper-agent-utils'
 
@@ -314,5 +317,39 @@ describe('useCommerceClientPagePush', () => {
             // The last rendered value (closed) stands; no update after unmount.
             expect(result.current.paddingRight).toBe(0)
         })
+    })
+})
+
+describe('isPagePushEnabled', () => {
+    test('returns true when all gate conditions are met', () => {
+        expect(isPagePushEnabled(enabledConfig)).toBe(true)
+    })
+
+    test('returns false with default (empty) config', () => {
+        expect(isPagePushEnabled({})).toBe(false)
+    })
+
+    test('returns false when agent is disabled', () => {
+        expect(isPagePushEnabled({...enabledConfig, enabled: 'false'})).toBe(false)
+    })
+
+    test('returns false for the miaw provider', () => {
+        expect(isPagePushEnabled({...enabledConfig, provider: 'miaw'})).toBe(false)
+    })
+
+    test('returns false when cc_pagePush is off', () => {
+        expect(isPagePushEnabled({...enabledConfig, cc_pagePush: 'false'})).toBe(false)
+    })
+
+    test('returns false for non-dialog display type', () => {
+        expect(isPagePushEnabled({...enabledConfig, cc_displayType: 'chat'})).toBe(false)
+    })
+
+    test('returns false when dialog is not full-height', () => {
+        expect(isPagePushEnabled({...enabledConfig, cc_dialogFullHeight: 'false'})).toBe(false)
+    })
+
+    test('returns false with no argument', () => {
+        expect(isPagePushEnabled()).toBe(false)
     })
 })
