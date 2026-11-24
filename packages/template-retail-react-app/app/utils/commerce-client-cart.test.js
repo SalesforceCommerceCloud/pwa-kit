@@ -124,21 +124,24 @@ it('rejects old or mismatched line ids', async () => {
 
 const scapiError = (status) => Object.assign(new Error('SCAPI error'), {response: {status}})
 
-it.each([400, 401, 403, 404, 422])(
-    'leaves edits enabled after SCAPI rejects a write with %s',
-    async (status) => {
-        const state = setup()
-        state.writeBasket.mockRejectedValueOnce(scapiError(status))
-        const rejected = await state.adapter.action({action: 'coupon', code: 'INVALID'})
-        expect(rejected).toMatchObject({ok: false})
-        expect(rejected.error).not.toContain('check the basket before making another change')
-        if (status === 400) expect(rejected.error).toContain('coupon code')
-        expect(await state.adapter.action({action: 'coupon', code: 'SAVE'})).toMatchObject({
-            ok: true
-        })
-        expect(state.writeBasket).toHaveBeenCalledTimes(2)
-    }
-)
+it.each([
+    [400, 'This coupon code could not be applied'],
+    [401, 'Your shopper session could not be verified'],
+    [403, 'Your shopper session could not be verified'],
+    [404, 'The basket or item is no longer available'],
+    [422, 'This coupon code could not be applied']
+])('leaves edits enabled after SCAPI rejects a write with %s', async (status, message) => {
+    const state = setup()
+    state.writeBasket.mockRejectedValueOnce(scapiError(status))
+    expect(await state.adapter.action({action: 'coupon', code: 'INVALID'})).toMatchObject({
+        ok: false,
+        error: expect.stringContaining(message)
+    })
+    expect(await state.adapter.action({action: 'coupon', code: 'SAVE'})).toMatchObject({
+        ok: true
+    })
+    expect(state.writeBasket).toHaveBeenCalledTimes(2)
+})
 
 it.each([408, 500])('keeps edits locked after an uncertain write response (%s)', async (status) => {
     const state = setup()
