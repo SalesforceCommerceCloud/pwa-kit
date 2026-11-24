@@ -8,6 +8,27 @@
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION} from '@salesforce/retail-react-app/app/constants'
 
+export const getSmartSearchStorefront = () => {
+    const {commerceAgentSearch, smartSearchStorefront} = getConfig()?.app || {}
+    const {brand, collections} = smartSearchStorefront || {}
+    if (
+        commerceAgentSearch?.enabled === true &&
+        typeof brand === 'string' &&
+        brand.trim() &&
+        Array.isArray(collections) &&
+        collections.length > 0 &&
+        collections.every(
+            (item) =>
+                typeof item?.id === 'string' &&
+                item.id.trim() &&
+                typeof item.label === 'string' &&
+                item.label.trim()
+        )
+    ) {
+        return smartSearchStorefront
+    }
+}
+
 export const getCommerceAgentConfig = () => {
     const defaults = {
         enabled: 'false',

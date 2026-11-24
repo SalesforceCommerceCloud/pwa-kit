@@ -33,6 +33,8 @@ import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {registerTokenBridgeRoute} from './components/shopper-agent/token-bridge.js'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
+import {registerCommerceAgentSearch} from './server/commerce-agent-search.js'
+// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
 import {getCommerceClientOverridesCspSources} from './utils/commerce-client-overrides.js'
 import {ShopperLogin, ShopperOrders, helpers} from 'commerce-sdk-isomorphic'
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
@@ -183,7 +185,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: config.app.commerceAPI.useSLASPrivateClient === true,
 
     // To extend the SLAS private-client proxy allow-list, supply
     // `slasPrivateClientAllowList`. See the built-in list in pwa-kit-runtime
@@ -606,9 +608,10 @@ const {handler} = runtime.createHandler(options, (app) => {
                 useDefaults: true,
                 directives: {
                     'img-src': [
-                        // Default source for product images - replace with your CDN
+                        // Default product image hosts and optional storefront CDN origins.
                         '*.commercecloud.salesforce.com',
                         '*.demandware.net',
+                        ...(config.app.productImageOrigins ?? []),
                         '*.adyen.com',
                         'pay.google.com', // Google Pay payment handler icon
                         'www.gstatic.com', // optional, if icon is on gstatic
@@ -837,6 +840,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     // the access token in an `Authorization: SLAS` header and the refresh
     // token in the body.
     registerTokenBridgeRoute(app)
+    registerCommerceAgentSearch(app, config, process.env.COMMERCE_AGENT_SEARCH_API_ORIGIN)
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))

@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import loadable from '@loadable/component'
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
@@ -73,6 +74,9 @@ import {
     useSearchParams
 } from '@salesforce/retail-react-app/app/hooks'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import useCommerceAgentSearch from '@salesforce/retail-react-app/app/hooks/use-commerce-agent-search'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
@@ -84,6 +88,7 @@ import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 // Constants
 import {
     DEFAULT_LIMIT_VALUES,
+    DEFAULT_SEARCH_PARAMS,
     API_ERROR_MESSAGE,
     MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
@@ -96,9 +101,16 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {getSmartSearchStorefront} from '@salesforce/retail-react-app/app/utils/config-utils'
+import Link from '@salesforce/retail-react-app/app/components/link'
+import {smartSearchColors} from '@salesforce/retail-react-app/app/components/commerce-agent-search/styles'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
+
+const SmartSearchOverview = loadable(() =>
+    import('@salesforce/retail-react-app/app/pages/product-list/partials/smart-search-overview')
+)
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -136,7 +148,7 @@ const ProductList = (props) => {
     const [searchByInventory, setSearchByInventory] = useState(null)
 
     const urlParams = new URLSearchParams(location.search)
-    let searchQuery = urlParams.get('q')
+    const searchQuery = urlParams.get('q')
     const isSearch = !!searchQuery
 
     if (params.categoryId) {
@@ -157,15 +169,43 @@ const ProductList = (props) => {
 
     const refine = searchByInventory ? [..._refine, `ilids=${searchByInventory}`] : _refine
 
-    const {
-        isLoading,
-        isFetched,
-        isRefetching,
-        data: productSearchResult
-    } = useProductSearch(
+    const {site, locale} = useMultiSite()
+    const {currency} = useCurrency()
+    const appConfig = getConfig()?.app
+    const smartSearchLayout = Boolean(isSearch && getSmartSearchStorefront())
+    const canOpenCommerceAgent =
+        appConfig?.commerceAgent?.enabled === 'true' &&
+        appConfig.commerceAgent.provider === 'commerce-client'
+    const useSmartSearchApi = Boolean(
+        appConfig?.commerceAgentSearch?.enabled &&
+            isSearch &&
+            !params.categoryId &&
+            !refine.length &&
+            restOfParams.offset === DEFAULT_SEARCH_PARAMS.offset &&
+            restOfParams.limit === DEFAULT_SEARCH_PARAMS.limit &&
+            restOfParams.sort === DEFAULT_SEARCH_PARAMS.sort
+    )
+    const agentSearch = useCommerceAgentSearch(
+        useSmartSearchApi,
+        {
+            query: searchQuery,
+            siteId: site.id,
+            locale: locale.id,
+            currency,
+            limit: restOfParams.limit,
+            sort: restOfParams.sort
+        },
+        location.key,
+        canOpenCommerceAgent &&
+            location.state?.commerceAgentSearch === true &&
+            history.action !== 'POP'
+    )
+
+    const scapi = useProductSearch(
         {
             parameters: {
                 ...restOfParams,
+                ...(isSearch && {q: searchQuery}),
                 perPricebook: true,
                 allVariationProperties: true,
                 allImages: true,
@@ -181,9 +221,16 @@ const ProductList = (props) => {
             }
         },
         {
+            ...(useSmartSearchApi && {enabled: !!agentSearch.fallback}),
             keepPreviousData: true
         }
     )
+    const {
+        isLoading,
+        isFetched,
+        isRefetching,
+        data: productSearchResult
+    } = useSmartSearchApi && !agentSearch.fallback ? agentSearch : scapi
 
     const {error, data: category} = useCategory(
         {
@@ -460,6 +507,76 @@ const ProductList = (props) => {
             <>
                 <AbovePageHeader />
                 <PageDesignerPromotionalBanner />
+                {smartSearchLayout && (
+                    <Flex
+                        as="nav"
+                        aria-label="Breadcrumb"
+                        gap={2}
+                        mb={4}
+                        fontSize="sm"
+                        color={smartSearchColors.muted}
+                    >
+                        <Link to="/">Home</Link>
+                        <Text aria-hidden="true">/</Text>
+                        <Text noOfLines={1} aria-current="page">
+                            {searchQuery}
+                        </Text>
+                    </Flex>
+                )}
+                {smartSearchLayout &&
+                    useSmartSearchApi &&
+                    !agentSearch.fallback &&
+                    (agentSearch.agentRouted ||
+                        agentSearch.hasOverview ||
+                        agentSearch.data?.total > 0) && (
+                        <SmartSearchOverview
+                            key={location.key || searchQuery}
+                            query={searchQuery}
+                            search={agentSearch}
+                            canOpenAgent={canOpenCommerceAgent}
+                        />
+                    )}
+                {useSmartSearchApi &&
+                    (!smartSearchLayout || agentSearch.fallback) &&
+                    (agentSearch.agentRouted ||
+                        agentSearch.hasOverview ||
+                        agentSearch.fallback) && (
+                        <Box borderWidth="1px" borderRadius="md" p={4} mb={4} role="status">
+                            {agentSearch.agentRouted ? (
+                                <>
+                                    <Text mb={2}>
+                                        {agentSearch.handoffError
+                                            ? 'The Commerce Shopper Agent handoff could not be confirmed.'
+                                            : canOpenCommerceAgent
+                                            ? 'Continue this search with the Commerce Shopper Agent.'
+                                            : 'The Commerce Shopper Agent is unavailable for this storefront.'}
+                                    </Text>
+                                    {canOpenCommerceAgent && (
+                                        <Button onClick={agentSearch.openAgent} variant="outline">
+                                            Open Commerce Shopper Agent
+                                        </Button>
+                                    )}
+                                </>
+                            ) : agentSearch.hasOverview ? (
+                                <>
+                                    <Heading as="h2" size="sm" mb={2}>
+                                        AI overview
+                                    </Heading>
+                                    <Text whiteSpace="pre-wrap">
+                                        {agentSearch.text ||
+                                            (agentSearch.streaming
+                                                ? 'Preparing your overview…'
+                                                : '')}
+                                    </Text>
+                                    {agentSearch.error && <Text>{agentSearch.error}</Text>}
+                                </>
+                            ) : (
+                                <Text>
+                                    AI search is unavailable. Showing product search results.
+                                </Text>
+                            )}
+                        </Box>
+                    )}
 
                 {/* Header */}
                 <Stack
@@ -470,12 +587,17 @@ const ProductList = (props) => {
                     spacing={4}
                     marginBottom={6}
                 >
-                    <Flex align="left" width="287px">
+                    <Flex
+                        align="left"
+                        width={smartSearchLayout ? 'auto' : '287px'}
+                        minW={smartSearchLayout ? '240px' : undefined}
+                    >
                         <PageHeader
                             searchQuery={searchQuery}
                             category={category}
                             productSearchResult={productSearchResult}
                             isLoading={isLoading}
+                            smartSearch={smartSearchLayout}
                         />
                     </Flex>
 
@@ -504,9 +626,14 @@ const ProductList = (props) => {
                             category={category}
                             productSearchResult={productSearchResult}
                             isLoading={isLoading}
+                            smartSearch={smartSearchLayout}
                         />
                         <Stack
-                            display={{base: 'flex', md: 'none'}}
+                            display={
+                                smartSearchLayout && agentSearch.agentRouted
+                                    ? 'none'
+                                    : {base: 'flex', md: 'none'}
+                            }
                             direction="row"
                             justify="flex-start"
                             align="center"
@@ -565,7 +692,14 @@ const ProductList = (props) => {
                 </HideOnDesktop>
 
                 {/* Body  */}
-                <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
+                <Grid
+                    display={smartSearchLayout && agentSearch.agentRouted ? 'none' : undefined}
+                    templateColumns={{
+                        base: '1fr',
+                        md: smartSearchLayout ? '210px minmax(0, 1fr)' : '280px 1fr'
+                    }}
+                    columnGap={6}
+                >
                     <Stack display={{base: 'none', md: 'flex'}}>
                         <Island hydrateOn={'visible'}>
                             <Refinements
@@ -595,13 +729,13 @@ const ProductList = (props) => {
                         ) : (
                             <>
                                 <SimpleGrid
-                                    columns={[2, 2, 4, 5]}
-                                    spacingX={4}
-                                    spacingY={{base: 12, lg: 16}}
+                                    columns={smartSearchLayout ? {base: 2, xl: 3} : [2, 2, 4, 5]}
+                                    spacingX={smartSearchLayout ? 5 : 4}
+                                    spacingY={smartSearchLayout ? 8 : {base: 12, lg: 16}}
                                 >
                                     {isHydrated() &&
                                     ((isRefetching && !isFetched) || !productSearchResult)
-                                        ? new Array(searchParams.limit)
+                                        ? new Array(smartSearchLayout ? 6 : searchParams.limit)
                                               .fill(0)
                                               .map((value, index) => (
                                                   <ProductTileSkeleton key={index} />

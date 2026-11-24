@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import PropTypes from 'prop-types'
 import {useSearchSuggestions} from '@salesforce/commerce-sdk-react'
 import {
     Input,
@@ -130,7 +131,7 @@ const formatSuggestions = (searchSuggestions) => {
  * @param  {object} ref reference to the input element
  * @return  {React.ReactElement} - SearchInput component
  */
-const Search = (props) => {
+const Search = ({submitButton, showSuggestions = true, inputId = 'search-input', ...props}) => {
     const config = getConfig()
 
     // Add new hooks for chat functionality
@@ -168,7 +169,7 @@ const Search = (props) => {
             }
         },
         {
-            enabled: searchQuery?.length >= RECENT_SEARCH_MIN_LENGTH
+            enabled: showSuggestions && searchQuery?.length >= RECENT_SEARCH_MIN_LENGTH
         }
     )
     const searchInputRef = useRef()
@@ -317,7 +318,12 @@ const Search = (props) => {
             return
         }
 
-        if (askAgentOnSearchEnabled && window.embeddedservice_bootstrap?.utilAPI) {
+        const useCommerceAgentSearch = config.app?.commerceAgentSearch?.enabled
+        if (
+            !useCommerceAgentSearch &&
+            askAgentOnSearchEnabled &&
+            window.embeddedservice_bootstrap?.utilAPI
+        ) {
             // Add a 500ms delay before sending the message to ensure the experience isn't jarring to the user
             setTimeout(() => {
                 window.embeddedservice_bootstrap.utilAPI
@@ -337,7 +343,9 @@ const Search = (props) => {
 
         saveRecentSearch(searchText)
         clearInput()
-        navigate(searchUrlBuilder(searchText))
+        const path = searchUrlBuilder(searchText)
+        if (useCommerceAgentSearch) navigate(path, 'push', {commerceAgentSearch: true})
+        else navigate(path)
     }
 
     const closeAndNavigate = (link) => {
@@ -362,8 +370,10 @@ const Search = (props) => {
         // As per design we only want to show the popover if the input is focused and we have recent searches saved
         // or we have search suggestions available and have inputed some text (empty text in this scenario should show recent searches)
         if (
-            (document.activeElement.id === 'search-input' && recentSearches?.length > 0) ||
-            (searchSuggestionsAvailable && searchInputRef.current?.value?.length > 0)
+            showSuggestions &&
+            document.activeElement === searchInputRef.current &&
+            (recentSearches?.length > 0 ||
+                (searchSuggestionsAvailable && searchInputRef.current?.value?.length > 0))
         ) {
             setIsOpen(true)
         } else {
@@ -383,20 +393,24 @@ const Search = (props) => {
                     <form onSubmit={onSubmitSearch}>
                         <HStack>
                             <InputGroup>
-                                <InputLeftElement pointerEvents="none">
+                                <InputLeftElement
+                                    pointerEvents="none"
+                                    height={submitButton ? 'full' : undefined}
+                                >
                                     <SearchIcon />
                                 </InputLeftElement>
                                 <Input
                                     autoComplete="off"
-                                    id="search-input"
+                                    id={inputId}
                                     onChange={(e) => onSearchInputChange(e)}
                                     onFocus={() => shouldOpenPopover()}
                                     onBlur={() => setIsOpen(false)}
                                     type="search"
                                     ref={searchInputRef}
-                                    {...props}
                                     variant="filled"
+                                    {...props}
                                 />
+                                {submitButton}
                             </InputGroup>
                             <HideOnDesktop>
                                 <Button
@@ -437,7 +451,12 @@ const Search = (props) => {
             </Popover>
             <HideOnDesktop>
                 <Flex
-                    display={isOpen || searchInputRef?.value?.length > 0 ? 'block' : 'none'}
+                    display={
+                        showSuggestions &&
+                        (isOpen || (!submitButton && searchInputRef?.value?.length > 0))
+                            ? 'block'
+                            : 'none'
+                    }
                     position="absolute"
                     background="white"
                     left={0}
@@ -471,5 +490,10 @@ const Search = (props) => {
 }
 
 Search.displayName = 'SearchInput'
+Search.propTypes = {
+    submitButton: PropTypes.node,
+    showSuggestions: PropTypes.bool,
+    inputId: PropTypes.string
+}
 
 export default Search

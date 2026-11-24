@@ -6,6 +6,7 @@
  */
 
 import React, {useEffect} from 'react'
+import loadable from '@loadable/component'
 import {useIntl, FormattedMessage} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 
@@ -48,6 +49,11 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
+import {getSmartSearchStorefront} from '@salesforce/retail-react-app/app/utils/config-utils'
+
+const SmartSearchHome = loadable(() =>
+    import('@salesforce/retail-react-app/app/pages/home/smart-search-home')
+)
 
 /**
  * This is the home page for Retail React App.
@@ -60,6 +66,7 @@ const Home = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
+    const storefront = getSmartSearchStorefront()
 
     const {res} = useServerContext()
     if (res) {
@@ -69,22 +76,27 @@ const Home = () => {
         )
     }
 
-    const {data: productSearchResult, isLoading} = useProductSearch({
-        parameters: {
-            allImages: true,
-            allVariationProperties: true,
-            expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
-            limit: HOME_SHOP_PRODUCTS_LIMIT,
-            perPricebook: true,
-            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master']
-        }
-    })
+    const {data: productSearchResult, isLoading} = useProductSearch(
+        {
+            parameters: {
+                allImages: true,
+                allVariationProperties: true,
+                expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
+                limit: HOME_SHOP_PRODUCTS_LIMIT,
+                perPricebook: true,
+                refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master']
+            }
+        },
+        {enabled: !storefront}
+    )
 
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
         dataCloud.sendViewPage(pathname)
     }, [])
+
+    if (storefront) return <SmartSearchHome storefront={storefront} />
 
     return (
         <Box data-testid="home-page" layerStyle="page">
