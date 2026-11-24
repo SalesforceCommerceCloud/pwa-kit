@@ -633,6 +633,7 @@ const toOptionalWidgetBoolean = (value) => {
  * @param {string} [props.commerceAgentConfiguration.cc_esDeveloperName] - Embedded Service developer name
  * @param {string} [props.commerceAgentConfiguration.embeddedServiceName] - Fallback for `cc_esDeveloperName`
  * @param {string} [props.commerceAgentConfiguration.cc_capabilitiesVersion] - Embedded Messaging capabilities version passed to `messagingConfig.capabilitiesVersion` (defaults to '65')
+ * @param {string} [props.commerceAgentConfiguration.cc_enableShopperAuthLink] - Set to 'false' to open an independent messaging session without linking the storefront shopper.
  * @param {string} [props.commerceAgentConfiguration.cc_enableEscalationToAgent] - When 'true', lets shoppers escalate to a human agent; forwarded as `messagingConfig.enableEscalationToAgent`. Defaults to 'false'
  * @param {string} [props.commerceAgentConfiguration.cc_enableDownloadTranscript] - 'true' (default) lets shoppers download the chat transcript; forwarded as `messagingConfig.enableDownloadTranscript`
  * @param {string} [props.commerceAgentConfiguration.cc_enableImageUpload] - When 'true', lets shoppers upload images in the chat; forwarded as `messagingConfig.enableImageUpload`. Requires a Commerce Client bundle that supports image upload. Defaults to 'false'
@@ -678,6 +679,7 @@ const CommerceClientAgentWindow = ({
         salesforceOrgId,
         cc_esDeveloperName,
         embeddedServiceName,
+        cc_enableShopperAuthLink = 'true',
         cc_capabilitiesVersion = DEFAULT_COMMERCE_CLIENT_CAPABILITIES_VERSION,
         cc_logoUrl,
         cc_headerText,
@@ -907,6 +909,8 @@ const CommerceClientAgentWindow = ({
      * @param {string} opts.reason - Diagnostic label for the triggering signal.
      */
     const performAuthLink = ({reason, excludedJWT = null}) => {
+        if (cc_enableShopperAuthLink === 'false') return
+
         const generation = ++authLinkGenerationRef.current
         const scheduledJWT = extractCommerceClientJWT()
         if (scheduledJWT) {

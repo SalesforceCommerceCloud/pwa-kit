@@ -10803,6 +10803,20 @@
       "value": "]"
     }
   ],
+  "search.action.ask_ai": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧşķ ȦĪ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "search.action.cancel": [
     {
       "type": 0,

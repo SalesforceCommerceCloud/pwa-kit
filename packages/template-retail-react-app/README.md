@@ -56,6 +56,40 @@ npm start
 
 See the comments above **`mrtDataStore`** in `config/default.js` for related env vars.
 
+## Smart Search storefront
+
+Smart Search is off by default.
+
+### Shared Commerce Agent API
+
+Set `COMMERCE_AGENT_SEARCH_API_ORIGIN` in the PWA server environment to the shared Commerce Agent HTTPS origin. Use the same origin for every storefront that calls that service environment. The PWA takes `organizationId` and `shortCode` from its existing Commerce API config and `siteId` from the active storefront.
+
+For an eligible Smart Search, the PWA runs regular product search and the Commerce Agent query in parallel. Regular product search supplies the grid, filters, and sort options. The PWA uses the Commerce Agent route to open the Shopper Agent or a returned turn ID to stream the AI overview. Both Commerce Agent requests use the storefront's SLAS shopper token under `/api/v1/agent/organizations/{organizationId}/`.
+
+### Storefront settings
+
+Configure each Commerce organization in its own PWA deployment using the existing `app.commerceAPI`, `app.sites`, and Shopper Agent settings. Deployments can share the Commerce Agent API origin for that environment. Enable Smart Search with these variables in the deployment environment or local `.env`:
+
+```bash
+ENABLE_COMMERCE_AGENT_SEARCH=true
+SMART_SEARCH_STOREFRONT_SETTINGS='{
+  "bySite": {
+    "ExampleSiteId": {
+      "brand": "Example Store",
+      "collections": [{"id": "replace-with-a-catalog-category-id", "label": "Featured"}],
+      "prompts": ["Help me choose a gift"],
+      "heroImage": "static/img/hero.png"
+    }
+  }
+}'
+```
+
+- **Storefront.** Key `bySite` by the exact `app.sites[].id`, using the category IDs from that site's catalog with their original case. `brand` and `collections` enable the redesigned header and home page, and the first collection is featured. Sites without a layout use the standard header and home page. A flat settings object is supported for `app.defaultSite`. The optional `prompts`, `headline`, `description`, and `heroImage` customize the hero. Omit `heroImage` to use a gradient, or use a bundled `static/` path or an HTTPS image URL. Add any custom image CDN origin to the `app.productImageOrigins` array in your storefront config.
+- **Chat.** Use `COMMERCE_AGENT_SETTINGS` to configure your Commerce Client deployment. Enable `cc_enablePageContext` with a widget bundle that supports search page context. Set `cc_pagePush` to `"true"` for a docked desktop panel. `cc_enableShopperAuthLink` defaults to `"true"`. Set it to `"false"` for an independent messaging session, for example when testing a separate sandbox agent.
+- **Local overrides.** Use the ignored `config/local.js` for sandbox-specific site, catalog, and widget settings. Supply a private SLAS client secret through `PWA_KIT_SLAS_CLIENT_SECRET`.
+
+Restart the storefront after changing the settings. Set `ENABLE_COMMERCE_AGENT_SEARCH=false` to disable Smart Search.
+
 ## Running the Commerce Client shopping agent widget (local development)
 
 The storefront's shopper agent (`app/components/shopper-agent/index.jsx`) supports two providers: **MIAW** (Salesforce Embedded Messaging, the default) and the **Commerce Client** widget (`provider: 'commerce-client'`). The Commerce Client provider loads the Cimulate messaging UMD bundle (`messaging.umd.js`) and injects a shopping-agent panel via `window.CimulateMessaging.injectMessagingWidget`.

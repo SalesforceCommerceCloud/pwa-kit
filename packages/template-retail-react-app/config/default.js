@@ -10,6 +10,10 @@ const {parseSettings, validateOtpTokenLength} = require('./utils.js')
 
 module.exports = {
     app: {
+        commerceAgentSearch: {
+            enabled: process.env.ENABLE_COMMERCE_AGENT_SEARCH === 'true'
+        },
+        smartSearchStorefront: parseSettings(process.env.SMART_SEARCH_STOREFRONT_SETTINGS),
         // MRT Data Store (opt-in): when true, SSR resolves prefs and serializes `__MRT_DATA_STORE__` in
         // `#mobify-data`; when false, that key is omitted. See `isMrtDataStoreEnabled` in pwa-kit-runtime.
         // Set `PWAKIT_MRT_DATA_STORE_ENABLED=true|false` to override without editing files.

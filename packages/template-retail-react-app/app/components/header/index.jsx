@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useRef, useState} from 'react'
+import loadable from '@loadable/component'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {
@@ -53,8 +54,16 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {
+    getCommerceAgentConfig,
+    getSmartSearchStorefront
+} from '@salesforce/retail-react-app/app/utils/config-utils'
 import {clearRememberedAuthEmails} from '@salesforce/retail-react-app/app/utils/auth-utils'
+import {smartSearchColors} from '@salesforce/retail-react-app/app/components/commerce-agent-search/styles'
+const SmartSearchHeaderControls = loadable(() =>
+    import('@salesforce/retail-react-app/app/components/commerce-agent-search/header-controls')
+)
 const IconButtonWithRegistration = withRegistration(IconButton)
 
 /**
@@ -142,6 +151,8 @@ const Header = ({
 
     const styles = useMultiStyleConfig('Header')
     const {oneClickCheckout = {}} = getConfig().app || {}
+    const {site} = useMultiSite()
+    const storefront = getSmartSearchStorefront(site?.id)
     const isOneClickCheckoutEnabled = oneClickCheckout.enabled
 
     // Filter navigation links based on 1CC configuration
@@ -173,12 +184,24 @@ const Header = ({
     }
 
     return (
-        <Box as="header" role="banner" {...styles.container} {...props}>
-            <Box {...styles.content}>
+        <Box
+            as="header"
+            role="banner"
+            {...styles.container}
+            {...(storefront && {
+                borderBottom: '1px solid',
+                borderColor: smartSearchColors.border,
+                boxShadow: 'none'
+            })}
+            {...props}
+        >
+            <Box {...styles.content} {...(storefront && {px: {base: 4, xl: 8}, py: 2})}>
                 {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
                 <Flex
                     wrap="wrap"
-                    alignItems={['baseline', 'baseline', 'baseline', 'center']}
+                    alignItems={
+                        storefront ? 'center' : ['baseline', 'baseline', 'baseline', 'center']
+                    }
                     gap={3}
                 >
                     <IconButton
@@ -196,32 +219,44 @@ const Header = ({
                         {...styles.icons}
                         onClick={onMenuClick}
                     />
-                    <IconButton
-                        aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.logo',
-                            defaultMessage: 'Logo'
-                        })}
-                        icon={<BrandLogo {...styles.logo} />}
-                        {...styles.icons}
-                        variant="unstyled"
-                        onClick={onLogoClick}
-                    />
-                    <Box {...styles.bodyContainer}>{children}</Box>
-                    <HideOnMobile>
-                        <SearchBar />
-                    </HideOnMobile>
-                    {showLaunchAgentButton && (
-                        <IconButton
-                            icon={<SparkleIcon />}
-                            aria-label={intl.formatMessage({
-                                id: 'header.button.assistive_msg.ask_shopping_agent',
-                                defaultMessage: 'Ask Shopping Agent'
-                            })}
-                            variant="unstyled"
-                            {...styles.icons}
-                            {...styles.agentIcon}
-                            onClick={onAgentClick}
-                        />
+                    {storefront ? (
+                        <SmartSearchHeaderControls
+                            storefront={storefront}
+                            onLogoClick={onLogoClick}
+                            onAgentClick={showLaunchAgentButton ? onAgentClick : undefined}
+                        >
+                            {children}
+                        </SmartSearchHeaderControls>
+                    ) : (
+                        <>
+                            <IconButton
+                                aria-label={intl.formatMessage({
+                                    id: 'header.button.assistive_msg.logo',
+                                    defaultMessage: 'Logo'
+                                })}
+                                icon={<BrandLogo {...styles.logo} />}
+                                {...styles.icons}
+                                variant="unstyled"
+                                onClick={onLogoClick}
+                            />
+                            <Box {...styles.bodyContainer}>{children}</Box>
+                            <HideOnMobile>
+                                <SearchBar />
+                            </HideOnMobile>
+                            {showLaunchAgentButton && (
+                                <IconButton
+                                    icon={<SparkleIcon />}
+                                    aria-label={intl.formatMessage({
+                                        id: 'header.button.assistive_msg.ask_shopping_agent',
+                                        defaultMessage: 'Ask Shopping Agent'
+                                    })}
+                                    variant="unstyled"
+                                    {...styles.icons}
+                                    {...styles.agentIcon}
+                                    onClick={onAgentClick}
+                                />
+                            )}
+                        </>
                     )}
                     <IconButtonWithRegistration
                         icon={<AccountIcon />}
@@ -377,9 +412,11 @@ const Header = ({
                         {...styles.icons}
                         onClick={onMyCartClick}
                     />
-                    <HideOnDesktop display={{base: 'contents', lg: 'none'}}>
-                        <SearchBar />
-                    </HideOnDesktop>
+                    {!storefront && (
+                        <HideOnDesktop display={{base: 'contents', lg: 'none'}}>
+                            <SearchBar />
+                        </HideOnDesktop>
+                    )}
                 </Flex>
             </Box>
         </Box>
