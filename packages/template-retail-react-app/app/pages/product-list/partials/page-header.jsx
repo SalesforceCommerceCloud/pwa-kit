@@ -12,8 +12,42 @@ import {Box, Heading, Flex, Text, Fade} from '@salesforce/retail-react-app/app/c
 
 // Project Components
 import Breadcrumb from '@salesforce/retail-react-app/app/components/breadcrumb'
+import {
+    editorialFont,
+    smartSearchColors
+} from '@salesforce/retail-react-app/app/components/commerce-agent-search/styles'
 
-const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...otherProps}) => {
+const PageHeader = ({
+    category,
+    productSearchResult,
+    isLoading,
+    searchQuery,
+    smartSearch,
+    ...otherProps
+}) => {
+    if (smartSearch) {
+        const total = productSearchResult?.total
+        return (
+            <Box {...otherProps} data-testid="sf-product-list-breadcrumb">
+                <Heading
+                    as="h1"
+                    fontFamily={editorialFont}
+                    fontSize={{base: '30px', md: '40px'}}
+                    color={smartSearchColors.ink}
+                    fontWeight="normal"
+                    letterSpacing="-.02em"
+                    overflowWrap="anywhere"
+                >
+                    {searchQuery}
+                </Heading>
+                {!isLoading && Number.isInteger(total) && (
+                    <Text color={smartSearchColors.muted} fontSize="sm" mt={1}>
+                        {total} {total === 1 ? 'product' : 'products'}
+                    </Text>
+                )}
+            </Box>
+        )
+    }
     return (
         <Box {...otherProps} data-testid="sf-product-list-breadcrumb">
             {/* Breadcrumb */}
@@ -36,7 +70,8 @@ PageHeader.propTypes = {
     category: PropTypes.object,
     productSearchResult: PropTypes.object,
     isLoading: PropTypes.bool,
-    searchQuery: PropTypes.string
+    searchQuery: PropTypes.string,
+    smartSearch: PropTypes.bool
 }
 
 export default PageHeader

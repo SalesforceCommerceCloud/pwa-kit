@@ -76,6 +76,7 @@
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
+    "markdown-it": "^14.2.0",
     "msw": "^1.2.1",
     "nanoid": "^3.3.8",
     "prop-types": "^15.8.1",
@@ -110,7 +111,7 @@
   "bundlesize": [
     {
       "path": "build/main.js",
-      "maxSize": "112 kB"
+      "maxSize": "113 kB"
     },
     {
       "path": "build/vendor.js",

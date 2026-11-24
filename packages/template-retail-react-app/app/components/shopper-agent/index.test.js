@@ -2806,6 +2806,23 @@ describe('ShopperAgent Component', () => {
                 })
             })
 
+            test('keeps messaging independent when storefront auth linking is disabled', async () => {
+                seedAuthLinkStorage()
+                const getAuthLinkKey = jest.fn()
+                window.CimulateMessaging = {injectMessagingWidget: jest.fn(), getAuthLinkKey}
+
+                renderCommerceClient({cc_enableShopperAuthLink: 'false'})
+
+                await act(async () => {
+                    window.dispatchEvent(new Event('onCimulateWidgetReady'))
+                })
+
+                expect(mockedUseCommerceClientMessaging).toHaveBeenCalled()
+                expect(getAuthLinkKey).not.toHaveBeenCalled()
+                expect(mockCallAuthLink).not.toHaveBeenCalled()
+                expect(mockCallTokenBridge).not.toHaveBeenCalled()
+            })
+
             test('uses the widget getAuthLinkKey when the bundle exposes it', async () => {
                 seedAuthLinkStorage()
                 const getAuthLinkKey = jest.fn().mockResolvedValue('widget-auth-link-key')

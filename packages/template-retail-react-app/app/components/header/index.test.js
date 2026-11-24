@@ -33,7 +33,8 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
 })
 
 jest.mock('@salesforce/retail-react-app/app/utils/config-utils', () => ({
-    getCommerceAgentConfig: jest.fn()
+    getCommerceAgentConfig: jest.fn(),
+    getSmartSearchStorefront: jest.fn()
 }))
 const MockedComponent = ({history}) => {
     const onAccountClick = () => {
