@@ -1,10 +1,9 @@
-name: Embedded widget browser checks
+name: PWA widget Chromium validation
+run-name: Validate PWA widget Chromium for PR 4130
 
 on:
-    pull_request:
-        branches: [develop]
-    merge_group:
-        types: [checks_requested]
+    push:
+        branches: [feat/w-24980765/validate-widget-chromium-4130]
 
 permissions:
     contents: read
@@ -24,12 +23,13 @@ jobs:
             - uses: actions/checkout@v4
               with:
                   fetch-depth: ${{ github.event_name == 'merge_group' && '0' || '2' }}
+                  ref: 867ddea46183f74ac675d385b94a4162f9b0398a
                   persist-credentials: false
                   sparse-checkout: .github
             - id: paths
               shell: bash
               env:
-                  EVENT_NAME: ${{ github.event_name }}
+                  EVENT_NAME: pull_request
                   MERGE_GROUP_BASE: ${{ github.event.merge_group.base_sha }}
               run: |
                   case "$EVENT_NAME" in
@@ -74,6 +74,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
+                  ref: 867ddea46183f74ac675d385b94a4162f9b0398a
                   persist-credentials: false
             - uses: actions/setup-node@v4
               with:
