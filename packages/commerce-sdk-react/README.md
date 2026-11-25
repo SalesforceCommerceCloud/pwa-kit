@@ -10,6 +10,28 @@ Thank you for being a part of our community and for your continuous support! :ra
 
 # Commerce SDK React
 
+## Googlebot token-response cache workaround
+
+`CommerceApiProvider` accepts `enableNoncedTokenRequests` (boolean, default
+`false`). When enabled, Auth adds a fresh `c_nonce` cache buster to `getAccessToken`
+requests using an instance ID plus an incrementing counter. The instance ID is
+generated once with Web Crypto when available, otherwise with a best-effort
+timestamp/random fallback. The counter keeps requests distinct within an Auth
+instance even when the clock and random source repeat. Without Web Crypto, distinct
+renderer runs can still repeat the same ID and counter sequence. Auth refreshes readable stored JWTs issued more than 60
+seconds in the future, while exempting the latest token acquired by the current Auth
+instance from that additional check to avoid refresh loops with a slow renderer clock.
+The usual expiration buffer and 401 recovery remain active regardless of this setting. Trusted-agent token requests are excluded because Googlebot does not use that flow.
+The cache buster is not an OAuth/OIDC security nonce.
+
+PWA Kit applications configure this through
+`app.commerceAPI.tokenCacheBusting: {enabled: true, requestClass: 'bot'}`.
+`AppConfig` enables the provider option only for browser documents whose serialized
+request class exactly matches. Assign the class with the existing `setRequestClass()`
+mechanism in `app/request-processor.js`; use a custom class name when needed.
+Server rendering leaves the workaround disabled. Standalone SDK consumers can pass
+the boolean directly based on their own browser classification.
+
 <p align="center">
 A collection of <a href="https://tanstack.com/query/latest/docs/react/overview">react-query</a> hooks for <b>fetching</b>, <b>caching</b>, and <b>mutating data</b> from the <b><a href="https://developer.salesforce.com/docs/commerce/commerce-api/overview">Salesforce B2C Commerce API</a></b> (SCAPI).</p>
 

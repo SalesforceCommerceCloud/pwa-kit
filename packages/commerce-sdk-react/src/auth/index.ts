@@ -63,6 +63,8 @@ interface AuthConfig extends ApiClientConfigParams {
     cookieDomain?: string
     /** When true, session tokens are set as HttpOnly cookies */
     enableHttpOnlySessionCookies?: boolean
+    /** Opt in to the browser token-response cache workaround. Defaults to false. */
+    enableNoncedTokenRequests?: boolean
 }
 
 interface JWTHeaders {
@@ -314,6 +316,19 @@ const HTTPONLY_COOKIE_BACKED_KEYS: ReadonlySet<AuthDataKeys> = new Set([
     'uido'
 ])
 
+/** Cache buster for Googlebot renderers whose clock and Math.random may be deterministic. */
+const createTokenRequestSessionId = () => {
+    const crypto = globalThis.crypto
+    if (crypto?.randomUUID) return crypto.randomUUID()
+    if (crypto?.getRandomValues) {
+        return Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) =>
+            byte.toString(16).padStart(2, '0')
+        ).join('')
+    }
+    // Best effort for environments without Web Crypto; not an OAuth/OIDC security nonce.
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+}
+
 /**
  * Module-level map for deduplicating concurrent refresh token requests across Auth instances.
  * React may recreate Auth instances on re-renders (due to unstable useMemo deps like `headers`),
@@ -351,8 +366,16 @@ class Auth {
 
     private hybridAuthEnabled: boolean
     private enableHttpOnlySessionCookies: boolean
+    private enableNoncedTokenRequests: boolean
+    private lastIssuedToken?: string
+    private tokenRequestSessionId = ''
+    private tokenRequestCount = 0
 
     constructor(config: AuthConfig) {
+        this.enableNoncedTokenRequests = config.enableNoncedTokenRequests === true
+        if (this.enableNoncedTokenRequests) {
+            this.tokenRequestSessionId = createTokenRequestSessionId()
+        }
         // Special proxy endpoint for injecting SLAS private client secret.
         // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
         this.client = new ShopperLogin({
@@ -377,6 +400,7 @@ class Auth {
                 ...config.fetchOptions
             }
         })
+        this.addTokenRequestNonce(this.client)
 
         // When HttpOnly session cookies are enabled and the storefront is
         // running inside a trusted Storefront Preview iframe, signal the parent
@@ -601,6 +625,7 @@ class Auth {
     }
 
     private clearStorage() {
+        this.lastIssuedToken = undefined
         // Type assertion because Object.keys is silly and limited :(
         const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
         keys.forEach((keyName) => {
@@ -650,10 +675,44 @@ class Auth {
      * Used to validate JWT token expiration.
      */
     private isTokenExpired(token: string) {
-        const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
+        const accessToken = token.replace('Bearer ', '')
+        const {exp, iat} = jwtDecode<JWTHeaders>(accessToken)
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
-        return validTimeSeconds <= tokenAgeSeconds
+        // Googlebot has been observed reusing expired token responses with a stale
+        // renderer clock. Refresh future-issued stored tokens, but accept the latest
+        // token acquired by this Auth instance so a slow clock cannot cause a refresh loop.
+        return (
+            (this.enableNoncedTokenRequests &&
+                tokenAgeSeconds < -60 &&
+                accessToken !== this.lastIssuedToken) ||
+            validTimeSeconds <= tokenAgeSeconds
+        )
+    }
+
+    /**
+     * Work around a Googlebot caching issue that reuses stale token responses.
+     * Vary token request URLs even when the renderer's clock is frozen.
+     */
+    private addTokenRequestNonce(client: ShopperLogin<ApiClientConfigParams>) {
+        if (!this.enableNoncedTokenRequests) return
+        // Googlebot does not use the trusted-agent authentication flow.
+        // Preserve the SDK overloads and its raw-response/error handling.
+        client.getAccessToken = new Proxy(client.getAccessToken.bind(client), {
+            apply: (request, _thisArg, [options, rawResponse]) => {
+                return Reflect.apply(request, client, [
+                    {
+                        ...options,
+                        parameters: {
+                            ...options?.parameters,
+                            // Non-secret cache buster, not an OAuth/OIDC security nonce.
+                            c_nonce: `${this.tokenRequestSessionId}-${++this.tokenRequestCount}`
+                        }
+                    },
+                    rawResponse
+                ])
+            }
+        })
     }
 
     /**
@@ -922,6 +981,9 @@ class Auth {
         this.set('usid', res.usid ?? '', {expires: expiresDate})
 
         this.set('access_token', res.access_token)
+        if (this.enableNoncedTokenRequests && res.access_token) {
+            this.lastIssuedToken = res.access_token
+        }
         this.set('idp_access_token', res.idp_access_token)
         if (res.access_token) {
             const parsed = this.parseSlasJWT(res.access_token)
@@ -1299,7 +1361,7 @@ class Auth {
             return this.client
         }
         const {clientConfig} = this.client
-        return new ShopperLogin({
+        const client = new ShopperLogin({
             ...clientConfig,
             headers: {
                 ...clientConfig.headers,
@@ -1308,6 +1370,8 @@ class Auth {
                 )
             }
         })
+        this.addTokenRequestNonce(client)
+        return client
     }
 
     /**
