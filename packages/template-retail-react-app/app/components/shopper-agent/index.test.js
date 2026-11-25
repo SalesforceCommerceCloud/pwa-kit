@@ -90,7 +90,8 @@ jest.mock('@salesforce/retail-react-app/app/components/shopper-agent/commerce-cl
         return React.createElement('button', {
             'data-testid': 'commerce-client-fab',
             'data-position': props.position,
-            'data-panel-open-by-default': String(props.isPanelOpenByDefault)
+            'data-panel-open-by-default': String(props.isPanelOpenByDefault),
+            'data-fab-label': props.fabLabel
         })
     }
 }))
@@ -1615,6 +1616,40 @@ describe('ShopperAgent Component', () => {
                 renderCommerceClient()
 
                 expect(screen.queryByTestId('commerce-client-fab')).toBeNull()
+            })
+
+            test('passes cc_theme.fabIconLabel to the FAB as its label', () => {
+                mockedUseScript.mockReturnValue({loaded: true, error: false})
+
+                renderCommerceClient({
+                    cc_showFab: 'true',
+                    cc_theme: {preset: 'commerce', fabIconLabel: 'Find your next favorite'}
+                })
+
+                expect(screen.getByTestId('commerce-client-fab')).toHaveAttribute(
+                    'data-fab-label',
+                    'Find your next favorite'
+                )
+            })
+
+            test('leaves the FAB label unset when cc_theme has no fabIconLabel', () => {
+                mockedUseScript.mockReturnValue({loaded: true, error: false})
+
+                renderCommerceClient({cc_showFab: 'true', cc_theme: {preset: 'commerce'}})
+
+                expect(screen.getByTestId('commerce-client-fab')).not.toHaveAttribute(
+                    'data-fab-label'
+                )
+            })
+
+            test('renders the FAB without crashing when cc_theme is undefined', () => {
+                mockedUseScript.mockReturnValue({loaded: true, error: false})
+
+                renderCommerceClient({cc_showFab: 'true', cc_theme: undefined})
+
+                expect(screen.getByTestId('commerce-client-fab')).not.toHaveAttribute(
+                    'data-fab-label'
+                )
             })
         })
 
