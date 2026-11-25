@@ -64,7 +64,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     /** When true, proxy returns tokens in HttpOnly cookies. */
     enableHttpOnlySessionCookies?: boolean
     /** Opt in to the Googlebot token-response cache workaround. Defaults to false. */
-    enableTokenResponseCacheWorkaround?: boolean
+    enableNoncedTokenRequests?: boolean
 }
 
 /**
@@ -167,7 +167,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         cookieDomain,
         pageDesignerParams = {},
         enableHttpOnlySessionCookies = false,
-        enableTokenResponseCacheWorkaround = false
+        enableNoncedTokenRequests = false
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -220,7 +220,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             hybridAuthEnabled,
             cookieDomain,
             enableHttpOnlySessionCookies,
-            enableTokenResponseCacheWorkaround
+            enableNoncedTokenRequests
         })
     }, [
         clientId,
@@ -246,7 +246,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         hybridAuthEnabled,
         cookieDomain,
         enableHttpOnlySessionCookies,
-        enableTokenResponseCacheWorkaround
+        enableNoncedTokenRequests
     ])
 
     const dwsid = auth.get(DWSID_COOKIE_NAME)
@@ -392,7 +392,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 refreshTokenGuestCookieTTL,
                 pageDesignerParams,
                 enableHttpOnlySessionCookies,
-                enableTokenResponseCacheWorkaround
+                enableNoncedTokenRequests
             }}
         >
             <CommerceApiContext.Provider value={updatedClients}>

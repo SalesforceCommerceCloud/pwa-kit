@@ -57,7 +57,7 @@ describe.each([undefined, false, true])('workaround enabled: %s', (enabled) => {
                 const auth = new Auth({
                     ...config,
                     ...options,
-                    enableTokenResponseCacheWorkaround: enabled
+                    enableNoncedTokenRequests: enabled
                 })
                 const response = {access_token: 'test-token'}
                 const scope = nock(host)
@@ -91,7 +91,7 @@ describe.each([undefined, false, true])('workaround enabled: %s', (enabled) => {
                 const auth = new Auth({
                     ...config,
                     ...options,
-                    enableTokenResponseCacheWorkaround: enabled
+                    enableNoncedTokenRequests: enabled
                 })
                 const scope = nock(host)
                     .post(`${prefix}/shopper/auth/v1/organizations/organizationId${endpoint}`)
@@ -112,7 +112,7 @@ describe.each([undefined, false, true])('workaround enabled: %s', (enabled) => {
             const auth = new Auth({
                 ...config,
                 ...options,
-                enableTokenResponseCacheWorkaround: enabled
+                enableNoncedTokenRequests: enabled
             })
             const path = `${prefix}/shopper/auth/v1/organizations/organizationId/oauth2/token`
             const response = {message: 'invalid refresh_token'}

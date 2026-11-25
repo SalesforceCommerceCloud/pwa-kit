@@ -79,15 +79,15 @@ const AppConfig = ({children, locals = {}}) => {
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
-    const tokenCacheWorkaround = commerceApiConfig.tokenResponseCacheWorkaround
+    const tokenCacheBusting = commerceApiConfig.tokenCacheBusting
     // Request classes are assigned by the storefront's request processor. Only
     // opt matching browser documents into the Googlebot caching workaround.
-    const enableTokenResponseCacheWorkaround =
+    const enableNoncedTokenRequests =
         typeof window !== 'undefined' &&
-        tokenCacheWorkaround?.enabled === true &&
-        typeof tokenCacheWorkaround.requestClass === 'string' &&
-        tokenCacheWorkaround.requestClass.length > 0 &&
-        window.Progressive?.ssrOptions?.requestClass === tokenCacheWorkaround.requestClass
+        tokenCacheBusting?.enabled === true &&
+        typeof tokenCacheBusting.requestClass === 'string' &&
+        tokenCacheBusting.requestClass.length > 0 &&
+        window.Progressive?.ssrOptions?.requestClass === tokenCacheBusting.requestClass
 
     const appOrigin = useAppOrigin()
 
@@ -137,7 +137,7 @@ const AppConfig = ({children, locals = {}}) => {
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
             // hybridAuthEnabled={true}
             cookieDomain={commerceApiConfig.cookieDomain}
-            enableTokenResponseCacheWorkaround={enableTokenResponseCacheWorkaround}
+            enableNoncedTokenRequests={enableNoncedTokenRequests}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
             pageDesignerParams={pageDesignerParams}
             enableHttpOnlySessionCookies={

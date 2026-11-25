@@ -120,7 +120,7 @@ describe('AppConfig', () => {
                                 ...mockConfig.app,
                                 commerceAPI: {
                                     ...mockConfig.app.commerceAPI,
-                                    tokenResponseCacheWorkaround: settings
+                                    tokenCacheBusting: settings
                                 }
                             }
                         }}
@@ -143,14 +143,14 @@ describe('AppConfig', () => {
         ])('settings %j and document class %s enable: %s', (settings, requestClass, expected) => {
             window.Progressive = {ssrOptions: {requestClass}}
             render(component(settings))
-            expect(captured.enableTokenResponseCacheWorkaround).toBe(expected)
+            expect(captured.enableNoncedTokenRequests).toBe(expected)
         })
         test.each([undefined, {}, {ssrOptions: {}}])(
             'missing request classification (%j) stays disabled',
             (progressive) => {
                 window.Progressive = progressive
                 render(component({enabled: true, requestClass: 'bot'}))
-                expect(captured.enableTokenResponseCacheWorkaround).toBe(false)
+                expect(captured.enableNoncedTokenRequests).toBe(false)
             }
         )
         test('SSR stays disabled and the browser render enables a matching document', () => {
@@ -160,12 +160,12 @@ describe('AppConfig', () => {
             try {
                 windowGetter.mockReturnValue(undefined)
                 renderToString(element)
-                expect(captured.enableTokenResponseCacheWorkaround).toBe(false)
+                expect(captured.enableNoncedTokenRequests).toBe(false)
             } finally {
                 windowGetter.mockRestore()
             }
             render(element)
-            expect(captured.enableTokenResponseCacheWorkaround).toBe(true)
+            expect(captured.enableNoncedTokenRequests).toBe(true)
         })
     })
 

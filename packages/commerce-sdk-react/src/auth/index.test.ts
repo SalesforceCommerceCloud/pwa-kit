@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import Auth, {AuthData} from './'
-import {waitFor} from '@testing-library/react'
+import {renderHook, waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
 import {
     helpers,
@@ -22,6 +22,9 @@ import {
     pendingRefreshTokens
 } from './index'
 import {RequireKeys} from '../hooks/types'
+import {useAuthorizationHeader} from '../hooks/useAuthorizationHeader'
+import * as authContext from '../hooks/useAuthContext'
+import * as configContext from '../hooks/useConfig'
 
 const baseCustomer: RequireKeys<ShopperCustomersTypes.Customer, 'login'> = {
     customerId: 'customerId',
@@ -233,7 +236,7 @@ describe('Auth', () => {
                 const now = 1800000000
                 const clock = jest.spyOn(Date, 'now').mockReturnValue(now * 1000)
                 try {
-                    const auth = new Auth({...config, enableTokenResponseCacheWorkaround: enabled})
+                    const auth = new Auth({...config, enableNoncedTokenRequests: enabled})
                     const token = jwt.sign({iat: now + iat, exp: now + exp}, 'secret')
                     // @ts-expect-error private method
                     expect(auth.isTokenExpired(token)).toBe(iat > 60 ? enabled === true : expired)
@@ -247,7 +250,7 @@ describe('Auth', () => {
     test.each([false, true])(
         'ready only refreshes a future-issued token when enabled (%s)',
         async (enabled) => {
-            const auth = new Auth({...config, enableTokenResponseCacheWorkaround: enabled})
+            const auth = new Auth({...config, enableNoncedTokenRequests: enabled})
             const now = Math.floor(Date.now() / 1000)
             const token = jwt.sign({iat: now + 61, exp: now + 1800}, 'secret')
             // @ts-expect-error private method
@@ -269,7 +272,7 @@ describe('Auth', () => {
             const clock = jest.spyOn(Date, 'now').mockReturnValue(now * 1000)
             const payload = {...(jwt.decode(JWTNotExpired) as jwt.JwtPayload), iat: now + 120}
             const token = jwt.sign({...payload, exp: now + 1920}, 'secret')
-            const auth = new Auth({...config, enableTokenResponseCacheWorkaround: true})
+            const auth = new Auth({...config, enableNoncedTokenRequests: true})
             const request = (
                 flow === 'guest login' ? helpers.loginGuestUser : helpers.refreshAccessToken
             ) as jest.Mock
@@ -291,7 +294,7 @@ describe('Auth', () => {
                 // @ts-expect-error private method
                 expect(auth.isTokenExpired(`Bearer ${token}`)).toBe(false)
 
-                const anotherAuth = new Auth({...config, enableTokenResponseCacheWorkaround: true})
+                const anotherAuth = new Auth({...config, enableNoncedTokenRequests: true})
                 // @ts-expect-error private method: the exemption is not persisted across instances
                 expect(anotherAuth.isTokenExpired(token)).toBe(true)
 
@@ -310,6 +313,76 @@ describe('Auth', () => {
         }
     )
 
+    test.each([undefined, ''])(
+        'an empty access token (%s) does not erase the latest-token marker',
+        (emptyToken) => {
+            const now = Math.floor(Date.now() / 1000)
+            const token = jwt.sign({iat: now + 120, exp: now + 1920}, 'secret')
+            const auth = new Auth({...config, enableNoncedTokenRequests: true})
+            // @ts-expect-error private response handler
+            auth.handleTokenResponse({...TOKEN_RESPONSE, access_token: token}, true)
+            // @ts-expect-error private response handler
+            auth.handleTokenResponse({...TOKEN_RESPONSE, access_token: emptyToken}, true)
+            // @ts-expect-error private method: missing response values cannot invalidate the prior exemption
+            expect(auth.isTokenExpired(token)).toBe(false)
+        }
+    )
+
+    test('SDK 401 recovery updates the latest-token marker without another ready refresh', async () => {
+        const now = 1800000000
+        const clock = jest.spyOn(Date, 'now').mockReturnValue(now * 1000)
+        const payload = {
+            ...(jwt.decode(JWTNotExpired) as jwt.JwtPayload),
+            iat: now + 120,
+            exp: now + 1920
+        }
+        const firstToken = jwt.sign({...payload, jti: 'initial'}, 'secret')
+        const nextToken = jwt.sign({...payload, jti: 'recovered'}, 'secret')
+        const logger = {...console, warn: jest.fn()}
+        const authConfig = {...config, logger, enableNoncedTokenRequests: true}
+        const auth = new Auth(authConfig)
+        const authHook = jest.spyOn(authContext, 'default').mockReturnValue(auth)
+        const configHook = jest
+            .spyOn(configContext, 'default')
+            .mockReturnValue({...authConfig, locale: 'en-GB', currency: 'GBP'})
+        const refresh = jest.spyOn(auth, 'refreshAccessToken')
+        ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce({
+            ...TOKEN_RESPONSE,
+            access_token: firstToken
+        })
+        ;(helpers.refreshAccessToken as jest.Mock).mockResolvedValueOnce({
+            ...TOKEN_RESPONSE,
+            access_token: nextToken
+        })
+        const method = jest
+            .fn()
+            .mockRejectedValueOnce({
+                response: {status: 401, clone: () => ({json: () => Promise.resolve({})})}
+            })
+            .mockResolvedValue({ok: true})
+        try {
+            await auth.loginGuestUser()
+            await auth.ready()
+            const {result} = renderHook(() => useAuthorizationHeader(method))
+            await expect(result.current({})).resolves.toEqual({ok: true})
+            expect(method).toHaveBeenNthCalledWith(1, {
+                headers: {Authorization: `Bearer ${firstToken}`}
+            })
+            expect(method).toHaveBeenNthCalledWith(2, {
+                headers: {Authorization: `Bearer ${nextToken}`}
+            })
+            await auth.ready()
+            await auth.ready()
+            expect(refresh).toHaveBeenCalledTimes(1)
+            expect(helpers.refreshAccessToken).toHaveBeenCalledTimes(1)
+        } finally {
+            refresh.mockRestore()
+            configHook.mockRestore()
+            authHook.mockRestore()
+            clock.mockRestore()
+        }
+    })
+
     test.each(['randomUUID', 'getRandomValues'] as const)(
         '%s varies cache busters across Auth instances with frozen clock and Math.random',
         async (method) => {
@@ -325,13 +398,16 @@ describe('Auth', () => {
             try {
                 const nonces = []
                 for (let i = 0; i < 2; i++) {
-                    const auth = new Auth({...config, enableTokenResponseCacheWorkaround: true})
+                    const auth = new Auth({...config, enableNoncedTokenRequests: true})
                     const request = jest.fn().mockResolvedValue({})
                     const client = {getAccessToken: request}
                     // @ts-expect-error private method with a minimal SDK client
                     auth.addTokenRequestNonce(client)
                     await client.getAccessToken({})
-                    nonces.push(request.mock.calls[0][0].parameters.c_nonce)
+                    await client.getAccessToken({})
+                    nonces.push(
+                        ...request.mock.calls.map(([options]) => options.parameters.c_nonce)
+                    )
                 }
                 expect(nonces[0]).not.toBe(nonces[1])
                 expect(
@@ -340,8 +416,13 @@ describe('Auth', () => {
                 expect(getRandomValues).toHaveBeenCalledTimes(method === 'randomUUID' ? 0 : 2)
                 expect(nonces).toEqual(
                     method === 'randomUUID'
-                        ? ['uuid-1', 'uuid-2']
-                        : ['01'.repeat(16), '02'.repeat(16)]
+                        ? ['uuid-1-1', 'uuid-1-2', 'uuid-2-1', 'uuid-2-2']
+                        : [1, 2].flatMap((id) =>
+                              [1, 2].map(
+                                  (count) =>
+                                      `${id.toString(16).padStart(2, '0').repeat(16)}-${count}`
+                              )
+                          )
                 )
                 expect(random).not.toHaveBeenCalled()
             } finally {
@@ -352,22 +433,24 @@ describe('Auth', () => {
         }
     )
 
-    test('uses the best-effort cache buster when Web Crypto is unavailable', async () => {
+    test('varies cache busters without Web Crypto, clock progression, or random progression', async () => {
         const crypto = jest
             .spyOn(globalThis, 'crypto', 'get')
             .mockReturnValue(undefined as unknown as Crypto)
         const clock = jest.spyOn(Date, 'now').mockReturnValue(1800000000000)
         const random = jest.spyOn(Math, 'random').mockReturnValue(0.1)
         try {
-            const auth = new Auth({...config, enableTokenResponseCacheWorkaround: true})
+            const auth = new Auth({...config, enableNoncedTokenRequests: true})
             const request = jest.fn().mockResolvedValue({})
             const client = {getAccessToken: request}
             // @ts-expect-error private method with a minimal SDK client
             auth.addTokenRequestNonce(client)
             await client.getAccessToken({})
-            expect(request.mock.calls[0][0].parameters.c_nonce).toBe(
-                `${(1800000000000).toString(36)}-${(0.1).toString(36).slice(2)}`
-            )
+            await client.getAccessToken({})
+            const sessionId = `${(1800000000000).toString(36)}-${(0.1).toString(36).slice(2)}`
+            expect(request.mock.calls[0][0].parameters.c_nonce).toBe(`${sessionId}-1`)
+            expect(request.mock.calls[1][0].parameters.c_nonce).toBe(`${sessionId}-2`)
+            expect(random).toHaveBeenCalledTimes(1)
         } finally {
             random.mockRestore()
             clock.mockRestore()
@@ -381,7 +464,7 @@ describe('Auth', () => {
             const auth = new Auth({
                 ...config,
                 enableHttpOnlySessionCookies: true,
-                enableTokenResponseCacheWorkaround: enabled
+                enableNoncedTokenRequests: enabled
             })
             // @ts-expect-error private method
             auth.set('cc-at-expires', String(Math.floor(Date.now() / 1000) + 1800))
@@ -395,61 +478,55 @@ describe('Auth', () => {
         }
     )
 
-    test.each(['getAccessToken'] as const)(
-        '%s varies token URLs with a frozen clock and preserves request options',
-        async (method) => {
-            const auth = new Auth({...config, enableTokenResponseCacheWorkaround: true})
-            const result = {access_token: 'token'}
-            const request = jest.fn().mockResolvedValue(result)
-            const client = {getAccessToken: request, getTrustedAgentAccessToken: request}
-            const clock = jest.spyOn(Date, 'now').mockReturnValue(1800000000000)
-            const random = jest
-                .spyOn(Math, 'random')
-                .mockReturnValueOnce(0.1)
-                .mockReturnValueOnce(0.2)
-            const options = Object.freeze({
-                parameters: Object.freeze({
-                    organizationId: 'org',
-                    c_custom: 'keep',
-                    c_nonce: 'old'
-                }),
-                headers: Object.freeze({Authorization: 'Basic credentials'}),
-                body: Object.freeze({grant_type: 'client_credentials'})
-            })
-            try {
-                // @ts-expect-error private method with a minimal SDK client
-                auth.addTokenRequestNonce(client)
-                await expect(client[method](options, true)).resolves.toBe(result)
-                await expect(client[method](options, false)).resolves.toBe(result)
-                const firstNonce = request.mock.calls[0][0].parameters.c_nonce
-                const secondNonce = request.mock.calls[1][0].parameters.c_nonce
-                expect(firstNonce).toEqual(expect.any(String))
-                expect(firstNonce).not.toBe('old')
-                expect(secondNonce).not.toBe(firstNonce)
-                expect(request).toHaveBeenNthCalledWith(
-                    1,
-                    {...options, parameters: {...options.parameters, c_nonce: firstNonce}},
-                    true
-                )
-                expect(request).toHaveBeenNthCalledWith(
-                    2,
-                    {...options, parameters: {...options.parameters, c_nonce: secondNonce}},
-                    false
-                )
-                expect(request.mock.contexts).toEqual([client, client])
-                expect(options.parameters.c_nonce).toBe('old')
-                const error = Object.assign(new Error('Unauthorized'), {response: {status: 401}})
-                request.mockRejectedValueOnce(error)
-                await expect(client[method](options)).rejects.toBe(error)
-            } finally {
-                clock.mockRestore()
-                random.mockRestore()
-            }
+    test('getAccessToken varies token URLs with a frozen clock and preserves request options', async () => {
+        const auth = new Auth({...config, enableNoncedTokenRequests: true})
+        const result = {access_token: 'token'}
+        const request = jest.fn().mockResolvedValue(result)
+        const client = {getAccessToken: request}
+        const clock = jest.spyOn(Date, 'now').mockReturnValue(1800000000000)
+        const random = jest.spyOn(Math, 'random').mockReturnValueOnce(0.1).mockReturnValueOnce(0.2)
+        const options = Object.freeze({
+            parameters: Object.freeze({
+                organizationId: 'org',
+                c_custom: 'keep',
+                c_nonce: 'old'
+            }),
+            headers: Object.freeze({Authorization: 'Basic credentials'}),
+            body: Object.freeze({grant_type: 'client_credentials'})
+        })
+        try {
+            // @ts-expect-error private method with a minimal SDK client
+            auth.addTokenRequestNonce(client)
+            await expect(client.getAccessToken(options, true)).resolves.toBe(result)
+            await expect(client.getAccessToken(options, false)).resolves.toBe(result)
+            const firstNonce = request.mock.calls[0][0].parameters.c_nonce
+            const secondNonce = request.mock.calls[1][0].parameters.c_nonce
+            expect(firstNonce).toEqual(expect.any(String))
+            expect(firstNonce).not.toBe('old')
+            expect(secondNonce).not.toBe(firstNonce)
+            expect(request).toHaveBeenNthCalledWith(
+                1,
+                {...options, parameters: {...options.parameters, c_nonce: firstNonce}},
+                true
+            )
+            expect(request).toHaveBeenNthCalledWith(
+                2,
+                {...options, parameters: {...options.parameters, c_nonce: secondNonce}},
+                false
+            )
+            expect(request.mock.contexts).toEqual([client, client])
+            expect(options.parameters.c_nonce).toBe('old')
+            const error = Object.assign(new Error('Unauthorized'), {response: {status: 401}})
+            request.mockRejectedValueOnce(error)
+            await expect(client.getAccessToken(options)).rejects.toBe(error)
+        } finally {
+            clock.mockRestore()
+            random.mockRestore()
         }
-    )
+    })
 
     test.each([false, true])('leaves the trusted-agent token method unchanged (%s)', (enabled) => {
-        const auth = new Auth({...config, enableTokenResponseCacheWorkaround: enabled})
+        const auth = new Auth({...config, enableNoncedTokenRequests: enabled})
         const trustedAgentRequest = jest.fn()
         const client = {
             getAccessToken: jest.fn(),
@@ -466,7 +543,7 @@ describe('Auth', () => {
             const auth = new Auth({
                 ...config,
                 clientSecret: 'secret',
-                enableTokenResponseCacheWorkaround: enabled
+                enableNoncedTokenRequests: enabled
             })
             const request = jest.fn().mockResolvedValue({})
             ;(ShopperLogin as unknown as jest.Mock).mockImplementationOnce((clientConfig) => ({

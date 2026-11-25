@@ -19,7 +19,7 @@ The workaround is opt-in and targets a configurable request class. A fixed `bot`
 Add the following property under `app.commerceAPI` in `packages/template-retail-react-app/config/default.js`, alongside `proxyPath` and `parameters`:
 
 ```js
-tokenResponseCacheWorkaround: {
+tokenCacheBusting: {
     enabled: false,
     requestClass: 'bot'
 }
@@ -28,7 +28,7 @@ tokenResponseCacheWorkaround: {
 Use the existing environment-specific configuration mechanism to enable it or override the class. For example, a storefront using a custom request class could configure:
 
 ```js
-tokenResponseCacheWorkaround: {
+tokenCacheBusting: {
     enabled: true,
     requestClass: 'custom-bot'
 }
@@ -55,7 +55,7 @@ Classification selects a compatibility workaround. It is not an authentication o
 
 1. `AppConfig` reads the resolved settings from `locals.appConfig.commerceAPI`.
 2. In the browser, it reads `window.Progressive?.ssrOptions?.requestClass` and computes whether the settings are enabled and the configured, non-empty class exactly matches.
-3. It passes the resulting boolean as `enableTokenResponseCacheWorkaround` to `CommerceApiProvider`.
+3. It passes the resulting boolean as `enableNoncedTokenRequests` to `CommerceApiProvider`.
 4. The provider forwards the boolean to `AuthConfig` and includes it in the Auth instance's memoization dependencies. The provider prop and Auth option both default to `false`.
 5. `Auth` uses this boolean to gate both additions described below.
 
@@ -77,7 +77,7 @@ The browser-only decision targets the observed Googlebot renderer issue and pres
 
 When enabled:
 
-- Add a fresh `c_nonce` on every `getAccessToken` invocation. Prefer `crypto.randomUUID()`, then 128 bits from `crypto.getRandomValues()`, so a frozen clock and deterministic `Math.random()` do not repeat the cache buster. Retain the timestamp-and-`Math.random()` form as a best-effort fallback when Web Crypto is unavailable; that fallback cannot guarantee distinct values across deterministic renderer runs.
+- Add a fresh `c_nonce=<instance-id>-<counter>` on every `getAccessToken` invocation. Generate the instance ID once per Auth instance, preferring `crypto.randomUUID()`, then 128 bits from `crypto.getRandomValues()`. Increment the same counter across standard and direct private-client token requests. Without Web Crypto, use a timestamp-and-`Math.random()` instance ID: the counter still guarantees variation within that Auth instance, but separate deterministic renderer runs can repeat the ID and sequence.
 - Apply the same setting to the separate client used for direct private-client authentication, as well as standard, private HttpOnly, and public HttpOnly proxy routes.
 - Preserve existing request parameters, headers, bodies, receiver binding, raw-response mode, response parsing, and SDK errors. Do not introduce retries at this layer.
 - Treat a readable stored JWT with `iat` more than 60 seconds ahead of the browser clock as expired. Exactly 60 seconds ahead remains allowed. Exempt only the latest token acquired by the current Auth instance from this additional check, preventing repeated refreshes when the renderer clock is behind a freshly issued token. The exemption is not persisted, is cleared with auth storage, and does not bypass the existing expiration buffer or 401 recovery.
@@ -104,7 +104,7 @@ Expected changes are limited to the Retail React App default configuration and `
 - Verify a matching class with `enabled: false` does not enable either addition.
 - Verify SSR stays disabled even for a matching class, and browser hydration computes the browser-specific value.
 - Verify provider configuration changes reach the Auth instance without rebuilding it on unrelated renders.
-- Verify both Web Crypto paths produce distinct nonces across Auth instances with a frozen clock and `Math.random()`. Cover the best-effort fallback. Disabled requests receive no injected nonce and preserve caller-supplied custom parameters.
+- Verify both Web Crypto paths produce distinct nonces across Auth instances with a frozen clock and `Math.random()`, sampling crypto only once per instance. Without Web Crypto and with a frozen clock/random source, repeated requests within an Auth instance must still have different counters. Disabled requests receive no injected nonce and preserve caller-supplied custom parameters.
 - Verify trusted-agent token requests remain unchanged even when enabled, including caller-supplied custom parameters.
 - Preserve coverage of direct private-client cloning, standard/HttpOnly proxy URLs, SDK errors, and raw responses.
 - Test future-`iat` offsets of 59, 60, and 61 seconds with the setting enabled and disabled, plus the unchanged expiration buffer.
@@ -119,3 +119,12 @@ Rollback is setting `enabled: false` through the existing configuration/deployme
 ## Review follow-up — November 25, 2026
 
 PR review identified two renderer-specific edge cases: a repeated clock and `Math.random()` sequence can repeat a cache-buster URL, and the future-`iat` check can reject every fresh token if the renderer clock remains behind. Web Crypto is now preferred for request variation, and the current Auth instance remembers only its latest acquired token to avoid a refresh loop. Stored/hydrated tokens remain subject to the future-`iat` guard. This exemption is in memory only and does not establish token validity independently of the upstream service.
+
+### Additional review decisions
+
+- Name the unshipped public SDK boolean `enableNoncedTokenRequests` and storefront configuration `app.commerceAPI.tokenCacheBusting`. These names describe the request behavior; the same opt-in also enables the future-`iat` guard.
+- Empty access-token values in a token response must not overwrite the latest-token exemption marker. This is a defensive marker update; the existing response storage behavior is unchanged.
+- The SDK's 401 helper already refreshes through Auth's token-response handler. Cover the actual authorization-header retry path with a slow clock and confirm subsequent `ready()` calls do not refresh again.
+- Keep the request-class predicate in the storefront and both scaffold templates for now. Extracting a shared storefront configuration utility is a possible follow-up; generated storefronts require an upgrade or an explicit backport regardless of where the helper lives. Keep the copies synchronized and validate generated output.
+- Retain the SDK method proxy, exact-token exemption identity, and inexpensive render-time predicate. A subclass would duplicate SDK overloads, token IDs are not guaranteed on every token, and memoizing with an empty dependency array would prevent configuration updates from taking effect.
+- Do not add new diagnostics in this change. Use request inspection for nonce verification; the fallback's cross-render limits remain documented.

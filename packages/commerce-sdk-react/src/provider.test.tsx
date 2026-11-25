@@ -106,9 +106,9 @@ describe('provider', () => {
     test.each([undefined, false, true])(
         'forwards the token-cache workaround setting (%s)',
         (enabled) => {
-            renderWithProviders(<h1>test</h1>, {enableTokenResponseCacheWorkaround: enabled})
+            renderWithProviders(<h1>test</h1>, {enableNoncedTokenRequests: enabled})
             expect(Auth).toHaveBeenCalledWith(
-                expect.objectContaining({enableTokenResponseCacheWorkaround: enabled ?? false})
+                expect.objectContaining({enableNoncedTokenRequests: enabled ?? false})
             )
         }
     )
@@ -118,7 +118,7 @@ describe('provider', () => {
             <CommerceApiProvider
                 {...DEFAULT_TEST_CONFIG}
                 disableAuthInit
-                enableTokenResponseCacheWorkaround={enabled}
+                enableNoncedTokenRequests={enabled}
             >
                 <h1>{label}</h1>
             </CommerceApiProvider>
@@ -129,12 +129,12 @@ describe('provider', () => {
         rerender(component(true, 'enabled'))
         expect(Auth).toHaveBeenCalledTimes(2)
         expect(Auth).toHaveBeenLastCalledWith(
-            expect.objectContaining({enableTokenResponseCacheWorkaround: true})
+            expect.objectContaining({enableNoncedTokenRequests: true})
         )
         rerender(component(false, 'disabled'))
         expect(Auth).toHaveBeenCalledTimes(3)
         expect(Auth).toHaveBeenLastCalledWith(
-            expect.objectContaining({enableTokenResponseCacheWorkaround: false})
+            expect.objectContaining({enableNoncedTokenRequests: false})
         )
     })
 

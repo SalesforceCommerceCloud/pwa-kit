@@ -190,7 +190,7 @@ module.exports = {
         commerceAPI: {
             // Opt matching browser request classes into the Googlebot token-cache workaround.
             // Classify requests via setRequestClass() in app/request-processor.js.
-            tokenResponseCacheWorkaround: {
+            tokenCacheBusting: {
                 enabled: false,
                 requestClass: 'bot'
             },
