@@ -1237,6 +1237,7 @@ const CommerceClientAgentWindow = ({
                 <CommerceClientFab
                     position={cc_widgetPosition}
                     isPanelOpenByDefault={initialIsOpen}
+                    fabLabel={cc_theme?.fabIconLabel}
                 />
             )}
         </>
