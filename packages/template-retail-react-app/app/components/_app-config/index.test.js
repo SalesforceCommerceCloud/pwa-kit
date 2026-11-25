@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import {renderToString} from 'react-dom/server'
 import {render, waitFor} from '@testing-library/react'
 import AppConfig from '@salesforce/retail-react-app/app/components/_app-config/index.jsx'
 
@@ -34,7 +35,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         CommerceApiProvider: (props) => {
             if (mockCaptureProviderProps) {
                 mockCaptureProviderProps(props)
-                return props.children || null
+                return null
             }
             return actual.CommerceApiProvider(props)
         }
@@ -92,6 +93,79 @@ describe('AppConfig', () => {
         // (for example: commerce-sdk-react Provider needs to finish its useEffect for `auth.ready()`)
         await waitFor(() => {
             expect(window.localStorage.setItem).toHaveBeenCalled()
+        })
+    })
+
+    describe('token-response cache workaround', () => {
+        let originalProgressive
+        let captured
+        beforeEach(() => {
+            originalProgressive = window.Progressive
+            mockCaptureProviderProps = (props) => {
+                captured = props
+            }
+        })
+        afterEach(() => {
+            window.Progressive = originalProgressive
+            mockCaptureProviderProps = null
+        })
+        const component = (settings) => (
+            <StaticRouter>
+                <CorrelationIdProvider correlationId={() => uuidv4()}>
+                    <AppConfig
+                        locals={{
+                            site: mockConfig.app.sites[0],
+                            originalUrl: '/',
+                            appConfig: {
+                                ...mockConfig.app,
+                                commerceAPI: {
+                                    ...mockConfig.app.commerceAPI,
+                                    tokenCacheBusting: settings
+                                }
+                            }
+                        }}
+                    />
+                </CorrelationIdProvider>
+            </StaticRouter>
+        )
+        test.each([
+            [undefined, 'bot', false],
+            [{enabled: false, requestClass: 'bot'}, 'bot', false],
+            [{enabled: 'true', requestClass: 'bot'}, 'bot', false],
+            [{enabled: true, requestClass: 'bot'}, 'bot', true],
+            [{enabled: true, requestClass: 'custom-bot'}, 'custom-bot', true],
+            [{enabled: true, requestClass: 'bot'}, 'human', false],
+            [{enabled: true, requestClass: 'bot'}, 'Bot', false],
+            [{enabled: true, requestClass: 'bot'}, undefined, false],
+            [{enabled: true, requestClass: ''}, '', false],
+            [{enabled: true}, undefined, false],
+            [{enabled: true, requestClass: 42}, 42, false]
+        ])('settings %j and document class %s enable: %s', (settings, requestClass, expected) => {
+            window.Progressive = {ssrOptions: {requestClass}}
+            render(component(settings))
+            expect(captured.enableNoncedTokenRequests).toBe(expected)
+        })
+        test.each([undefined, {}, {ssrOptions: {}}])(
+            'missing request classification (%j) stays disabled',
+            (progressive) => {
+                window.Progressive = progressive
+                render(component({enabled: true, requestClass: 'bot'}))
+                expect(captured.enableNoncedTokenRequests).toBe(false)
+            }
+        )
+        test('SSR stays disabled and the browser render enables a matching document', () => {
+            window.Progressive = {ssrOptions: {requestClass: 'bot'}}
+            const windowGetter = jest.spyOn(global, 'window', 'get')
+            const element = component({enabled: true, requestClass: 'bot'})
+            try {
+                windowGetter.mockReturnValue(undefined)
+                renderToString(element)
+                expect(captured.enableNoncedTokenRequests).toBe(false)
+            } finally {
+                windowGetter.mockRestore()
+            }
+            render(element)
+            expect(captured.enableNoncedTokenRequests).toBe(true)
         })
     })
 
