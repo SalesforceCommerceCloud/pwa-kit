@@ -92,11 +92,12 @@ afterEach(() => {
     delete window.CimulateMessaging
 })
 
-it('direct add uses the selected variant and refreshes shared cart state and widget', async () => {
+it('direct add updates the cache and returns the cart through the action response', async () => {
     setup()
     await waitFor(() =>
         expect(update).toHaveBeenCalledWith(expect.objectContaining({id: 'basket'}))
     )
+    update.mockClear()
     mockApi.shopperBasketsV2.getBasket.mockResolvedValue(mockBasket(3))
     let response
     await act(async () => {
@@ -113,7 +114,7 @@ it('direct add uses the selected variant and refreshes shared cart state and wid
         queryClient.getQueryData(mockCustomerKey(mockCustomerId)).baskets[0].productItems[0]
             .quantity
     ).toBe(3)
-    expect(update).toHaveBeenLastCalledWith(response.cart)
+    expect(update).not.toHaveBeenCalled()
 })
 
 it('storefront cache updates, confirmed agent events and same-origin iframe signals trigger fresh reads', async () => {
@@ -129,22 +130,26 @@ it('storefront cache updates, confirmed agent events and same-origin iframe sign
         )
     )
     for (const event of ['cimulate:cart-update', 'commerceclient:cart-changed']) {
-        const reads = mockApi.shopperBasketsV2.getBasket.mock.calls.length
+        update.mockClear()
         act(() => window.dispatchEvent(new CustomEvent(event, {detail: {basket: mockBasket(99)}})))
         await waitFor(() =>
-            expect(mockApi.shopperBasketsV2.getBasket.mock.calls.length).toBeGreaterThan(reads)
-        )
-        expect(update).not.toHaveBeenLastCalledWith(
-            expect.objectContaining({items: [expect.objectContaining({quantity: 99})]})
+            expect(update).toHaveBeenCalledWith(
+                expect.objectContaining({items: [expect.objectContaining({quantity: 4})]})
+            )
         )
     }
 })
 
-it('quantity, removal and coupon actions use existing basket APIs', async () => {
+it('responds to get, quantity, removal and coupon actions without a competing cart push', async () => {
     setup()
     await waitFor(() =>
         expect(update).toHaveBeenCalledWith(expect.objectContaining({id: 'basket'}))
     )
+    update.mockClear()
+    await act(async () =>
+        expect(await action({action: 'get'})).toMatchObject({ok: true, cart: {id: 'basket'}})
+    )
+    expect(update).not.toHaveBeenCalled()
     for (const [request, method, body] of [
         [
             {action: 'quantity', productId: 'variant', itemId: 'line', quantity: 2},
@@ -158,7 +163,10 @@ it('quantity, removal and coupon actions use existing basket APIs', async () => 
         ],
         [{action: 'coupon', code: ' SAVE '}, 'addCouponToBasket', {code: 'SAVE'}]
     ]) {
-        await act(async () => expect(await action(request)).toMatchObject({ok: true}))
+        await act(async () =>
+            expect(await action(request)).toMatchObject({ok: true, cart: {id: 'basket'}})
+        )
+        expect(update).not.toHaveBeenCalled()
         expect(mockApi.shopperBasketsV2[method]).toHaveBeenCalledWith({
             parameters: {basketId: 'basket', ...(request.itemId ? {itemId: 'line'} : {})},
             headers: {Authorization: 'Bearer token'},

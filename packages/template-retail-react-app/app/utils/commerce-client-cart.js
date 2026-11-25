@@ -88,7 +88,7 @@ export const mapBasketToWidgetCart = (basket, {checkoutUrl = '/checkout'} = {}) 
             }
         }),
         subtotal: basket?.productSubTotal ?? 0,
-        total: basket?.orderTotal ?? basket?.productSubTotal ?? 0,
+        total: basket?.orderTotal ?? basket?.productTotal ?? basket?.productSubTotal ?? 0,
         taxes: basket?.taxTotal ?? null,
         taxationMode: basket?.taxation || null,
         shippingCost: basket?.shippingTotal ?? null,
@@ -146,6 +146,7 @@ export const createCommerceClientCart = ({
     readBasket,
     writeBasket,
     publish,
+    pushCart,
     clear,
     timeoutMs = 8000
 }) => {
@@ -174,10 +175,11 @@ export const createCommerceClientCart = ({
         queue = result.catch(() => {})
         return result
     }
-    const read = async (identity, epoch, version) => {
+    const read = async (identity, epoch, version, onCart) => {
         const basket = await readBasket(identity)
         if (!valid(identity, epoch, version)) throw new Error(SHOPPER_CHANGED)
         const cart = publish(basket, identity)
+        onCart?.(cart)
         return {ok: true, cart}
     }
     const refresh = () => {
@@ -187,7 +189,8 @@ export const createCommerceClientCart = ({
         return enqueue(async () => {
             if (!valid(identity, epoch, version)) return
             try {
-                return await deadline(read(identity, epoch, version))
+                // Only background reads push. Widget actions receive their cart through respond().
+                return await deadline(read(identity, epoch, version, pushCart))
             } catch (error) {
                 if (valid(identity, epoch, version)) revision++
                 throw error

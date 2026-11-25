@@ -271,6 +271,19 @@ it('validates optional iframe URLs', () => {
         expect(normalizeCartPageUrl(url)).toBe('')
 })
 
+it.each([
+    [95, 90, 95],
+    [null, 90, 90],
+    [null, 0, 0],
+    [null, undefined, 100],
+    [0, 90, 0]
+])('maps order total %s and product total %s to %s', (orderTotal, productTotal, expected) => {
+    expect(mapBasketToWidgetCart({orderTotal, productTotal, productSubTotal: 100})).toMatchObject({
+        subtotal: 100,
+        total: expected
+    })
+})
+
 it('maps product images, selected variant labels, discounts and unformatted amounts', () => {
     const value = {
         ...basket(2),

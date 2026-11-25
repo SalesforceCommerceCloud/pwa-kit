@@ -27,6 +27,8 @@ import {
     mapBasketToWidgetCart
 } from '@salesforce/retail-react-app/app/utils/commerce-client-cart'
 
+const pushCartToWidget = (cart) => window.CimulateMessaging?.eventHandlers?.cart?.update?.(cart)
+
 // Raw SDK writes bypass React Query's automatic cache updates: an old shopper's
 // response must never enter the current shopper's cache. There is no write retry.
 const useCommerceClientCart = ({enabled, ready}) => {
@@ -189,14 +191,12 @@ const useCommerceClientCart = ({enabled, ready}) => {
                             return {...old, baskets, total: baskets.length}
                         }
                     )
-                    window.CimulateMessaging?.eventHandlers?.cart?.update?.(cart)
                     return cart
                 },
+                pushCart: pushCartToWidget,
                 clear: () => {
                     publishedRef.current = undefined
-                    window.CimulateMessaging?.eventHandlers?.cart?.update?.(
-                        mapBasketToWidgetCart(null)
-                    )
+                    pushCartToWidget(mapBasketToWidgetCart(null))
                 }
             }),
         [queryClient]
