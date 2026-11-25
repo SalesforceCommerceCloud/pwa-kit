@@ -677,7 +677,6 @@ class Auth {
         // Googlebot has been observed reusing expired token responses with a stale
         // renderer clock. Refresh future-issued stored tokens, but accept the latest
         // token acquired by this Auth instance so a slow clock cannot cause a refresh loop.
-        // Workaround for the Googlebot caching issue tracked in W-24950604.
         return (
             (this.enableTokenResponseCacheWorkaround &&
                 tokenAgeSeconds < -60 &&
@@ -687,8 +686,8 @@ class Auth {
     }
 
     /**
-     * Work around a Googlebot caching issue that reuses stale token responses
-     * (W-24950604). Vary token request URLs even when the renderer's clock is frozen.
+     * Work around a Googlebot caching issue that reuses stale token responses.
+     * Vary token request URLs even when the renderer's clock is frozen.
      */
     private addTokenRequestNonce(client: ShopperLogin<ApiClientConfigParams>) {
         if (!this.enableTokenResponseCacheWorkaround) return

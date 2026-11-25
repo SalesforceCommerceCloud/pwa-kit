@@ -4,7 +4,7 @@ Status: Implemented; live rollout verification remains.
 
 Decision date: November 18, 2026.
 
-Tracking: [W-24950604](https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00002sJriXYAS/view) · [PR #4119](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4119) · [Design discussion](https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1794960916426999)
+Tracking: [PR #4119](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4119)
 
 ## Problem and context
 
