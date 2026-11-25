@@ -18,6 +18,8 @@ const mockBasket = (quantity = 1) => ({
     productItems: [{itemId: 'line', productId: 'variant', quantity}]
 })
 let mockCustomerId = 'shopper-a'
+let mockHttpOnly = false
+const mockGetTokenWhenReady = jest.fn()
 const mockCustomerKey = (customerId) => [
     '/commerce-sdk-react',
     '/organizations/',
@@ -29,6 +31,7 @@ const mockCustomerKey = (customerId) => [
 ]
 const mockApi = {
     shopperCustomers: {getCustomerBaskets: jest.fn()},
+    shopperProducts: {getProducts: jest.fn()},
     shopperBasketsV2: {
         getBasket: jest.fn(),
         addItemToBasket: jest.fn(),
@@ -41,7 +44,8 @@ const mockApi = {
 const mockBuildUrl = (path) => '/en-US' + path
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useCommerceApi: () => mockApi,
-    useAccessToken: () => ({getTokenWhenReady: async () => 'token'}),
+    useAccessToken: () => ({getTokenWhenReady: mockGetTokenWhenReady}),
+    useConfig: () => ({enableHttpOnlySessionCookies: mockHttpOnly}),
     useCustomerId: () => mockCustomerId,
     useCustomerType: () => ({customerType: 'guest'}),
     useUsid: () => ({usid: mockCustomerId}),
@@ -79,6 +83,9 @@ const action = (request) =>
     })
 beforeEach(() => {
     jest.clearAllMocks()
+    mockHttpOnly = false
+    mockGetTokenWhenReady.mockReset().mockResolvedValue('token')
+    mockApi.shopperProducts.getProducts.mockResolvedValue({data: []})
     mockCustomerId = 'shopper-a'
     mockApi.shopperCustomers.getCustomerBaskets.mockResolvedValue({baskets: [mockBasket()]})
     mockApi.shopperBasketsV2.getBasket.mockResolvedValue(mockBasket())
@@ -116,6 +123,81 @@ it('direct add updates the cache and returns the cart through the action respons
     ).toBe(3)
     expect(update).not.toHaveBeenCalled()
 })
+
+it('waits for auth and uses the session cookie for customer, basket, catalog and mutation requests', async () => {
+    mockHttpOnly = true
+    let ready
+    mockGetTokenWhenReady.mockImplementationOnce(
+        () =>
+            new Promise((resolve) => {
+                ready = resolve
+            })
+    )
+    setup()
+    await waitFor(() => expect(ready).toBeDefined())
+    expect(mockApi.shopperCustomers.getCustomerBaskets).not.toHaveBeenCalled()
+    ready('token')
+    await waitFor(() =>
+        expect(update).toHaveBeenCalledWith(expect.objectContaining({id: 'basket'}))
+    )
+    await act(async () =>
+        expect(await action({action: 'add', productId: 'variant', quantity: 1})).toMatchObject({
+            ok: true
+        })
+    )
+    for (const method of [
+        mockApi.shopperCustomers.getCustomerBaskets,
+        mockApi.shopperBasketsV2.getBasket,
+        mockApi.shopperProducts.getProducts,
+        mockApi.shopperBasketsV2.addItemToBasket
+    ]) {
+        expect(method).toHaveBeenCalledWith(expect.objectContaining({headers: {}}))
+    }
+})
+
+it.each(['write authentication', 'basket creation'])(
+    'does not add an item after %s outlasts the action',
+    async (stage) => {
+        setup()
+        await waitFor(() =>
+            expect(update).toHaveBeenCalledWith(expect.objectContaining({id: 'basket'}))
+        )
+        let release
+        const wait = () =>
+            new Promise((resolve) => {
+                release = resolve
+            })
+        if (stage === 'basket creation') {
+            mockApi.shopperCustomers.getCustomerBaskets.mockResolvedValueOnce({baskets: []})
+            mockApi.shopperBasketsV2.createBasket.mockImplementationOnce(wait)
+        } else {
+            mockGetTokenWhenReady.mockResolvedValueOnce('token').mockImplementationOnce(wait)
+        }
+        jest.useFakeTimers()
+        try {
+            const add = {action: 'add', productId: 'variant', quantity: 1}
+            const pending = action(add)
+            await jest.advanceTimersByTimeAsync(0)
+            expect(release).toBeDefined()
+            await jest.advanceTimersByTimeAsync(8001)
+            const response = await pending
+            expect(response.ok).toBe(false)
+            release(stage === 'basket creation' ? {basketId: 'created'} : 'token')
+            await jest.advanceTimersByTimeAsync(0)
+            expect(mockApi.shopperBasketsV2.addItemToBasket).not.toHaveBeenCalled()
+            await act(async () =>
+                expect(await action(add)).toMatchObject({ok: stage === 'write authentication'})
+            )
+            await act(async () => expect(await action({action: 'get'})).toMatchObject({ok: true}))
+            await act(async () => expect(await action(add)).toMatchObject({ok: true}))
+            expect(mockApi.shopperBasketsV2.addItemToBasket).toHaveBeenCalledTimes(
+                stage === 'write authentication' ? 2 : 1
+            )
+        } finally {
+            jest.useRealTimers()
+        }
+    }
+)
 
 it('storefront cache updates, confirmed agent events and same-origin iframe signals trigger fresh reads', async () => {
     setup()

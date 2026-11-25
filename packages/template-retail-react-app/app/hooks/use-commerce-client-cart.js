@@ -10,6 +10,7 @@ import {useQueryClient} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCommerceApi,
+    useConfig,
     useCustomerBaskets,
     useCustomerId,
     useCustomerType,
@@ -34,6 +35,7 @@ const pushCartToWidget = (cart) => window.CimulateMessaging?.eventHandlers?.cart
 const useCommerceClientCart = ({enabled, ready}) => {
     const api = useCommerceApi()
     const {getTokenWhenReady} = useAccessToken()
+    const {enableHttpOnlySessionCookies} = useConfig()
     const customerId = useCustomerId()
     const {customerType} = useCustomerType()
     const {usid} = useUsid()
@@ -57,7 +59,12 @@ const useCommerceClientCart = ({enabled, ready}) => {
     const current = useRef()
     current.current = {
         api,
-        getTokenWhenReady,
+        getHeaders: async () => {
+            const token = await getTokenWhenReady()
+            return enableHttpOnlySessionCookies && typeof window !== 'undefined'
+                ? {}
+                : {Authorization: `Bearer ${token}`}
+        },
         customerId,
         identity,
         siteId: site?.id,
@@ -73,10 +80,9 @@ const useCommerceClientCart = ({enabled, ready}) => {
                     const session = current.current
                     if (!session.customerId || expectedIdentity !== session.identity)
                         throw new Error('Your shopper session is changing. Open View Cart again.')
-                    const token = await session.getTokenWhenReady()
+                    const headers = await session.getHeaders()
                     if (current.current.identity !== expectedIdentity)
                         throw new Error('Your shopper session changed.')
-                    const headers = {Authorization: `Bearer ${token}`}
                     const result = await session.api.shopperCustomers.getCustomerBaskets({
                         parameters: {customerId: session.customerId},
                         headers
@@ -121,25 +127,24 @@ const useCommerceClientCart = ({enabled, ready}) => {
                         return basket
                     }
                 },
-                writeBasket: async (request, activeBasket, expectedIdentity) => {
+                writeBasket: async (request, activeBasket, expectedIdentity, beforeMutation) => {
                     const session = current.current
-                    const token = await session.getTokenWhenReady()
+                    const headers = await session.getHeaders()
                     if (current.current.identity !== expectedIdentity)
                         throw new Error('Your shopper session changed.')
-                    const headers = {Authorization: `Bearer ${token}`}
                     const client = session.api.shopperBasketsV2
                     let basketId = activeBasket?.basketId
                     if (!basketId) {
                         if (request.action !== 'add') throw new Error('Your basket is empty.')
+                        beforeMutation()
                         const created = await client.createBasket({
                             body: {currency: session.currency},
                             headers
                         })
-                        if (current.current.identity !== expectedIdentity)
-                            throw new Error('Your shopper session changed.')
                         basketId = created.basketId
                     }
                     const options = {parameters: {basketId}, headers}
+                    beforeMutation()
                     switch (request.action) {
                         case 'add':
                             return client.addItemToBasket({

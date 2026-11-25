@@ -33,10 +33,12 @@ responds once with `{ok: true, cart}` or `{ok: false, error}`.
 | Coupon (`coupon`) | nonblank `code` | `addCouponToBasket` |
 
 Reads select the current shopper's non-temporary basket. View Cart never creates
-one. Add creates one if needed, in the current currency. Each write is followed
-by an authoritative read. Commerce API validates inventory, pricing and basket
-rules. Catalog data decorates the cart with variant labels and images when
-available; it does not determine the payable amounts.
+one. Direct cart requests wait for authentication and use the session cookie when
+HttpOnly session cookies are enabled in the browser. Add creates a basket if
+needed, in the current currency. After each write, the adapter reads the current
+basket from Commerce API, which validates inventory, pricing and basket rules.
+When available, catalog data supplies variant labels and images. Payable amounts
+come from the basket.
 
 The adapter updates the same customer-basket cache used by `useCurrentBasket`,
 the cart page and header count, then publishes through
@@ -46,13 +48,16 @@ confirmed agent `cimulate:cart-update` events, and
 never treated as the current basket. The widget retains ownership of historical
 conversation cart snapshots.
 
-Actions are serialized, have an eight-second deadline, and are never automatically
-retried. A lost write response or failed post-write read blocks further widget
-edits. A successful explicit **View Cart** read, after the original request has
-settled, is required to unlock editing; background sync cannot unlock it. Browser
-timeouts cannot cancel a server-side mutation. Check the basket before deliberately
-repeating an add. Shopper/site/locale/currency changes clear the widget's current
-basket and invalidate old reads and queued actions.
+The adapter processes cart actions in order. Each has eight seconds from dispatch,
+including time spent in the queue and waiting for authentication. The adapter
+checks the deadline before each basket change. If it expires before sending a
+change, the shopper can retry immediately. The adapter sends each write once.
+If the write response is lost or the next basket read fails, editing pauses.
+After the original request settles, the shopper can open **View Cart** to
+refresh the basket and resume editing. Browser timeouts cannot cancel a change
+already sent to the server. Check the basket before repeating an add. Changes to
+the shopper, site, locale or currency clear the widget's current basket and
+invalidate old reads and queued actions.
 
 ## Optional merchant-owned cart iframe
 

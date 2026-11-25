@@ -116,6 +116,7 @@ export const mapBasketToWidgetCart = (basket, {checkoutUrl = '/checkout'} = {}) 
 }
 
 const CHECK_CART = 'Open View Cart to check the basket before making another change.'
+const TIMED_OUT = 'The cart request timed out. Try again.'
 const SHOPPER_CHANGED = 'Your shopper session changed. Open View Cart before trying again.'
 
 // Only explicit rejections from the write itself can bypass the recovery barrier.
@@ -163,17 +164,12 @@ export const createCommerceClientCart = ({
             return await Promise.race([
                 operation,
                 new Promise((resolve, reject) => {
-                    timer = setTimeout(() => reject(new Error(CHECK_CART)), timeoutMs)
+                    timer = setTimeout(() => reject(new Error(TIMED_OUT)), timeoutMs)
                 })
             ])
         } finally {
             clearTimeout(timer)
         }
-    }
-    const enqueue = (run) => {
-        const result = queue.then(run, run)
-        queue = result.catch(() => {})
-        return result
     }
     const read = async (identity, epoch, version, onCart) => {
         const basket = await readBasket(identity)
@@ -186,7 +182,7 @@ export const createCommerceClientCart = ({
         const identity = getIdentity()
         const epoch = generation
         const version = ++revision
-        return enqueue(async () => {
+        const result = queue.then(async () => {
             if (!valid(identity, epoch, version)) return
             try {
                 // Only background reads push. Widget actions receive their cart through respond().
@@ -196,55 +192,66 @@ export const createCommerceClientCart = ({
                 throw error
             }
         })
+        queue = result.catch(() => {})
+        return result
     }
     const action = (request) => {
         const identity = getIdentity()
         const epoch = generation
-        return enqueue(async () => {
-            if (epoch !== generation || identity !== getIdentity())
-                return {ok: false, error: SHOPPER_CHANGED}
+        const expiresAt = performance.now() + timeoutMs
+        let active = true
+        let sent = false
+
+        const run = async () => {
             const version = revision
-            const isWrite = request.action !== 'get'
-            let sent = false
-            try {
-                if (isWrite && uncertain) throw new Error(CHECK_CART)
-                return await deadline(
-                    (async () => {
-                        if (!isWrite && pendingWrites) throw new Error(CHECK_CART)
-                        // Always resolve the active shopper basket rather than using an old line's basket id.
-                        let basket = await readBasket(identity)
-                        if (!valid(identity, epoch, version)) throw new Error(SHOPPER_CHANGED)
-                        if (isWrite) {
-                            validateCartAction(request, basket)
-                            sent = true
-                            pendingWrites++
-                            try {
-                                await writeBasket(request, basket, identity)
-                            } catch (error) {
-                                const message = getWriteRejectionMessage(error, request.action)
-                                if (!message) throw error
-                                const sameShopper =
-                                    identity === getIdentity() && epoch === generation
-                                return {ok: false, error: sameShopper ? message : SHOPPER_CHANGED}
-                            } finally {
-                                pendingWrites--
-                            }
-                            if (!valid(identity, epoch, version)) throw new Error(SHOPPER_CHANGED)
-                            return read(identity, epoch, version)
-                        }
-                        if (pendingWrites) throw new Error(CHECK_CART)
-                        const cart = publish(basket, identity)
-                        uncertain = false
-                        return {ok: true, cart}
-                    })()
-                )
-            } catch (error) {
-                // Invalidate late read/write completions after the deadline.
-                if (valid(identity, epoch, version)) revision++
-                if (isWrite && sent && epoch === generation) uncertain = true
-                return {ok: false, error: sent ? CHECK_CART : error.message || CHECK_CART}
+            const checkActive = () => {
+                if (!active || performance.now() >= expiresAt) throw new Error(TIMED_OUT)
+                if (!valid(identity, epoch, version)) throw new Error(SHOPPER_CHANGED)
             }
+            checkActive()
+            const isWrite = request.action !== 'get'
+            if (isWrite ? uncertain : pendingWrites) throw new Error(CHECK_CART)
+
+            let basket = await readBasket(identity)
+            checkActive()
+            if (isWrite) {
+                validateCartAction(request, basket)
+                const beforeMutation = () => {
+                    checkActive()
+                    if (!sent) {
+                        sent = true
+                        pendingWrites++
+                    }
+                }
+                try {
+                    await writeBasket(request, basket, identity, beforeMutation)
+                } catch (error) {
+                    const message = getWriteRejectionMessage(error, request.action)
+                    if (!sent || !message) throw error
+                    const sameShopper = identity === getIdentity() && epoch === generation
+                    return {ok: false, error: sameShopper ? message : SHOPPER_CHANGED}
+                } finally {
+                    if (sent) pendingWrites--
+                }
+                checkActive()
+                basket = await readBasket(identity)
+                checkActive()
+            }
+            const cart = publish(basket, identity)
+            if (!isWrite) uncertain = false
+            return {ok: true, cart}
+        }
+
+        const previous = queue
+        const result = deadline(previous.then(run)).catch((error) => {
+            active = false
+            if (sent && epoch === generation) uncertain = true
+            return {ok: false, error: sent ? CHECK_CART : error.message || CHECK_CART}
         })
+        // A queued action can expire before its turn. Its successor must still wait for the
+        // previous turn, and any write already in flight stays behind the recovery barrier.
+        queue = previous.then(() => result)
+        return result
     }
     return {
         action,

@@ -49,7 +49,10 @@ const setup = () => {
     const adapter = createCommerceClientCart({
         getIdentity: () => identity,
         readBasket,
-        writeBasket,
+        writeBasket: (request, basket, identity, beforeMutation) => {
+            beforeMutation()
+            return writeBasket(request, basket, identity)
+        },
         publish,
         clear,
         timeoutMs: 50
@@ -178,6 +181,50 @@ it('blocks further writes when a mutation response is lost, even after a failed 
     expect(await state.adapter.action({action: 'get'})).toMatchObject({ok: false})
     expect(await state.adapter.action(add)).toMatchObject({ok: false})
     expect(state.writeBasket).toHaveBeenCalledTimes(1)
+})
+
+it('counts queue time toward the deadline and permits one fresh add after an unsent add expires', async () => {
+    jest.useFakeTimers()
+    try {
+        const state = setup()
+        const refreshRead = deferred()
+        const actionRead = deferred()
+        state.readBasket
+            .mockReturnValueOnce(refreshRead.promise)
+            .mockReturnValueOnce(actionRead.promise)
+        const refresh = state.adapter.refresh()
+        const first = state.adapter.action(add)
+        await jest.advanceTimersByTimeAsync(35)
+        refreshRead.resolve(basket())
+        await refresh
+        await jest.advanceTimersByTimeAsync(16)
+        expect(await first).toMatchObject({ok: false, error: expect.stringContaining('timed out')})
+        const retry = state.adapter.action(add)
+        actionRead.resolve(basket())
+        expect(await retry).toMatchObject({ok: true})
+        expect(state.writeBasket).toHaveBeenCalledTimes(1)
+    } finally {
+        jest.useRealTimers()
+    }
+})
+
+it('never starts a basket read for an action that expired while still queued', async () => {
+    jest.useFakeTimers()
+    try {
+        const state = setup()
+        const refreshRead = deferred()
+        state.readBasket.mockReturnValueOnce(refreshRead.promise)
+        const refresh = state.adapter.refresh().catch(() => {})
+        const first = state.adapter.action(add)
+        await jest.advanceTimersByTimeAsync(51)
+        expect(await first).toMatchObject({ok: false, error: expect.stringContaining('timed out')})
+        refreshRead.resolve(basket())
+        await refresh
+        expect(state.readBasket).toHaveBeenCalledTimes(1)
+        expect(state.writeBasket).not.toHaveBeenCalled()
+    } finally {
+        jest.useRealTimers()
+    }
 })
 
 it('expires an in-flight write and ignores its late response without replaying it', async () => {
