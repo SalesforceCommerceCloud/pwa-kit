@@ -90,10 +90,11 @@ module.exports = {
             // CHANGELOG entry for details. Forwarded as
             // `messagingConfig.enableImageUpload`. Defaults to 'false'.
             cc_enableImageUpload: 'false',
-            // Opt in to PDP context on shopper turns. Requires messaging.umd.js >= 1.53.0
+            // Opt in to PDP and results-page context on shopper turns. Requires messaging.umd.js >= 1.53.0
             // for the commerce_agent_context envelope, context chips, and local dividers.
             // Uses public pageContext.set/clear, including seeding before widget mount,
             // and enables the shopper-agent handoff to prime product context.
+            // Product rows and category-only context require a messaging bundle with SRP-8 support.
             // Forwarded as messagingConfig.enablePageContext; the widget defaults to false.
             cc_enablePageContext: 'false',
             // Optional URL to customer's component override script. Must use HTTPS;

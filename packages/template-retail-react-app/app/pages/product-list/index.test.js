@@ -5,10 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import {useQueryClient} from '@tanstack/react-query'
+import {getCommerceClientPageContext} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
 import {Helmet} from 'react-helmet'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
     mockProductSearch,
     mockedEmptyCustomerProductList,
@@ -554,3 +557,89 @@ test('should filter by inventory when inventory filter is clicked', async () => 
     // Verify URL hasn't changed
     expect(window.location.pathname).toBe('/uk/en-GB/category/mens-clothing-jackets')
 })
+
+const jacketsCategory = {id: 'mens-clothing-jackets', name: 'Jackets'}
+const scopedSearchPath = `/category/${jacketsCategory.id}?q=boots`
+
+test.each([
+    {path: '/search?q=true', term: 'true', state: 'no category route'},
+    {path: '/search?q=false', term: 'false', state: 'no category route'},
+    {
+        path: scopedSearchPath,
+        term: 'boots',
+        state: 'category pending',
+        categoryId: jacketsCategory.id
+    },
+    {
+        path: scopedSearchPath,
+        term: 'boots',
+        state: 'category resolved',
+        categoryId: jacketsCategory.id,
+        categoryResult: {data: jacketsCategory},
+        expectedCategory: jacketsCategory
+    },
+    {
+        path: scopedSearchPath,
+        term: 'boots',
+        state: 'category lookup failed',
+        categoryId: jacketsCategory.id,
+        categoryResult: {error: {response: {status: 404}}}
+    },
+    {
+        path: scopedSearchPath,
+        term: 'boots',
+        state: 'another category was returned',
+        categoryId: jacketsCategory.id,
+        categoryResult: {data: {id: 'mens-clothing', name: 'Mens'}}
+    }
+])(
+    'publishes SRP context for $path with $state',
+    async ({path, term, categoryId, categoryResult = {}, expectedCategory}) => {
+        const appConfig = getConfig().app
+        const originalConfig = appConfig.commerceAgent
+        appConfig.commerceAgent = {
+            enabled: 'true',
+            provider: 'commerce-client',
+            cc_enablePageContext: 'true'
+        }
+        useCategory.mockReturnValue(categoryResult)
+        let queryClient
+        const ContextProbe = () => {
+            queryClient = useQueryClient()
+            return null
+        }
+        try {
+            window.history.pushState({}, 'ProductList', `/uk/en-GB${path}`)
+            renderWithProviders(
+                <>
+                    <MockedComponent />
+                    <ContextProbe />
+                </>
+            )
+            expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+            expect(useCategory).toHaveBeenCalledWith(
+                {parameters: {id: categoryId}},
+                {enabled: Boolean(categoryId)}
+            )
+            expect(useProductSearch).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    parameters: expect.objectContaining({
+                        refine: categoryId ? [`cgid=${categoryId}`] : []
+                    })
+                }),
+                {keepPreviousData: true}
+            )
+            await waitFor(() => {
+                const context = getCommerceClientPageContext(queryClient)
+                expect(context).toEqual(expect.objectContaining({type: 'srp', query: term}))
+                expect(context.category).toEqual(expectedCategory)
+                const tiles = screen.getAllByTestId(/^sf-product-tile-/)
+                expect(context.products.map(({id}) => id)).toEqual(
+                    tiles.map((tile) => tile.dataset.testid.replace('sf-product-tile-', ''))
+                )
+            })
+        } finally {
+            appConfig.commerceAgent = originalConfig
+        }
+    }
+)
