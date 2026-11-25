@@ -14,9 +14,11 @@ Thank you for being a part of our community and for your continuous support! :ra
 
 `CommerceApiProvider` accepts `enableTokenResponseCacheWorkaround` (boolean, default
 `false`). When enabled, Auth adds a fresh `c_nonce` cache buster to `getAccessToken`
-requests and refreshes readable JWTs issued more than 60 seconds
-in the future. The usual expiration buffer and 401 recovery remain active regardless
-of this setting. Trusted-agent token requests are excluded because Googlebot does not use that flow.
+requests, preferring Web Crypto randomness. Without Web Crypto it uses a best-effort
+timestamp/random fallback. Auth refreshes readable stored JWTs issued more than 60
+seconds in the future, while exempting the latest token acquired by the current Auth
+instance from that additional check to avoid refresh loops with a slow renderer clock.
+The usual expiration buffer and 401 recovery remain active regardless of this setting. Trusted-agent token requests are excluded because Googlebot does not use that flow.
 The cache buster is not an OAuth/OIDC security nonce.
 
 PWA Kit applications configure this through

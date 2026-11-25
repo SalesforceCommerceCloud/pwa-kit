@@ -316,6 +316,19 @@ const HTTPONLY_COOKIE_BACKED_KEYS: ReadonlySet<AuthDataKeys> = new Set([
     'uido'
 ])
 
+/** Cache buster for Googlebot renderers whose clock and Math.random may be deterministic. */
+const createTokenRequestNonce = () => {
+    const crypto = globalThis.crypto
+    if (crypto?.randomUUID) return crypto.randomUUID()
+    if (crypto?.getRandomValues) {
+        return Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) =>
+            byte.toString(16).padStart(2, '0')
+        ).join('')
+    }
+    // Best effort for environments without Web Crypto; not an OAuth/OIDC security nonce.
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+}
+
 /**
  * Module-level map for deduplicating concurrent refresh token requests across Auth instances.
  * React may recreate Auth instances on re-renders (due to unstable useMemo deps like `headers`),
@@ -354,6 +367,7 @@ class Auth {
     private hybridAuthEnabled: boolean
     private enableHttpOnlySessionCookies: boolean
     private enableTokenResponseCacheWorkaround: boolean
+    private lastIssuedToken?: string
 
     constructor(config: AuthConfig) {
         this.enableTokenResponseCacheWorkaround = config.enableTokenResponseCacheWorkaround === true
@@ -606,6 +620,7 @@ class Auth {
     }
 
     private clearStorage() {
+        this.lastIssuedToken = undefined
         // Type assertion because Object.keys is silly and limited :(
         const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
         keys.forEach((keyName) => {
@@ -655,14 +670,18 @@ class Auth {
      * Used to validate JWT token expiration.
      */
     private isTokenExpired(token: string) {
-        const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
+        const accessToken = token.replace('Bearer ', '')
+        const {exp, iat} = jwtDecode<JWTHeaders>(accessToken)
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
         // Googlebot has been observed reusing expired token responses with a stale
-        // renderer clock. Reject future-issued tokens so this condition triggers a refresh.
+        // renderer clock. Refresh future-issued stored tokens, but accept the latest
+        // token acquired by this Auth instance so a slow clock cannot cause a refresh loop.
         // Workaround for the Googlebot caching issue tracked in W-24950604.
         return (
-            (this.enableTokenResponseCacheWorkaround && tokenAgeSeconds < -60) ||
+            (this.enableTokenResponseCacheWorkaround &&
+                tokenAgeSeconds < -60 &&
+                accessToken !== this.lastIssuedToken) ||
             validTimeSeconds <= tokenAgeSeconds
         )
     }
@@ -683,9 +702,7 @@ class Auth {
                         parameters: {
                             ...options?.parameters,
                             // Non-secret cache buster, not an OAuth/OIDC security nonce.
-                            c_nonce: `${Date.now().toString(36)}-${Math.random()
-                                .toString(36)
-                                .slice(2)}`
+                            c_nonce: createTokenRequestNonce()
                         }
                     },
                     rawResponse
@@ -960,6 +977,9 @@ class Auth {
         this.set('usid', res.usid ?? '', {expires: expiresDate})
 
         this.set('access_token', res.access_token)
+        if (this.enableTokenResponseCacheWorkaround) {
+            this.lastIssuedToken = res.access_token
+        }
         this.set('idp_access_token', res.idp_access_token)
         if (res.access_token) {
             const parsed = this.parseSlasJWT(res.access_token)

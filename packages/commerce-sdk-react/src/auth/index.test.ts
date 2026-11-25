@@ -262,6 +262,119 @@ describe('Auth', () => {
         }
     )
 
+    test.each(['guest login', 'refresh'])(
+        'a clock two minutes behind does not repeat %s on each ready()',
+        async (flow) => {
+            const now = 1800000000
+            const clock = jest.spyOn(Date, 'now').mockReturnValue(now * 1000)
+            const payload = {...(jwt.decode(JWTNotExpired) as jwt.JwtPayload), iat: now + 120}
+            const token = jwt.sign({...payload, exp: now + 1920}, 'secret')
+            const auth = new Auth({...config, enableTokenResponseCacheWorkaround: true})
+            const request = (
+                flow === 'guest login' ? helpers.loginGuestUser : helpers.refreshAccessToken
+            ) as jest.Mock
+            request.mockResolvedValueOnce({...TOKEN_RESPONSE, access_token: token})
+            if (flow === 'refresh') {
+                // @ts-expect-error private storage method
+                auth.set('refresh_token_guest', 'stored-refresh-token')
+                // @ts-expect-error private storage method
+                auth.set(
+                    'access_token',
+                    jwt.sign({...payload, exp: now + 1920, jti: 'stored'}, 'secret')
+                )
+            }
+            try {
+                await auth.ready()
+                await auth.ready()
+                await auth.ready()
+                expect(request).toHaveBeenCalledTimes(1)
+                // @ts-expect-error private method
+                expect(auth.isTokenExpired(`Bearer ${token}`)).toBe(false)
+
+                const anotherAuth = new Auth({...config, enableTokenResponseCacheWorkaround: true})
+                // @ts-expect-error private method: the exemption is not persisted across instances
+                expect(anotherAuth.isTokenExpired(token)).toBe(true)
+
+                clock.mockReturnValue((now + 1860) * 1000)
+                // @ts-expect-error private method: the normal 60-second expiry buffer still applies
+                expect(auth.isTokenExpired(token)).toBe(true)
+
+                clock.mockReturnValue(now * 1000)
+                // @ts-expect-error private method
+                auth.clearStorage()
+                // @ts-expect-error private method: logout/storage cleanup clears the exemption
+                expect(auth.isTokenExpired(token)).toBe(true)
+            } finally {
+                clock.mockRestore()
+            }
+        }
+    )
+
+    test.each(['randomUUID', 'getRandomValues'] as const)(
+        '%s varies cache busters across Auth instances with frozen clock and Math.random',
+        async (method) => {
+            const clock = jest.spyOn(Date, 'now').mockReturnValue(1800000000000)
+            const random = jest.spyOn(Math, 'random').mockReturnValue(0.1)
+            let counter = 0
+            const randomUUID = jest.fn(() => `uuid-${++counter}`)
+            const getRandomValues = jest.fn((bytes: Uint8Array) => bytes.fill(++counter))
+            const crypto = jest.spyOn(globalThis, 'crypto', 'get').mockReturnValue({
+                ...(method === 'randomUUID' ? {randomUUID} : {}),
+                getRandomValues
+            } as unknown as Crypto)
+            try {
+                const nonces = []
+                for (let i = 0; i < 2; i++) {
+                    const auth = new Auth({...config, enableTokenResponseCacheWorkaround: true})
+                    const request = jest.fn().mockResolvedValue({})
+                    const client = {getAccessToken: request}
+                    // @ts-expect-error private method with a minimal SDK client
+                    auth.addTokenRequestNonce(client)
+                    await client.getAccessToken({})
+                    nonces.push(request.mock.calls[0][0].parameters.c_nonce)
+                }
+                expect(nonces[0]).not.toBe(nonces[1])
+                expect(
+                    method === 'randomUUID' ? randomUUID : getRandomValues
+                ).toHaveBeenCalledTimes(2)
+                expect(getRandomValues).toHaveBeenCalledTimes(method === 'randomUUID' ? 0 : 2)
+                expect(nonces).toEqual(
+                    method === 'randomUUID'
+                        ? ['uuid-1', 'uuid-2']
+                        : ['01'.repeat(16), '02'.repeat(16)]
+                )
+                expect(random).not.toHaveBeenCalled()
+            } finally {
+                crypto.mockRestore()
+                random.mockRestore()
+                clock.mockRestore()
+            }
+        }
+    )
+
+    test('uses the best-effort cache buster when Web Crypto is unavailable', async () => {
+        const crypto = jest
+            .spyOn(globalThis, 'crypto', 'get')
+            .mockReturnValue(undefined as unknown as Crypto)
+        const clock = jest.spyOn(Date, 'now').mockReturnValue(1800000000000)
+        const random = jest.spyOn(Math, 'random').mockReturnValue(0.1)
+        try {
+            const auth = new Auth({...config, enableTokenResponseCacheWorkaround: true})
+            const request = jest.fn().mockResolvedValue({})
+            const client = {getAccessToken: request}
+            // @ts-expect-error private method with a minimal SDK client
+            auth.addTokenRequestNonce(client)
+            await client.getAccessToken({})
+            expect(request.mock.calls[0][0].parameters.c_nonce).toBe(
+                `${(1800000000000).toString(36)}-${(0.1).toString(36).slice(2)}`
+            )
+        } finally {
+            random.mockRestore()
+            clock.mockRestore()
+            crypto.mockRestore()
+        }
+    })
+
     test.each([false, true])(
         'HttpOnly browser expiry is unchanged by the workaround (%s)',
         async (enabled) => {

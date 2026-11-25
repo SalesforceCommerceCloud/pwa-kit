@@ -4,7 +4,7 @@ Status: Implemented; live rollout verification remains.
 
 Decision date: November 18, 2026.
 
-Tracking: [W-24950604](https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00002sJriXYAS/view) · [Draft PR #4119](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4119) · [Design discussion](https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1794960916426999)
+Tracking: [W-24950604](https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE00002sJriXYAS/view) · [PR #4119](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/4119) · [Design discussion](https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1794960916426999)
 
 ## Problem and context
 
@@ -77,10 +77,10 @@ The browser-only decision targets the observed Googlebot renderer issue and pres
 
 When enabled:
 
-- Add a fresh timestamp-and-random `c_nonce` on every `getAccessToken` invocation. The random component lets the URL vary even with a frozen renderer clock.
+- Add a fresh `c_nonce` on every `getAccessToken` invocation. Prefer `crypto.randomUUID()`, then 128 bits from `crypto.getRandomValues()`, so a frozen clock and deterministic `Math.random()` do not repeat the cache buster. Retain the timestamp-and-`Math.random()` form as a best-effort fallback when Web Crypto is unavailable; that fallback cannot guarantee distinct values across deterministic renderer runs.
 - Apply the same setting to the separate client used for direct private-client authentication, as well as standard, private HttpOnly, and public HttpOnly proxy routes.
 - Preserve existing request parameters, headers, bodies, receiver binding, raw-response mode, response parsing, and SDK errors. Do not introduce retries at this layer.
-- Treat a readable JWT with `iat` more than 60 seconds ahead of the browser clock as expired. Exactly 60 seconds ahead remains allowed. This check triggers the existing refresh path.
+- Treat a readable stored JWT with `iat` more than 60 seconds ahead of the browser clock as expired. Exactly 60 seconds ahead remains allowed. Exempt only the latest token acquired by the current Auth instance from this additional check, preventing repeated refreshes when the renderer clock is behind a freshly issued token. The exemption is not persisted, is cleared with auth storage, and does not bypass the existing expiration buffer or 401 recovery.
 
 When disabled, do not inject `c_nonce` or apply the additional future-`iat` check. Retain the pre-workaround token behavior, including any custom parameters supplied by callers.
 
@@ -104,14 +104,18 @@ Expected changes are limited to the Retail React App default configuration and `
 - Verify a matching class with `enabled: false` does not enable either addition.
 - Verify SSR stays disabled even for a matching class, and browser hydration computes the browser-specific value.
 - Verify provider configuration changes reach the Auth instance without rebuilding it on unrelated renders.
-- Verify enabled token requests have distinct nonces under a frozen clock; disabled requests receive no injected nonce and preserve caller-supplied custom parameters.
+- Verify both Web Crypto paths produce distinct nonces across Auth instances with a frozen clock and `Math.random()`. Cover the best-effort fallback. Disabled requests receive no injected nonce and preserve caller-supplied custom parameters.
 - Verify trusted-agent token requests remain unchanged even when enabled, including caller-supplied custom parameters.
 - Preserve coverage of direct private-client cloning, standard/HttpOnly proxy URLs, SDK errors, and raw responses.
 - Test future-`iat` offsets of 59, 60, and 61 seconds with the setting enabled and disabled, plus the unchanged expiration buffer.
-- Confirm the future-`iat` condition reaches the existing refresh path when enabled and does not change HttpOnly browser expiry handling.
+- Confirm the future-`iat` condition reaches the existing refresh path when enabled and does not change HttpOnly browser expiry handling. With a clock two minutes behind, repeated `ready()` calls after guest login or refresh must not repeatedly acquire tokens. Verify the latest-token exemption is instance-local, clears with auth storage, and preserves normal expiry checks.
 
 ## Rollout verification
 
 Deploy with the setting disabled first, then enable it for the intended request class in the target environment. Use Google Search Console's inspection tooling to exercise Googlebot rendering. Confirm the serialized class matches the configured value, token URLs vary and reach the upstream service, and repeated SCAPI 401s decrease. Confirm ordinary shopper traffic retains its previous behavior.
 
 Rollback is setting `enabled: false` through the existing configuration/deployment process. Local tests establish request construction and gating behavior; live Googlebot behavior and upstream acceptance require rollout verification.
+
+## Review follow-up — November 25, 2026
+
+PR review identified two renderer-specific edge cases: a repeated clock and `Math.random()` sequence can repeat a cache-buster URL, and the future-`iat` check can reject every fresh token if the renderer clock remains behind. Web Crypto is now preferred for request variation, and the current Auth instance remembers only its latest acquired token to avoid a refresh loop. Stored/hydrated tokens remain subject to the future-`iat` guard. This exemption is in memory only and does not establish token validity independently of the upstream service.
