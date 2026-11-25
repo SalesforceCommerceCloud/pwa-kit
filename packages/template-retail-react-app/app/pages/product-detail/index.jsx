@@ -64,7 +64,10 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {isPickupMethod} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {useProductInventory} from '@salesforce/retail-react-app/app/hooks/use-product-inventory'
-import {useCommerceClientPdpContext} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
+import {
+    isCommerceClientPageContextEnabled,
+    useCommerceClientPdpContext
+} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -80,13 +83,7 @@ const ProductDetail = () => {
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const embeddedAgentConfig = getConfig()?.app?.embeddedAgent
-    const commerceAgent = getConfig()?.app?.commerceAgent
-    const pageContextEnabled =
-        commerceAgent?.enabled === 'true' &&
-        commerceAgent?.provider === 'commerce-client' &&
-        (commerceAgent?.cc_enablePageContext === true ||
-            (typeof commerceAgent?.cc_enablePageContext === 'string' &&
-                commerceAgent.cc_enablePageContext.trim().toLowerCase() === 'true'))
+    const pageContextEnabled = isCommerceClientPageContextEnabled(getConfig()?.app?.commerceAgent)
 
     /****************************** Basket *********************************/
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()

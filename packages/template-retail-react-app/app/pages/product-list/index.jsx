@@ -67,11 +67,16 @@ import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/comp
 
 // Hooks
 import {
+    useCurrency,
     useLimitUrls,
     usePageUrls,
     useSortUrls,
     useSearchParams
 } from '@salesforce/retail-react-app/app/hooks'
+import {
+    isCommerceClientPageContextEnabled,
+    useCommerceClientSrpContext
+} from '@salesforce/retail-react-app/app/hooks/use-commerce-client-page-context'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
@@ -126,8 +131,11 @@ const ProductList = (props) => {
     const activeData = useActiveData()
     const {res} = useServerContext()
     const customerId = useCustomerId()
+    const {currency} = useCurrency()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const appConfig = getConfig()?.app
+    const pageContextEnabled = isCommerceClientPageContextEnabled(appConfig?.commerceAgent)
+    const storeLocatorEnabled = appConfig?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
@@ -161,6 +169,9 @@ const ProductList = (props) => {
         isLoading,
         isFetched,
         isRefetching,
+        isSuccess: isSearchSuccess,
+        isPreviousData: isPreviousSearchData,
+        isError: isSearchError,
         data: productSearchResult
     } = useProductSearch(
         {
@@ -185,16 +196,34 @@ const ProductList = (props) => {
         }
     )
 
-    const {error, data: category} = useCategory(
+    const {error, data: resolvedCategory} = useCategory(
         {
             parameters: {
                 id: params.categoryId
             }
         },
         {
-            enabled: !isSearch && !!params.categoryId
+            enabled: !!params.categoryId && (!isSearch || pageContextEnabled)
         }
     )
+
+    const category = isSearch ? undefined : resolvedCategory
+
+    useCommerceClientSrpContext({
+        enabled: pageContextEnabled,
+        query:
+            typeof restOfParams.q === 'number' || typeof restOfParams.q === 'boolean'
+                ? String(restOfParams.q)
+                : restOfParams.q,
+        result: productSearchResult,
+        isSuccess: isSearchSuccess,
+        isPreviousData: isPreviousSearchData,
+        isError: isSearchError,
+        // Scoped search results are valid before the category name resolves.
+        requestedCategoryId: isSearch ? undefined : params.categoryId,
+        category: resolvedCategory?.id === params.categoryId ? resolvedCategory : undefined,
+        currency
+    })
 
     // Apply disallow list to refinements.
     if (productSearchResult?.refinements) {
@@ -204,7 +233,7 @@ const ProductList = (props) => {
     }
 
     /**************** Error Handling ****************/
-    const errorStatus = error?.response?.status
+    const errorStatus = isSearch ? undefined : error?.response?.status
     switch (errorStatus) {
         case undefined:
             // No Error.
