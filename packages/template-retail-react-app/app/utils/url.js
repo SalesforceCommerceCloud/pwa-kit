@@ -294,16 +294,16 @@ export const removeSiteLocaleFromPath = (pathName = '') => {
     const basePath = getRouterBasePath()
     pathName = removeBasePathFromPath(pathName, basePath)
 
-    // remove the site alias from the current pathName
-    if (siteRef) {
-        pathName = pathName.replace(new RegExp(`/${siteRef}`, 'g'), '')
-    }
-    // remove the locale from the current pathName
-    if (localeRef) {
-        pathName = pathName.replace(new RegExp(`/${localeRef}`, 'g'), '')
+    const refs = [siteRef, localeRef].filter(Boolean)
+    if (!refs.length) {
+        return pathName
     }
 
-    return pathName
+    // The site and locale are always the leading segments of the path. Only strip those, matching
+    // whole segments, so that the rest of the path is untouched even when it contains the same
+    // characters (e.g. the locale `en` and the category `/category/engravable`).
+    const leadingRefs = new RegExp(`^(?:/(?:${refs.join('|')})(?=[/?#]|$))+`)
+    return pathName.replace(leadingRefs, '')
 }
 
 /**
