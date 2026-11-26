@@ -94,7 +94,7 @@ const SmartSearchHome = ({storefront}) => {
                     background="linear-gradient(90deg, #0e242bea 0%, #0e242b80 48%, #0e242b15 100%)"
                     zIndex={-1}
                 />
-                <Stack spacing={4} w="full" maxW="620px">
+                <Stack spacing={4} w="full" minW={0} maxW="620px">
                     <Flex
                         align="center"
                         gap={2}
@@ -129,17 +129,25 @@ const SmartSearchHome = ({storefront}) => {
                             height={{base: '54px', md: '60px'}}
                         />
                     </Box>
-                    <Flex gap={2} flexWrap="wrap">
+                    <Flex gap={2} flexWrap="wrap" align="start">
                         {prompts.map((prompt) => (
                             <Button
                                 key={prompt}
                                 onClick={() => search(prompt)}
                                 size="sm"
                                 variant="outline"
+                                maxW="min(100%, 28rem)"
+                                h="auto"
+                                minH={8}
+                                py={2}
+                                whiteSpace="normal"
+                                overflowWrap="anywhere"
+                                textAlign="left"
+                                lineHeight="short"
                                 color="white"
                                 bg="blackAlpha.300"
                                 borderColor="whiteAlpha.600"
-                                borderRadius="full"
+                                borderRadius="2xl"
                                 _hover={{bg: 'whiteAlpha.300'}}
                             >
                                 {prompt}

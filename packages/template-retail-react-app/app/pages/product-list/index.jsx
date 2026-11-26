@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import loadable from '@loadable/component'
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
@@ -108,10 +107,6 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 
-const SmartSearchOverview = loadable(() =>
-    import('@salesforce/retail-react-app/app/pages/product-list/partials/smart-search-overview')
-)
-
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
 const REFINEMENT_DISALLOW_LIST = ['c_isNew']
@@ -185,15 +180,13 @@ const ProductList = (props) => {
             restOfParams.limit === DEFAULT_SEARCH_PARAMS.limit &&
             restOfParams.sort === DEFAULT_SEARCH_PARAMS.sort
     )
-    const agentSearch = useCommerceAgentSearch(
+    useCommerceAgentSearch(
         useSmartSearchApi,
         {
             query: searchQuery,
             siteId: site.id,
             locale: locale.id,
-            currency,
-            limit: restOfParams.limit,
-            sort: restOfParams.sort
+            currency
         },
         location.key,
         canOpenCommerceAgent &&
@@ -205,8 +198,6 @@ const ProductList = (props) => {
         isLoading,
         isFetched,
         isRefetching,
-        isPreviousData,
-        isError,
         data: productSearchResult
     } = useProductSearch(
         {
@@ -229,10 +220,6 @@ const ProductList = (props) => {
         },
         {keepPreviousData: true}
     )
-    // Cached products from the previous search can remain in the grid during navigation.
-    const currentSearchResults = isPreviousData || isError ? undefined : productSearchResult
-    const showOverview = agentSearch.hasOverview && Boolean(currentSearchResults)
-
     const {error, data: category} = useCategory(
         {
             parameters: {
@@ -524,55 +511,6 @@ const ProductList = (props) => {
                         </Text>
                     </Flex>
                 )}
-                {smartSearchLayout &&
-                    useSmartSearchApi &&
-                    (agentSearch.agentRouted ||
-                        showOverview ||
-                        currentSearchResults?.total > 0) && (
-                        <SmartSearchOverview
-                            key={location.key || searchQuery}
-                            query={searchQuery}
-                            search={agentSearch}
-                            productSearchResult={currentSearchResults}
-                            canOpenAgent={canOpenCommerceAgent}
-                        />
-                    )}
-                {useSmartSearchApi &&
-                    !smartSearchLayout &&
-                    (agentSearch.agentRouted || showOverview) && (
-                        <Box borderWidth="1px" borderRadius="md" p={4} mb={4} role="status">
-                            {agentSearch.agentRouted ? (
-                                <>
-                                    <Text mb={2}>
-                                        {agentSearch.handoffError
-                                            ? 'The Commerce Shopper Agent handoff could not be confirmed.'
-                                            : canOpenCommerceAgent
-                                            ? 'Continue this search with the Commerce Shopper Agent.'
-                                            : 'The Commerce Shopper Agent is unavailable for this storefront.'}
-                                    </Text>
-                                    {canOpenCommerceAgent && (
-                                        <Button onClick={agentSearch.openAgent} variant="outline">
-                                            Open Commerce Shopper Agent
-                                        </Button>
-                                    )}
-                                </>
-                            ) : (
-                                <>
-                                    <Heading as="h2" size="sm" mb={2}>
-                                        AI overview
-                                    </Heading>
-                                    <Text whiteSpace="pre-wrap">
-                                        {agentSearch.text ||
-                                            (agentSearch.streaming
-                                                ? 'Preparing your overview…'
-                                                : '')}
-                                    </Text>
-                                    {agentSearch.error && <Text>{agentSearch.error}</Text>}
-                                </>
-                            )}
-                        </Box>
-                    )}
-
                 {/* Header */}
                 <Stack
                     display={{base: 'none', lg: 'flex'}}

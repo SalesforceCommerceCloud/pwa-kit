@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {PassThrough} from 'node:stream'
-import {ReadableStream} from 'node:stream/web'
+import {EventEmitter} from 'node:events'
 import {
     createCommerceAgentSearch,
     registerCommerceAgentSearch
@@ -16,19 +15,16 @@ const apiOrigin = 'https://commerce-agent.example.com'
 const config = {
     app: {
         commerceAPI: {parameters: {organizationId: 'f_ecom_example', shortCode: 'example'}},
-        sites: [
-            {id: siteId, l10n: {supportedLocales: [{id: 'en-US'}], supportedCurrencies: ['USD']}}
-        ]
+        sites: [{id: siteId}]
     }
 }
 const headers = {authorization: 'Bearer shopper'}
 const res = () => {
-    const output = new PassThrough()
+    const output = new EventEmitter()
     return Object.assign(output, {
         set: jest.fn(),
         status: jest.fn(() => output),
-        json: jest.fn(),
-        flushHeaders: jest.fn()
+        json: jest.fn()
     })
 }
 
@@ -37,110 +33,97 @@ test.each([
         organizationId: 'f_ecom_example',
         shortCode: 'example',
         activeSite: 'ExampleSite',
-        locale: 'en-US',
-        currency: 'USD'
+        type: 'search'
     },
-    {
-        organizationId: 'f_ecom_second',
-        shortCode: 'second',
-        activeSite: 'OtherSite',
-        locale: 'en-GB',
-        currency: 'GBP'
-    }
+    {organizationId: 'f_ecom_second', shortCode: 'second', activeSite: 'OtherSite', type: 'agent'}
 ])(
-    'uses the shared API origin for $organizationId',
-    async ({organizationId, shortCode, activeSite, locale, currency}) => {
-        const outcome = {
-            route: 'search',
-            initialContent: {type: 'search', productSearchResult: {total: 1}}
-        }
-        const fetchImpl = jest.fn().mockResolvedValue({ok: true, json: async () => outcome})
+    'classifies for $organizationId at the configured API origin',
+    async ({organizationId, shortCode, activeSite, type}) => {
+        const fetchImpl = jest.fn().mockResolvedValue({ok: true, json: async () => ({type})})
         const output = res()
         const storefrontConfig = {
             app: {
                 commerceAPI: {parameters: {organizationId, shortCode}},
-                sites: [
-                    {
-                        id: activeSite,
-                        l10n: {supportedLocales: [{id: locale}], supportedCurrencies: [currency]}
-                    }
-                ]
+                sites: [{id: activeSite}]
             }
         }
-        await createCommerceAgentSearch({config: storefrontConfig, apiOrigin, fetchImpl}).query(
+        const searchQuestion = 'Shoes for men & women?'
+        await createCommerceAgentSearch({config: storefrontConfig, apiOrigin, fetchImpl})(
             {
                 headers,
-                body: {
+                query: {
                     siteId: activeSite,
-                    query: 'vest',
-                    locale,
-                    currency,
+                    query: searchQuestion,
                     organizationId: 'f_ecom_unconfigured',
-                    shortCode: 'unconfigured',
-                    limit: 25,
-                    sort: 'best-matches'
+                    shortCode: 'unconfigured'
                 }
             },
             output
         )
         const [[url, init]] = fetchImpl.mock.calls
         expect(url.origin).toBe(apiOrigin)
-        expect(url.pathname).toBe(`/api/v1/agent/organizations/${organizationId}/query`)
-        expect(url.searchParams.get('siteId')).toBe(activeSite)
-        expect(url.searchParams.get('shortCode')).toBe(shortCode)
-        expect(url.searchParams.get('locale')).toBe(locale)
-        expect(url.searchParams.get('currency')).toBe(currency)
+        expect(url.pathname).toBe(`/api/v1/agent/organizations/${organizationId}/classify`)
+        expect([...url.searchParams]).toEqual([
+            ['siteId', activeSite],
+            ['shortCode', shortCode],
+            ['query', searchQuestion]
+        ])
         expect(init).toEqual(
             expect.objectContaining({
-                method: 'POST',
+                method: 'GET',
                 redirect: 'error',
-                body: JSON.stringify({query: 'vest'}),
-                headers: {
-                    Authorization: 'Bearer shopper',
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json'
-                }
+                headers: {Authorization: 'Bearer shopper', Accept: 'application/json'}
             })
         )
-        expect(output.json).toHaveBeenCalledWith(outcome)
+        expect(init).not.toHaveProperty('body')
+        expect(output.set).toHaveBeenCalledWith('Cache-Control', 'no-store')
+        expect(output.json).toHaveBeenCalledWith({type})
     }
 )
 
-test('flushes SSE before the upstream stream closes', async () => {
-    let source
-    const body = new ReadableStream({
-        start(controller) {
-            source = controller
-        }
-    })
-    const fetchImpl = jest
-        .fn()
-        .mockResolvedValue({ok: true, headers: {get: () => 'text/event-stream'}, body})
+test.each([
+    ['x'.repeat(501), siteId, headers, 400],
+    [['shoes', 'hats'], siteId, headers, 400],
+    ['shoes', 'different-site', headers, 400],
+    ['shoes', siteId, {}, 401]
+])(
+    'rejects invalid classification requests before contacting QA',
+    async (query, site, auth, status) => {
+        const fetchImpl = jest.fn()
+        const output = res()
+        await createCommerceAgentSearch({config, apiOrigin, fetchImpl})(
+            {headers: auth, query: {siteId: site, query}},
+            output
+        )
+        expect(fetchImpl).not.toHaveBeenCalled()
+        expect(output.status).toHaveBeenCalledWith(status)
+    }
+)
+
+test('reports invalid classification verdicts as an upstream failure', async () => {
+    const fetchImpl = jest.fn().mockResolvedValue({ok: true, json: async () => ({route: 'agent'})})
     const output = res()
-    const first = new Promise((resolve) => output.once('data', (data) => resolve(data.toString())))
-    const done = createCommerceAgentSearch({config, apiOrigin, fetchImpl}).events(
-        {
-            headers,
-            query: {siteId},
-            params: {turnId: 'turn_test'}
-        },
+    await createCommerceAgentSearch({config, apiOrigin, fetchImpl})(
+        {headers, query: {siteId, query: 'shoes'}},
         output
     )
-    source.enqueue(Buffer.from(': ok\n\n'))
-    expect(await first).toBe(': ok\n\n')
-    expect(output.flushHeaders).toHaveBeenCalled()
-    expect(output.writableEnded).toBe(false)
-    expect(fetchImpl.mock.calls[0][0].pathname).toBe(
-        '/api/v1/agent/organizations/f_ecom_example/turns/turn_test/events'
-    )
-    source.close()
-    await done
+    expect(output.status).toHaveBeenCalledWith(502)
 })
 
-test('leaves the proxy routes unregistered by default', () => {
+test('registers only the classification route when enabled', () => {
     const app = {post: jest.fn(), get: jest.fn()}
-    registerCommerceAgentSearch(app, config, apiOrigin)
+    registerCommerceAgentSearch(
+        app,
+        {app: {...config.app, commerceAgentSearch: {enabled: true}}},
+        apiOrigin
+    )
+    expect(app.get.mock.calls).toEqual([['/api/commerce-agent/classify', expect.any(Function)]])
     expect(app.post).not.toHaveBeenCalled()
+})
+
+test('leaves the classification route unregistered by default', () => {
+    const app = {get: jest.fn()}
+    registerCommerceAgentSearch(app, config, apiOrigin)
     expect(app.get).not.toHaveBeenCalled()
 })
 

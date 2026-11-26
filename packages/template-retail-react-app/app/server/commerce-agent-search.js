@@ -4,20 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {Readable} from 'node:stream'
-import {pipeline} from 'node:stream/promises'
 import logger from '@salesforce/pwa-kit-runtime/utils/logger-instance'
-// SSR resolves this module directly in Node.
-// eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
-import {TURN_ID} from '../utils/commerce-agent-turn.js'
 
-const PREFIX = '/api/commerce-agent'
-const SEARCH_FIELDS = {
-    perPricebook: 'true',
-    allVariationProperties: 'true',
-    allImages: 'true',
-    expand: 'promotions,variations,prices,images,page_meta_tags,custom_properties'
-}
+const CLASSIFY_PATH = '/api/commerce-agent/classify'
 
 const getApiOrigin = (value) => {
     try {
@@ -42,89 +31,48 @@ export function createCommerceAgentSearch({config, apiOrigin, fetchImpl = fetch}
     const origin = getApiOrigin(apiOrigin)
     if (!origin) throw new TypeError('Commerce Agent Search requires an HTTPS API origin')
     const {organizationId, shortCode} = config.app.commerceAPI.parameters
-    const scope = '/api/v1/agent/organizations/' + encodeURIComponent(organizationId)
+    const path = '/api/v1/agent/organizations/' + encodeURIComponent(organizationId) + '/classify'
 
-    const forward = (stream) => async (req, res) => {
-        res.set('Cache-Control', 'no-store, no-transform')
+    return async (req, res) => {
+        res.set('Cache-Control', 'no-store')
         const authorization = req.headers.authorization || ''
         if (!/^Bearer \S{1,16000}$/.test(authorization))
             return res.status(401).json({detail: 'A shopper session is required.'})
 
-        const {siteId, query, locale, currency, limit, sort} = stream ? req.query : req.body || {}
-        const site = config.app.sites.find((item) => item.id === siteId)
-        if (!site) return res.status(400).json({detail: 'Invalid storefront site.'})
-        const url = new URL(scope + '/query', origin)
-        url.search = new URLSearchParams({siteId, shortCode}).toString()
-        if (stream) {
-            if (!TURN_ID.test(req.params.turnId || ''))
-                return res.status(400).json({detail: 'Invalid search turn.'})
-            url.pathname = scope + '/turns/' + req.params.turnId + '/events'
-        } else {
-            if (
-                typeof query !== 'string' ||
-                !query.trim() ||
-                query.length > 500 ||
-                !site.l10n.supportedLocales.some((item) => item.id === locale) ||
-                !site.l10n.supportedCurrencies.includes(currency) ||
-                !Number.isInteger(limit) ||
-                limit < 1 ||
-                limit > 200 ||
-                typeof sort !== 'string' ||
-                sort.length > 64
-            )
-                return res.status(400).json({detail: 'Invalid search parameters.'})
-            for (const [name, value] of Object.entries({
-                ...SEARCH_FIELDS,
-                locale,
-                currency,
-                limit,
-                sort
-            }))
-                url.searchParams.set(name, value)
-        }
+        const {siteId, query} = req.query
+        if (!config.app.sites.some((site) => site.id === siteId))
+            return res.status(400).json({detail: 'Invalid storefront site.'})
+        if (typeof query !== 'string' || !query.trim() || query.length > 500)
+            return res.status(400).json({detail: 'Invalid search query.'})
+        const url = new URL(path, origin)
+        url.search = new URLSearchParams({siteId, shortCode, query}).toString()
 
         const controller = new AbortController()
         const abort = () => controller.abort()
         res.once('close', abort)
-        const deadline = setTimeout(abort, stream ? 130000 : 25000)
+        const deadline = setTimeout(abort, 15000)
         try {
-            const headers = {
-                Authorization: authorization,
-                Accept: stream ? 'text/event-stream' : 'application/json'
-            }
-            if (!stream) headers['Content-Type'] = 'application/json'
             const result = await fetchImpl(url, {
-                method: stream ? 'GET' : 'POST',
-                headers,
+                method: 'GET',
+                headers: {Authorization: authorization, Accept: 'application/json'},
                 redirect: 'error',
-                body: stream ? undefined : JSON.stringify({query}),
                 signal: controller.signal
             })
             if (!result.ok) {
                 await result.body?.cancel()
                 return res.status(result.status).json({detail: 'Commerce Agent request failed.'})
             }
-            if (!stream) return res.json(await result.json())
-            if (
-                !result.body ||
-                !result.headers.get('content-type')?.includes('text/event-stream')
-            ) {
-                await result.body?.cancel()
-                return res.status(502).json({detail: 'Commerce Agent returned an invalid stream.'})
-            }
-            res.set({'Content-Type': 'text/event-stream; charset=utf-8', 'X-Accel-Buffering': 'no'})
-            res.flushHeaders()
-            await pipeline(Readable.fromWeb(result.body), res, {signal: controller.signal})
+            const verdict = await result.json()
+            if (verdict?.type !== 'search' && verdict?.type !== 'agent')
+                return res.status(502).json({detail: 'Commerce Agent returned an invalid verdict.'})
+            return res.json({type: verdict.type})
         } catch {
-            if (!res.headersSent && !res.destroyed)
-                res.status(502).json({detail: 'Commerce Agent is unavailable.'})
-            else if (!res.destroyed) res.end()
+            if (!res.destroyed) res.status(502).json({detail: 'Commerce Agent is unavailable.'})
         } finally {
             clearTimeout(deadline)
             res.removeListener('close', abort)
         }
     }
-    return {query: forward(false), events: forward(true)}
 }
 
 export function registerCommerceAgentSearch(app, config, apiOrigin) {
@@ -135,7 +83,5 @@ export function registerCommerceAgentSearch(app, config, apiOrigin) {
         })
         return
     }
-    const handlers = createCommerceAgentSearch({config, apiOrigin})
-    app.post(PREFIX + '/query', handlers.query)
-    app.get(PREFIX + '/turns/:turnId/events', handlers.events)
+    app.get(CLASSIFY_PATH, createCommerceAgentSearch({config, apiOrigin}))
 }

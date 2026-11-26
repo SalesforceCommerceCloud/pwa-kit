@@ -21,31 +21,57 @@ test('passes page context before opening the drawer and queues the original sear
     expect(widget.setPageContext).toHaveBeenCalledWith(pageContext)
     expect(toggleWidgetOpen).toHaveBeenCalledWith(true)
     expect(widget.setPageContext.mock.invocationCallOrder[0]).toBeLessThan(
+        widget.sendMessage.mock.invocationCallOrder[0]
+    )
+    expect(widget.sendMessage.mock.invocationCallOrder[0]).toBeLessThan(
         toggleWidgetOpen.mock.invocationCallOrder[0]
     )
     expect(widget.sendMessage.mock.calls).toEqual([
-        [query, {displayContent: query, pageContextSnapshot: pageContext}]
+        [query, {displayContent: query, pageContextSnapshot: pageContext, hideWelcome: true}]
     ])
 })
 
-test('passes the selected question and real results into the existing chat', async () => {
-    const signal = new AbortController().signal
+test('does not open chat for a cancelled search', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    const getWidget = jest.fn()
+    await handoffSearch('basketball shoes', controller.signal, {getWidget})
+    expect(getWidget).not.toHaveBeenCalled()
+})
+
+test('retries an async not-ready rejection before opening the drawer', async () => {
+    const sendMessage = jest
+        .fn()
+        .mockRejectedValueOnce(new Error('Messaging widget not ready until it has mounted'))
+        .mockResolvedValueOnce({outcome: 'success'})
+    const toggleWidgetOpen = jest.fn()
     const widget = {
         setPageContext: jest.fn(),
+        sendMessage,
+        eventHandlers: {components: {toggleWidgetOpen}}
+    }
+    await handoffSearch('basketball shoes', new AbortController().signal, {
+        getWidget: () => widget,
+        wait: jest.fn().mockResolvedValue()
+    })
+    expect(sendMessage).toHaveBeenCalledTimes(2)
+    expect(toggleWidgetOpen).toHaveBeenCalledTimes(1)
+})
+
+test('sends the utterance with a widget that only supports PDP context', async () => {
+    const query = 'Can you help me choose basketball shoes?'
+    const widget = {
+        setPageContext: jest.fn(() => {
+            throw new Error('Unsupported page context type: srp')
+        }),
         sendMessage: jest.fn().mockResolvedValue({outcome: 'success'}),
         eventHandlers: {components: {toggleWidgetOpen: jest.fn()}}
     }
-    const query = 'linen shirts'
-    const question = 'Which of these would be best for a wedding?'
-    const results = {
-        resultCount: 32,
-        matches: ['Linen Resort Shirt'],
-        overview: 'Lightweight options.'
-    }
-    await handoffSearch(query, signal, {question, results, getWidget: () => widget})
-    expect(widget.setPageContext).toHaveBeenCalledWith({type: 'srp', query})
+    await handoffSearch(query, new AbortController().signal, {getWidget: () => widget})
+    expect(widget.sendMessage).toHaveBeenCalledTimes(1)
     expect(widget.sendMessage).toHaveBeenCalledWith(
-        expect.stringContaining(JSON.stringify({query, ...results})),
-        {displayContent: question, pageContextSnapshot: {type: 'srp', query}}
+        query,
+        expect.objectContaining({hideWelcome: true})
     )
+    expect(widget.eventHandlers.components.toggleWidgetOpen).toHaveBeenCalledWith(true)
 })

@@ -10,44 +10,34 @@ const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, mil
 export async function handoffSearch(
     query,
     signal,
-    {question = query, results, getWidget = () => window.CimulateMessaging, wait = delay} = {}
+    {getWidget = () => window.CimulateMessaging, wait = delay} = {}
 ) {
     const context = {type: 'srp', query}
-    const message = results
-        ? `${question}\n\nStorefront search context for reference: ${JSON.stringify({
-              query,
-              ...results
-          })}`
-        : question
-    let opened = false
     for (let attempt = 0; attempt < 100 && !signal.aborted; attempt++) {
         const widget = getWidget()
-        if (
-            !widget?.setPageContext ||
-            !widget?.sendMessage ||
-            !widget?.eventHandlers?.components?.toggleWidgetOpen
-        ) {
+        if (!widget?.sendMessage || !widget?.eventHandlers?.components?.toggleWidgetOpen) {
             await wait(100)
             continue
         }
-        if (!opened) {
-            widget.setPageContext(context)
-            widget.eventHandlers.components.toggleWidgetOpen(true)
-            opened = true
-        }
-        let send
         try {
-            send = widget.sendMessage(message, {
-                displayContent: question,
-                pageContextSnapshot: context
+            widget.setPageContext?.(context)
+        } catch (error) {
+            if (error.message !== 'Unsupported page context type: srp') throw error
+        }
+        try {
+            const result = await widget.sendMessage(query, {
+                displayContent: query,
+                pageContextSnapshot: context,
+                hideWelcome: true
             })
+            if (result?.outcome !== 'success')
+                throw new Error('Agent handoff could not be confirmed')
         } catch (error) {
             if (!/not ready.*mounted/i.test(error.message)) throw error
             await wait(100)
             continue
         }
-        const result = await send
-        if (result?.outcome !== 'success') throw new Error('Agent handoff could not be confirmed')
+        if (!signal.aborted) widget.eventHandlers.components.toggleWidgetOpen(true)
         return
     }
     if (!signal.aborted) throw new Error('Agent is unavailable')
