@@ -1,0 +1,115 @@
+name: Embedded widget browser checks
+
+on:
+    pull_request:
+        branches: [develop]
+    merge_group:
+        types: [checks_requested]
+
+permissions:
+    contents: read
+
+concurrency:
+    group: pwa-widget-${{ github.event_name }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    scope:
+        name: Check changed files
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        outputs:
+            relevant: ${{ steps.paths.outputs.relevant }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: ${{ github.event_name == 'merge_group' && '0' || '2' }}
+                  persist-credentials: false
+                  sparse-checkout: .github
+            - id: paths
+              shell: bash
+              env:
+                  EVENT_NAME: ${{ github.event_name }}
+                  MERGE_GROUP_BASE: ${{ github.event.merge_group.base_sha }}
+              run: |
+                  case "$EVENT_NAME" in
+                    pull_request) base="$(git rev-parse --verify HEAD^1)" ;;
+                    merge_group) base="${MERGE_GROUP_BASE:?Missing merge group base SHA}" ;;
+                    *) exit 1 ;;
+                  esac
+
+                  template=packages/template-retail-react-app
+                  app="$template/app"
+                  status=0
+                  git diff --quiet --no-renames "$base" HEAD -- \
+                      ':(top,glob)e2e/widget/**' \
+                      .github/workflows/{embedded-widget-e2e,e2e-pr}.yml \
+                      package{,-lock}.json \
+                      packages/pwa-kit-dev/package{,-lock}.json \
+                      packages/pwa-kit-runtime/src/utils/ssr-namespace-paths.js \
+                      "$template"/package{,-lock}.json \
+                      ":(top,glob)$template/config/*.js" \
+                      ":(top,glob)$app/components/inline-agent-widget/**" \
+                      "$app"/components/{_app-config,shopper-agent,product-view}/index.jsx \
+                      "$app"/components/shared/ui/index.jsx \
+                      ":(top,glob)$app/components/shared/ui/"{Alert,Box,Button,ChakraProvider,Text}"/**" \
+                      "$app"/pages/product-detail/index.jsx \
+                      "$app"/hooks/{use-inline-agent-widget,use-commerce-client-page-context,use-commerce-client-messaging,use-script}.js \
+                      "$app"/utils/{inline-agent-widget-utils,load-inline-agent-widget,shopper-agent-handoff,shopper-agent-utils,commerce-client-overrides,utils}.js \
+                      "$app"/{constants,ssr}.js || status=$?
+                  case "$status" in
+                    0) echo 'relevant=false' >> "$GITHUB_OUTPUT" ;;
+                    1) echo 'relevant=true' >> "$GITHUB_OUTPUT" ;;
+                    *) exit "$status" ;;
+                  esac
+
+    regression:
+        name: PWA Kit widget integration (desktop and mobile)
+        needs: scope
+        if: needs.scope.outputs.relevant == 'true'
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        container:
+            image: mcr.microsoft.com/playwright:v1.61.1-noble
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  persist-credentials: false
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+                  cache: npm
+            - run: npm ci
+            - name: Run controlled widget checks
+              run: npx --no-install playwright test -c e2e/widget/playwright.config.cjs
+            - uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: pwa-widget-browser-report
+                  path: |
+                      e2e/widget/playwright-report/
+                      e2e/widget/test-results/
+                  retention-days: 14
+
+    gate:
+        name: PWA Kit embedded widget browser merge check
+        if: always()
+        needs: [scope, regression]
+        runs-on: ubuntu-latest
+        timeout-minutes: 2
+        steps:
+            - name: Report merge check result
+              shell: bash
+              env:
+                  SCOPE_RESULT: ${{ needs.scope.result }}
+                  RELEVANT: ${{ needs.scope.outputs.relevant }}
+                  BROWSER_RESULT: ${{ needs.regression.result }}
+              run: |
+                  case "$SCOPE_RESULT/$RELEVANT/$BROWSER_RESULT" in
+                    success/false/skipped) echo "Out of scope. No widget-related files changed." >> "$GITHUB_STEP_SUMMARY" ;;
+                    success/true/success) echo "Chromium checks passed." >> "$GITHUB_STEP_SUMMARY" ;;
+                    *)
+                      echo "::error::Widget check failed (scope=$SCOPE_RESULT, relevant=$RELEVANT, browser=$BROWSER_RESULT)."
+                      exit 1
+                      ;;
+                  esac
