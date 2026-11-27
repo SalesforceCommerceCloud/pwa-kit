@@ -1,3 +1,6 @@
+## v6.0.0-nightly-20261127080250 (Nov 27, 2026)
+## v6.0.0-dev (Nov 27, 2026)
+## v3.22.0-nightly-20261127080250 (Nov 27, 2026)
 ## v6.0.0-dev
 - [Bugfix] Add an opt-in `enableNoncedTokenRequests` provider option for Googlebot token-response caching issues (disabled by default). When enabled, `getAccessToken` requests receive a cache-busting query parameter using a per-Auth instance ID (Web Crypto when available, with a best-effort fallback) and incrementing request counter. Stored JWTs issued more than 60 seconds in the future trigger refresh; the latest token acquired by the current Auth instance is exempt from this additional check to avoid slow-clock refresh loops. The existing expiration buffer remains unchanged.
 - [Breaking] Upgrade to `commerce-sdk-isomorphic@5.8.0`. Require `login_id` and `channel_id` on `getPasswordLessAccessToken` / `LoginPasswordlessUser` and forward them to the helper as camelCase `loginId` / `channelId` (mapped to snake_case on the wire by isomorphic). Also remove the stale `@ts-ignore` on `resetPassword` `user_id` (present in SDK types since 5.2.0); `user_id` and `channel_id` continue to be sent on password reset.
