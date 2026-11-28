@@ -19,7 +19,7 @@ import PropTypes from 'prop-types'
  * occur, or adding reporting.
  *
  * The default Error component provides a basic layout for displaying errors
- * that have occured during server-side rendering or client-side execution.
+ * that have occurred during server-side rendering or client-side execution.
  *
  * @param {string} props.message - The errors message.
  * @param {string} props.stack - The errors stack trace.
