@@ -45,29 +45,42 @@ const invalidateCustomerBasketsQuery = (
     }
 }
 
-const updateCustomerBasketsQuery = (
-    customerId: string,
-    parameters: BasketParameters,
-    response: Basket
-): CacheUpdateUpdate<unknown> => {
+const updateCustomerBasketsQuery = (customerId: string, parameters: BasketParameters, response: Basket): CacheUpdateUpdate<unknown> => {
     return {
         queryKey: getCustomerBaskets.queryKey({...parameters, customerId}),
         updater: (oldData: CustomerBasketsResult | undefined) => {
+            // custom code to enable multiple baskets query upadte
+            let isBasketNew = true
+            let basketsTotal = 1
             if (!oldData?.baskets?.length) {
                 return {
                     baskets: [response],
-                    total: 1
+                    total: basketsTotal
                 }
             }
-            const updatedBaskets = oldData.baskets.map((basket) =>
-                basket.basketId === parameters.basketId ? response : basket
-            )
+
+            basketsTotal = oldData.total
+            const updatedBaskets = oldData.baskets.map((basket) => {
+                if (basket.basketId === parameters.basketId) {
+                    isBasketNew = false
+                    return response
+                } else {
+                    return basket
+                }
+            })
+
+            if (isBasketNew) {
+                updatedBaskets[basketsTotal] = response
+                basketsTotal += 1
+            }
+
             return {
                 ...oldData,
                 // Shopper Customers and Shopper Baskets have different definitions for the `Basket`
                 // type. (99% similar, but that's not good enough for TypeScript.)
                 // TODO: Remove this type assertion when the RAML specs match.
-                baskets: updatedBaskets as CustomerBasketsResult['baskets']
+                baskets: updatedBaskets as CustomerBasketsResult['baskets'],
+                total: basketsTotal
             }
         }
     }
