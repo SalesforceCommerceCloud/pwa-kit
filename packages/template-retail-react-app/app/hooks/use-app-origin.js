@@ -13,4 +13,4 @@
  */
 import {useOrigin} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
-export const useAppOrigin = () => useOrigin({fromXForwardedHeader: false})
+export const useAppOrigin = () => useOrigin({fromXForwardedHeader: true})
