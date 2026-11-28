@@ -17,6 +17,7 @@ export class PWAKitLogger {
      */
     constructor(options = {}) {
         this.packageName = options.packageName || ''
+        this.filters = options.filters || []
     }
 
     /**
@@ -71,6 +72,15 @@ export class PWAKitLogger {
     #printLog(message, options = {}) {
         const {level} = options
 
+        // Apply filters
+        // If any filter returns false, do not log the message
+        for (const filter of this.filters) {
+            const result = filter(message, options)
+            if (result === false) {
+                return
+            }
+        }
+
         const formattedMessage = this.#formatLogMessage(message, options)
 
         switch (level) {
@@ -90,6 +100,25 @@ export class PWAKitLogger {
                 console.log(formattedMessage)
                 break
         }
+    }
+
+    /**
+     * Adds a filter function to the logger.
+     *
+     * Filter functions receive the log message and details as parameters
+     * and can modify options or prevent the log from being printed by returning false.
+     * @param {Function} fn - The filter function to add.
+     */
+    addFilter(fn) {
+        this.filters.push(fn)
+    }
+
+    /**
+     * Removes a filter function from the logger.
+     * @param {Function} fn - The filter function to remove.
+     */
+    removeFilter(fn) {
+        this.filters = this.filters.filter((f) => f !== fn)
     }
 
     /**
